@@ -467,7 +467,7 @@ Format as JSON for GitHub API import."
 ```json
 {
   "title": "Backend: Implement password reset token generation",
-  "body": "## Description\nCreate secure token generation for password reset requests\n\n## Acceptance Criteria\n- [ ] Generate cryptographically secure reset tokens\n- [ ] Set token expiration (15 minutes)\n- [ ] Store token-user mapping in Redis\n- [ ] Validate email exists before token creation",
+  "body": "## Description\nCreate secure token generation for password reset requests\n\n## Acceptance Criteria\n- [ ] Generate cryptographically secure reset tokens\n- [ ] Set token expiration (15 minutes)\n- [ ] Store token-user mapping in Redis\n- [ ] Validate email exists before token creation\n\n## Estimated Time\n1-2 days, deployable independently",
   "labels": ["backend", "security", "size-medium"],
   "milestone": "Password Reset MVP"
 }
@@ -486,17 +486,25 @@ curl -X POST "$JIRA_API/issue" \
   -d "$jira_issue_json"
 ```
 
-**Task Sizing with Historical Data**
+**Task Sizing for Kanban Flow**
 ```bash
-ai "Estimate task sizes using team velocity:
+ai "Size these tasks for continuous delivery and Kanban flow:
 
-Previous sprints:
-- Authentication system: 8 tasks (3 Large, 4 Medium, 1 Small), completed in 2 weeks
-- Search feature: 5 tasks (1 Large, 2 Medium, 2 Small), completed in 1.5 weeks
+Guidelines:
+- Small: 1 day or less, single developer, immediately deployable
+- Medium: 2-3 days max, may involve multiple files but single feature
+- Large: Break down further - no task should take more than 3 days
+
+Previous task completion times:
+- Authentication token generation: 1 day (Small)
+- Email service integration: 2 days (Medium) 
+- Password reset form: 4 hours (Small)
+- User dashboard API: 3 days (Medium)
+- Database migration: 1 day (Small)
 
 New tasks: [task list]
 
-Use Small/Medium/Large sizing and provide reasoning."
+Recommend breaking any Large tasks into smaller chunks."
 ```
 
 **Anti-pattern: Vague Issue Generation**

@@ -219,7 +219,7 @@ ai "Break down these product requirements into GitHub issues:
 - Size estimates (Small, Medium, Large)
 - Frontend/backend/testing labels
 - Dependency mapping between tasks
-- 2-week sprint organization
+- Kanban-ready task breakdown
 
 Format as JSON for automated issue creation."
 ```
@@ -341,19 +341,19 @@ Format as JSON for GitHub API import."
 [
   {
     "title": "Backend: Implement password reset token generation",
-    "body": "## Description\nCreate secure token generation for password reset requests\n\n## Acceptance Criteria\n- [ ] Generate cryptographically secure reset tokens\n- [ ] Set token expiration (15 minutes)\n- [ ] Store token-user mapping in Redis\n- [ ] Validate email exists before token creation\n\n## Technical Notes\n- Use crypto.randomBytes(32)\n- TTL of 900 seconds in Redis\n- Rate limit: 3 requests per hour per email",
+    "body": "## Description\nCreate secure token generation for password reset requests\n\n## Acceptance Criteria\n- [ ] Generate cryptographically secure reset tokens\n- [ ] Set token expiration (15 minutes)\n- [ ] Store token-user mapping in Redis\n- [ ] Validate email exists before token creation\n\n## Technical Notes\n- Use crypto.randomBytes(32)\n- TTL of 900 seconds in Redis\n- Rate limit: 3 requests per hour per email\n\n## Estimated Time\n1-2 days, deployable independently",
     "labels": ["backend", "security", "size-medium"],
     "milestone": "Password Reset MVP"
   },
   {
     "title": "Backend: Email service integration for reset links", 
-    "body": "## Description\nSend password reset emails with secure links\n\n## Acceptance Criteria\n- [ ] Template-based email generation\n- [ ] Secure reset link with token\n- [ ] Email delivery confirmation\n- [ ] Handle email service failures gracefully\n\n## Dependencies\n- Requires: Password reset token generation",
+    "body": "## Description\nSend password reset emails with secure links\n\n## Acceptance Criteria\n- [ ] Template-based email generation\n- [ ] Secure reset link with token\n- [ ] Email delivery confirmation\n- [ ] Handle email service failures gracefully\n\n## Dependencies\n- Requires: Password reset token generation\n\n## Estimated Time\n1 day, can deploy once token generation is complete",
     "labels": ["backend", "email", "size-small"],
     "milestone": "Password Reset MVP"
   },
   {
     "title": "Frontend: Password reset request form",
-    "body": "## Description\nUI for users to request password reset\n\n## Acceptance Criteria\n- [ ] Email input field with validation\n- [ ] Submit button with loading state\n- [ ] Success/error message display\n- [ ] Rate limiting feedback\n\n## Design\n- Use existing form components\n- Match current auth page styling",
+    "body": "## Description\nUI for users to request password reset\n\n## Acceptance Criteria\n- [ ] Email input field with validation\n- [ ] Submit button with loading state\n- [ ] Success/error message display\n- [ ] Rate limiting feedback\n\n## Design\n- Use existing form components\n- Match current auth page styling\n\n## Estimated Time\n4-6 hours, can work in parallel with backend tasks",
     "labels": ["frontend", "ui", "size-small"],
     "milestone": "Password Reset MVP"
   }
@@ -362,19 +362,19 @@ Format as JSON for GitHub API import."
 
 **Advanced: Epic Breakdown**
 ```bash
-ai "Break down this epic into a full development roadmap:
+ai "Break down this epic into small, independent tasks for Kanban flow:
 
 Epic: User Dashboard with Analytics
 
 Include:
-- Database schema changes
-- Backend API endpoints  
-- Frontend components
-- Testing requirements
-- Security considerations
-- Performance requirements
+- Database schema changes (Small tasks, 1-2 days each)
+- Backend API endpoints (Medium tasks, deployable independently)
+- Frontend components (Small UI tasks, immediate feedback)
+- Testing requirements (Small validation tasks)
+- Security considerations (Small security checks)
+- Performance requirements (Small optimization tasks)
 
-Generate 2-week sprint planning with dependencies."
+Each task should be completable in 1-3 days and immediately deployable."
 ```
 
 **Integration with Project Management**
@@ -395,18 +395,25 @@ az boards work-item create --title "$title" \
                           --description "$description"
 ```
 
-**Task Sizing Estimation Prompt**
+**Task Sizing for Kanban Flow**
 ```bash
-ai "Estimate task sizes for these development items using team velocity data:
+ai "Size these tasks for continuous delivery and Kanban flow:
 
-Previous sprints:
-- Authentication system: 8 tasks (3 Large, 4 Medium, 1 Small), completed in 2 weeks
-- Search feature: 5 tasks (1 Large, 2 Medium, 2 Small), completed in 1.5 weeks
-- Dashboard redesign: 12 tasks (2 Large, 6 Medium, 4 Small), completed in 3 weeks
+Guidelines:
+- Small: 1 day or less, single developer, immediately deployable
+- Medium: 2-3 days max, may involve multiple files but single feature
+- Large: Break down further - no task should take more than 3 days
+
+Previous task completion times:
+- Authentication token generation: 1 day (Small)
+- Email service integration: 2 days (Medium) 
+- Password reset form: 4 hours (Small)
+- User dashboard API: 3 days (Medium)
+- Database migration: 1 day (Small)
 
 New tasks: [task list]
 
-Use Small/Medium/Large sizing and provide reasoning."
+Recommend breaking any Large tasks into smaller chunks."
 ```
 
 **Anti-pattern: Vague Issue Generation**
