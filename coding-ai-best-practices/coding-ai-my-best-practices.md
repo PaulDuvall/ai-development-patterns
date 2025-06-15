@@ -512,6 +512,133 @@ Creating generic tasks like "Fix the login page" without specific acceptance cri
 
 ---
 
+## AI-Driven Refactoring
+
+**Maturity**: Intermediate  
+**Description**: Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics, following established refactoring rules and maintaining test coverage throughout the process.
+
+**Related Patterns**: [Rules as Code](#rules-as-code), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)
+
+**Examples**
+
+**Automated Code Smell Detection**
+```bash
+# .refactoringrules.md - Define measurable thresholds
+cat > .refactoringrules.md << 'EOF'
+# Refactoring Rules
+
+## Long Method Smell
+- Max lines: 20 (excluding docstrings)
+- Max cyclomatic complexity: 10
+- Detection: flake8 C901, pylint R0915
+
+## Large Class Smell  
+- Max class lines: 250
+- Max methods: 20
+- Max instance variables: 10
+- Detection: pylint R0902, R0904
+
+## Primitive Obsession Smell
+- String validation patterns in multiple places
+- Dictionaries as pseudo-objects
+- Lists of primitives that always travel together
+EOF
+
+# AI smell detection and refactoring
+ai "Analyze this codebase using .refactoringrules.md:
+1. Run static analysis tools (flake8, pylint, radon)
+2. Identify code smells per defined thresholds
+3. Prioritize by impact and complexity
+4. Suggest specific refactoring strategy for each smell"
+```
+
+**When to Apply Refactoring**
+
+**During Initial Development** (Ideal Time)
+```bash
+# Red-Green-Refactor cycle with AI
+1. Write failing test
+2. Make test pass (minimum code)
+3. AI refactoring for code quality
+
+ai "Review this just-written method for immediate refactoring opportunities:
+- Check against .refactoringrules.md thresholds
+- Suggest improvements while context is fresh
+- Maintain green tests throughout"
+```
+
+**During Feature Development** (Continuous)
+```bash
+# Before adding new functionality
+ai "Analyze existing code before adding feature:
+1. Check if target class/method already violates thresholds
+2. Refactor to good state first if needed
+3. Then add new feature cleanly
+4. Apply boy scout rule: leave code better than found"
+```
+
+**During Bug Fixes** (Opportunistic)
+```bash
+ai "Fix bug in process_user_data() method:
+1. First refactor the method to be testable/understandable
+2. Then apply the actual bug fix to clean code
+3. Much easier to verify fix in simple, focused methods"
+```
+
+**Automated Refactoring Pipeline**
+```bash
+#!/bin/bash
+# refactor-pipeline.sh
+
+echo "Running code smell detection..."
+flake8 --select=C901 src/  # Complexity
+pylint src/ --disable=all --enable=R0915,R0902,R0904  # Method/class size
+radon cc src/ --min=C  # Cyclomatic complexity
+
+echo "AI refactoring analysis..."
+ai "Analyze static analysis output and .refactoringrules.md:
+1. List code smells by priority (impact × frequency)
+2. Suggest refactoring strategy for top 3 smells  
+3. Estimate effort and risk for each refactoring"
+
+echo "Running tests before refactoring..."
+pytest --cov=src tests/
+
+echo "AI refactoring implementation..."
+ai "Implement highest priority refactoring:
+- Maintain test coverage >90%
+- Preserve existing API contracts  
+- Create atomic commits for each smell"
+
+echo "Validate refactoring..."
+pytest --cov=src tests/
+flake8 src/
+pylint src/
+```
+
+**Risk Assessment for Refactoring Timing**
+
+**Low Risk - Anytime**
+- Extract Method (pure functions)
+- Rename variables/methods
+- Extract constants
+
+**Medium Risk - During feature work**
+- Extract Class
+- Replace conditional with polymorphism
+
+**High Risk - Scheduled maintenance windows**
+- Large class decomposition
+- Inheritance hierarchy changes
+
+**Anti-pattern: Refactoring Without Tests**
+Attempting refactoring without comprehensive automated tests makes it impossible to verify behavior preservation.
+
+**Anti-pattern: Speculative Refactoring**
+Refactoring code "just in case" without measurable quality issues or clear improvement goals wastes time and introduces risk.
+
+---
+
 # Development Patterns
 
 Development patterns provide tactical approaches for day-to-day AI-assisted coding workflows, focusing on quality, maintainability, and team collaboration.

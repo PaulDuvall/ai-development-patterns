@@ -57,6 +57,7 @@ graph TD
 | **[AI Knowledge Persistence](#ai-knowledge-persistence)** | Intermediate | Development | Capture successful patterns and failed attempts as versioned knowledge for future sessions | Rules as Code |
 | **[Constraint-Based AI Development](#constraint-based-ai-development)** | Beginner | Development | Give AI specific constraints to prevent over-engineering and ensure focused solutions | Progressive AI Enhancement |
 | **[Observable AI Development](#observable-ai-development)** | Intermediate | Development | Strategic logging and debugging that makes system behavior visible to AI | AI Developer Lifecycle |
+| **[AI-Driven Refactoring](#ai-driven-refactoring)** | Intermediate | Development | Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics | Rules as Code |
 | **[AI Security & Compliance](#ai-security--compliance)** | Advanced | Operations | Unified framework for policy generation, vulnerability scanning, and compliance automation | AI Security Sandbox |
 | **[Deployment Automation](#deployment-automation)** | Advanced | Operations | AI-powered pipeline generation, blue-green deployments, and intelligent rollback strategies | AI Workflow Orchestration |
 | **[Monitoring & Maintenance](#monitoring--maintenance)** | Advanced | Operations | Performance baselines, incident response, and technical debt management with AI assistance | Observable AI Development |
@@ -728,6 +729,501 @@ def process_order(order):
 
 **Anti-pattern: Black Box Systems**
 Minimal or cryptic logging that leaves AI guessing about system state and failure causes.
+
+---
+
+## AI-Driven Refactoring
+
+**Maturity**: Intermediate  
+**Description**: Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics, following established refactoring rules and maintaining test coverage throughout the process.
+
+**Related Patterns**: [Rules as Code](#rules-as-code), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)
+
+**Code Smell Detection Framework**
+
+```mermaid
+graph TD
+    A[Code Analysis] --> B[Smell Detection]
+    B --> C[Refactoring Strategy]
+    C --> D[AI Implementation]
+    D --> E[Test Validation]
+    E --> F[Quality Metrics]
+    F --> G{Improvement?}
+    G -->|Yes| H[Commit Changes]
+    G -->|No| I[Revert & Retry]
+    H --> J[Update Knowledge Base]
+    I --> C
+```
+
+**Automated Code Smell Detection**
+
+```bash
+# .refactoringrules.md - Define measurable thresholds
+cat > .refactoringrules.md << 'EOF'
+# Refactoring Rules
+
+## Long Method Smell
+- Max lines: 20 (excluding docstrings)
+- Max cyclomatic complexity: 10
+- Detection: flake8 C901, pylint R0915
+
+## Large Class Smell  
+- Max class lines: 250
+- Max methods: 20
+- Max instance variables: 10
+- Detection: pylint R0902, R0904
+
+## Primitive Obsession Smell
+- String validation patterns in multiple places
+- Dictionaries as pseudo-objects
+- Lists of primitives that always travel together
+
+## Refactoring Strategies
+- Extract Method for long methods
+- Extract Class for large classes
+- Replace Primitive with Object for primitive obsession
+EOF
+
+# AI smell detection
+ai "Analyze this codebase using .refactoringrules.md:
+1. Run static analysis tools (flake8, pylint, radon)
+2. Identify code smells per defined thresholds
+3. Prioritize by impact and complexity
+4. Suggest specific refactoring strategy for each smell"
+```
+
+**Long Method Refactoring Example**
+
+```python
+# Before: Long method with complexity > 10
+def process_user_data(user_data):
+    # 35 lines of mixed responsibilities
+    if not user_data.get('email'):
+        raise ValueError("Email required")
+    if '@' not in user_data['email']:
+        raise ValueError("Invalid email")
+    
+    # Database operations
+    user = User.objects.filter(email=user_data['email']).first()
+    if user:
+        user.name = user_data.get('name', user.name)
+        user.phone = user_data.get('phone', user.phone)
+    else:
+        user = User.objects.create(**user_data)
+    
+    # Send notifications
+    if user_data.get('send_welcome'):
+        email_service.send_welcome(user.email)
+    
+    # Analytics tracking
+    analytics.track('user_processed', user.id)
+    
+    return user
+```
+
+**AI Refactoring Prompt**
+
+```bash
+ai "Refactor this method using Extract Method pattern:
+
+Analyze process_user_data() in user_service.py:
+1. Method has 35 lines (exceeds 20 line threshold)
+2. Cyclomatic complexity: 12 (exceeds 10)
+3. Multiple responsibilities: validation, database, notifications, analytics
+
+Apply Extract Method refactoring:
+- Extract email validation
+- Extract user creation/update logic  
+- Extract notification logic
+- Extract analytics logic
+- Keep main method as coordinator
+
+Maintain existing test coverage and API contract."
+```
+
+**After: Refactored with extracted methods**
+
+```python
+def process_user_data(user_data):
+    """Coordinate user data processing with clear separation of concerns."""
+    validated_data = self._validate_user_data(user_data)
+    user = self._create_or_update_user(validated_data)
+    self._send_notifications(user, user_data)
+    self._track_analytics(user)
+    return user
+
+def _validate_user_data(self, user_data):
+    """Validate user data and return cleaned data."""
+    if not user_data.get('email'):
+        raise ValueError("Email required")
+    if '@' not in user_data['email']:
+        raise ValueError("Invalid email")
+    return user_data
+
+def _create_or_update_user(self, user_data):
+    """Create new user or update existing user."""
+    user = User.objects.filter(email=user_data['email']).first()
+    if user:
+        user.name = user_data.get('name', user.name)
+        user.phone = user_data.get('phone', user.phone)
+        user.save()
+    else:
+        user = User.objects.create(**user_data)
+    return user
+
+def _send_notifications(self, user, user_data):
+    """Handle user notification logic."""
+    if user_data.get('send_welcome'):
+        email_service.send_welcome(user.email)
+
+def _track_analytics(self, user):
+    """Track user processing analytics."""
+    analytics.track('user_processed', user.id)
+```
+
+**Large Class Refactoring Example**
+
+```bash
+# Detect large class smell
+ai "Analyze UserManager class using .refactoringrules.md:
+
+Class metrics:
+- 320 lines (exceeds 250 threshold)
+- 25 methods (exceeds 20 threshold)  
+- 12 instance variables (exceeds 10 threshold)
+
+Apply Extract Class refactoring:
+1. Group related methods and data
+2. Identify cohesive responsibilities
+3. Extract separate classes with single responsibilities
+4. Update all references and maintain API compatibility"
+```
+
+**Primitive Obsession Refactoring**
+
+```python
+# Before: Primitive obsession
+def validate_user_input(email_str, phone_str, address_dict):
+    # String validation scattered everywhere
+    if not re.match(r'^[^@]+@[^@]+\.[^@]+$', email_str):
+        raise ValueError("Invalid email")
+    if not re.match(r'^\+?1?\d{9,15}$', phone_str):
+        raise ValueError("Invalid phone")
+    # Dictionary used as pseudo-object
+    if not all(k in address_dict for k in ['street', 'city', 'zip']):
+        raise ValueError("Invalid address")
+
+# After: AI-assisted value object extraction
+ai "Replace primitive obsession with value objects:
+
+Create Email, Phone, and Address classes:
+- Encapsulate validation logic
+- Provide meaningful methods
+- Replace primitive parameters with objects
+- Maintain backward compatibility during transition"
+
+class Email:
+    def __init__(self, value: str):
+        if not re.match(r'^[^@]+@[^@]+\.[^@]+$', value):
+            raise ValueError("Invalid email")
+        self.value = value
+    
+    def __str__(self):
+        return self.value
+
+class Phone:
+    def __init__(self, value: str):
+        if not re.match(r'^\+?1?\d{9,15}$', value):
+            raise ValueError("Invalid phone")
+        self.value = value
+
+class Address:
+    def __init__(self, street: str, city: str, zip_code: str):
+        if not all([street, city, zip_code]):
+            raise ValueError("All address fields required")
+        self.street = street
+        self.city = city
+        self.zip_code = zip_code
+
+def validate_user_input(email: Email, phone: Phone, address: Address):
+    # Validation now encapsulated in value objects
+    pass
+```
+
+**Refactoring Workflow Integration**
+
+```bash
+# Automated refactoring pipeline
+#!/bin/bash
+# refactor-pipeline.sh
+
+echo "Running code smell detection..."
+flake8 --select=C901 src/  # Complexity
+pylint src/ --disable=all --enable=R0915,R0902,R0904  # Method/class size
+radon cc src/ --min=C  # Cyclomatic complexity
+
+echo "AI refactoring analysis..."
+ai "Analyze static analysis output and .refactoringrules.md:
+1. List code smells by priority (impact × frequency)
+2. Suggest refactoring strategy for top 3 smells  
+3. Estimate effort and risk for each refactoring
+4. Generate implementation plan"
+
+echo "Running tests before refactoring..."
+pytest --cov=src tests/
+
+echo "AI refactoring implementation..."
+ai "Implement highest priority refactoring:
+- Maintain test coverage >90%
+- Preserve existing API contracts  
+- Create atomic commits for each smell
+- Document refactoring decisions"
+
+echo "Validate refactoring..."
+pytest --cov=src tests/
+flake8 src/
+pylint src/
+
+echo "Update knowledge base..."
+ai "Document refactoring outcome in .ai/knowledge/refactoring.md:
+- What was refactored and why
+- Metrics before/after
+- Lessons learned
+- Patterns to reuse"
+```
+
+**Quality Metrics Tracking**
+
+```bash
+# Before/after metrics comparison
+ai "Generate refactoring impact report:
+
+Before refactoring:
+- Cyclomatic complexity: 12
+- Method length: 35 lines
+- Test coverage: 85%
+- Code duplication: 15%
+
+After refactoring:
+- Cyclomatic complexity: 4 (main) + 2 (extracted methods)
+- Method length: 8 lines (main) + 4 extracted methods <10 lines each
+- Test coverage: 92% 
+- Code duplication: 8%
+
+Calculate:
+- Maintainability improvement score
+- Technical debt reduction
+- Risk assessment for future changes"
+```
+
+**When to Apply Refactoring**
+
+**During Initial Development** (Ideal Time)
+```bash
+# Red-Green-Refactor cycle with AI
+1. Write failing test
+2. Make test pass (minimum code)
+3. AI refactoring for code quality
+
+ai "Review this just-written method for immediate refactoring opportunities:
+- Check against .refactoringrules.md thresholds
+- Suggest improvements while context is fresh
+- Maintain green tests throughout
+- Focus on single responsibility and readability"
+```
+
+**During Feature Development** (Continuous)
+```bash
+# Before adding new functionality
+ai "Analyze existing code before adding feature:
+1. Check if target class/method already violates thresholds
+2. Refactor to good state first if needed
+3. Then add new feature cleanly
+4. Apply boy scout rule: leave code better than found"
+
+# Example workflow
+git checkout -b feature/user-notifications
+ai "Check UserService class health before adding notifications"
+# If smells detected: refactor first, commit, then add feature
+ai "Add notification feature to now-clean UserService"
+```
+
+**During Bug Fixes** (Opportunistic)
+```bash
+# When fixing bugs in smelly code
+ai "Fix bug in process_user_data() method:
+1. First refactor the method to be testable/understandable
+2. Then apply the actual bug fix to clean code
+3. Much easier to verify fix in simple, focused methods
+
+Benefits: Bug fixes in complex code often miss edge cases"
+```
+
+**During Code Reviews** (Preventive)
+```bash
+# Automated PR checks
+name: Code Quality Check
+on: [pull_request]
+jobs:
+  refactoring-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run smell detection
+        run: |
+          flake8 --select=C901 src/
+          pylint src/ --enable=R0915,R0902,R0904
+      
+      - name: AI refactoring suggestions
+        run: |
+          ai "Review PR changes for refactoring opportunities:
+          - Focus on changed files only
+          - Suggest immediate improvements
+          - Check if changes make existing smells worse
+          - Provide specific refactoring steps"
+```
+
+**Scheduled Refactoring** (Proactive)
+```bash
+# Weekly code health check
+#!/bin/bash
+# weekly-refactor.sh
+
+echo "=== Weekly Code Health Report ==="
+echo "Running comprehensive smell detection..."
+
+# Generate metrics
+radon cc src/ --json > complexity.json
+radon mi src/ --json > maintainability.json
+coverage run -m pytest && coverage json
+
+ai "Generate weekly refactoring report:
+1. Compare metrics vs last week
+2. Identify top 3 refactoring priorities
+3. Estimate effort for each (Small: <2h, Medium: 2-8h, Large: >8h)
+4. Create GitHub issues for approved refactorings
+
+Focus on:
+- High-impact, low-risk improvements
+- Classes/methods touched frequently (git log analysis)
+- Areas with recent bugs (correlate with issue tracker)"
+```
+
+**Integration with Development Workflow**
+
+**Pre-Commit Hook Integration**
+```bash
+# .git/hooks/pre-commit
+#!/bin/bash
+echo "Checking for immediate refactoring opportunities..."
+
+# Check only staged files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=AM | grep "\.py$")
+
+if [ -n "$STAGED_FILES" ]; then
+    ai "Quick refactoring check for staged files:
+    Files: $STAGED_FILES
+    
+    Check for obvious smells:
+    - Methods >20 lines
+    - Cyclomatic complexity >10
+    - Duplicate code blocks
+    
+    If smells found: suggest quick fixes before commit"
+fi
+```
+
+**IDE Integration**
+```bash
+# VS Code settings.json
+{
+  "python.linting.enabled": true,
+  "python.linting.flake8Enabled": true,
+  "python.linting.pylintEnabled": true,
+  "python.linting.flake8Args": ["--select=C901", "--max-complexity=10"],
+  "ai.refactoring.autoSuggest": true,
+  "ai.refactoring.rulesFile": ".refactoringrules.md"
+}
+
+# AI-powered refactoring assistant
+ai "Monitor code as I type:
+- Real-time smell detection
+- Suggest refactorings during development  
+- Auto-apply safe refactorings (rename, extract constant)
+- Warn before code crosses quality thresholds"
+```
+
+**Continuous Integration Pipeline**
+```yaml
+# .github/workflows/code-quality.yml
+name: Code Quality Gate
+on: [push, pull_request]
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code smell detection
+        run: |
+          # Fail build if critical thresholds exceeded
+          flake8 --select=C901 --max-complexity=15 src/
+          
+      - name: AI refactoring report
+        run: |
+          ai "Generate refactoring report for CI:
+          1. List methods/classes exceeding thresholds
+          2. Calculate technical debt score
+          3. Recommend if changes should be blocked
+          4. Create refactoring tasks for backlog"
+          
+      - name: Update technical debt dashboard
+        run: |
+          # Track metrics over time
+          python scripts/update-debt-metrics.py
+```
+
+**Risk Assessment for Refactoring Timing**
+
+**Low Risk - Anytime**
+- Extract Method (pure functions)
+- Rename variables/methods
+- Extract constants
+- Add type hints
+
+**Medium Risk - During feature work**
+- Extract Class
+- Replace conditional with polymorphism
+- Introduce parameter objects
+
+**High Risk - Scheduled maintenance windows**
+- Large class decomposition
+- Inheritance hierarchy changes
+- Database schema refactoring
+
+**AI-Guided Risk Assessment**
+```bash
+ai "Assess refactoring risk for UserManager class:
+
+Factors to consider:
+1. Number of callers (grep analysis)
+2. Test coverage percentage
+3. Recent change frequency (git log)
+4. Complexity of dependencies
+5. Team familiarity with codebase area
+
+Recommend timing:
+- Low risk: Do during regular development
+- Medium risk: Schedule for next sprint
+- High risk: Plan dedicated refactoring sprint"
+```
+
+**Anti-pattern: Shotgun Surgery**
+Making widespread changes without systematic analysis leads to introduced bugs and degraded code quality.
+
+**Anti-pattern: Speculative Refactoring**
+Refactoring code "just in case" without measurable quality issues or clear improvement goals wastes time and introduces risk.
+
+**Anti-pattern: Refactoring Without Tests**
+Attempting refactoring without comprehensive automated tests makes it impossible to verify behavior preservation.
 
 ---
 
