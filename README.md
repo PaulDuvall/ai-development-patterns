@@ -1,61 +1,189 @@
-# AI-Powered Development Patterns
+# AI Development Patterns
 
-A comprehensive collection of proven patterns for building software with AI assistance across CI/CD workflows and general development practices.
+A comprehensive collection of proven patterns for building software with AI assistance, organized by implementation maturity and development lifecycle phases.
 
-## Pattern Overview
+## Pattern Organization
 
-This repository contains two complementary pattern collections:
+This repository provides a structured approach to AI-assisted development through three pattern categories:
 
-- **[CI/CD AI Patterns](cicdaipatterns/ci-cd-ai-patterns.md)** - AI-enhanced continuous integration and deployment workflows
-- **[Coding AI Best Practices](coding-ai-best-practices/coding-ai-my-best-practices.md)** - Foundational patterns for AI-assisted development
+- **[Foundation Patterns](#foundation-patterns)** - Essential patterns for team readiness and basic AI integration
+- **[Development Patterns](#development-patterns)** - Daily practice patterns for AI-assisted coding workflows  
+- **[Operations Patterns](#operations-patterns)** - CI/CD, security, and production management with AI
+
+## Pattern Dependencies & Implementation Order
+
+```mermaid
+graph TD
+    subgraph "Phase 1: Foundation (Weeks 1-2)"
+        A[AI Readiness Assessment] --> B[Rules as Code]
+        B --> C[AI Security Sandbox]
+        C --> D[AI Developer Lifecycle]
+    end
+    
+    subgraph "Phase 2: Development (Weeks 3-4)"
+        D --> E[Comprehensive AI Testing Strategy]
+        D --> F[Progressive AI Enhancement]
+        E --> G[AI Workflow Orchestration]
+        F --> H[Context Window Optimization]
+    end
+    
+    subgraph "Phase 3: Operations (Weeks 5-6)"
+        G --> I[AI Security & Compliance]
+        H --> J[Deployment Automation]
+        I --> K[Monitoring & Maintenance]
+    end
+```
 
 ## Complete Pattern Reference
 
-| Pattern | Type | Description | Related Patterns |
-|---------|------|-------------|------------------|
-| **[AI Developer Lifecycle](#ai-developer-lifecycle)** | Foundation | Structured 9-stage process from problem definition through deployment with AI assistance | Rules as Code, Test-Driven AI Development, Observable AI Development |
-| **[AI-Powered Pipeline Synthesizer](#ai-powered-pipeline-synthesizer)** | CI/CD | Convert plain-English build specs into CI/CD YAML workflows automatically | Everything as a Tool, AI Prompt Pipeline |
-| **[Policy-as-Code Constructor](#policy-as-code-constructor)** | CI/CD | Transform compliance requirements into executable Cedar/OPA policy files | Rules as Code, AI Security Sandbox |
-| **[Continuous Security Scanning Orchestrator](#continuous-security-scanning-orchestrator)** | CI/CD | Aggregate SAST/SCA/DAST tools and AI-summarize findings for PR comments | AI Prompt Pipeline, ChatOps Security Assistant |
-| **[Test Suite Amplifier](#test-suite-amplifier)** | CI/CD | Generate unit tests for code changes covering edge cases and error paths | Test-Driven AI Development, Test Flakiness Detector |
-| **[Drift Detection & Remediation Loop](#drift-detection--remediation-loop)** | CI/CD | Auto-detect infrastructure drift and generate Terraform patches | Observable AI Development, Everything as a Tool |
-| **[Intelligent Rollback & Canary Advisor](#intelligent-rollback--canary-advisor)** | CI/CD | Analyze metrics to recommend canary splits and rollback criteria | Performance Baseline Advisor, AI-Guided Blue-Green Deployment |
-| **[Compliance Evidence Automator](#compliance-evidence-automator)** | CI/CD | Generate audit evidence matrices from logs and config changes | Observable AI Development, Policy-as-Code Constructor |
-| **[ChatOps Security Assistant](#chatops-security-assistant)** | CI/CD | Deploy bots for on-demand security scans via Slack commands | Continuous Security Scanning Orchestrator, Everything as a Tool |
-| **[Incident Playbook Generator](#incident-playbook-generator)** | CI/CD | Distill PagerDuty incidents into versioned step-by-step runbooks | AI Knowledge Persistence, On-Call Handoff Brief Generator |
-| **[Release Note Synthesizer](#release-note-synthesizer)** | CI/CD | Categorize commits into Added/Changed/Fixed for automated changelogs | AI Commit Protocol, AI Prompt Pipeline |
-| **[Dependency Upgrade Advisor](#dependency-upgrade-advisor)** | CI/CD | Suggest non-breaking package upgrades with compatibility analysis | Technical Debt Forecaster, Context Window Optimization |
-| **[Technical Debt Forecaster](#technical-debt-forecaster)** | CI/CD | Rank code hotspots needing refactoring based on metrics analysis | Dependency Upgrade Advisor, Observable AI Development |
-| **[Test Flakiness Detector](#test-flakiness-detector)** | CI/CD | Identify intermittently failing tests and suggest retry strategies | Test Suite Amplifier, Observable AI Development |
-| **[Chaos Scenario Generator](#chaos-scenario-generator)** | CI/CD | Create targeted chaos engineering scripts based on service topology | Performance Baseline Advisor, Everything as a Tool |
-| **[Performance Baseline Advisor](#performance-baseline-advisor)** | CI/CD | Recommend alert thresholds and autoscale policies from historical data | Intelligent Rollback & Canary Advisor, Observable AI Development |
-| **[On-Call Handoff Brief Generator](#on-call-handoff-brief-generator)** | CI/CD | Summarize alerts and dashboards for seamless on-call transitions | Incident Playbook Generator, Observable AI Development |
-| **[AI-Guided Blue-Green Deployment Orchestrator](#ai-guided-blue-green-deployment-orchestrator)** | CI/CD | Generate blue-green deployment scripts with validation to prevent LLM misconceptions | Intelligent Rollback & Canary Advisor, Everything as a Tool |
-| **[Rules as Code](#rules-as-code)** | Foundation | Version and maintain AI coding standards as explicit files (.cursorrules, CLAUDE.md) | AI Developer Lifecycle, AI Knowledge Persistence |
-| **[Test-Driven AI Development](#test-driven-ai-development)** | Development | Write failing tests first, then use AI to generate implementations that pass specific test criteria | AI Developer Lifecycle, Test-Driven Prompt Engineering |
-| **[Progressive AI Enhancement](#progressive-ai-enhancement)** | Development | Build complex features through small, deployable iterations rather than big-bang generation | AI Developer Lifecycle, Constraint-Based AI Development |
-| **[AI Security Sandbox](#ai-security-sandbox)** | Security | Run AI tools in isolated environments without access to secrets or sensitive data | Policy-as-Code Constructor, Everything as a Tool |
-| **[AI Prompt Pipeline](#ai-prompt-pipeline)** | Development | Chain AI prompts in stages where each validates and improves the previous output | AI-Powered Pipeline Synthesizer, Test-Driven Prompt Engineering |
-| **[Context Window Optimization](#context-window-optimization)** | Development | Match AI tool selection to task complexity (Copilot for simple, Claude for architecture) | AI Pair Rotation, Dependency Upgrade Advisor |
-| **[Test-Driven Prompt Engineering](#test-driven-prompt-engineering)** | Development | Define expected AI output first, then systematically refine prompts to achieve it | Test-Driven AI Development, AI Prompt Pipeline |
-| **[AI Knowledge Persistence](#ai-knowledge-persistence)** | Development | Capture successful patterns and failed attempts as versioned knowledge for future sessions | Rules as Code, Incident Playbook Generator |
-| **[AI Commit Protocol](#ai-commit-protocol)** | Development | Structure commits with clear attribution and checkpoints for easy rollback of AI changes | Release Note Synthesizer, AI Security Sandbox |
-| **[AI Pair Rotation](#ai-pair-rotation)** | Development | Use different AI tools for different development phases based on their strengths | Context Window Optimization, Parallel AI Workflows |
-| **[Constraint-Based AI Development](#constraint-based-ai-development)** | Development | Give AI specific constraints (lines of code, dependencies) to prevent over-engineering | Progressive AI Enhancement, Everything as a Tool |
-| **[Observable AI Development](#observable-ai-development)** | Development | Strategic logging and debugging that makes system behavior visible to AI | AI Developer Lifecycle, Performance Baseline Advisor |
-| **[Parallel AI Workflows](#parallel-ai-workflows)** | Development | Use multiple AI agents concurrently with shared contracts for different aspects of features | AI Pair Rotation, Everything as a Tool |
-| **[Everything as a Tool](#everything-as-a-tool)** | Architecture | Design scripts and services as AI-accessible with structured output and self-documentation | AI Security Sandbox, Parallel AI Workflows |
+| Pattern | Maturity | Type | Description | Dependencies |
+|---------|----------|------|-------------|--------------|
+| **[AI Readiness Assessment](#ai-readiness-assessment)** | Beginner | Foundation | Systematic evaluation of codebase and team readiness for AI integration | None |
+| **[Rules as Code](#rules-as-code)** | Beginner | Foundation | Version and maintain AI coding standards as explicit configuration files | AI Readiness Assessment |
+| **[AI Security Sandbox](#ai-security-sandbox)** | Beginner | Foundation | Run AI tools in isolated environments without access to secrets or sensitive data | Rules as Code |
+| **[AI Developer Lifecycle](#ai-developer-lifecycle)** | Intermediate | Foundation | Structured 9-stage process from problem definition through deployment with AI assistance | Rules as Code, AI Security Sandbox |
+| **[AI Failure Recovery Protocol](#ai-failure-recovery-protocol)** | Intermediate | Foundation | Systematic approach to detecting and recovering from AI-generated issues | AI Developer Lifecycle |
+| **[Human-AI Handoff Protocol](#human-ai-handoff-protocol)** | Intermediate | Foundation | Clear boundaries and procedures for transitioning work between human developers and AI | AI Developer Lifecycle |
+| **[ATDD-Driven AI Development](#atdd-driven-ai-development)** | Intermediate | Development | Use Acceptance Test-Driven Development to guide AI code generation with executable specifications | AI Developer Lifecycle |
+| **[Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)** | Intermediate | Development | Unified approach to test-first development, automated generation, and quality assurance | ATDD-Driven AI Development |
+| **[Progressive AI Enhancement](#progressive-ai-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | AI Developer Lifecycle |
+| **[AI Workflow Orchestration](#ai-workflow-orchestration)** | Advanced | Development | Coordinate sequential pipelines, parallel workflows, and hybrid human-AI processes | Comprehensive AI Testing Strategy |
+| **[Context Window Optimization](#context-window-optimization)** | Intermediate | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive AI Enhancement |
+| **[AI Knowledge Persistence](#ai-knowledge-persistence)** | Intermediate | Development | Capture successful patterns and failed attempts as versioned knowledge for future sessions | Rules as Code |
+| **[Constraint-Based AI Development](#constraint-based-ai-development)** | Beginner | Development | Give AI specific constraints to prevent over-engineering and ensure focused solutions | Progressive AI Enhancement |
+| **[Observable AI Development](#observable-ai-development)** | Intermediate | Development | Strategic logging and debugging that makes system behavior visible to AI | AI Developer Lifecycle |
+| **[AI Security & Compliance](#ai-security--compliance)** | Advanced | Operations | Unified framework for policy generation, vulnerability scanning, and compliance automation | AI Security Sandbox |
+| **[Deployment Automation](#deployment-automation)** | Advanced | Operations | AI-powered pipeline generation, blue-green deployments, and intelligent rollback strategies | AI Workflow Orchestration |
+| **[Monitoring & Maintenance](#monitoring--maintenance)** | Advanced | Operations | Performance baselines, incident response, and technical debt management with AI assistance | Observable AI Development |
 
 ---
 
 # Foundation Patterns
 
+Foundation patterns establish the essential infrastructure and team readiness required for successful AI-assisted development. These patterns must be implemented first as they enable all subsequent patterns.
+
+## AI Readiness Assessment
+
+**Maturity**: Beginner  
+**Description**: Systematic evaluation of codebase and team readiness for AI-assisted development before implementing AI patterns.
+
+**Assessment Framework**
+
+```mermaid
+graph TD
+    A[Codebase Assessment] --> B[Team Assessment]
+    B --> C[Infrastructure Assessment]
+    C --> D[Readiness Score]
+    D --> E[Implementation Plan]
+```
+
+**Codebase Readiness Checklist**
+```markdown
+## Code Quality Prerequisites
+□ Consistent code formatting and style guide
+□ Comprehensive test coverage (>80% for critical paths)
+□ Clear separation of concerns and modular architecture
+□ Documented APIs and interfaces
+□ Version-controlled configuration and secrets management
+
+## Documentation Standards
+□ README with setup and development instructions
+□ API documentation (OpenAPI/Swagger)
+□ Architecture decision records (ADRs)
+□ Coding standards and conventions documented
+□ Deployment and operational procedures
+```
+
+**Anti-pattern: Rushing Into AI**
+Starting AI adoption without proper assessment leads to inconsistent practices, security vulnerabilities, and team frustration.
+
+---
+
+## Rules as Code
+
+**Maturity**: Beginner  
+**Description**: Treat AI coding standards like infrastructure - version them, evolve them, and make them explicit. Every AI session starts fresh, so without persistent rules, you're teaching AI your preferences from scratch each time.
+
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Knowledge Persistence](#ai-knowledge-persistence)
+
+**Standardized Project Structure**
+```bash
+project/
+├── .ai/                          # AI configuration directory
+│   ├── rules/                    # Modular rule sets
+│   │   ├── security.md          # Security standards
+│   │   ├── testing.md           # Testing requirements
+│   │   ├── style.md             # Code style guide
+│   │   └── architecture.md      # Architectural patterns
+│   ├── prompts/                 # Reusable prompt templates
+│   │   ├── implementation.md    # Implementation prompts
+│   │   ├── review.md            # Code review prompts
+│   │   └── testing.md           # Test generation prompts
+│   └── knowledge/               # Captured patterns and gotchas
+│       ├── successful.md        # Proven successful patterns
+│       └── failures.md          # Known failure patterns
+├── .cursorrules                 # Cursor IDE configuration
+├── CLAUDE.md                    # Claude Code session context
+└── .windsurf/                   # Windsurf configuration
+    └── rules.md
+```
+
+**Anti-pattern: Context Drift**
+Each developer maintains their own prompts and preferences, leading to inconsistent code across the team.
+
+---
+
+## AI Security Sandbox
+
+**Maturity**: Beginner  
+**Description**: Run AI tools in isolated environments that can't access secrets, credentials, or sensitive data. Essential for preventing credential leaks and maintaining security compliance.
+
+**Related Patterns**: [AI Security & Compliance](#ai-security--compliance), [Rules as Code](#rules-as-code)
+
+**Docker-Based Isolation**
+```yaml
+# docker-compose.ai-sandbox.yml
+version: '3.8'
+
+services:
+  ai-development:
+    build:
+      context: .
+      dockerfile: Dockerfile.ai-sandbox
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      # Read-only source code access
+      - ./src:/workspace/src:ro
+      - ./tests:/workspace/tests:rw
+      # NO access to sensitive directories:
+      # - .env files, .aws credentials, .ssh keys, secrets/ directory
+    environment:
+      - NODE_ENV=development
+      - AI_SANDBOX=true
+    networks:
+      - ai-isolated
+    restart: no
+
+networks:
+  ai-isolated:
+    driver: bridge
+    internal: true  # No external network access
+```
+
+**Anti-pattern: Unrestricted Access**
+Allowing AI tools full system access risks credential leaks, data breaches, and security compliance violations.
+
+---
+
 ## AI Developer Lifecycle
 
-**Description**
-AI development follows a structured lifecycle from problem definition through deployment, just like traditional software development but with AI-specific considerations at each stage. This lifecycle serves as the foundational framework that integrates all the tactical patterns described in this document - from Rules as Code to Everything as a Tool - ensuring systematic, testable, and maintainable AI-assisted development.
+**Maturity**: Intermediate  
+**Description**: AI development follows a structured lifecycle from problem definition through deployment, integrating all tactical patterns for systematic, testable, and maintainable AI-assisted development.
 
-**Related Patterns**: [Rules as Code](#rules-as-code), [Test-Driven AI Development](#test-driven-ai-development), [Observable AI Development](#observable-ai-development)
+**Related Patterns**: [Rules as Code](#rules-as-code), [ATDD-Driven AI Development](#atdd-driven-ai-development), [Observable AI Development](#observable-ai-development)
 
 **The Complete Lifecycle**
 
@@ -73,104 +201,188 @@ graph TD
     J --> A
 ```
 
-**Stage 1: AI-Assisted Problem Definition**
-*Patterns: Constraint-Based AI Development, Test-Driven Prompt Engineering*
-
-```markdown
-## Problem Statement Template
-
-**Business Problem**: [What business challenge are we solving?]
-**Technical Problem**: [What specific technical implementation is needed?]
-**Success Criteria**: [How will we measure success?]
-**Constraints**: [Time, budget, technology, compliance limitations]
-**Assumptions**: [What are we assuming to be true?]
-
-AI Prompt: "Analyze this problem statement for technical feasibility, suggest alternative approaches, and identify potential risks"
-```
-
-Apply **Constraint-Based AI Development** by setting specific boundaries upfront. Use **Test-Driven Prompt Engineering** to refine your problem analysis prompts until they consistently produce actionable insights.
-
 **Anti-pattern: Ad-Hoc AI Development**
-Jumping straight to coding with AI without proper planning, requirements, or testing strategy, leading to technical debt and unmaintainable systems.
+Jumping straight to coding with AI without proper planning, requirements, or testing strategy.
 
 ---
 
-## Rules as Code
+## AI Failure Recovery Protocol
 
-**Description**
-Treat your AI coding standards like infrastructure - version them, evolve them, and make them explicit. Every AI session starts fresh, so without persistent rules, you're teaching AI your preferences from scratch each time.
+**Maturity**: Intermediate  
+**Description**: Systematic approach to detecting and recovering from AI-generated issues with automated rollback triggers and learning capture mechanisms.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Knowledge Persistence](#ai-knowledge-persistence)
+**Detection & Recovery Framework**
 
-**Examples**
-```bash
-# Project structure
-project/
-├── .cursorrules           # Cursor-specific patterns
-├── CLAUDE.md             # Claude Code context
-├── rules/                # Windsurf modular rules
-│   ├── security.md      
-│   ├── testing.md       
-│   └── refactoring.md   
+```mermaid
+graph TD
+    A[Issue Detection] --> B{Severity Assessment}
+    B -->|Critical| C[Immediate Rollback]
+    B -->|High| D[Human Escalation]
+    B -->|Medium| E[Automated Fix Attempt]
+    B -->|Low| F[Log for Review]
+    C --> G[Post-Incident Analysis]
+    D --> G
+    E --> H{Fix Successful?}
+    H -->|No| D
+    H -->|Yes| I[Update Knowledge Base]
+    F --> I
+    G --> I
 ```
 
-Sample `.cursorrules`:
-```markdown
-## Code Generation Rules
+**Anti-pattern: Ignore and Hope**
+Ignoring AI-generated issues or assuming they'll resolve themselves leads to accumulated technical debt and system instability.
 
-When generating code:
-1. Always use TypeScript with strict mode
-2. Prefer composition over inheritance
-3. Every public method needs JSDoc
-4. Use dependency injection for testability
-5. Follow the pattern in src/patterns/
+---
 
-When refactoring:
-1. Run tests before any changes
-2. One refactoring type per commit
-3. Preserve all public APIs
+## Human-AI Handoff Protocol
+
+**Maturity**: Intermediate  
+**Description**: Clear boundaries and procedures for transitioning work between human developers and AI tools based on complexity, security requirements, and creative problem-solving needs.
+
+**Handoff Decision Framework**
+
+```mermaid
+graph TD
+    A[Task Assessment] --> B{Complexity Level}
+    B -->|Low| C[AI First]
+    B -->|Medium| D[AI with Human Review]
+    B -->|High| E[Human First]
+    B -->|Critical| F[Human Only]
+    
+    C --> G{Quality Check}
+    D --> H{AI Success?}
+    E --> I{Need AI Assistance?}
+    F --> J[Human Implementation]
+    
+    G -->|Pass| K[Deploy]
+    G -->|Fail| L[Human Review]
+    H -->|Yes| M[Human Verification]
+    H -->|No| N[Human Takeover]
+    I -->|Yes| O[Collaborative Mode]
+    I -->|No| J
 ```
 
-**Anti-pattern: Context Drift**
-Each developer maintains their own prompts and preferences, leading to inconsistent code across the team.
+**Anti-pattern: Unclear Boundaries**
+Allowing AI and humans to work on the same task simultaneously without clear handoff points leads to conflicts, duplicated effort, and inconsistent quality.
 
 ---
 
 # Development Patterns
 
-## Test-Driven AI Development
+Development patterns provide tactical approaches for day-to-day AI-assisted coding workflows, focusing on quality, maintainability, and team collaboration.
 
-**Description**
-Write failing tests first, then use AI to generate implementations that pass. Tests provide unambiguous success criteria that prevent AI from hallucinating features you don't need.
+## ATDD-Driven AI Development
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Test-Driven Prompt Engineering](#test-driven-prompt-engineering)
+**Maturity**: Intermediate  
+**Description**: Use Acceptance Test-Driven Development (ATDD) to guide AI code generation by writing executable specifications first, then prompting AI to create minimal implementations that satisfy the acceptance criteria.
 
-**Examples**
-```javascript
-// Step 1: You write the test (not AI)
-describe('PasswordHasher', () => {
-  it('should use bcrypt with cost factor 12', async () => {
-    const hasher = new PasswordHasher();
-    const hash = await hasher.hash('password123');
-    
-    expect(hash).toMatch(/^\$2[aby]\$12\$/);
-    expect(await bcrypt.compare('password123', hash)).toBe(true);
-  });
-});
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy), [Observable AI Development](#observable-ai-development)
 
-// Step 2: Prompt AI with the failing test
-"Implement PasswordHasher to make this test pass. Use bcrypt with cost factor 12."
+**The ATDD-AI Workflow**
+
+```mermaid
+graph TD
+    A[Write Gherkin Feature] --> B[Generate Step Definitions with AI]
+    B --> C[Prompt AI for Minimal Implementation]
+    C --> D[Run Acceptance Tests]
+    D --> E{Tests Pass?}
+    E -->|No| F[Refine AI Prompts]
+    F --> C
+    E -->|Yes| G[Refactor with AI]
+    G --> H[Verify Tests Still Pass]
+    H --> I[Next Feature]
+    I --> A
 ```
 
-**Anti-pattern: Test After**
-Letting AI generate both implementation and tests results in tests that mirror the implementation rather than specify behavior.
+**Examples**
+
+**Step 1: Write Executable Specifications First**
+```gherkin
+# features/user_authentication.feature
+Feature: User Authentication
+  As a user
+  I want to log into the system
+  So that I can access my personal dashboard
+
+  Scenario: Successful login with valid credentials
+    Given a user exists with email "user@example.com" and password "securepass123"
+    When I submit login credentials "user@example.com" and "securepass123"
+    Then I should be redirected to the dashboard
+    And I should see a welcome message "Welcome back!"
+
+  Scenario: Failed login with invalid credentials
+    Given a user exists with email "user@example.com" and password "securepass123"
+    When I submit login credentials "user@example.com" and "wrongpassword"
+    Then I should see an error message "Invalid credentials"
+    And I should remain on the login page
+```
+
+**Step 2: AI-Generated Step Definitions**
+```python
+# features/steps/auth_steps.py
+# Prompt: "Generate pytest-bdd step definitions for the user authentication feature"
+
+from pytest_bdd import given, when, then, scenarios
+from selenium import webdriver
+import pytest
+
+scenarios('../user_authentication.feature')
+
+@given('a user exists with email "<email>" and password "<password>"')
+def user_exists(email, password):
+    # AI generates user creation logic
+    user_service.create_user(email=email, password=password)
+
+@when('I submit login credentials "<email>" and "<password>"')
+def submit_login(browser, email, password):
+    # AI generates form interaction
+    browser.find_element_by_id("email").send_keys(email)
+    browser.find_element_by_id("password").send_keys(password)
+    browser.find_element_by_id("login-button").click()
+
+@then('I should be redirected to the dashboard')
+def verify_dashboard_redirect(browser):
+    # AI generates assertion logic
+    assert "/dashboard" in browser.current_url
+```
+
+**Anti-pattern: Implementation-First AI**
+Writing code with AI first, then trying to retrofit tests, resulting in tests that mirror implementation rather than specify behavior.
+
+---
+
+## Comprehensive AI Testing Strategy
+
+**Maturity**: Intermediate  
+**Description**: Unified approach combining test-first development, automated test generation, and quality assurance patterns to ensure AI-generated code meets quality and behavioral specifications.
+
+**Related Patterns**: [ATDD-Driven AI Development](#atdd-driven-ai-development), [Observable AI Development](#observable-ai-development)
+
+**Integrated Testing Framework**
+
+```mermaid
+graph TD
+    A[Acceptance Tests] --> B[Unit Test Generation]
+    B --> C[Integration Tests]
+    C --> D[Performance Tests]
+    D --> E[Security Tests]
+    E --> F[Flakiness Detection]
+    F --> G[Quality Gates]
+    G --> H{All Tests Pass?}
+    H -->|Yes| I[Deploy]
+    H -->|No| J[AI Test Refinement]
+    J --> B
+```
+
+**Anti-pattern: Test Generation Without Strategy**
+Generating tests with AI without a coherent strategy leads to poor coverage, flaky tests, and false confidence in code quality.
 
 ---
 
 ## Progressive AI Enhancement
 
-**Description**
-Build complex features through small, deployable iterations. Each AI interaction adds one specific enhancement rather than trying to build everything at once.
+**Maturity**: Beginner  
+**Description**: Build complex features through small, deployable iterations. Each AI interaction adds one specific enhancement rather than trying to build everything at once.
 
 **Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Constraint-Based AI Development](#constraint-based-ai-development)
 
@@ -188,77 +400,64 @@ Building authentication progressively:
 # Day 3: Add security
 "Add bcrypt hashing to login. Support both hashed and plain passwords temporarily."
 → Deploy
+
+# Day 4: Modern tokens
+"Replace session with JWT. Keep session endpoint for backward compatibility."
+→ Deploy
 ```
 
 **Anti-pattern: Big Bang Generation**
-Asking AI to "create a complete user management system" results in 5000 lines of coupled, untested code.
+Asking AI to "create a complete user management system" results in 5000 lines of coupled, untested code that takes days to review and debug.
 
 ---
 
-## AI Security Sandbox
+## AI Workflow Orchestration
 
-**Description**
-Run AI tools in isolated environments that can't access secrets, credentials, or sensitive data.
+**Maturity**: Advanced  
+**Description**: Coordinate sequential pipelines, parallel workflows, and hybrid human-AI processes for complex development tasks requiring multiple AI tools and human oversight.
 
-**Related Patterns**: [Policy-as-Code Constructor](#policy-as-code-constructor), [Everything as a Tool](#everything-as-a-tool)
+**Related Patterns**: [Human-AI Handoff Protocol](#human-ai-handoff-protocol), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)
 
-**Examples**
-Docker-based isolation:
-```yaml
-services:
-  ai-sandbox:
-    image: development:latest
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    volumes:
-      - ./src:/workspace/src:ro      # Read-only source
-      - ./tests:/workspace/tests:rw   # Writable tests
-      # No access to .env, .aws, secrets/
+**Workflow Types & Selection**
+
+```mermaid
+graph TD
+    A[Task Analysis] --> B{Workflow Type}
+    B -->|Sequential| C[Pipeline Workflow]
+    B -->|Parallel| D[Multi-Agent Workflow]
+    B -->|Complex| E[Hybrid Workflow]
+    
+    C --> F[Stage 1: Generate]
+    F --> G[Stage 2: Review]
+    G --> H[Stage 3: Optimize]
+    H --> I[Stage 4: Test]
+    
+    D --> J[Agent 1: Backend]
+    D --> K[Agent 2: Frontend]
+    D --> L[Agent 3: Tests]
+    J --> M[Synchronization]
+    K --> M
+    L --> M
+    
+    E --> N[Human Planning]
+    N --> O[AI Implementation]
+    O --> P[Human Review]
+    P --> Q[AI Refinement]
 ```
 
-**Anti-pattern: Unrestricted Access**
-Allowing AI tools full system access risks credential leaks and security breaches.
-
----
-
-## AI Prompt Pipeline
-
-**Description**
-Chain AI prompts like a CI/CD pipeline where each stage validates and improves the previous stage's output.
-
-**Related Patterns**: [AI-Powered Pipeline Synthesizer](#ai-powered-pipeline-synthesizer), [Test-Driven Prompt Engineering](#test-driven-prompt-engineering)
-
-**Examples**
-```bash
-#!/bin/bash
-# ai-pipeline.sh
-
-# Stage 1: Generate implementation
-ai "Implement UserService.create based on failing test" > stage1.ts
-
-# Stage 2: Security review
-ai "Review this code for OWASP Top 10 vulnerabilities: $(cat stage1.ts)" > stage2.ts
-
-# Stage 3: Performance optimization  
-ai "Optimize for <50ms response time: $(cat stage2.ts)" > stage3.ts
-
-# Run tests after each stage
-npm test || exit 1
-```
+**Anti-pattern: Uncoordinated Multi-Tool Usage**
+Using multiple AI tools without proper orchestration leads to inconsistent code, integration conflicts, and wasted effort from competing implementations.
 
 ---
 
 ## Context Window Optimization
 
-**Description**
-Match AI tool selection to task complexity. Using Claude for every task is like using a sledgehammer to hang a picture.
+**Maturity**: Intermediate  
+**Description**: Match AI tool selection to task complexity and optimize cost/performance trade-offs. Using Claude for every task is like using a sledgehammer to hang a picture.
 
-**Related Patterns**: [AI Pair Rotation](#ai-pair-rotation), [Dependency Upgrade Advisor](#dependency-upgrade-advisor)
+**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Workflow Orchestration](#ai-workflow-orchestration)
 
-**Examples**
-Decision matrix:
+**Decision Matrix**
 ```
 Task: Add null check
 Tool: GitHub Copilot (instant, cheap)
@@ -279,55 +478,12 @@ Context: Full codebase
 
 ---
 
-## Test-Driven Prompt Engineering
-
-**Description**
-Define expected AI output first, then refine prompts systematically until they produce it - just like TDD for prompts.
-
-**Related Patterns**: [Test-Driven AI Development](#test-driven-ai-development), [AI Prompt Pipeline](#ai-prompt-pipeline)
-
-**Examples**
-Goal: Secure password reset endpoint
-
-Expected output:
-```typescript
-@Post('/password-reset')
-@RateLimit({ window: '15m', max: 3 })
-async resetPassword(@Body() dto: ResetPasswordDto) {
-  const user = await this.users.findByEmail(dto.email);
-  if (!user) {
-    return { message: 'If email exists, reset link sent' };
-  }
-  // ... rest of implementation
-}
-```
-
-Prompt evolution:
-```
-V1: "Create password reset endpoint"
-Result: ❌ Missing rate limiting, reveals emails
-
-V2: "Create secure password reset with rate limiting"  
-Result: ❌ Still reveals if email exists
-
-V3: "Create password reset:
-- Rate limit 3 per 15 min
-- Same response whether email exists or not
-- Use Redis for tokens"
-Result: ✅ Matches expected output
-```
-
-**Anti-pattern: Prompt and Pray**
-Vague prompts like "make it better" waste time with multiple iterations.
-
----
-
 ## AI Knowledge Persistence
 
-**Description**
-Capture successful AI patterns and failed attempts as versioned knowledge for future sessions.
+**Maturity**: Intermediate  
+**Description**: Capture successful patterns and failed attempts as versioned knowledge for future sessions.
 
-**Related Patterns**: [Rules as Code](#rules-as-code), [Incident Playbook Generator](#incident-playbook-generator)
+**Related Patterns**: [Rules as Code](#rules-as-code), [AI Failure Recovery Protocol](#ai-failure-recovery-protocol)
 
 **Examples**
 `.ai/knowledge/authentication.md`:
@@ -354,61 +510,12 @@ Too vague - AI adds unnecessary complexity
 
 ---
 
-## AI Commit Protocol
-
-**Description**
-Structure commits to maintain clear attribution and enable rollback when working with AI-generated code.
-
-**Related Patterns**: [Release Note Synthesizer](#release-note-synthesizer), [AI Security Sandbox](#ai-security-sandbox)
-
-**Examples**
-```bash
-# Before AI work
-git commit -am "checkpoint: Before implementing auth"
-
-# After AI generates code
-git add -p  # Review carefully
-git commit -m "feat(auth): Add JWT validation
-
-AI-Assisted: Claude
-Safety: Checkpoint at abc123"
-
-# If AI messes up
-git reset --hard abc123
-```
-
----
-
-## AI Pair Rotation
-
-**Description**
-Use different AI tools for different development phases, like rotating pair programming partners.
-
-**Related Patterns**: [Context Window Optimization](#context-window-optimization), [Parallel AI Workflows](#parallel-ai-workflows)
-
-**Examples**
-```bash
-# Morning: Architecture design
-claude "Design event sourcing for order system"
-
-# Midday: Implementation  
-cursor "Implement OrderAggregate from Claude's design"
-
-# Afternoon: Testing
-windsurf "Generate comprehensive tests for OrderAggregate"
-
-# Evening: Review
-chatgpt "Review this code for best practices"
-```
-
----
-
 ## Constraint-Based AI Development
 
-**Description**
-Give AI specific constraints to prevent over-engineering and ensure focused solutions.
+**Maturity**: Beginner  
+**Description**: Give AI specific constraints to prevent over-engineering and ensure focused solutions.
 
-**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Everything as a Tool](#everything-as-a-tool)
+**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Human-AI Handoff Protocol](#human-ai-handoff-protocol)
 
 **Examples**
 ```
@@ -426,10 +533,10 @@ Good: "Reduce p99 latency to <50ms without new dependencies"
 
 ## Observable AI Development
 
-**Description**
-Make your system's behavior visible to AI through strategic logging and debugging. AI can't fix what it can't see.
+**Maturity**: Intermediate  
+**Description**: Make your system's behavior visible to AI through strategic logging and debugging. AI can't fix what it can't see.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Performance Baseline Advisor](#performance-baseline-advisor)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)
 
 **Examples**
 ```python
@@ -459,166 +566,42 @@ Minimal or cryptic logging that leaves AI guessing about system state and failur
 
 ---
 
-## Parallel AI Workflows
+# Operations Patterns
 
-**Description**
-Use multiple AI agents concurrently for different aspects of the same problem, multiplying your effective throughput.
+Operations patterns focus on CI/CD, security, compliance, and production management with AI assistance, building on the foundation and development patterns.
 
-**Related Patterns**: [AI Pair Rotation](#ai-pair-rotation), [Everything as a Tool](#everything-as-a-tool)
+## AI Security & Compliance
 
-**Examples**
-Contract-based coordination:
-```python
-# contracts/checkout_api.py
-from typing import TypedDict, List
+**Maturity**: Advanced  
+**Description**: Unified framework for policy generation, vulnerability scanning, and compliance automation using AI to transform regulatory requirements into executable code.
 
-class CartItem(TypedDict):
-    product_id: str
-    quantity: int
-    price: float
+**Related Patterns**: [AI Security Sandbox](#ai-security-sandbox), [Rules as Code](#rules-as-code)
 
-class CheckoutAPI:
-    """Shared contract for all agents"""
-    
-    create_order = {
-        "method": "POST",
-        "path": "/api/checkout",
-        "request": {
-            "items": List[CartItem],
-            "payment_method": str,
-            "shipping_address": str
-        },
-        "response": {
-            "order_id": str,
-            "total": float,
-            "status": str
-        }
-    }
+**Unified Security Framework**
+
+```mermaid
+graph TD
+    A[Compliance Requirements] --> B[AI Policy Generation]
+    B --> C[Vulnerability Scanning]
+    C --> D[Security Testing]
+    D --> E[Compliance Evidence]
+    E --> F[Audit Reports]
+    F --> G[Continuous Monitoring]
+    G --> H[Policy Updates]
+    H --> B
 ```
 
-**Anti-pattern: Uncoordinated Parallel Work**
-Multiple AI agents working without shared contracts or clear boundaries.
-
----
-
-## Everything as a Tool
-
-**Description**
-Design every script, service, and system component as an AI-accessible tool with clear interfaces, predictable behavior, and built-in documentation.
-
-**Related Patterns**: [AI Security Sandbox](#ai-security-sandbox), [Parallel AI Workflows](#parallel-ai-workflows)
-
-**Examples**
-AI-friendly CLI tool:
-```python
-#!/usr/bin/env python3
-# deploy.py
-
-import click
-import json
-import sys
-
-@click.command()
-@click.argument('environment', type=click.Choice(['dev', 'staging', 'prod']))
-@click.option('--dry-run', is_flag=True, help='Show what would happen')
-def deploy(environment, dry_run):
-    """Deploy application to specified environment."""
-    # Structured output for AI
-    print(json.dumps({
-        "action": "deploy_start",
-        "environment": environment,
-        "dry_run": dry_run
-    }))
-    
-    try:
-        if not dry_run:
-            perform_deployment(environment)
-            
-        print(json.dumps({
-            "action": "deploy_success",
-            "url": f"https://{environment}.example.com"
-        }))
-        return 0
-        
-    except Exception as e:
-        print(json.dumps({
-            "action": "deploy_error",
-            "error": str(e),
-            "suggestion": get_error_suggestion(e)
-        }))
-        return 1
-```
-
-**Anti-pattern: Human-Only Interfaces**
-Tools that only work interactively or produce unstructured output that AI cannot reliably parse.
-
----
-
-# CI/CD Patterns
-
-## AI-Powered Pipeline Synthesizer
-
-**Description**
-Create human-readable specifications of your build, test, and deploy steps, then use AI to automatically generate pipeline configuration files. Version control both the plain-English spec and the generated pipeline definitions to maintain traceability and enable iterative refinement.
-
-**Related Patterns**: [Everything as a Tool](#everything-as-a-tool), [AI Prompt Pipeline](#ai-prompt-pipeline)
-
-**Examples**
-
-```bash
-# ci.spec
-install dependencies -> pip install -r requirements.txt
-run tests -> pytest
-build image -> docker build -t myapp .
-push image -> aws ecr get-login-password | docker push myapp:latest
-```
-
-```bash
-# generate CI
-ai "Read ci.spec and output GitHub Actions YAML" > .github/workflows/ci.yml
-git add ci.spec .github/workflows/ci.yml
-git commit -m "chore: generate CI from spec"
-```
-
-**Anti-pattern: Over-generation**
-Accepting every AI-suggested stage without pruning adds slow, unused steps to your pipeline.
-
----
-
-## Policy-as-Code Constructor
-
-**Description**
-Transform written compliance requirements into executable policy code by feeding regulatory text into AI and generating policy files in standard formats.
-
-**Related Patterns**: [Rules as Code](#rules-as-code), [AI Security Sandbox](#ai-security-sandbox)
-
-**Examples**
-
+**Policy-as-Code Generation**
 ```bash
 # policies/req.md
 "Data at rest must be AES-256 encrypted in transit and at rest per SOC 2."
-```
 
-```bash
-# generate policy
+# Generate policy
 ai "Convert policies/req.md into Cedar policy code" > policies/code/encryption.cedar
 opa test policies/code/encryption.cedar
 ```
 
-**Anti-pattern: Opaque policies**
-Merging AI output without tests leaves enforcement gaps you can't trace.
-
----
-
-## Continuous Security Scanning Orchestrator
-
-**Description**
-Orchestrate multiple security scanning tools through automation, then use AI to parse and summarize the results into actionable insights for developers.
-
-**Related Patterns**: [AI Prompt Pipeline](#ai-prompt-pipeline), [ChatOps Security Assistant](#chatops-security-assistant)
-
-**Examples**
-
+**Security Scanning Orchestration**
 ```bash
 #!/bin/bash
 snyk test --json > snyk.json
@@ -629,342 +612,159 @@ gh pr comment --body-file pr-comment.txt
 if grep -q '"severity":"CRITICAL"' pr-comment.txt; then exit 1; fi
 ```
 
-**Anti-pattern: Alert fatigue**
-Posting every low-severity finding buries real issues and frustrates devs.
+**Anti-pattern: Fragmented Security**
+Implementing security tools and compliance checks in isolation without a unified AI-driven framework leads to gaps and inconsistencies.
 
 ---
 
-## Test Suite Amplifier
+## Deployment Automation
 
-**Description**
-Analyze code changes and automatically generate comprehensive unit tests that cover edge cases and error conditions.
+**Maturity**: Advanced  
+**Description**: AI-powered pipeline generation, blue-green deployments, and intelligent rollback strategies that adapt to system behavior and historical patterns.
 
-**Related Patterns**: [Test-Driven AI Development](#test-driven-ai-development), [Test Flakiness Detector](#test-flakiness-detector)
+**Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration), [Observable AI Development](#observable-ai-development)
 
-**Examples**
-
+**Pipeline Synthesis**
 ```bash
-git diff main...HEAD > change.diff
-ai "Generate pytest tests for change.diff covering error paths" > tests/test_new.py
-pytest --maxfail=1 --disable-warnings -q
+# ci.spec
+install dependencies -> pip install -r requirements.txt
+run tests -> pytest
+build image -> docker build -t myapp .
+push image -> aws ecr get-login-password | docker push myapp:latest
+
+# Generate CI
+ai "Read ci.spec and output GitHub Actions YAML" > .github/workflows/ci.yml
+git add ci.spec .github/workflows/ci.yml
+git commit -m "chore: generate CI from spec"
 ```
 
-**Anti-pattern: Mirror testing**
-Auto-generated tests that simply assert "no exception" mirror code and miss real bugs.
-
----
-
-## Drift Detection & Remediation Loop
-
-**Description**
-Detect infrastructure configuration drift and automatically generate corrective patches through AI analysis.
-
-**Related Patterns**: [Observable AI Development](#observable-ai-development), [Everything as a Tool](#everything-as-a-tool)
-
-**Examples**
-
-```bash
-terraform plan -out=tf.plan ; terraform show -json tf.plan > drift.json
-ai "Create Terraform patch from drift.json to restore desired state" > patch.tf
-terraform apply patch.tf
-```
-
-**Anti-pattern: Automated overwrite**
-Auto-applying AI's patch without inspection can break resources you didn't intend to change.
-
----
-
-## Intelligent Rollback & Canary Advisor
-
-**Description**
-Analyze post-deployment metrics to intelligently recommend canary deployment percentages and automated rollback criteria.
-
-**Related Patterns**: [Performance Baseline Advisor](#performance-baseline-advisor), [AI-Guided Blue-Green Deployment Orchestrator](#ai-guided-blue-green-deployment-orchestrator)
-
-**Examples**
-
+**Intelligent Rollback Strategies**
 ```bash
 aws cloudwatch get-metric-statistics --output text > metrics.csv
 ai "From metrics.csv, suggest a 5% canary rollout and rollback criteria" > canary.json
 deploy-tool update-release --config canary.json
 ```
 
-**Anti-pattern: Static thresholds**
-Hard-coding thresholds ignores shifting traffic patterns and degrades rollback accuracy.
+**Anti-pattern: Static Deployment**
+Using fixed deployment scripts without AI adaptation leads to suboptimal rollout strategies and missed opportunities for intelligent automation.
 
 ---
 
-## Compliance Evidence Automator
+## Monitoring & Maintenance
 
-**Description**
-Automate compliance evidence collection by extracting system logs and configuration changes, then using AI to compile comprehensive audit reports.
+**Maturity**: Advanced  
+**Description**: Performance baselines, incident response, and technical debt management with AI assistance for proactive system health and automated maintenance workflows.
 
-**Related Patterns**: [Observable AI Development](#observable-ai-development), [Policy-as-Code Constructor](#policy-as-code-constructor)
+**Related Patterns**: [Observable AI Development](#observable-ai-development), [AI Knowledge Persistence](#ai-knowledge-persistence)
 
-**Examples**
-
-```bash
-aws configservice get-resource-config-history > awsconfig.json
-aws cloudtrail lookup-events > iam-changes.json
-ai "Generate SOC2 evidence sheet from awsconfig.json and iam-changes.json" > report.csv
-```
-
-**Anti-pattern: Manual aggregation**
-Hand-crafted spreadsheets miss events or outdated entries under audit pressure.
-
----
-
-## ChatOps Security Assistant
-
-**Description**
-Integrate security scanning capabilities directly into team chat platforms through intelligent bots that respond to security-related commands.
-
-**Related Patterns**: [Continuous Security Scanning Orchestrator](#continuous-security-scanning-orchestrator), [Everything as a Tool](#everything-as-a-tool)
-
-**Examples**
-
-```yaml
-# bot-config.yml
-commands:
-  - trigger: /sec scan {{repo}}
-    action: "./security-scan.sh && cat pr-comment.txt"
-```
-
-```text
-User: /sec scan myapp
-Bot: "SNYK: 2 CRITICAL, BANDIT: 1 HIGH…"
-```
-
-**Anti-pattern: Over-automation**
-Allowing auto-fix commands via chat can deploy untested changes.
-
----
-
-## Incident Playbook Generator
-
-**Description**
-Generate actionable incident response playbooks by analyzing historical incident data and extracting common patterns and resolution steps.
-
-**Related Patterns**: [AI Knowledge Persistence](#ai-knowledge-persistence), [On-Call Handoff Brief Generator](#on-call-handoff-brief-generator)
-
-**Examples**
-
-```bash
-pd incidents:list --limit 10 > incidents.json
-ai "Create a step-by-step RDS failover runbook from incidents.json" > runbooks/rds-failover.md
-git add runbooks/rds-failover.md
-```
-
-**Anti-pattern: Stale docs**
-Failing to regenerate playbooks after new incidents yields outdated guidance.
-
----
-
-## Release Note Synthesizer
-
-**Description**
-Automatically generate structured release notes by analyzing commit messages and categorizing changes into meaningful sections.
-
-**Related Patterns**: [AI Commit Protocol](#ai-commit-protocol), [AI Prompt Pipeline](#ai-prompt-pipeline)
-
-**Examples**
-
-```bash
-git log v1.3.2..HEAD --pretty=format:"%s" > commits.log
-ai "Group commits in commits.log under Added, Changed, Fixed" >> CHANGELOG.md
-```
-
-**Anti-pattern: Minimal notes**
-Simply pasting commit hashes without context leaves users guessing what changed.
-
----
-
-## Dependency Upgrade Advisor
-
-**Description**
-Intelligently manage dependency upgrades by analyzing available updates and their potential impact on your codebase.
-
-**Related Patterns**: [Technical Debt Forecaster](#technical-debt-forecaster), [Context Window Optimization](#context-window-optimization)
-
-**Examples**
-
-```bash
-npm outdated --json > deps.json
-ai "From deps.json, suggest npm install commands for lodash and axios without breaking changes" > deps-update.sh
-bash deps-update.sh
-```
-
-**Anti-pattern: Bulk updates**
-`npm update` without understanding breaking changes causes runtime errors.
-
----
-
-## Technical Debt Forecaster
-
-**Description**
-Proactively identify and prioritize technical debt by analyzing code metrics, test coverage, and complexity indicators through AI-powered assessment.
-
-**Related Patterns**: [Dependency Upgrade Advisor](#dependency-upgrade-advisor), [Observable AI Development](#observable-ai-development)
-
-**Examples**
-
-```bash
-cloc src > loc.txt
-coverage run -m pytest; coverage report > cov.txt
-ai "From loc.txt and cov.txt, list top-3 files needing refactor and tests" > debt.txt
-```
-
-**Anti-pattern: Reactive fixes**
-Waiting for incidents to spike forces firefighting rather than long-term health.
-
----
-
-## Test Flakiness Detector
-
-**Description**
-Analyze build history to identify unreliable tests that intermittently fail without code changes.
-
-**Related Patterns**: [Test Suite Amplifier](#test-suite-amplifier), [Observable AI Development](#observable-ai-development)
-
-**Examples**
-
-```bash
-wget ci-server/logs/last50 > ci.log
-ai "Find intermittently failing tests in ci.log and suggest retry decorators" > flaky.txt
-# Then edit tests:
-# @pytest.mark.flaky(reruns=3)
-```
-
-**Anti-pattern: Skip tests**
-Marking tests as skipped ignores root causes and shrinks coverage.
-
----
-
-## Chaos Scenario Generator
-
-**Description**
-Generate targeted chaos engineering experiments based on your system architecture and service dependencies.
-
-**Related Patterns**: [Performance Baseline Advisor](#performance-baseline-advisor), [Everything as a Tool](#everything-as-a-tool)
-
-**Examples**
-
-```bash
-ai "From services.json, generate a Gremlin script to kill 1 of 3 instances of service-A every 5m" > chaos.json
-gremlin run chaos.json
-```
-
-**Anti-pattern: Random faulting**
-Unguided chaos tests miss critical dependencies and yield noise.
-
----
-
-## Performance Baseline Advisor
-
-**Description**
-Establish intelligent performance baselines by analyzing historical metrics and automatically configuring monitoring thresholds and autoscaling policies.
-
-**Related Patterns**: [Intelligent Rollback & Canary Advisor](#intelligent-rollback--canary-advisor), [Observable AI Development](#observable-ai-development)
-
-**Examples**
-
+**Performance Baseline Management**
 ```bash
 aws cloudwatch get-metric-statistics --period 86400 > perf.csv
 ai "From perf.csv, recommend latency alert thresholds and autoscale policies" > perf-policy.json
 deploy-tool apply perf-policy.json
 ```
 
-**Anti-pattern: One-off alerts**
-Manual thresholds quickly become stale, causing alert storms or blind spots.
-
----
-
-## On-Call Handoff Brief Generator
-
-**Description**
-Streamline on-call transitions by automatically generating comprehensive handoff briefs that summarize current system state, active alerts, and ongoing issues.
-
-**Related Patterns**: [Incident Playbook Generator](#incident-playbook-generator), [Observable AI Development](#observable-ai-development)
-
-**Examples**
-
+**Technical Debt Forecasting**
 ```bash
-pd incidents:list --status triggered > alerts.json
-curl grafana/api/dashboards/home > dash.json
-ai "Create an on-call handoff brief from alerts.json and dash.json" > handoff.md
-slack-cli post --file handoff.md --channel oncall
+cloc src > loc.txt
+coverage run -m pytest; coverage report > cov.txt
+ai "From loc.txt and cov.txt, list top-3 files needing refactor and tests" > debt.txt
 ```
 
-**Anti-pattern: Fragmented handoffs**
-Relying on chat logs or email threads skips critical context and action items.
-
----
-
-## AI-Guided Blue-Green Deployment Orchestrator
-
-**Description**
-Generate correct blue-green deployment automation by providing AI with explicit reference documentation and validation checks to prevent common misconceptions.
-
-**Related Patterns**: [Intelligent Rollback & Canary Advisor](#intelligent-rollback--canary-advisor), [Everything as a Tool](#everything-as-a-tool)
-
-**Examples**
-
-Blue-green reference documentation (`docs/blue-green-guide.md`):
-```markdown
-# Blue-Green Deployment Pattern
-
-## Key Principles (from Martin Fowler)
-1. Maintain two identical production environments: Blue (live) and Green (idle)
-2. Deploy new version to the idle environment
-3. Test thoroughly in idle environment
-4. Switch traffic from Blue to Green atomically
-5. Keep Blue as rollback option
-
-## Critical Steps
-1. Identify current live environment
-2. Deploy to idle environment
-3. Run smoke tests on idle
-4. Switch load balancer/DNS
-5. Monitor for issues
-6. Rollback if needed by switching back
-
-## Anti-patterns to avoid:
-- Deploying to both environments
-- Gradual traffic shifting (that's canary, not blue-green)
-- Not maintaining identical environments
-```
-
-AI prompt with explicit guidance:
+**Incident Response Automation**
 ```bash
-ai "Using the blue-green pattern in docs/blue-green-guide.md, create AWS CodeDeploy scripts that:
-1. Deploy to the IDLE environment only
-2. Run health checks on idle environment  
-3. Switch ALL traffic atomically via ALB target groups
-4. Keep the previous environment as rollback
-
-Reference: https://web.archive.org/web/20200110052353/https://martinfowler.com/bliki/BlueGreenDeployment.html
-
-DO NOT create canary deployment. DO NOT deploy to both environments." > scripts/blue-green-deploy.sh
+pd incidents:list --limit 10 > incidents.json
+ai "Create a step-by-step RDS failover runbook from incidents.json" > runbooks/rds-failover.md
+git add runbooks/rds-failover.md
 ```
 
-**Anti-pattern: Trusting AI without validation**
-LLMs frequently confuse blue-green with canary deployments or generate scripts that deploy to both environments simultaneously.
+**Anti-pattern: Reactive Maintenance**
+Waiting for incidents to spike forces firefighting rather than proactive system health management with AI assistance.
 
 ---
+
+# Anti-Patterns Reference
+
+## Common AI Development Anti-Patterns
+
+### Foundation Anti-Patterns
+- **Rushing Into AI**: Starting AI adoption without proper assessment
+- **Context Drift**: Inconsistent AI rules across team members
+- **Unrestricted Access**: Allowing AI tools access to sensitive data
+- **Ad-Hoc Development**: Skipping structured development lifecycle
+
+### Development Anti-Patterns
+- **Implementation-First AI**: Writing code before defining acceptance criteria
+- **Test Generation Without Strategy**: Creating tests without coherent quality goals
+- **Big Bang Generation**: Attempting complex features in single AI interaction
+- **Uncoordinated Multi-Tool Usage**: Using multiple AI tools without orchestration
+- **Black Box Systems**: Insufficient logging for AI debugging
+- **Unclear Boundaries**: Ambiguous human-AI handoff points
+
+### Operations Anti-Patterns
+- **Fragmented Security**: Isolated security tools without unified framework
+- **Static Deployment**: Fixed scripts without AI adaptation
+- **Reactive Maintenance**: Firefighting instead of proactive AI-assisted management
+- **Alert Fatigue**: Overwhelming developers with low-priority findings
+
+---
+
+# Implementation Guide
 
 ## Getting Started
 
-1. **Establish AI Developer Lifecycle** - Define your process from problem to production
-2. **Start with Rules as Code** - Biggest immediate impact for consistency
-3. **Add Security Sandbox** - Prevent credential leaks
-4. **Practice Test-Driven AI** - Better quality output
-5. **Build Knowledge Base** - Capture what works
-6. **Measure and Iterate** - Track what improves
+### Phase 1: Foundation (Weeks 1-2)
+1. **[AI Readiness Assessment](#ai-readiness-assessment)** - Evaluate team and codebase readiness
+2. **[Rules as Code](#rules-as-code)** - Establish consistent AI coding standards
+3. **[AI Security Sandbox](#ai-security-sandbox)** - Implement secure AI tool isolation
+4. **[AI Developer Lifecycle](#ai-developer-lifecycle)** - Define structured development process
+
+### Phase 2: Development (Weeks 3-4)
+1. **[ATDD-Driven AI Development](#atdd-driven-ai-development)** - Implement acceptance test-first approach
+2. **[Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)** - Establish unified testing framework
+3. **[Progressive AI Enhancement](#progressive-ai-enhancement)** - Practice iterative development
+4. **[Context Window Optimization](#context-window-optimization)** - Optimize AI tool selection
+
+### Phase 3: Operations (Weeks 5-6)
+1. **[AI Security & Compliance](#ai-security--compliance)** - Implement unified security framework
+2. **[Deployment Automation](#deployment-automation)** - Establish AI-powered CI/CD
+3. **[Monitoring & Maintenance](#monitoring--maintenance)** - Deploy proactive system management
+
+## Success Metrics
+
+### Foundation Metrics
+- Team readiness score improvement
+- Consistent AI rule adherence across projects
+- Zero credential leaks in AI-generated code
+- Reduced onboarding time for new developers
+
+### Development Metrics
+- Test coverage maintenance (>90% for AI-generated code)
+- Reduced code review cycles
+- Faster feature delivery with maintained quality
+- Decreased debugging time for AI-generated issues
+
+### Operations Metrics
+- Automated policy compliance verification
+- Reduced deployment failures
+- Faster incident response with AI-generated runbooks
+- Proactive technical debt management
 
 ## Contributing
 
 Have a pattern that's working well for your team? Open an issue or PR to share your experience. The AI development landscape is evolving rapidly, and we're all learning together.
 
+### Pattern Contribution Guidelines
+1. Follow the established pattern template (Maturity, Description, Related Patterns, Examples, Anti-patterns)
+2. Include practical, runnable examples
+3. Specify clear success criteria and anti-patterns
+4. Reference related patterns appropriately
+5. Test patterns with multiple AI tools when applicable
+
 ## License
 
 MIT License - See LICENSE file for details.
+
+---
+
+*The patterns in this collection represent collective wisdom from teams pioneering AI-assisted development. They're designed to be adapted and evolved as the AI development landscape continues to mature.*
