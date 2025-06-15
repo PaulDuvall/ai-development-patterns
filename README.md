@@ -48,6 +48,7 @@ graph TD
 | **[AI Developer Lifecycle](#ai-developer-lifecycle)** | Intermediate | Foundation | Structured 9-stage process from problem definition through deployment with AI assistance | Rules as Code, AI Security Sandbox |
 | **[AI Failure Recovery Protocol](#ai-failure-recovery-protocol)** | Intermediate | Foundation | Systematic approach to detecting and recovering from AI-generated issues | AI Developer Lifecycle |
 | **[Human-AI Handoff Protocol](#human-ai-handoff-protocol)** | Intermediate | Foundation | Clear boundaries and procedures for transitioning work between human developers and AI | AI Developer Lifecycle |
+| **[AI Issue Generation](#ai-issue-generation)** | Beginner | Foundation | Generate structured work items and tickets from requirements using AI to break down features into actionable tasks | AI Readiness Assessment |
 | **[ATDD-Driven AI Development](#atdd-driven-ai-development)** | Intermediate | Development | Use Acceptance Test-Driven Development to guide AI code generation with executable specifications | AI Developer Lifecycle |
 | **[Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)** | Intermediate | Development | Unified approach to test-first development, automated generation, and quality assurance | ATDD-Driven AI Development |
 | **[Progressive AI Enhancement](#progressive-ai-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | AI Developer Lifecycle |
@@ -195,15 +196,35 @@ Allowing AI tools full system access risks credential leaks, data breaches, and 
 graph TD
     A[Problem Definition] --> B[Technical Plan]
     B --> C[Product Requirements]
-    C --> D[User Stories]
-    D --> E[Acceptance Tests]
-    E --> F[Implementation]
-    F --> G[Testing & Validation]
-    G --> H[Deployment]
-    H --> I[Monitoring]
-    I --> J[Iteration]
-    J --> A
+    C --> D[AI Issue Generation]
+    D --> E[User Stories]
+    E --> F[Acceptance Tests]
+    F --> G[Implementation]
+    G --> H[Testing & Validation]
+    H --> I[Deployment]
+    I --> J[Monitoring]
+    J --> K[Iteration]
+    K --> A
 ```
+
+**Stage 4: AI Issue Generation**
+*Patterns: AI Issue Generation, Progressive AI Enhancement*
+
+Transform product requirements into structured, actionable work items using AI to break down features into properly sized tasks with clear acceptance criteria and dependencies.
+
+```bash
+# Generate development tasks from PRD
+ai "Break down these product requirements into GitHub issues:
+- Clear titles and acceptance criteria  
+- Size estimates (Small, Medium, Large)
+- Frontend/backend/testing labels
+- Dependency mapping between tasks
+- 2-week sprint organization
+
+Format as JSON for automated issue creation."
+```
+
+Apply **AI Issue Generation** to create comprehensive task breakdown. Use **Progressive AI Enhancement** to ensure tasks are properly sized for iterative delivery.
 
 **Anti-pattern: Ad-Hoc AI Development**
 Jumping straight to coding with AI without proper planning, requirements, or testing strategy.
@@ -268,6 +289,139 @@ graph TD
 
 **Anti-pattern: Unclear Boundaries**
 Allowing AI and humans to work on the same task simultaneously without clear handoff points leads to conflicts, duplicated effort, and inconsistent quality.
+
+---
+
+## AI Issue Generation
+
+**Maturity**: Beginner  
+**Description**: Generate structured work items and tickets from requirements using AI to break down features into actionable tasks with proper estimation, acceptance criteria, and dependencies.
+
+**Related Patterns**: [AI Readiness Assessment](#ai-readiness-assessment), [ATDD-Driven AI Development](#atdd-driven-ai-development)
+
+**Issue Generation Framework**
+
+```mermaid
+graph TD
+    A[Requirements Document] --> B[AI Feature Analysis]
+    B --> C[Task Breakdown]
+    C --> D[Story Generation]
+    D --> E[Acceptance Criteria]
+    E --> F[Effort Estimation]
+    F --> G[Dependency Mapping]
+    G --> H[Issue Creation]
+```
+
+**Examples**
+
+**Input: High-level requirement**
+```markdown
+## Feature Request
+"Users need to be able to reset their passwords via email"
+```
+
+**AI Prompt for Issue Generation**
+```bash
+ai "Break down this feature into development tasks:
+
+Feature: Password reset via email
+
+Create GitHub issues with:
+- Clear titles and descriptions
+- Acceptance criteria
+- Size estimates (Small, Medium, Large)
+- Labels (frontend, backend, testing)
+- Dependencies between tasks
+
+Format as JSON for GitHub API import."
+```
+
+**Generated Issues Output**
+```json
+[
+  {
+    "title": "Backend: Implement password reset token generation",
+    "body": "## Description\nCreate secure token generation for password reset requests\n\n## Acceptance Criteria\n- [ ] Generate cryptographically secure reset tokens\n- [ ] Set token expiration (15 minutes)\n- [ ] Store token-user mapping in Redis\n- [ ] Validate email exists before token creation\n\n## Technical Notes\n- Use crypto.randomBytes(32)\n- TTL of 900 seconds in Redis\n- Rate limit: 3 requests per hour per email",
+    "labels": ["backend", "security", "size-medium"],
+    "milestone": "Password Reset MVP"
+  },
+  {
+    "title": "Backend: Email service integration for reset links", 
+    "body": "## Description\nSend password reset emails with secure links\n\n## Acceptance Criteria\n- [ ] Template-based email generation\n- [ ] Secure reset link with token\n- [ ] Email delivery confirmation\n- [ ] Handle email service failures gracefully\n\n## Dependencies\n- Requires: Password reset token generation",
+    "labels": ["backend", "email", "size-small"],
+    "milestone": "Password Reset MVP"
+  },
+  {
+    "title": "Frontend: Password reset request form",
+    "body": "## Description\nUI for users to request password reset\n\n## Acceptance Criteria\n- [ ] Email input field with validation\n- [ ] Submit button with loading state\n- [ ] Success/error message display\n- [ ] Rate limiting feedback\n\n## Design\n- Use existing form components\n- Match current auth page styling",
+    "labels": ["frontend", "ui", "size-small"],
+    "milestone": "Password Reset MVP"
+  }
+]
+```
+
+**Advanced: Epic Breakdown**
+```bash
+ai "Break down this epic into a full development roadmap:
+
+Epic: User Dashboard with Analytics
+
+Include:
+- Database schema changes
+- Backend API endpoints  
+- Frontend components
+- Testing requirements
+- Security considerations
+- Performance requirements
+
+Generate 2-week sprint planning with dependencies."
+```
+
+**Integration with Project Management**
+```bash
+# GitHub Issues
+gh issue create --title "$(echo "$issue" | jq -r '.title')" \
+                --body "$(echo "$issue" | jq -r '.body')" \
+                --label "$(echo "$issue" | jq -r '.labels[]')"
+
+# JIRA Integration
+curl -X POST "$JIRA_API/issue" \
+  -H "Content-Type: application/json" \
+  -d "$jira_issue_json"
+
+# Azure DevOps
+az boards work-item create --title "$title" \
+                          --type "User Story" \
+                          --description "$description"
+```
+
+**Task Sizing Estimation Prompt**
+```bash
+ai "Estimate task sizes for these development items using team velocity data:
+
+Previous sprints:
+- Authentication system: 8 tasks (3 Large, 4 Medium, 1 Small), completed in 2 weeks
+- Search feature: 5 tasks (1 Large, 2 Medium, 2 Small), completed in 1.5 weeks
+- Dashboard redesign: 12 tasks (2 Large, 6 Medium, 4 Small), completed in 3 weeks
+
+New tasks: [task list]
+
+Use Small/Medium/Large sizing and provide reasoning."
+```
+
+**Anti-pattern: Vague Issue Generation**
+Creating generic tasks without specific acceptance criteria, proper sizing, or clear dependencies leads to scope creep and estimation errors.
+
+**Anti-pattern Examples:**
+```markdown
+❌ "Fix the login page"
+❌ "Make the dashboard better" 
+❌ "Add some tests"
+
+✅ "Replace deprecated auth library with OAuth 2.0 (Size: Large)"
+✅ "Add real-time data refresh to dashboard metrics (Size: Medium)"
+✅ "Achieve 90% test coverage for user service (Size: Small)"
+```
 
 ---
 
@@ -722,6 +876,7 @@ Waiting for incidents to spike forces firefighting rather than proactive system 
 2. **[Rules as Code](#rules-as-code)** - Establish consistent AI coding standards
 3. **[AI Security Sandbox](#ai-security-sandbox)** - Implement secure AI tool isolation
 4. **[AI Developer Lifecycle](#ai-developer-lifecycle)** - Define structured development process
+5. **[AI Issue Generation](#ai-issue-generation)** - Generate structured work items from requirements
 
 ### Phase 2: Development (Weeks 3-4)
 1. **[ATDD-Driven AI Development](#atdd-driven-ai-development)** - Implement acceptance test-first approach
