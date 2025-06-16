@@ -198,14 +198,51 @@ graph TD
     A[Problem Definition] --> B[Technical Plan]
     B --> C[Product Requirements]
     C --> D[AI Issue Generation]
-    D --> E[User Stories]
-    E --> F[Acceptance Tests]
-    F --> G[Implementation]
-    G --> H[Testing & Validation]
-    H --> I[Deployment]
-    I --> J[Monitoring]
-    J --> K[Iteration]
-    K --> A
+    D --> E[Acceptance Tests]
+    E --> F[Implementation]
+    F --> G[Testing & Validation]
+    G --> H[Deployment]
+    H --> I[Monitoring]
+    I --> J[Iteration]
+    J --> A
+```
+
+**Stage 1: AI-Assisted Problem Definition**
+*Patterns: Constraint-Based AI Development, Test-Driven Prompt Engineering*
+
+Define clear problem statements and success criteria before any implementation work begins.
+
+```bash
+ai "Analyze this problem statement for technical feasibility:
+- Suggest alternative approaches
+- Identify potential risks
+- Estimate complexity and effort"
+```
+
+**Stage 2: AI-Generated Technical Plan**
+*Patterns: Context Window Optimization, AI Pair Rotation, Rules as Code*
+
+Transform problem definitions into concrete technical architectures with clear implementation paths.
+
+```bash
+ai "Create a technical plan for [problem] using [technology stack]:
+- Include architecture diagrams
+- Detail security considerations
+- Break into 3-week development phases
+- Identify technical risks and mitigation strategies"
+```
+
+**Stage 3: Product Requirements Document (PRD)**
+*Patterns: AI Knowledge Persistence, Progressive AI Enhancement*
+
+Translate technical plans into detailed product specifications with measurable acceptance criteria.
+
+```bash
+ai "Convert this technical plan into detailed product requirements:
+- Include API specifications with OpenAPI format
+- Define user interaction flows
+- Specify error handling patterns
+- Add acceptance criteria for each feature"
 ```
 
 **Stage 4: AI Issue Generation**
@@ -226,6 +263,74 @@ Format as JSON for automated issue creation."
 ```
 
 Apply **AI Issue Generation** to create comprehensive task breakdown. Use **Progressive AI Enhancement** to ensure tasks are properly sized for iterative delivery.
+
+**Stage 5: Acceptance Test-Driven Development (ATDD)**
+*Patterns: Test-Driven AI Development, Observable AI Development*
+
+Write executable acceptance tests before implementation to guide AI code generation.
+
+```bash
+ai "Generate acceptance tests for user story:
+- Use Gherkin format for clarity
+- Cover happy path and edge cases
+- Include performance criteria
+- Make tests executable with minimal setup"
+```
+
+**Stage 6: AI-Driven Implementation**
+*Patterns: AI Commit Protocol, AI Security Sandbox, Rules as Code, Progressive AI Enhancement*
+
+Use AI to implement features that satisfy the acceptance tests while maintaining code quality.
+
+```bash
+# Implementation workflow
+ai-checkpoint "Before implementing user authentication"
+ai-implement "Create JWT-based authentication following our security patterns"
+ai-test "Run tests and fix any failures"
+ai-review "Review code for security vulnerabilities"
+ai-commit "Add authentication with security review"
+```
+
+**Stage 7: Comprehensive Testing Strategy**
+*Patterns: AI Prompt Pipeline, Parallel AI Workflows, Context Window Optimization*
+
+Execute multi-layered testing approach with AI assistance for thorough quality assurance.
+
+```bash
+ai "Generate comprehensive test suite:
+- Unit tests with edge cases
+- Integration tests for API endpoints
+- End-to-end user journey tests
+- Security vulnerability scans
+- Performance benchmarks"
+```
+
+**Stage 8: Deployment Pipeline**
+*Patterns: Everything as a Tool, AI Prompt Pipeline, AI Security Sandbox*
+
+Automate deployment with AI validation at each stage to ensure production readiness.
+
+```bash
+ai "Review deployment checklist:
+- Validate all tests passing
+- Check security compliance
+- Verify performance metrics
+- Generate deployment notes
+- Create rollback plan"
+```
+
+**Stage 9: AI-Monitored Production**
+*Patterns: Observable AI Development, AI Knowledge Persistence, Everything as a Tool*
+
+Continuous monitoring with AI-powered analysis for proactive issue detection and resolution.
+
+```bash
+ai "Analyze production metrics:
+- Identify performance anomalies
+- Detect error rate increases
+- Suggest optimization opportunities
+- Generate incident reports"
+```
 
 **Anti-pattern: Ad-Hoc AI Development**
 Jumping straight to coding with AI without proper planning, requirements, or testing strategy.
