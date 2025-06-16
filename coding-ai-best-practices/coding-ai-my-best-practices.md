@@ -77,22 +77,37 @@ graph TD
 **Stage 1: AI-Assisted Problem Definition**
 *Patterns: Constraint-Based AI Development, Test-Driven Prompt Engineering*
 
-### Problem Statement Template
+Define clear problem statements and success criteria before any implementation work begins.
+
+**Problem Statement Template**
+```markdown
+# Problem Definition
 
 **Business Problem**: [What business challenge are we solving?]  
 **Technical Problem**: [What specific technical implementation is needed?]  
 **Success Criteria**: [How will we measure success?]  
 **Constraints**: [Time, budget, technology, compliance limitations]  
 **Assumptions**: [What are we assuming to be true?]
+```
 
-> **AI Prompt**: "Analyze this problem statement for technical feasibility, suggest alternative approaches, and identify potential risks"
+**AI Prompt Example**
+```bash
+ai "Analyze this problem statement for technical feasibility:
+- Suggest alternative approaches
+- Identify potential risks
+- Estimate complexity and effort"
+```
 
 Apply **Constraint-Based AI Development** by setting specific boundaries upfront. Use **Test-Driven Prompt Engineering** to refine your problem analysis prompts until they consistently produce actionable insights.
 
 **Stage 2: AI-Generated Technical Plan**
 *Patterns: Context Window Optimization, AI Pair Rotation, Rules as Code*
 
-### Technical Plan Template
+Transform problem definitions into concrete technical architectures with clear implementation paths.
+
+**Technical Plan Template**
+```markdown
+# Technical Plan
 
 **Architecture Overview**: [High-level system design]  
 **Technology Stack**: [Languages, frameworks, databases, cloud services]  
@@ -100,37 +115,60 @@ Apply **Constraint-Based AI Development** by setting specific boundaries upfront
 **Security Considerations**: [Auth, data protection, compliance]  
 **Performance Requirements**: [SLA targets, scalability needs]  
 **Development Phases**: [Breakdown into deliverable milestones]
+```
 
-> **AI Prompt**: "Create a technical plan for [problem] using [technology stack]. Include architecture diagrams, security considerations, and 3-week development phases."
+**AI Integration Example**
+```bash
+ai "Create a technical plan for [problem] using [technology stack]:
+- Include architecture diagrams
+- Detail security considerations
+- Break into 3-week development phases
+- Identify technical risks and mitigation strategies"
+```
 
 Use **Context Window Optimization** - choose Claude for complex architectural reasoning. Apply **AI Pair Rotation** by having different AI tools review the plan. Ensure consistency with your **Rules as Code** for architecture standards.
 
 **Stage 3: Product Requirements Document (PRD)**
 *Patterns: AI Knowledge Persistence, Progressive AI Enhancement*
 
-### PRD Template
+Translate technical plans into detailed product specifications with measurable acceptance criteria.
 
-**Functional Requirements**:
+**PRD Template**
+```markdown
+# Product Requirements
+
+## Functional Requirements
 - Feature 1: [Detailed behavior description]
 - Feature 2: [User interactions and system responses]
 
-**Non-Functional Requirements**:
+## Non-Functional Requirements
 - Performance: [Response times, throughput]
 - Security: [Authentication, authorization, data protection]
 - Usability: [User experience standards]
 
-**API Specifications**:
+## API Specifications
 - Endpoint definitions
 - Request/response schemas
 - Error handling
+```
 
-> **AI Prompt**: "Convert this technical plan into detailed product requirements with API specifications and user interaction flows."
+**AI-Driven PRD Generation**
+```bash
+ai "Convert this technical plan into detailed product requirements:
+- Include API specifications with OpenAPI format
+- Define user interaction flows
+- Specify error handling patterns
+- Add acceptance criteria for each feature"
+```
 
 Leverage **AI Knowledge Persistence** by referencing successful patterns from previous PRDs. Plan for **Progressive AI Enhancement** by breaking requirements into deployable iterations.
 
-**Stage 4: User Stories with AI Context**
+**Stage 4: AI Issue Generation**
 *Patterns: AI Knowledge Persistence, Constraint-Based AI Development*
 
+Generate structured, actionable work items from product requirements with clear acceptance criteria.
+
+**User Story Template**
 ```markdown
 ## User Story Template
 
@@ -147,8 +185,15 @@ Leverage **AI Knowledge Persistence** by referencing successful patterns from pr
 - Relevant patterns from knowledge base
 - Security considerations
 - Performance requirements
+```
 
-AI Prompt: "Generate user stories from these requirements. Include acceptance criteria and implementation guidance for each story."
+**AI Issue Generation Example**
+```bash
+ai "Generate user stories from these requirements:
+- Break down features into tasks under 3 days
+- Include acceptance criteria for each story
+- Add implementation guidance and dependencies
+- Format for GitHub/JIRA import"
 ```
 
 Include **AI Knowledge Persistence** references in implementation notes. Apply **Constraint-Based AI Development** to scope each story appropriately.
