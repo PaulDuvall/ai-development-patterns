@@ -77,43 +77,38 @@ graph TD
 **Stage 1: AI-Assisted Problem Definition**
 *Patterns: Constraint-Based AI Development, Test-Driven Prompt Engineering*
 
-```markdown
-## Problem Statement Template
+### Problem Statement Template
 
-**Business Problem**: [What business challenge are we solving?]
-**Technical Problem**: [What specific technical implementation is needed?]
-**Success Criteria**: [How will we measure success?]
-**Constraints**: [Time, budget, technology, compliance limitations]
+**Business Problem**: [What business challenge are we solving?]  
+**Technical Problem**: [What specific technical implementation is needed?]  
+**Success Criteria**: [How will we measure success?]  
+**Constraints**: [Time, budget, technology, compliance limitations]  
 **Assumptions**: [What are we assuming to be true?]
 
-AI Prompt: "Analyze this problem statement for technical feasibility, suggest alternative approaches, and identify potential risks"
-```
+> **AI Prompt**: "Analyze this problem statement for technical feasibility, suggest alternative approaches, and identify potential risks"
 
 Apply **Constraint-Based AI Development** by setting specific boundaries upfront. Use **Test-Driven Prompt Engineering** to refine your problem analysis prompts until they consistently produce actionable insights.
 
 **Stage 2: AI-Generated Technical Plan**
 *Patterns: Context Window Optimization, AI Pair Rotation, Rules as Code*
 
-```markdown
-## Technical Plan Template
+### Technical Plan Template
 
-**Architecture Overview**: [High-level system design]
-**Technology Stack**: [Languages, frameworks, databases, cloud services]
-**Integration Points**: [APIs, services, data sources]
-**Security Considerations**: [Auth, data protection, compliance]
-**Performance Requirements**: [SLA targets, scalability needs]
+**Architecture Overview**: [High-level system design]  
+**Technology Stack**: [Languages, frameworks, databases, cloud services]  
+**Integration Points**: [APIs, services, data sources]  
+**Security Considerations**: [Auth, data protection, compliance]  
+**Performance Requirements**: [SLA targets, scalability needs]  
 **Development Phases**: [Breakdown into deliverable milestones]
 
-AI Prompt: "Create a technical plan for [problem] using [technology stack]. Include architecture diagrams, security considerations, and 3-week development phases."
-```
+> **AI Prompt**: "Create a technical plan for [problem] using [technology stack]. Include architecture diagrams, security considerations, and 3-week development phases."
 
 Use **Context Window Optimization** - choose Claude for complex architectural reasoning. Apply **AI Pair Rotation** by having different AI tools review the plan. Ensure consistency with your **Rules as Code** for architecture standards.
 
 **Stage 3: Product Requirements Document (PRD)**
 *Patterns: AI Knowledge Persistence, Progressive AI Enhancement*
 
-```markdown
-## PRD Template
+### PRD Template
 
 **Functional Requirements**:
 - Feature 1: [Detailed behavior description]
@@ -129,8 +124,7 @@ Use **Context Window Optimization** - choose Claude for complex architectural re
 - Request/response schemas
 - Error handling
 
-AI Prompt: "Convert this technical plan into detailed product requirements with API specifications and user interaction flows."
-```
+> **AI Prompt**: "Convert this technical plan into detailed product requirements with API specifications and user interaction flows."
 
 Leverage **AI Knowledge Persistence** by referencing successful patterns from previous PRDs. Plan for **Progressive AI Enhancement** by breaking requirements into deployable iterations.
 
