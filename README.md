@@ -335,6 +335,8 @@ ai "Analyze production metrics:
 **Anti-pattern: Ad-Hoc AI Development**
 Jumping straight to coding with AI without proper planning, requirements, or testing strategy.
 
+**Note**: Some patterns referenced in the lifecycle stages (Test-Driven Prompt Engineering, AI Pair Rotation, AI Commit Protocol, Everything as a Tool) are advanced patterns documented in separate resources. The patterns linked above provide the foundation for the AI Developer Lifecycle.
+
 ---
 
 ## AI Failure Recovery Protocol
