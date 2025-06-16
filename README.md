@@ -208,7 +208,7 @@ graph TD
 ```
 
 **Stage 1: AI-Assisted Problem Definition**
-*Patterns: Constraint-Based AI Development, Test-Driven Prompt Engineering*
+*Patterns: [Constraint-Based AI Development](#constraint-based-ai-development), Test-Driven Prompt Engineering*
 
 Define clear problem statements and success criteria before any implementation work begins.
 
@@ -220,7 +220,7 @@ ai "Analyze this problem statement for technical feasibility:
 ```
 
 **Stage 2: AI-Generated Technical Plan**
-*Patterns: Context Window Optimization, AI Pair Rotation, Rules as Code*
+*Patterns: [Context Window Optimization](#context-window-optimization), AI Pair Rotation, [Rules as Code](#rules-as-code)*
 
 Transform problem definitions into concrete technical architectures with clear implementation paths.
 
@@ -233,7 +233,7 @@ ai "Create a technical plan for [problem] using [technology stack]:
 ```
 
 **Stage 3: Product Requirements Document (PRD)**
-*Patterns: AI Knowledge Persistence, Progressive AI Enhancement*
+*Patterns: [AI Knowledge Persistence](#ai-knowledge-persistence), [Progressive AI Enhancement](#progressive-ai-enhancement)*
 
 Translate technical plans into detailed product specifications with measurable acceptance criteria.
 
@@ -246,7 +246,7 @@ ai "Convert this technical plan into detailed product requirements:
 ```
 
 **Stage 4: AI Issue Generation**
-*Patterns: AI Issue Generation, Progressive AI Enhancement*
+*Patterns: [AI Issue Generation](#ai-issue-generation), [Progressive AI Enhancement](#progressive-ai-enhancement)*
 
 Transform product requirements into structured, actionable work items using AI to break down features into properly sized tasks with clear acceptance criteria and dependencies.
 
@@ -262,10 +262,10 @@ ai "Break down these product requirements into GitHub issues:
 Format as JSON for automated issue creation."
 ```
 
-Apply **AI Issue Generation** to create comprehensive task breakdown. Use **Progressive AI Enhancement** to ensure tasks are properly sized for iterative delivery.
+Apply [**AI Issue Generation**](#ai-issue-generation) to create comprehensive task breakdown. Use [**Progressive AI Enhancement**](#progressive-ai-enhancement) to ensure tasks are properly sized for iterative delivery.
 
 **Stage 5: Acceptance Test-Driven Development (ATDD)**
-*Patterns: Test-Driven AI Development, Observable AI Development*
+*Patterns: [ATDD-Driven AI Development](#atdd-driven-ai-development), [Observable AI Development](#observable-ai-development)*
 
 Write executable acceptance tests before implementation to guide AI code generation.
 
@@ -278,7 +278,7 @@ ai "Generate acceptance tests for user story:
 ```
 
 **Stage 6: AI-Driven Implementation**
-*Patterns: AI Commit Protocol, AI Security Sandbox, Rules as Code, Progressive AI Enhancement*
+*Patterns: AI Commit Protocol, [AI Security Sandbox](#ai-security-sandbox), [Rules as Code](#rules-as-code), [Progressive AI Enhancement](#progressive-ai-enhancement)*
 
 Use AI to implement features that satisfy the acceptance tests while maintaining code quality.
 
@@ -292,7 +292,7 @@ ai-commit "Add authentication with security review"
 ```
 
 **Stage 7: Comprehensive Testing Strategy**
-*Patterns: AI Prompt Pipeline, Parallel AI Workflows, Context Window Optimization*
+*Patterns: [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy), [AI Workflow Orchestration](#ai-workflow-orchestration), [Context Window Optimization](#context-window-optimization)*
 
 Execute multi-layered testing approach with AI assistance for thorough quality assurance.
 
@@ -306,7 +306,7 @@ ai "Generate comprehensive test suite:
 ```
 
 **Stage 8: Deployment Pipeline**
-*Patterns: Everything as a Tool, AI Prompt Pipeline, AI Security Sandbox*
+*Patterns: Everything as a Tool, [Deployment Automation](#deployment-automation), [AI Security Sandbox](#ai-security-sandbox)*
 
 Automate deployment with AI validation at each stage to ensure production readiness.
 
@@ -320,7 +320,7 @@ ai "Review deployment checklist:
 ```
 
 **Stage 9: AI-Monitored Production**
-*Patterns: Observable AI Development, AI Knowledge Persistence, Everything as a Tool*
+*Patterns: [Observable AI Development](#observable-ai-development), [AI Knowledge Persistence](#ai-knowledge-persistence), [Monitoring & Maintenance](#monitoring--maintenance)*
 
 Continuous monitoring with AI-powered analysis for proactive issue detection and resolution.
 
