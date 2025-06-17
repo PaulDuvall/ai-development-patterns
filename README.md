@@ -57,9 +57,24 @@ graph TD
 | **[Constraint-Based AI Development](#constraint-based-ai-development)** | Beginner | Development | Give AI specific constraints to prevent over-engineering and ensure focused solutions | Progressive AI Enhancement |
 | **[Observable AI Development](#observable-ai-development)** | Intermediate | Development | Strategic logging and debugging that makes system behavior visible to AI | AI Developer Lifecycle |
 | **[AI-Driven Refactoring](#ai-driven-refactoring)** | Intermediate | Development | Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics | Rules as Code |
-| **[AI Security & Compliance](#ai-security--compliance)** | Advanced | Operations | Policy generation, vulnerability scanning, compliance automation, and ChatOps security integration | AI Security Sandbox |
-| **[Deployment Automation](#deployment-automation)** | Advanced | Operations | Pipeline synthesis, blue-green deployments, drift remediation, and release note generation | AI Workflow Orchestration |
-| **[Monitoring & Maintenance](#monitoring--maintenance)** | Advanced | Operations | Incident response, test health, dependency management, on-call automation, and chaos engineering | Observable AI Development |
+| **Security & Compliance** | | Operations | *Category containing security and compliance patterns* | |
+| **[Policy-as-Code Generation](#policy-as-code-generation)** | Advanced | Operations | Transform compliance requirements into executable Cedar/OPA policy files with AI assistance | AI Security Sandbox |
+| **[Security Scanning Orchestration](#security-scanning-orchestration)** | Intermediate | Operations | Aggregate multiple security tools and use AI to summarize findings for actionable insights | Policy-as-Code Generation |
+| **[Compliance Evidence Automation](#compliance-evidence-automation)** | Advanced | Operations | Generate audit evidence matrices from logs and configuration changes automatically | Security Scanning Orchestration |
+| **[ChatOps Security Integration](#chatops-security-integration)** | Beginner | Operations | Deploy security scanning capabilities through chat commands for immediate feedback | Security Scanning Orchestration |
+| **Deployment Automation** | | Operations | *Category containing deployment and pipeline patterns* | |
+| **[Pipeline Synthesis](#pipeline-synthesis)** | Intermediate | Operations | Convert plain-English build specifications into CI/CD pipeline configurations | AI Workflow Orchestration |
+| **[AI-Guided Blue-Green Deployment](#ai-guided-blue-green-deployment)** | Advanced | Operations | Generate blue-green deployment scripts with validation to prevent AI misconceptions | Pipeline Synthesis |
+| **[Drift Detection & Remediation](#drift-detection--remediation)** | Advanced | Operations | Detect infrastructure configuration drift and generate corrective patches automatically | Pipeline Synthesis |
+| **[Release Note Synthesis](#release-note-synthesis)** | Beginner | Operations | Automatically generate structured release notes by analyzing git commit history | Pipeline Synthesis |
+| **Monitoring & Maintenance** | | Operations | *Category containing monitoring and maintenance patterns* | |
+| **[Performance Baseline Management](#performance-baseline-management)** | Advanced | Operations | Establish intelligent performance baselines and configure monitoring thresholds automatically | Observable AI Development |
+| **[Technical Debt Forecasting](#technical-debt-forecasting)** | Intermediate | Operations | Proactively identify and prioritize technical debt using AI-powered code analysis | AI-Driven Refactoring |
+| **[Incident Response Automation](#incident-response-automation)** | Advanced | Operations | Generate actionable incident response playbooks from historical incident data | Performance Baseline Management |
+| **[Test Suite Health Management](#test-suite-health-management)** | Intermediate | Operations | Analyze build history to identify and remediate flaky tests automatically | Comprehensive AI Testing Strategy |
+| **[Dependency Upgrade Advisor](#dependency-upgrade-advisor)** | Intermediate | Operations | Intelligently manage dependency upgrades with compatibility analysis and risk assessment | Technical Debt Forecasting |
+| **[On-Call Handoff Automation](#on-call-handoff-automation)** | Intermediate | Operations | Generate comprehensive handoff briefs that summarize system state and active issues | Incident Response Automation |
+| **[Chaos Engineering Scenarios](#chaos-engineering-scenarios)** | Advanced | Operations | Generate targeted chaos experiments based on system architecture and dependencies | Performance Baseline Management |
 
 ---
 
@@ -71,6 +86,8 @@ Foundation patterns establish the essential infrastructure and team readiness re
 
 **Maturity**: Beginner  
 **Description**: Systematic evaluation of codebase and team readiness for AI-assisted development before implementing AI patterns.
+
+**Related Patterns**: [Rules as Code](#rules-as-code), [AI Issue Generation](#ai-issue-generation)
 
 **Assessment Framework**
 
@@ -354,6 +371,8 @@ Jumping straight to coding with AI without proper planning, requirements, or tes
 
 **Maturity**: Intermediate  
 **Description**: Clear boundaries and procedures for transitioning work between human developers and AI tools based on complexity, security requirements, and creative problem-solving needs.
+
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Observable AI Development](#observable-ai-development)
 
 **Handoff Decision Framework**
 
@@ -1076,28 +1095,15 @@ Attempting refactoring without comprehensive automated tests makes it impossible
 
 Operations patterns focus on CI/CD, security, compliance, and production management with AI assistance, building on the foundation and development patterns.
 
-## AI Security & Compliance
+## Security & Compliance Patterns
+
+### Policy-as-Code Generation
 
 **Maturity**: Advanced  
-**Description**: Unified framework for policy generation, vulnerability scanning, and compliance automation using AI to transform regulatory requirements into executable code.
+**Description**: Transform compliance requirements into executable Cedar/OPA policy files with AI assistance, ensuring regulatory requirements become testable code.
 
 **Related Patterns**: [AI Security Sandbox](#ai-security-sandbox), [Rules as Code](#rules-as-code)
 
-**Unified Security Framework**
-
-```mermaid
-graph TD
-    A[Compliance Requirements] --> B[AI Policy Generation]
-    B --> C[Vulnerability Scanning]
-    C --> D[Security Testing]
-    D --> E[Compliance Evidence]
-    E --> F[Audit Reports]
-    F --> G[Continuous Monitoring]
-    G --> H[Policy Updates]
-    H --> B
-```
-
-**Policy-as-Code Generation**
 ```bash
 # policies/req.md
 "Data at rest must be AES-256 encrypted in transit and at rest per SOC 2."
@@ -1107,7 +1113,18 @@ ai "Convert policies/req.md into Cedar policy code" > policies/code/encryption.c
 opa test policies/code/encryption.cedar
 ```
 
-**Security Scanning Orchestration**
+**Anti-pattern: Manual Policy Translation**
+Hand-coding policies from written requirements introduces inconsistencies and interpretation errors.
+
+---
+
+### Security Scanning Orchestration
+
+**Maturity**: Intermediate  
+**Description**: Aggregate multiple security tools and use AI to summarize findings for actionable insights, reducing alert fatigue while maintaining security rigor.
+
+**Related Patterns**: [Policy-as-Code Generation](#policy-as-code-generation)
+
 ```bash
 #!/bin/bash
 snyk test --json > snyk.json
@@ -1118,7 +1135,18 @@ gh pr comment --body-file pr-comment.txt
 if grep -q '"severity":"CRITICAL"' pr-comment.txt; then exit 1; fi
 ```
 
-**Compliance Evidence Automation**
+**Anti-pattern: Alert Fatigue**
+Posting every low-severity finding buries real issues and frustrates developers.
+
+---
+
+### Compliance Evidence Automation
+
+**Maturity**: Advanced  
+**Description**: Generate audit evidence matrices from logs and configuration changes automatically, creating comprehensive compliance documentation without manual effort.
+
+**Related Patterns**: [Security Scanning Orchestration](#security-scanning-orchestration)
+
 ```bash
 # Automated compliance evidence collection
 aws configservice get-resource-config-history > awsconfig.json
@@ -1126,7 +1154,18 @@ aws cloudtrail lookup-events > iam-changes.json
 ai "Generate SOC2 evidence sheet from awsconfig.json and iam-changes.json" > report.csv
 ```
 
-**ChatOps Security Integration**
+**Anti-pattern: Manual Evidence Collection**
+Hand-crafted spreadsheets miss events or contain outdated entries under audit pressure.
+
+---
+
+### ChatOps Security Integration
+
+**Maturity**: Beginner  
+**Description**: Deploy security scanning capabilities through chat commands for immediate feedback, making security assessment as easy as sending a message.
+
+**Related Patterns**: [Security Scanning Orchestration](#security-scanning-orchestration)
+
 ```yaml
 # bot-config.yml
 commands:
@@ -1134,22 +1173,20 @@ commands:
     action: "./security-scan.sh && cat pr-comment.txt"
 ```
 
-**Anti-pattern: Fragmented Security**
-Implementing security tools and compliance checks in isolation without a unified AI-driven framework leads to gaps and inconsistencies.
-
-**Anti-pattern: Alert Fatigue**
-Posting every low-severity finding buries real issues and frustrates developers.
+**Anti-pattern: Over-Automation**
+Allowing auto-fix commands via chat can deploy untested changes.
 
 ---
 
-## Deployment Automation
+## Deployment Automation Patterns
 
-**Maturity**: Advanced  
-**Description**: AI-powered pipeline generation, blue-green deployments, and intelligent rollback strategies that adapt to system behavior and historical patterns.
+### Pipeline Synthesis
 
-**Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration), [Observable AI Development](#observable-ai-development)
+**Maturity**: Intermediate  
+**Description**: Convert plain-English build specifications into CI/CD pipeline configurations, maintaining traceability between human-readable specs and generated pipelines.
 
-**Pipeline Synthesis**
+**Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration)
+
 ```bash
 # ci.spec
 install dependencies -> pip install -r requirements.txt
@@ -1163,16 +1200,17 @@ git add ci.spec .github/workflows/ci.yml
 git commit -m "chore: generate CI from spec"
 ```
 
-**Intelligent Rollback Strategies**
-```bash
-aws cloudwatch get-metric-statistics --output text > metrics.csv
-ai "From metrics.csv, suggest a 5% canary rollout and rollback criteria" > canary.json
-deploy-tool update-release --config canary.json
-```
+**Anti-pattern: Over-Generation**
+Accepting every AI-suggested stage without pruning adds slow, unused steps to pipelines.
 
-**AI-Guided Blue-Green Deployment**
+---
 
-Blue-green deployments are often misunderstood by AI models. This pattern provides explicit guidance to ensure correct implementation.
+### AI-Guided Blue-Green Deployment
+
+**Maturity**: Advanced  
+**Description**: Generate blue-green deployment scripts with validation to prevent AI misconceptions, ensuring proper atomic traffic switching rather than gradual rollouts.
+
+**Related Patterns**: [Pipeline Synthesis](#pipeline-synthesis)
 
 ```bash
 # Blue-green reference documentation
@@ -1208,7 +1246,18 @@ if grep -q "canary\|gradual\|percentage" deploy-blue-green.sh; then
 fi
 ```
 
-**Drift Detection & Remediation**
+**Anti-pattern: Trusting AI Blue-Green Generation**
+LLMs frequently confuse blue-green with canary deployments, generating gradual traffic shifting instead of atomic switches.
+
+---
+
+### Drift Detection & Remediation
+
+**Maturity**: Advanced  
+**Description**: Detect infrastructure configuration drift and generate corrective patches automatically, maintaining infrastructure as intended without manual intervention.
+
+**Related Patterns**: [Pipeline Synthesis](#pipeline-synthesis)
+
 ```bash
 # Detect and fix infrastructure drift
 terraform plan -out=tf.plan
@@ -1217,50 +1266,92 @@ ai "Create Terraform patch from drift.json to restore desired state" > patch.tf
 terraform apply patch.tf
 ```
 
-**Release Note Synthesis**
+**Anti-pattern: Automated Overwrite**
+Auto-applying AI patches without inspection can break resources you didn't intend to change.
+
+---
+
+### Release Note Synthesis
+
+**Maturity**: Beginner  
+**Description**: Automatically generate structured release notes by analyzing git commit history, categorizing changes into meaningful sections for clear communication.
+
+**Related Patterns**: [Pipeline Synthesis](#pipeline-synthesis)
+
 ```bash
 # Auto-generate structured release notes
 git log v1.3.2..HEAD --pretty=format:"%s" > commits.log
 ai "Group commits in commits.log under Added, Changed, Fixed" >> CHANGELOG.md
 ```
 
-**Anti-pattern: Static Deployment**
-Using fixed deployment scripts without AI adaptation leads to suboptimal rollout strategies and missed opportunities for intelligent automation.
-
-**Anti-pattern: Trusting AI Blue-Green Generation**
-LLMs frequently confuse blue-green with canary deployments, generating gradual traffic shifting instead of atomic switches.
+**Anti-pattern: Minimal Notes**
+Simply pasting commit hashes without context leaves users guessing what changed.
 
 ---
 
-## Monitoring & Maintenance
+## Monitoring & Maintenance Patterns
+
+### Performance Baseline Management
 
 **Maturity**: Advanced  
-**Description**: Performance baselines, incident response, and technical debt management with AI assistance for proactive system health and automated maintenance workflows.
+**Description**: Establish intelligent performance baselines and configure monitoring thresholds automatically, minimizing false positives while catching real performance issues.
 
-**Related Patterns**: [Observable AI Development](#observable-ai-development), [AI Knowledge Persistence](#ai-knowledge-persistence)
+**Related Patterns**: [Observable AI Development](#observable-ai-development)
 
-**Performance Baseline Management**
 ```bash
 aws cloudwatch get-metric-statistics --period 86400 > perf.csv
 ai "From perf.csv, recommend latency alert thresholds and autoscale policies" > perf-policy.json
 deploy-tool apply perf-policy.json
 ```
 
-**Technical Debt Forecasting**
+**Anti-pattern: One-Off Alerts**
+Manual thresholds quickly become stale, causing alert storms or blind spots.
+
+---
+
+### Technical Debt Forecasting
+
+**Maturity**: Intermediate  
+**Description**: Proactively identify and prioritize technical debt using AI-powered code analysis, ranking areas most in need of attention with specific remediation strategies.
+
+**Related Patterns**: [AI-Driven Refactoring](#ai-driven-refactoring)
+
 ```bash
 cloc src > loc.txt
 coverage run -m pytest; coverage report > cov.txt
 ai "From loc.txt and cov.txt, list top-3 files needing refactor and tests" > debt.txt
 ```
 
-**Incident Response Automation**
+**Anti-pattern: Reactive Fixes**
+Waiting for incidents to spike forces firefighting rather than long-term health management.
+
+---
+
+### Incident Response Automation
+
+**Maturity**: Advanced  
+**Description**: Generate actionable incident response playbooks from historical incident data, extracting common patterns and successful resolution strategies for future use.
+
+**Related Patterns**: [Performance Baseline Management](#performance-baseline-management)
+
 ```bash
 pd incidents:list --limit 10 > incidents.json
 ai "Create a step-by-step RDS failover runbook from incidents.json" > runbooks/rds-failover.md
 git add runbooks/rds-failover.md
 ```
 
-**Test Suite Health Management**
+**Anti-pattern: Stale Documentation**
+Failing to regenerate playbooks after new incidents yields outdated guidance.
+
+---
+
+### Test Suite Health Management
+
+**Maturity**: Intermediate  
+**Description**: Analyze build history to identify and remediate flaky tests automatically, improving build reliability by distinguishing between legitimate failures and intermittent issues.
+
+**Related Patterns**: [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)
+
 ```bash
 # Identify and fix flaky tests
 wget ci-server/logs/last50 > ci.log
@@ -1268,7 +1359,18 @@ ai "Find intermittently failing tests in ci.log and suggest retry decorators" > 
 # Apply fixes like: @pytest.mark.flaky(reruns=3)
 ```
 
-**Dependency Upgrade Advisor**
+**Anti-pattern: Skip Tests**
+Marking tests as skipped ignores root causes and shrinks coverage.
+
+---
+
+### Dependency Upgrade Advisor
+
+**Maturity**: Intermediate  
+**Description**: Intelligently manage dependency upgrades with compatibility analysis and risk assessment, recommending safe upgrade paths while flagging potentially breaking changes.
+
+**Related Patterns**: [Technical Debt Forecasting](#technical-debt-forecasting)
+
 ```bash
 # Intelligent dependency management
 npm outdated --json > deps.json
@@ -1276,7 +1378,18 @@ ai "From deps.json, suggest npm install commands for lodash and axios without br
 bash deps-update.sh
 ```
 
-**On-Call Handoff Automation**
+**Anti-pattern: Bulk Updates**
+Running `npm update` without understanding breaking changes causes runtime errors.
+
+---
+
+### On-Call Handoff Automation
+
+**Maturity**: Intermediate  
+**Description**: Generate comprehensive handoff briefs that summarize system state and active issues, ensuring smooth transitions between on-call engineers with complete context.
+
+**Related Patterns**: [Incident Response Automation](#incident-response-automation)
+
 ```bash
 # Generate comprehensive handoff briefs
 pd incidents:list --status triggered > alerts.json
@@ -1285,15 +1398,23 @@ ai "Create an on-call handoff brief from alerts.json and dash.json" > handoff.md
 slack-cli post --file handoff.md --channel oncall
 ```
 
-**Chaos Engineering Scenarios**
+**Anti-pattern: Fragmented Handoffs**
+Relying on chat logs or email threads skips critical context and action items.
+
+---
+
+### Chaos Engineering Scenarios
+
+**Maturity**: Advanced  
+**Description**: Generate targeted chaos experiments based on system architecture and dependencies, creating focused scenarios that test resilience without unnecessary disruption.
+
+**Related Patterns**: [Performance Baseline Management](#performance-baseline-management)
+
 ```bash
 # Generate targeted chaos experiments
 ai "From services.json, generate a Gremlin script to kill 1 of 3 instances of service-A every 5m" > chaos.json
 gremlin run chaos.json
 ```
-
-**Anti-pattern: Reactive Maintenance**
-Waiting for incidents to spike forces firefighting rather than proactive system health management with AI assistance.
 
 **Anti-pattern: Blind Chaos Testing**
 Running random fault injection without understanding system dependencies yields noise rather than insights.
