@@ -1,0 +1,133 @@
+# Compliance Traceability Mapping
+# Links business requirements to regulatory compliance frameworks
+
+compliance_requirements:
+  SOX_404:
+    description: "Sarbanes-Oxley Section 404 - Internal controls over financial reporting"
+    linked_requirements: 
+      - "REQ-101: Financial data access controls"
+      - "REQ-102: Audit trail for financial transactions"
+      - "REQ-105: Segregation of duties in financial processes"
+    test_evidence: 
+      - "tests/audit/access_controls_test.py"
+      - "tests/audit/transaction_logging_test.py"
+      - "tests/financial/segregation_duties_test.py"
+    documentation: 
+      - "docs/compliance/sox_controls.md"
+      - "docs/audit/financial_controls.md"
+    certification_required: true
+    audit_frequency: "quarterly"
+    
+  PCI_DSS:
+    description: "Payment Card Industry Data Security Standard"
+    linked_requirements:
+      - "REQ-201: Payment data encryption at rest"
+      - "REQ-202: Secure payment data transmission"
+      - "REQ-203: Payment data access logging"
+      - "REQ-204: Tokenization of sensitive payment data"
+    test_evidence:
+      - "tests/security/payment/encryption_test.py"
+      - "tests/security/payment/transmission_test.py" 
+      - "tests/security/payment/access_logging_test.py"
+      - "tests/security/payment/tokenization_test.py"
+    documentation:
+      - "docs/security/pci_compliance.md"
+      - "docs/security/payment_security.md"
+    certification_required: true
+    audit_frequency: "annually"
+    
+  GDPR:
+    description: "General Data Protection Regulation"
+    linked_requirements:
+      - "REQ-301: User consent management"
+      - "REQ-302: Data portability and export"
+      - "REQ-303: Right to be forgotten implementation"
+      - "REQ-304: Data breach notification system"
+    test_evidence:
+      - "tests/privacy/consent_management_test.py"
+      - "tests/privacy/data_export_test.py"
+      - "tests/privacy/data_deletion_test.py"
+      - "tests/privacy/breach_notification_test.py"
+    documentation:
+      - "docs/privacy/gdpr_compliance.md"
+      - "docs/privacy/data_protection.md"
+    certification_required: false
+    audit_frequency: "annually"
+    
+  HIPAA:
+    description: "Health Insurance Portability and Accountability Act"
+    linked_requirements:
+      - "REQ-401: PHI encryption and access controls"
+      - "REQ-402: Audit logging for PHI access"
+      - "REQ-403: Business associate agreements"
+      - "REQ-404: Breach detection and notification"
+    test_evidence:
+      - "tests/security/hipaa/phi_encryption_test.py"
+      - "tests/security/hipaa/access_logging_test.py"
+      - "tests/security/hipaa/breach_detection_test.py"
+    documentation:
+      - "docs/compliance/hipaa_controls.md"
+      - "docs/security/phi_protection.md"
+    certification_required: true
+    audit_frequency: "annually"
+
+audit_trail:
+  requirement_changes: 
+    command: "git log --grep='REQ-' --oneline"
+    retention_period: "7_years"
+    
+  test_changes:
+    command: "git log -- tests/ --oneline"
+    retention_period: "7_years"
+    
+  documentation_updates:
+    command: "git log -- docs/ --oneline" 
+    retention_period: "7_years"
+    
+  compliance_reviews:
+    schedule: "monthly"
+    reviewer: "compliance_team"
+    evidence_collection: "automated"
+    
+  certification_renewals:
+    pci_dss: "annually"
+    sox_404: "annually"
+    iso_27001: "triannually"
+
+evidence_collection:
+  automated_tests:
+    frequency: "every_commit"
+    storage: "test_results/"
+    format: "junit_xml"
+    
+  security_scans:
+    frequency: "daily"
+    storage: "security_reports/"
+    format: "sarif"
+    
+  access_logs:
+    frequency: "real_time"
+    storage: "audit_logs/"
+    format: "json"
+    retention: "7_years"
+    
+  change_logs:
+    frequency: "every_commit"
+    storage: "git_history"
+    format: "git_log"
+    retention: "indefinite"
+
+reporting:
+  compliance_dashboard:
+    frequency: "real_time"
+    stakeholders: ["compliance_officer", "security_team", "audit_team"]
+    
+  quarterly_compliance_report:
+    frequency: "quarterly"
+    includes: ["requirement_coverage", "test_evidence", "audit_findings"]
+    stakeholders: ["executives", "board", "external_auditors"]
+    
+  audit_readiness_report:
+    frequency: "on_demand"
+    includes: ["evidence_inventory", "gap_analysis", "remediation_plans"]
+    stakeholders: ["audit_team", "compliance_officer"]
