@@ -1,6 +1,6 @@
 # AI Development Patterns
 
-A comprehensive collection of proven patterns for building software with AI assistance, organized by implementation maturity and development lifecycle phases.
+A comprehensive collection of patterns based on my experience for building software with AI assistance, organized by implementation maturity and development lifecycle phases. These patterns are subject to change as the field evolves.
 
 ## Pattern Organization
 
@@ -48,7 +48,7 @@ graph TD
 | **[AI Developer Lifecycle](#ai-developer-lifecycle)** | Intermediate | Foundation | Structured 9-stage process from problem definition through deployment with AI assistance | Rules as Code, AI Security Sandbox |
 | **[AI Failure Recovery Protocol](#ai-failure-recovery-protocol)** | Intermediate | Foundation | Systematic approach to detecting and recovering from AI-generated issues | AI Developer Lifecycle |
 | **[Human-AI Handoff Protocol](#human-ai-handoff-protocol)** | Intermediate | Foundation | Clear boundaries and procedures for transitioning work between human developers and AI | AI Developer Lifecycle |
-| **[AI Issue Generation](#ai-issue-generation)** | Beginner | Foundation | Generate structured work items and tickets from requirements using AI to break down features into actionable tasks with proper estimation, acceptance criteria, and dependencies | AI Readiness Assessment |
+| **[AI Issue Generation](#ai-issue-generation)** | Beginner | Foundation | Generate Kanban-optimized work items (1-2 day max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies | AI Readiness Assessment |
 | **[ATDD-Driven AI Development](#atdd-driven-ai-development)** | Intermediate | Development | Use Acceptance Test-Driven Development to guide AI code generation with executable specifications | AI Developer Lifecycle |
 | **[Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)** | Intermediate | Development | Unified approach to test-first development, automated generation, and quality assurance | ATDD-Driven AI Development |
 | **[Progressive AI Enhancement](#progressive-ai-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | AI Developer Lifecycle |
@@ -208,7 +208,7 @@ graph TD
 ```
 
 **Stage 1: AI-Assisted Problem Definition**
-*Patterns: [Constraint-Based AI Development](#constraint-based-ai-development), Test-Driven Prompt Engineering*
+*Patterns: [Constraint-Based AI Development](#constraint-based-ai-development)*
 
 Define clear problem statements and success criteria before any implementation work begins.
 
@@ -220,7 +220,7 @@ ai "Analyze this problem statement for technical feasibility:
 ```
 
 **Stage 2: AI-Generated Technical Plan**
-*Patterns: [Context Window Optimization](#context-window-optimization), AI Pair Rotation, [Rules as Code](#rules-as-code)*
+*Patterns: [Context Window Optimization](#context-window-optimization), [Rules as Code](#rules-as-code)*
 
 Transform problem definitions into concrete technical architectures with clear implementation paths.
 
@@ -278,7 +278,7 @@ ai "Generate acceptance tests for user story:
 ```
 
 **Stage 6: AI-Driven Implementation**
-*Patterns: AI Commit Protocol, [AI Security Sandbox](#ai-security-sandbox), [Rules as Code](#rules-as-code), [Progressive AI Enhancement](#progressive-ai-enhancement)*
+*Patterns: [AI Security Sandbox](#ai-security-sandbox), [Rules as Code](#rules-as-code), [Progressive AI Enhancement](#progressive-ai-enhancement)*
 
 Use AI to implement features that satisfy the acceptance tests while maintaining code quality.
 
@@ -306,7 +306,7 @@ ai "Generate comprehensive test suite:
 ```
 
 **Stage 8: Deployment Pipeline**
-*Patterns: Everything as a Tool, [Deployment Automation](#deployment-automation), [AI Security Sandbox](#ai-security-sandbox)*
+*Patterns: [Deployment Automation](#deployment-automation), [AI Security Sandbox](#ai-security-sandbox)*
 
 Automate deployment with AI validation at each stage to ensure production readiness.
 
@@ -335,7 +335,7 @@ ai "Analyze production metrics:
 **Anti-pattern: Ad-Hoc AI Development**
 Jumping straight to coding with AI without proper planning, requirements, or testing strategy.
 
-**Note**: Some patterns referenced in the lifecycle stages (Test-Driven Prompt Engineering, AI Pair Rotation, AI Commit Protocol, Everything as a Tool) are advanced patterns documented in separate resources. The patterns linked above provide the foundation for the AI Developer Lifecycle.
+**Note**: Some patterns referenced in the lifecycle stages are advanced patterns documented in separate resources. The patterns linked above provide the foundation for the AI Developer Lifecycle.
 
 ---
 
@@ -403,7 +403,7 @@ Allowing AI and humans to work on the same task simultaneously without clear han
 ## AI Issue Generation
 
 **Maturity**: Beginner  
-**Description**: Generate structured work items and tickets from requirements using AI to break down features into actionable tasks with proper estimation, acceptance criteria, and dependencies. Interface directly with issue tracking tools to create tickets automatically.
+**Description**: Generate structured work items optimized for Kanban flow using AI to break down features into small, rapidly completable tasks (1-2 days max) with clear acceptance criteria and dependencies. Focus on continuous flow rather than batch estimation.
 
 **Related Patterns**: [AI Readiness Assessment](#ai-readiness-assessment), [ATDD-Driven AI Development](#atdd-driven-ai-development)
 
@@ -412,12 +412,15 @@ Allowing AI and humans to work on the same task simultaneously without clear han
 ```mermaid
 graph TD
     A[Requirements Document] --> B[AI Feature Analysis]
-    B --> C[Task Breakdown]
-    C --> D[Story Generation]
-    D --> E[Acceptance Criteria]
-    E --> F[Effort Estimation]
-    F --> G[Dependency Mapping]
-    G --> H[Issue Creation]
+    B --> C[Work Item Splitting]
+    C --> D{<16 hours?}
+    D -->|No| E[Split Further]
+    E --> C
+    D -->|Yes| F[Story Generation]
+    F --> G[Acceptance Criteria]
+    G --> H[Cycle Time Target]
+    H --> I[Dependency Mapping]
+    I --> J[Kanban Card Creation]
 ```
 
 **Examples**
@@ -428,61 +431,69 @@ graph TD
 "Users need to be able to reset their passwords via email"
 ```
 
-**AI Prompt for Issue Generation**
+**AI Prompt for Kanban-Ready Task Generation**
 ```bash
-ai "Break down this feature into development tasks:
+ai "Break down this feature into small Kanban tasks:
 
 Feature: Password reset via email
 
-Create GitHub issues with:
+Create GitHub issues following Kanban principles:
+- Each task completable in 1-2 days maximum
 - Clear titles and descriptions
-- Acceptance criteria
-- Size estimates (Small, Medium, Large)
+- Specific acceptance criteria
+- Cycle time estimates in hours (not T-shirt sizes)
 - Labels (frontend, backend, testing)
 - Dependencies between tasks
+- If any task takes >2 days, split it further
 
 Format as JSON for GitHub API import."
 ```
 
-**Generated Issues Output**
+**Generated Kanban-Ready Issues**
 ```json
 [
   {
     "title": "Backend: Implement password reset token generation",
-    "body": "## Description\nCreate secure token generation for password reset requests\n\n## Acceptance Criteria\n- [ ] Generate cryptographically secure reset tokens\n- [ ] Set token expiration (15 minutes)\n- [ ] Store token-user mapping in Redis\n- [ ] Validate email exists before token creation\n\n## Technical Notes\n- Use crypto.randomBytes(32)\n- TTL of 900 seconds in Redis\n- Rate limit: 3 requests per hour per email\n\n## Estimated Time\n1-2 days, deployable independently",
-    "labels": ["backend", "security", "size-medium"],
+    "body": "## Description\nCreate secure token generation for password reset requests\n\n## Acceptance Criteria\n- [ ] Generate cryptographically secure reset tokens\n- [ ] Set token expiration (15 minutes)\n- [ ] Store token-user mapping in Redis\n- [ ] Validate email exists before token creation\n\n## Technical Notes\n- Use crypto.randomBytes(32)\n- TTL of 900 seconds in Redis\n- Rate limit: 3 requests per hour per email\n\n## Cycle Time Target\n8-12 hours (deployable independently)",
+    "labels": ["backend", "security", "kanban-ready"],
     "milestone": "Password Reset MVP"
   },
   {
     "title": "Backend: Email service integration for reset links", 
-    "body": "## Description\nSend password reset emails with secure links\n\n## Acceptance Criteria\n- [ ] Template-based email generation\n- [ ] Secure reset link with token\n- [ ] Email delivery confirmation\n- [ ] Handle email service failures gracefully\n\n## Dependencies\n- Requires: Password reset token generation\n\n## Estimated Time\n1 day, can deploy once token generation is complete",
-    "labels": ["backend", "email", "size-small"],
+    "body": "## Description\nSend password reset emails with secure links\n\n## Acceptance Criteria\n- [ ] Template-based email generation\n- [ ] Secure reset link with token\n- [ ] Email delivery confirmation\n- [ ] Handle email service failures gracefully\n\n## Dependencies\n- Requires: Password reset token generation\n\n## Cycle Time Target\n6-8 hours (deploy once token generation is complete)",
+    "labels": ["backend", "email", "kanban-ready"],
     "milestone": "Password Reset MVP"
   },
   {
     "title": "Frontend: Password reset request form",
-    "body": "## Description\nUI for users to request password reset\n\n## Acceptance Criteria\n- [ ] Email input field with validation\n- [ ] Submit button with loading state\n- [ ] Success/error message display\n- [ ] Rate limiting feedback\n\n## Design\n- Use existing form components\n- Match current auth page styling\n\n## Estimated Time\n4-6 hours, can work in parallel with backend tasks",
-    "labels": ["frontend", "ui", "size-small"],
+    "body": "## Description\nUI for users to request password reset\n\n## Acceptance Criteria\n- [ ] Email input field with validation\n- [ ] Submit button with loading state\n- [ ] Success/error message display\n- [ ] Rate limiting feedback\n\n## Design\n- Use existing form components\n- Match current auth page styling\n\n## Cycle Time Target\n4-6 hours (can work in parallel with backend tasks)",
+    "labels": ["frontend", "ui", "kanban-ready"],
     "milestone": "Password Reset MVP"
   }
 ]
 ```
 
-**Advanced: Epic Breakdown**
+**Kanban Epic Breakdown**
 ```bash
-ai "Break down this epic into small, independent tasks for Kanban flow:
+ai "Break down this epic for optimal Kanban flow:
 
 Epic: User Dashboard with Analytics
 
-Include:
-- Database schema changes (Small tasks, 1-2 days each)
-- Backend API endpoints (Medium tasks, deployable independently)
-- Frontend components (Small UI tasks, immediate feedback)
-- Testing requirements (Small validation tasks)
-- Security considerations (Small security checks)
-- Performance requirements (Small optimization tasks)
+Kanban task requirements:
+- Maximum 8-16 hours per task (1-2 days)
+- If a task would take longer, split it
+- Each task independently deployable
+- Focus on flow over estimates
 
-Each task should be completable in 1-3 days and immediately deployable."
+Break down into:
+- Database migrations (each table/index separately)
+- Individual API endpoints (one endpoint per task)
+- UI components (one component per task)
+- Test suites (by feature area)
+- Security checks (per component)
+- Performance optimizations (targeted improvements)
+
+Goal: Continuous flow with rapid feedback cycles."
 ```
 
 **Integration with Project Management**
@@ -503,26 +514,36 @@ az boards work-item create --title "$title" \
                           --description "$description"
 ```
 
-**Task Sizing for Kanban Flow**
+**Kanban Work Item Splitting**
 ```bash
-ai "Size these tasks for continuous delivery and Kanban flow:
+ai "Apply Kanban principles to split these work items:
 
-Guidelines:
-- Small: 1 day or less, single developer, immediately deployable
-- Medium: 2-3 days max, may involve multiple files but single feature
-- Large: Break down further - no task should take more than 3 days
+Kanban splitting rules:
+- Maximum cycle time: 8-16 hours (1-2 days)
+- If >16 hours, must split into smaller items
+- Each item independently deployable
+- Measure actual cycle time, not estimates
 
-Previous task completion times:
-- Authentication token generation: 1 day (Small)
-- Email service integration: 2 days (Medium) 
-- Password reset form: 4 hours (Small)
-- User dashboard API: 3 days (Medium)
-- Database migration: 1 day (Small)
+Historical cycle times for reference:
+- Authentication token generation: 8 hours
+- Email template setup: 4 hours
+- Password reset form: 4 hours  
+- API endpoint creation: 6 hours
+- Database migration: 3 hours per table
 
-New tasks: [task list]
+For each task:
+1. Can it be completed in <16 hours?
+2. If no, how to split it?
+3. What's the smallest valuable increment?
 
-Recommend breaking any Large tasks into smaller chunks."
+Remember: Flow over estimates, rapid feedback over perfect planning."
 ```
+
+> "If a task takes more than one day, split it."  
+> – Kanban Guide, Lean Kanban University
+
+> "Small, frequent deliveries expose issues early and keep teams aligned."  
+> – Agile Alliance, Kanban Glossary
 
 **Anti-pattern: Vague Issue Generation**
 Creating generic tasks without specific acceptance criteria, proper sizing, or clear dependencies leads to scope creep and estimation errors.
@@ -533,9 +554,9 @@ Creating generic tasks without specific acceptance criteria, proper sizing, or c
 ❌ "Make the dashboard better" 
 ❌ "Add some tests"
 
-✅ "Replace deprecated auth library with OAuth 2.0 (Size: Large)"
-✅ "Add real-time data refresh to dashboard metrics (Size: Medium)"
-✅ "Achieve 90% test coverage for user service (Size: Small)"
+✅ "Add OAuth 2.0 token validation endpoint (8 hours)"
+✅ "Implement dashboard metric WebSocket connection (6 hours)"
+✅ "Write unit tests for user service login method (4 hours)"
 ```
 
 ---
