@@ -48,7 +48,7 @@ graph TD
 | **[AI Developer Lifecycle](#ai-developer-lifecycle)** | Intermediate | Foundation | Structured 9-stage process from problem definition through deployment with AI assistance | Rules as Code, AI Security Sandbox |
 | **[AI Failure Recovery Protocol](#ai-failure-recovery-protocol)** | Intermediate | Foundation | Systematic approach to detecting and recovering from AI-generated issues | AI Developer Lifecycle |
 | **[Human-AI Handoff Protocol](#human-ai-handoff-protocol)** | Intermediate | Foundation | Clear boundaries and procedures for transitioning work between human developers and AI | AI Developer Lifecycle |
-| **[AI Issue Generation](#ai-issue-generation)** | Beginner | Foundation | Generate structured work items and tickets from requirements using AI to break down features into actionable tasks | AI Readiness Assessment |
+| **[AI Issue Generation](#ai-issue-generation)** | Beginner | Foundation | Generate structured work items and tickets from requirements using AI to break down features into actionable tasks with proper estimation, acceptance criteria, and dependencies | AI Readiness Assessment |
 | **[ATDD-Driven AI Development](#atdd-driven-ai-development)** | Intermediate | Development | Use Acceptance Test-Driven Development to guide AI code generation with executable specifications | AI Developer Lifecycle |
 | **[Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)** | Intermediate | Development | Unified approach to test-first development, automated generation, and quality assurance | ATDD-Driven AI Development |
 | **[Progressive AI Enhancement](#progressive-ai-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | AI Developer Lifecycle |
@@ -403,7 +403,7 @@ Allowing AI and humans to work on the same task simultaneously without clear han
 ## AI Issue Generation
 
 **Maturity**: Beginner  
-**Description**: Generate structured work items and tickets from requirements using AI to break down features into actionable tasks with proper estimation, acceptance criteria, and dependencies.
+**Description**: Generate structured work items and tickets from requirements using AI to break down features into actionable tasks with proper estimation, acceptance criteria, and dependencies. Interface directly with issue tracking tools to create tickets automatically.
 
 **Related Patterns**: [AI Readiness Assessment](#ai-readiness-assessment), [ATDD-Driven AI Development](#atdd-driven-ai-development)
 
@@ -547,7 +547,7 @@ Development patterns provide tactical approaches for day-to-day AI-assisted codi
 ## ATDD-Driven AI Development
 
 **Maturity**: Intermediate  
-**Description**: Use Acceptance Test-Driven Development (ATDD) to guide AI code generation by writing executable specifications first, then prompting AI to create minimal implementations that satisfy the acceptance criteria.
+**Description**: Use Acceptance Test-Driven Development (ATDD) to guide AI code generation by writing executable specifications first, then prompting AI to create minimal implementations that satisfy the acceptance criteria. For detailed implementation guidance, see [ATDD-Driven AI Development: How Prompting and Tests Steer the Code](https://www.paulmduvall.com/atdd-driven-ai-development-how-prompting-and-tests-steer-the-code/).
 
 **Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy), [Observable AI Development](#observable-ai-development)
 
@@ -901,160 +901,33 @@ ai "Analyze this codebase using .refactoringrules.md:
 
 **Long Method Refactoring Example**
 
-```python
-# Before: Long method with complexity > 10
-def process_user_data(user_data):
-    # 35 lines of mixed responsibilities
-    if not user_data.get('email'):
-        raise ValueError("Email required")
-    if '@' not in user_data['email']:
-        raise ValueError("Invalid email")
-    
-    # Database operations
-    user = User.objects.filter(email=user_data['email']).first()
-    if user:
-        user.name = user_data.get('name', user.name)
-        user.phone = user_data.get('phone', user.phone)
-    else:
-        user = User.objects.create(**user_data)
-    
-    # Send notifications
-    if user_data.get('send_welcome'):
-        email_service.send_welcome(user.email)
-    
-    # Analytics tracking
-    analytics.track('user_processed', user.id)
-    
-    return user
-```
-
-**AI Refactoring Prompt**
-
 ```bash
-ai "Refactor this method using Extract Method pattern:
-
-Analyze process_user_data() in user_service.py:
-1. Method has 35 lines (exceeds 20 line threshold)
-2. Cyclomatic complexity: 12 (exceeds 10)
-3. Multiple responsibilities: validation, database, notifications, analytics
-
-Apply Extract Method refactoring:
-- Extract email validation
-- Extract user creation/update logic  
-- Extract notification logic
-- Extract analytics logic
-- Keep main method as coordinator
-
-Maintain existing test coverage and API contract."
-```
-
-**After: Refactored with extracted methods**
-
-```python
-def process_user_data(user_data):
-    """Coordinate user data processing with clear separation of concerns."""
-    validated_data = self._validate_user_data(user_data)
-    user = self._create_or_update_user(validated_data)
-    self._send_notifications(user, user_data)
-    self._track_analytics(user)
-    return user
-
-def _validate_user_data(self, user_data):
-    """Validate user data and return cleaned data."""
-    if not user_data.get('email'):
-        raise ValueError("Email required")
-    if '@' not in user_data['email']:
-        raise ValueError("Invalid email")
-    return user_data
-
-def _create_or_update_user(self, user_data):
-    """Create new user or update existing user."""
-    user = User.objects.filter(email=user_data['email']).first()
-    if user:
-        user.name = user_data.get('name', user.name)
-        user.phone = user_data.get('phone', user.phone)
-        user.save()
-    else:
-        user = User.objects.create(**user_data)
-    return user
-
-def _send_notifications(self, user, user_data):
-    """Handle user notification logic."""
-    if user_data.get('send_welcome'):
-        email_service.send_welcome(user.email)
-
-def _track_analytics(self, user):
-    """Track user processing analytics."""
-    analytics.track('user_processed', user.id)
+# AI refactoring prompt for long methods
+ai "Refactor process_user_data() method:
+- 35 lines (exceeds 20 line threshold)
+- Multiple responsibilities: validation, database, notifications
+- Apply Extract Method pattern
+- Maintain test coverage and API contract"
 ```
 
 **Large Class Refactoring Example**
 
 ```bash
-# Detect large class smell
-ai "Analyze UserManager class using .refactoringrules.md:
-
-Class metrics:
-- 320 lines (exceeds 250 threshold)
-- 25 methods (exceeds 20 threshold)  
-- 12 instance variables (exceeds 10 threshold)
-
-Apply Extract Class refactoring:
-1. Group related methods and data
-2. Identify cohesive responsibilities
-3. Extract separate classes with single responsibilities
-4. Update all references and maintain API compatibility"
+# AI refactoring prompt for large classes
+ai "Extract cohesive classes from UserManager:
+- 320 lines, 25 methods, 12 variables (all exceed thresholds)
+- Apply Extract Class pattern
+- Maintain API compatibility"
 ```
 
 **Primitive Obsession Refactoring**
 
-```python
-# Before: Primitive obsession
-def validate_user_input(email_str, phone_str, address_dict):
-    # String validation scattered everywhere
-    if not re.match(r'^[^@]+@[^@]+\.[^@]+$', email_str):
-        raise ValueError("Invalid email")
-    if not re.match(r'^\+?1?\d{9,15}$', phone_str):
-        raise ValueError("Invalid phone")
-    # Dictionary used as pseudo-object
-    if not all(k in address_dict for k in ['street', 'city', 'zip']):
-        raise ValueError("Invalid address")
-
-# After: AI-assisted value object extraction
-ai "Replace primitive obsession with value objects:
-
-Create Email, Phone, and Address classes:
+```bash
+# AI refactoring prompt for primitive obsession
+ai "Replace primitive strings/dicts with value objects:
+- Create Email, Phone, Address classes
 - Encapsulate validation logic
-- Provide meaningful methods
-- Replace primitive parameters with objects
-- Maintain backward compatibility during transition"
-
-class Email:
-    def __init__(self, value: str):
-        if not re.match(r'^[^@]+@[^@]+\.[^@]+$', value):
-            raise ValueError("Invalid email")
-        self.value = value
-    
-    def __str__(self):
-        return self.value
-
-class Phone:
-    def __init__(self, value: str):
-        if not re.match(r'^\+?1?\d{9,15}$', value):
-            raise ValueError("Invalid phone")
-        self.value = value
-
-class Address:
-    def __init__(self, street: str, city: str, zip_code: str):
-        if not all([street, city, zip_code]):
-            raise ValueError("All address fields required")
-        self.street = street
-        self.city = city
-        self.zip_code = zip_code
-
-def validate_user_input(email: Email, phone: Phone, address: Address):
-    # Validation now encapsulated in value objects
-    pass
+- Replace primitive parameters with objects"
 ```
 
 **Refactoring Workflow Integration**
@@ -1125,203 +998,23 @@ Calculate:
 
 **When to Apply Refactoring**
 
-**During Initial Development** (Ideal Time)
-```bash
-# Red-Green-Refactor cycle with AI
-1. Write failing test
-2. Make test pass (minimum code)
-3. AI refactoring for code quality
-
-ai "Review this just-written method for immediate refactoring opportunities:
-- Check against .refactoringrules.md thresholds
-- Suggest improvements while context is fresh
-- Maintain green tests throughout
-- Focus on single responsibility and readability"
-```
-
-**During Feature Development** (Continuous)
-```bash
-# Before adding new functionality
-ai "Analyze existing code before adding feature:
-1. Check if target class/method already violates thresholds
-2. Refactor to good state first if needed
-3. Then add new feature cleanly
-4. Apply boy scout rule: leave code better than found"
-
-# Example workflow
-git checkout -b feature/user-notifications
-ai "Check UserService class health before adding notifications"
-# If smells detected: refactor first, commit, then add feature
-ai "Add notification feature to now-clean UserService"
-```
-
-**During Bug Fixes** (Opportunistic)
-```bash
-# When fixing bugs in smelly code
-ai "Fix bug in process_user_data() method:
-1. First refactor the method to be testable/understandable
-2. Then apply the actual bug fix to clean code
-3. Much easier to verify fix in simple, focused methods
-
-Benefits: Bug fixes in complex code often miss edge cases"
-```
-
-**During Code Reviews** (Preventive)
-```bash
-# Automated PR checks
-name: Code Quality Check
-on: [pull_request]
-jobs:
-  refactoring-check:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run smell detection
-        run: |
-          flake8 --select=C901 src/
-          pylint src/ --enable=R0915,R0902,R0904
-      
-      - name: AI refactoring suggestions
-        run: |
-          ai "Review PR changes for refactoring opportunities:
-          - Focus on changed files only
-          - Suggest immediate improvements
-          - Check if changes make existing smells worse
-          - Provide specific refactoring steps"
-```
-
-**Scheduled Refactoring** (Proactive)
-```bash
-# Weekly code health check
-#!/bin/bash
-# weekly-refactor.sh
-
-echo "=== Weekly Code Health Report ==="
-echo "Running comprehensive smell detection..."
-
-# Generate metrics
-radon cc src/ --json > complexity.json
-radon mi src/ --json > maintainability.json
-coverage run -m pytest && coverage json
-
-ai "Generate weekly refactoring report:
-1. Compare metrics vs last week
-2. Identify top 3 refactoring priorities
-3. Estimate effort for each (Small: <2h, Medium: 2-8h, Large: >8h)
-4. Create GitHub issues for approved refactorings
-
-Focus on:
-- High-impact, low-risk improvements
-- Classes/methods touched frequently (git log analysis)
-- Areas with recent bugs (correlate with issue tracker)"
-```
+- **During Development**: Red-Green-Refactor cycle with AI assistance
+- **Feature Work**: Refactor smelly code before adding features
+- **Bug Fixes**: Clean up code while fixing issues
+- **Code Reviews**: Automated PR quality checks
+- **Scheduled**: Weekly code health assessments
 
 **Integration with Development Workflow**
 
-**Pre-Commit Hook Integration**
-```bash
-# .git/hooks/pre-commit
-#!/bin/bash
-echo "Checking for immediate refactoring opportunities..."
-
-# Check only staged files
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=AM | grep "\.py$")
-
-if [ -n "$STAGED_FILES" ]; then
-    ai "Quick refactoring check for staged files:
-    Files: $STAGED_FILES
-    
-    Check for obvious smells:
-    - Methods >20 lines
-    - Cyclomatic complexity >10
-    - Duplicate code blocks
-    
-    If smells found: suggest quick fixes before commit"
-fi
-```
-
-**IDE Integration**
-```bash
-# VS Code settings.json
-{
-  "python.linting.enabled": true,
-  "python.linting.flake8Enabled": true,
-  "python.linting.pylintEnabled": true,
-  "python.linting.flake8Args": ["--select=C901", "--max-complexity=10"],
-  "ai.refactoring.autoSuggest": true,
-  "ai.refactoring.rulesFile": ".refactoringrules.md"
-}
-
-# AI-powered refactoring assistant
-ai "Monitor code as I type:
-- Real-time smell detection
-- Suggest refactorings during development  
-- Auto-apply safe refactorings (rename, extract constant)
-- Warn before code crosses quality thresholds"
-```
-
-**Continuous Integration Pipeline**
-```yaml
-# .github/workflows/code-quality.yml
-name: Code Quality Gate
-on: [push, pull_request]
-
-jobs:
-  quality-check:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Code smell detection
-        run: |
-          # Fail build if critical thresholds exceeded
-          flake8 --select=C901 --max-complexity=15 src/
-          
-      - name: AI refactoring report
-        run: |
-          ai "Generate refactoring report for CI:
-          1. List methods/classes exceeding thresholds
-          2. Calculate technical debt score
-          3. Recommend if changes should be blocked
-          4. Create refactoring tasks for backlog"
-          
-      - name: Update technical debt dashboard
-        run: |
-          # Track metrics over time
-          python scripts/update-debt-metrics.py
-```
+- **Pre-commit hooks**: Check staged files for code smells
+- **IDE integration**: Real-time refactoring suggestions
+- **CI pipeline**: Automated quality gates and technical debt tracking
 
 **Risk Assessment for Refactoring Timing**
 
-**Low Risk - Anytime**
-- Extract Method (pure functions)
-- Rename variables/methods
-- Extract constants
-- Add type hints
-
-**Medium Risk - During feature work**
-- Extract Class
-- Replace conditional with polymorphism
-- Introduce parameter objects
-
-**High Risk - Scheduled maintenance windows**
-- Large class decomposition
-- Inheritance hierarchy changes
-- Database schema refactoring
-
-**AI-Guided Risk Assessment**
-```bash
-ai "Assess refactoring risk for UserManager class:
-
-Factors to consider:
-1. Number of callers (grep analysis)
-2. Test coverage percentage
-3. Recent change frequency (git log)
-4. Complexity of dependencies
-5. Team familiarity with codebase area
-
-Recommend timing:
-- Low risk: Do during regular development
-- Medium risk: Schedule for next sprint
-- High risk: Plan dedicated refactoring sprint"
-```
+- **Low Risk**: Extract Method, rename, constants, type hints
+- **Medium Risk**: Extract Class, replace conditionals, parameter objects  
+- **High Risk**: Large decomposition, inheritance changes, schema refactoring
 
 **Anti-pattern: Shotgun Surgery**
 Making widespread changes without systematic analysis leads to introduced bugs and degraded code quality.
