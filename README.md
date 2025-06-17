@@ -58,9 +58,9 @@ graph TD
 | **[Constraint-Based AI Development](#constraint-based-ai-development)** | Beginner | Development | Give AI specific constraints to prevent over-engineering and ensure focused solutions | Progressive AI Enhancement |
 | **[Observable AI Development](#observable-ai-development)** | Intermediate | Development | Strategic logging and debugging that makes system behavior visible to AI | AI Developer Lifecycle |
 | **[AI-Driven Refactoring](#ai-driven-refactoring)** | Intermediate | Development | Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics | Rules as Code |
-| **[AI Security & Compliance](#ai-security--compliance)** | Advanced | Operations | Unified framework for policy generation, vulnerability scanning, and compliance automation | AI Security Sandbox |
-| **[Deployment Automation](#deployment-automation)** | Advanced | Operations | AI-powered pipeline generation, blue-green deployments, and intelligent rollback strategies | AI Workflow Orchestration |
-| **[Monitoring & Maintenance](#monitoring--maintenance)** | Advanced | Operations | Performance baselines, incident response, and technical debt management with AI assistance | Observable AI Development |
+| **[AI Security & Compliance](#ai-security--compliance)** | Advanced | Operations | Policy generation, vulnerability scanning, compliance automation, and ChatOps security integration | AI Security Sandbox |
+| **[Deployment Automation](#deployment-automation)** | Advanced | Operations | Pipeline synthesis, blue-green deployments, drift remediation, and release note generation | AI Workflow Orchestration |
+| **[Monitoring & Maintenance](#monitoring--maintenance)** | Advanced | Operations | Incident response, test health, dependency management, on-call automation, and chaos engineering | Observable AI Development |
 
 ---
 
@@ -262,12 +262,13 @@ Transform product requirements into structured, actionable work items using AI t
 
 ```bash
 # Generate development tasks from PRD
-ai "Break down these product requirements into GitHub issues:
+ai "Break down these product requirements into Kanban-ready GitHub issues:
 - Clear titles and acceptance criteria  
-- Size estimates (Small, Medium, Large)
+- Cycle time targets (8-16 hours max per task)
+- If any task would take >16 hours, split it further
 - Frontend/backend/testing labels
 - Dependency mapping between tasks
-- Kanban-ready task breakdown
+- Each task independently deployable
 
 Format as JSON for automated issue creation."
 ```
@@ -1146,8 +1147,27 @@ gh pr comment --body-file pr-comment.txt
 if grep -q '"severity":"CRITICAL"' pr-comment.txt; then exit 1; fi
 ```
 
+**Compliance Evidence Automation**
+```bash
+# Automated compliance evidence collection
+aws configservice get-resource-config-history > awsconfig.json
+aws cloudtrail lookup-events > iam-changes.json
+ai "Generate SOC2 evidence sheet from awsconfig.json and iam-changes.json" > report.csv
+```
+
+**ChatOps Security Integration**
+```yaml
+# bot-config.yml
+commands:
+  - trigger: /sec scan {{repo}}
+    action: "./security-scan.sh && cat pr-comment.txt"
+```
+
 **Anti-pattern: Fragmented Security**
 Implementing security tools and compliance checks in isolation without a unified AI-driven framework leads to gaps and inconsistencies.
+
+**Anti-pattern: Alert Fatigue**
+Posting every low-severity finding buries real issues and frustrates developers.
 
 ---
 
@@ -1179,8 +1199,65 @@ ai "From metrics.csv, suggest a 5% canary rollout and rollback criteria" > canar
 deploy-tool update-release --config canary.json
 ```
 
+**AI-Guided Blue-Green Deployment**
+
+Blue-green deployments are often misunderstood by AI models. This pattern provides explicit guidance to ensure correct implementation.
+
+```bash
+# Blue-green reference documentation
+cat > docs/blue-green-guide.md << 'EOF'
+# Blue-Green Deployment Pattern
+
+## Key Principles (from Martin Fowler)
+1. Maintain two identical production environments: Blue (live) and Green (idle)
+2. Deploy new version to the idle environment
+3. Test thoroughly in idle environment
+4. Switch traffic from Blue to Green atomically
+5. Keep Blue as rollback option
+
+## Critical: This is NOT canary deployment
+- NO gradual traffic shifting
+- NO percentage-based rollout
+- Traffic switches 100% at once
+EOF
+
+# AI prompt with validation
+ai "Using docs/blue-green-guide.md, create AWS deployment script that:
+1. Deploys to IDLE environment only
+2. Runs health checks on idle
+3. Switches ALL traffic atomically via ALB
+4. Keeps previous environment for rollback
+
+DO NOT create canary deployment." > deploy-blue-green.sh
+
+# Validate AI didn't confuse patterns
+if grep -q "canary\|gradual\|percentage" deploy-blue-green.sh; then
+    echo "ERROR: AI generated canary deployment, not blue-green"
+    exit 1
+fi
+```
+
+**Drift Detection & Remediation**
+```bash
+# Detect and fix infrastructure drift
+terraform plan -out=tf.plan
+terraform show -json tf.plan > drift.json
+ai "Create Terraform patch from drift.json to restore desired state" > patch.tf
+terraform apply patch.tf
+```
+
+**Release Note Synthesis**
+```bash
+# Auto-generate structured release notes
+git log v1.3.2..HEAD --pretty=format:"%s" > commits.log
+ai "Group commits in commits.log under Added, Changed, Fixed" >> CHANGELOG.md
+```
+
 **Anti-pattern: Static Deployment**
 Using fixed deployment scripts without AI adaptation leads to suboptimal rollout strategies and missed opportunities for intelligent automation.
+
+**Anti-pattern: Trusting AI Blue-Green Generation**
+LLMs frequently confuse blue-green with canary deployments, generating gradual traffic shifting instead of atomic switches.
 
 ---
 
@@ -1212,8 +1289,43 @@ ai "Create a step-by-step RDS failover runbook from incidents.json" > runbooks/r
 git add runbooks/rds-failover.md
 ```
 
+**Test Suite Health Management**
+```bash
+# Identify and fix flaky tests
+wget ci-server/logs/last50 > ci.log
+ai "Find intermittently failing tests in ci.log and suggest retry decorators" > flaky.txt
+# Apply fixes like: @pytest.mark.flaky(reruns=3)
+```
+
+**Dependency Upgrade Advisor**
+```bash
+# Intelligent dependency management
+npm outdated --json > deps.json
+ai "From deps.json, suggest npm install commands for lodash and axios without breaking changes" > deps-update.sh
+bash deps-update.sh
+```
+
+**On-Call Handoff Automation**
+```bash
+# Generate comprehensive handoff briefs
+pd incidents:list --status triggered > alerts.json
+curl grafana/api/dashboards/home > dash.json
+ai "Create an on-call handoff brief from alerts.json and dash.json" > handoff.md
+slack-cli post --file handoff.md --channel oncall
+```
+
+**Chaos Engineering Scenarios**
+```bash
+# Generate targeted chaos experiments
+ai "From services.json, generate a Gremlin script to kill 1 of 3 instances of service-A every 5m" > chaos.json
+gremlin run chaos.json
+```
+
 **Anti-pattern: Reactive Maintenance**
 Waiting for incidents to spike forces firefighting rather than proactive system health management with AI assistance.
+
+**Anti-pattern: Blind Chaos Testing**
+Running random fault injection without understanding system dependencies yields noise rather than insights.
 
 ---
 
@@ -1237,9 +1349,11 @@ Waiting for incidents to spike forces firefighting rather than proactive system 
 
 ### Operations Anti-Patterns
 - **Fragmented Security**: Isolated security tools without unified framework
-- **Static Deployment**: Fixed scripts without AI adaptation
-- **Reactive Maintenance**: Firefighting instead of proactive AI-assisted management
 - **Alert Fatigue**: Overwhelming developers with low-priority findings
+- **Static Deployment**: Fixed scripts without AI adaptation
+- **Trusting AI Blue-Green Generation**: Accepting AI output without validation for deployment patterns
+- **Reactive Maintenance**: Firefighting instead of proactive AI-assisted management
+- **Blind Chaos Testing**: Random fault injection without understanding dependencies
 
 ---
 
