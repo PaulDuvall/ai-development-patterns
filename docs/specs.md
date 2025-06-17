@@ -208,15 +208,7 @@ By adopting these components—feature-scoped fragments, spec-driven development
 
 ## Application Specification Examples
 
-Just like the OpenAI Model Spec, each `[^identifier]` reference in application specifications links to concrete examples:
-
-- [^au3f]: Authentication timeout handling scenarios → [examples/au3f.md](examples/au3f.md)
-- [^au5f]: Rate limiting implementation examples → [examples/au5f.md](examples/au5f.md)  
-- [^au1a]: Email format validation cases → [examples/au1a.md](examples/au1a.md)
-- [^au2b]: Password hashing requirements → [examples/au2b.md](examples/au2b.md)
-- [^au3c]: Failed authentication tracking → [examples/au3c.md](examples/au3c.md)
-- [^pm7a]: Transaction amount validation → [examples/pm7a.md](examples/pm7a.md)
-- [^pm8a]: Transaction rejection messaging → [examples/pm8a.md](examples/pm8a.md)
+Just like the OpenAI Model Spec, each footnote reference in application specifications links to concrete examples. The following identifiers are used throughout application specifications to reference behavioral examples:
 
 These examples follow the same human-readable format as OpenAI's model specification examples, providing concrete scenarios that demonstrate expected application behavior for each specification requirement.
 
@@ -503,3 +495,20 @@ class SpecCompliantCodeReview:
 ```
 
 This automated alignment approach transforms application specification compliance from manual oversight into automatic development habits, ensuring consistent adherence through tool integration and team practice.
+
+[^au1a]: examples/au1a.md
+[^au2b]: examples/au2b.md
+[^au3c]: examples/au3c.md
+[^au3f]: examples/au3f.md
+[^au4d]: examples/au4d.md
+[^au5f]: examples/au5f.md
+[^pm7a]: examples/pm7a.md
+[^pm7b]: examples/pm7b.md
+[^pm7c]: examples/pm7c.md
+[^pm7d]: examples/pm7d.md
+[^pm8a]: examples/pm8a.md
+[^pm8b]: examples/pm8b.md
+[^pm8c]: examples/pm8c.md
+[^pm9a]: examples/pm9a.md
+[^pm9b]: examples/pm9b.md
+[^pm9c]: examples/pm9c.md
