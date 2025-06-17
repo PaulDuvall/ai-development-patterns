@@ -46,7 +46,6 @@ graph TD
 | **[Rules as Code](#rules-as-code)** | Beginner | Foundation | Version and maintain AI coding standards as explicit configuration files | AI Readiness Assessment |
 | **[AI Security Sandbox](#ai-security-sandbox)** | Beginner | Foundation | Run AI tools in isolated environments without access to secrets or sensitive data | Rules as Code |
 | **[AI Developer Lifecycle](#ai-developer-lifecycle)** | Intermediate | Foundation | Structured 9-stage process from problem definition through deployment with AI assistance | Rules as Code, AI Security Sandbox |
-| **[AI Failure Recovery Protocol](#ai-failure-recovery-protocol)** | Intermediate | Foundation | Systematic approach to detecting and recovering from AI-generated issues | AI Developer Lifecycle |
 | **[Human-AI Handoff Protocol](#human-ai-handoff-protocol)** | Intermediate | Foundation | Clear boundaries and procedures for transitioning work between human developers and AI | AI Developer Lifecycle |
 | **[AI Issue Generation](#ai-issue-generation)** | Beginner | Foundation | Generate Kanban-optimized work items (1-2 day max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies | AI Readiness Assessment |
 | **[Specification Driven Development](#specification-driven-development)** | Intermediate | Development | Use executable specifications to guide AI code generation with clear acceptance criteria before implementation | AI Developer Lifecycle |
@@ -350,33 +349,6 @@ Jumping straight to coding with AI without proper planning, requirements, or tes
 
 ---
 
-## AI Failure Recovery Protocol
-
-**Maturity**: Intermediate  
-**Description**: Systematic approach to detecting and recovering from AI-generated issues with automated rollback triggers and learning capture mechanisms.
-
-**Detection & Recovery Framework**
-
-```mermaid
-graph TD
-    A[Issue Detection] --> B{Severity Assessment}
-    B -->|Critical| C[Immediate Rollback]
-    B -->|High| D[Human Escalation]
-    B -->|Medium| E[Automated Fix Attempt]
-    B -->|Low| F[Log for Review]
-    C --> G[Post-Incident Analysis]
-    D --> G
-    E --> H{Fix Successful?}
-    H -->|No| D
-    H -->|Yes| I[Update Knowledge Base]
-    F --> I
-    G --> I
-```
-
-**Anti-pattern: Ignore and Hope**
-Ignoring AI-generated issues or assuming they'll resolve themselves leads to accumulated technical debt and system instability.
-
----
 
 ## Human-AI Handoff Protocol
 
@@ -449,10 +421,9 @@ ai "Break down this feature into small Kanban tasks:
 Feature: Password reset via email
 
 Create GitHub issues following Kanban principles:
-- Each task completable in 1-2 days maximum
+- Ensure each task can be completed in less than a day
 - Clear titles and descriptions
 - Specific acceptance criteria
-- Cycle time estimates in hours (not T-shirt sizes)
 - Labels (frontend, backend, testing)
 - Dependencies between tasks
 - If any task takes >2 days, split it further
@@ -830,7 +801,7 @@ Context: Full codebase
 **Maturity**: Intermediate  
 **Description**: Capture successful patterns and failed attempts as versioned knowledge for future sessions.
 
-**Related Patterns**: [Rules as Code](#rules-as-code), [AI Failure Recovery Protocol](#ai-failure-recovery-protocol)
+**Related Patterns**: [Rules as Code](#rules-as-code)
 
 **Examples**
 `.ai/knowledge/authentication.md`:
