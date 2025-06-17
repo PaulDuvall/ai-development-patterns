@@ -613,7 +613,9 @@ graph TD
 
 **Step 1: Write Persistent Specifications (These Live Forever)**
 ```gherkin
-# See actual implementation: specs/user_authentication.feature
+# See actual implementations: 
+# specs/user_authentication.feature (Gherkin format)
+# specs/user_authentication_structured.md (OpenAI Model Spec format)
 # features/user_authentication.feature
 # This specification will persist throughout the project lifecycle
 # It defines WHAT the system does, not HOW it's implemented
@@ -670,18 +672,84 @@ def verify_dashboard_redirect(browser):
     assert "/dashboard" in browser.current_url
 ```
 
+**Machine-Readable Specification Structure**
+
+Following the OpenAI Model Spec pattern, specifications should be structured for both human comprehension and automated processing:
+
+```markdown
+# User Authentication Specification {#user_auth}
+
+## Overview {#overview}
+This specification defines the authentication system behavior, establishing the contract between user expectations and system implementation.
+
+**Strategic Goals:**
+- Secure user credential validation
+- Seamless user experience
+- Protection against brute force attacks
+- Clear error messaging for failed attempts
+
+## Definitions {#definitions}
+
+**User**: An entity with valid account credentials in the system  
+**Session**: A time-limited authenticated state after successful login  
+**Credentials**: Email address and password combination  
+**Dashboard**: The authenticated user's primary interface post-login  
+
+## Authentication Requirements {#auth_requirements authority=system}
+
+### Successful Authentication {#successful_auth authority=system}
+The system MUST:
+- Validate credentials against stored user data
+- Create a secure session upon successful validation  
+- Redirect authenticated users to dashboard
+- Display personalized welcome message
+
+### Failed Authentication {#failed_auth authority=system}
+The system MUST:
+- Reject invalid credentials without revealing user existence
+- Display generic "Invalid credentials" message
+- Remain on login page after failed attempt
+- Implement rate limiting after 3 failed attempts [^rl2c]
+
+### Security Controls {#security_controls authority=platform}
+The system MUST:
+- Hash passwords using bcrypt with minimum cost factor 12
+- Implement CSRF protection on authentication endpoints
+- Log authentication attempts for security monitoring
+- Expire sessions after 30 minutes of inactivity
+
+## Evaluation Cases {#evaluation}
+
+[^rl2c]: tests/security/test_rate_limiting.py
+[^cv9g]: tests/security/test_csrf_authentication.py
+[^sl3f]: tests/auth/test_session_expiration.py
+```
+
 **Why Specifications Persist While Prompts Don't**
 
 1. **Specifications are contracts**: They define what your system promises to do, regardless of implementation
-2. **Prompts are conversations**: They're tactical instructions that change based on AI capabilities and context
+2. **Prompts are conversations**: They're tactical instructions that change based on AI capabilities and context  
 3. **Specifications enable refactoring**: You can completely rewrite implementations while specifications ensure behavior remains correct
 4. **Prompts are tool-specific**: Different AI tools need different prompts, but they all must satisfy the same specifications
+5. **Anchored sections enable traceability**: Each requirement has a unique identifier for automated testing and compliance linking
+
+**Key Elements of Machine-Readable Specifications** (inspired by OpenAI Model Spec):
+
+1. **Anchored Headings**: Every section has explicit `{#anchor}` identifiers for unambiguous cross-referencing
+2. **Authority Levels**: Requirements annotated with `authority=platform|system|feature` to resolve conflicts
+3. **Explicit Language**: Use MUST/SHOULD/MAY for clear requirement strength
+4. **Linked Evaluation**: Footnotes `[^sy73]` connect requirements to automated test files
+5. **Definitions Section**: Concrete definitions for all domain terms used in specifications
+6. **Meta Commentary**: `!!! meta` blocks explain document structure without instructing implementation
+7. **Hierarchical Conflict Resolution**: Clear precedence rules when requirements conflict
 
 **Benefits of Specification Persistence**
 - **AI Tool Independence**: Switch between Copilot, Cursor, Claude without losing your behavioral requirements
 - **Team Alignment**: New developers understand system behavior from specs, not from scattered prompts
+- **Automated Compliance**: Machine-readable structure enables automated requirement validation
+- **Precise Traceability**: Anchored sections link directly to test cases and implementation code
+- **Living Documentation**: Specifications evolve with the system while maintaining historical context
 - **Regression Safety**: Specifications catch breaking changes regardless of how code was generated
-- **Living Documentation**: Specifications document actual system behavior, not intended behavior
 
 **Anti-pattern: Implementation-First AI**
 Writing code with AI first, then trying to retrofit tests, resulting in tests that mirror implementation rather than specify behavior.
