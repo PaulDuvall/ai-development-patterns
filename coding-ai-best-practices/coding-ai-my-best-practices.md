@@ -75,7 +75,7 @@ graph TD
 ```
 
 **Stage 1: AI-Assisted Problem Definition**
-*Patterns: Constraint-Based AI Development, Test-Driven Prompt Engineering*
+*Patterns: [Constraint-Based AI Development](#constraint-based-ai-development), [Test-Driven Prompt Engineering](#test-driven-prompt-engineering)*
 
 Define clear problem statements and success criteria before any implementation work begins.
 
@@ -98,10 +98,10 @@ ai "Analyze this problem statement for technical feasibility:
 - Estimate complexity and effort"
 ```
 
-Apply **Constraint-Based AI Development** by setting specific boundaries upfront. Use **Test-Driven Prompt Engineering** to refine your problem analysis prompts until they consistently produce actionable insights.
+Apply **[Constraint-Based AI Development](#constraint-based-ai-development)** by setting specific boundaries upfront. Use **[Test-Driven Prompt Engineering](#test-driven-prompt-engineering)** to refine your problem analysis prompts until they consistently produce actionable insights.
 
 **Stage 2: AI-Generated Technical Plan**
-*Patterns: Context Window Optimization, AI Pair Rotation, Rules as Code*
+*Patterns: [Context Window Optimization](#context-window-optimization), [AI Pair Rotation](#ai-pair-rotation), [Rules as Code](#rules-as-code)*
 
 Transform problem definitions into concrete technical architectures with clear implementation paths.
 
@@ -126,10 +126,10 @@ ai "Create a technical plan for [problem] using [technology stack]:
 - Identify technical risks and mitigation strategies"
 ```
 
-Use **Context Window Optimization** - choose Claude for complex architectural reasoning. Apply **AI Pair Rotation** by having different AI tools review the plan. Ensure consistency with your **Rules as Code** for architecture standards.
+Use **[Context Window Optimization](#context-window-optimization)** - choose Claude for complex architectural reasoning. Apply **[AI Pair Rotation](#ai-pair-rotation)** by having different AI tools review the plan. Ensure consistency with your **[Rules as Code](#rules-as-code)** for architecture standards.
 
 **Stage 3: Product Requirements Document (PRD)**
-*Patterns: AI Knowledge Persistence, Progressive AI Enhancement*
+*Patterns: [AI Knowledge Persistence](#ai-knowledge-persistence), [Progressive AI Enhancement](#progressive-ai-enhancement)*
 
 Translate technical plans into detailed product specifications with measurable acceptance criteria.
 
@@ -161,10 +161,10 @@ ai "Convert this technical plan into detailed product requirements:
 - Add acceptance criteria for each feature"
 ```
 
-Leverage **AI Knowledge Persistence** by referencing successful patterns from previous PRDs. Plan for **Progressive AI Enhancement** by breaking requirements into deployable iterations.
+Leverage **[AI Knowledge Persistence](#ai-knowledge-persistence)** by referencing successful patterns from previous PRDs. Plan for **[Progressive AI Enhancement](#progressive-ai-enhancement)** by breaking requirements into deployable iterations.
 
 **Stage 4: AI Issue Generation**
-*Patterns: AI Knowledge Persistence, Constraint-Based AI Development*
+*Patterns: [AI Knowledge Persistence](#ai-knowledge-persistence), [Constraint-Based AI Development](#constraint-based-ai-development)*
 
 Generate structured, actionable work items from product requirements with clear acceptance criteria.
 
@@ -196,10 +196,10 @@ ai "Generate user stories from these requirements:
 - Format for GitHub/JIRA import"
 ```
 
-Include **AI Knowledge Persistence** references in implementation notes. Apply **Constraint-Based AI Development** to scope each story appropriately.
+Include **[AI Knowledge Persistence](#ai-knowledge-persistence)** references in implementation notes. Apply **[Constraint-Based AI Development](#constraint-based-ai-development)** to scope each story appropriately.
 
 **Stage 5: Acceptance Test-Driven Development (ATDD)**
-*Patterns: Test-Driven AI Development, Observable AI Development*
+*Patterns: [Test-Driven AI Development](#test-driven-ai-development), [Observable AI Development](#observable-ai-development)*
 
 ```javascript
 // Example: Authentication feature
@@ -246,10 +246,10 @@ describe('User Authentication', () => {
 // AI Prompt: "Implement authentication service to make these tests pass"
 ```
 
-This is **Test-Driven AI Development** in action - write tests first, then use AI to implement. Include **Observable AI Development** patterns in your test setup to make system behavior visible to AI during implementation.
+This is **[Test-Driven AI Development](#test-driven-ai-development)** in action - write tests first, then use AI to implement. Include **[Observable AI Development](#observable-ai-development)** patterns in your test setup to make system behavior visible to AI during implementation.
 
 **Stage 6: AI-Driven Implementation**
-*Patterns: AI Commit Protocol, AI Security Sandbox, Rules as Code, Progressive AI Enhancement*
+*Patterns: [AI Commit Protocol](#ai-commit-protocol), [AI Security Sandbox](#ai-security-sandbox), [Rules as Code](#rules-as-code), [Progressive AI Enhancement](#progressive-ai-enhancement)*
 
 ```bash
 # Implementation workflow
@@ -260,10 +260,10 @@ This is **Test-Driven AI Development** in action - write tests first, then use A
 5. ai-commit "Add authentication with security review"
 ```
 
-Follow **AI Commit Protocol** for safe rollbacks. Work within an **AI Security Sandbox** to protect secrets. Apply **Rules as Code** for consistent implementation. Use **Progressive AI Enhancement** for incremental delivery.
+Follow **[AI Commit Protocol](#ai-commit-protocol)** for safe rollbacks. Work within an **[AI Security Sandbox](#ai-security-sandbox)** to protect secrets. Apply **[Rules as Code](#rules-as-code)** for consistent implementation. Use **[Progressive AI Enhancement](#progressive-ai-enhancement)** for incremental delivery.
 
 **Stage 7: Comprehensive Testing Strategy**
-*Patterns: AI Prompt Pipeline, Parallel AI Workflows, Context Window Optimization*
+*Patterns: [AI Prompt Pipeline](#ai-prompt-pipeline), [Parallel AI Workflows](#parallel-ai-workflows), [Context Window Optimization](#context-window-optimization)*
 
 ```markdown
 ## Testing Phases
@@ -282,10 +282,10 @@ AI Prompts for each phase:
 - "Generate performance tests for [endpoints]"
 ```
 
-Use **AI Prompt Pipeline** to chain testing phases. Deploy **Parallel AI Workflows** to run different test types concurrently. Apply **Context Window Optimization** - use Copilot for simple tests, Claude for complex test scenarios.
+Use **[AI Prompt Pipeline](#ai-prompt-pipeline)** to chain testing phases. Deploy **[Parallel AI Workflows](#parallel-ai-workflows)** to run different test types concurrently. Apply **[Context Window Optimization](#context-window-optimization)** - use Copilot for simple tests, Claude for complex test scenarios.
 
 **Stage 8: Deployment Pipeline**
-*Patterns: Everything as a Tool, AI Prompt Pipeline, AI Security Sandbox*
+*Patterns: [Everything as a Tool](#everything-as-a-tool), [AI Prompt Pipeline](#ai-prompt-pipeline), [AI Security Sandbox](#ai-security-sandbox)*
 
 ```yaml
 # .github/workflows/ai-assisted-deploy.yml
@@ -320,10 +320,10 @@ jobs:
           ai-deploy "Deploy to production with zero-downtime strategy"
 ```
 
-Implement **Everything as a Tool** for AI-accessible deployment scripts. Use **AI Prompt Pipeline** for sequential validation stages. Maintain **AI Security Sandbox** isolation during deployment.
+Implement **[Everything as a Tool](#everything-as-a-tool)** for AI-accessible deployment scripts. Use **[AI Prompt Pipeline](#ai-prompt-pipeline)** for sequential validation stages. Maintain **[AI Security Sandbox](#ai-security-sandbox)** isolation during deployment.
 
 **Stage 9: AI-Monitored Production**
-*Patterns: Observable AI Development, AI Knowledge Persistence, Everything as a Tool*
+*Patterns: [Observable AI Development](#observable-ai-development), [AI Knowledge Persistence](#ai-knowledge-persistence), [Everything as a Tool](#everything-as-a-tool)*
 
 ```python
 # monitoring/ai_alerts.py
@@ -357,7 +357,7 @@ class AIMonitoring:
                 return await self.execute_remediation(remediation)
 ```
 
-Apply **Observable AI Development** to make system behavior visible to AI monitoring. Use **AI Knowledge Persistence** to load historical patterns for analysis. Design monitoring as **Everything as a Tool** for AI accessibility.
+Apply **[Observable AI Development](#observable-ai-development)** to make system behavior visible to AI monitoring. Use **[AI Knowledge Persistence](#ai-knowledge-persistence)** to load historical patterns for analysis. Design monitoring as **[Everything as a Tool](#everything-as-a-tool)** for AI accessibility.
 
 **Real-World Example: E-commerce Cart Feature**
 
@@ -379,7 +379,7 @@ Day 12: AI monitoring → "Performance analysis and optimization suggestions"
 ```
 
 **Lifecycle Tools Integration**
-*Integrating All Patterns: Rules as Code, AI Knowledge Persistence, Everything as a Tool*
+*Integrating All Patterns: [Rules as Code](#rules-as-code), [AI Knowledge Persistence](#ai-knowledge-persistence), [Everything as a Tool](#everything-as-a-tool)*
 
 ```bash
 # Project structure for AI lifecycle
@@ -391,11 +391,11 @@ project/
 │   ├── 04-user-stories.md
 │   └── 05-acceptance-tests.js
 ├── .ai/
-│   ├── prompts/           # Stage-specific prompts (Test-Driven Prompt Engineering)
-│   ├── patterns/          # Successful implementation patterns (AI Knowledge Persistence)  
-│   └── knowledge/         # Domain-specific AI knowledge (AI Knowledge Persistence)
-├── .cursorrules           # Rules as Code for consistent AI behavior
-├── CLAUDE.md             # Rules as Code for Claude Code sessions
+│   ├── prompts/           # Stage-specific prompts ([Test-Driven Prompt Engineering](#test-driven-prompt-engineering))
+│   ├── patterns/          # Successful implementation patterns ([AI Knowledge Persistence](#ai-knowledge-persistence))  
+│   └── knowledge/         # Domain-specific AI knowledge ([AI Knowledge Persistence](#ai-knowledge-persistence))
+├── .cursorrules           # [Rules as Code](#rules-as-code) for consistent AI behavior
+├── CLAUDE.md             # [Rules as Code](#rules-as-code) for Claude Code sessions
 ├── tests/
 │   ├── unit/
 │   ├── integration/
@@ -405,7 +405,7 @@ project/
     └── ai-analysis/
 ```
 
-This structure supports all patterns: **Rules as Code** through .cursorrules and CLAUDE.md, **AI Knowledge Persistence** in the .ai/ directory, and **Everything as a Tool** with structured, discoverable organization.
+This structure supports all patterns: **[Rules as Code](#rules-as-code)** through .cursorrules and CLAUDE.md, **[AI Knowledge Persistence](#ai-knowledge-persistence)** in the .ai/ directory, and **[Everything as a Tool](#everything-as-a-tool)** with structured, discoverable organization.
 
 **Anti-pattern: Ad-Hoc AI Development**
 Jumping straight to coding with AI without proper planning, requirements, or testing strategy.
@@ -683,7 +683,7 @@ Refactoring code "just in case" without measurable quality issues or clear impro
 Development patterns provide tactical approaches for day-to-day AI-assisted coding workflows, focusing on quality, maintainability, and team collaboration.
 
 **Pattern Integration Summary**
-The AI Developer Lifecycle serves as the orchestrating framework that weaves together all tactical patterns described in this document. Each stage strategically applies specific patterns - from **Constraint-Based AI Development** in problem definition to **Observable AI Development** in production monitoring. This systematic approach ensures that AI assistance enhances rather than replaces software engineering discipline, creating a sustainable and scalable development process.
+The AI Developer Lifecycle serves as the orchestrating framework that weaves together all tactical patterns described in this document. Each stage strategically applies specific patterns - from **[Constraint-Based AI Development](#constraint-based-ai-development)** in problem definition to **[Observable AI Development](#observable-ai-development)** in production monitoring. This systematic approach ensures that AI assistance enhances rather than replaces software engineering discipline, creating a sustainable and scalable development process.
 
 ## Rapid Iteration Cycles
 
