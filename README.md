@@ -280,8 +280,8 @@ Transform product requirements into structured, actionable work items using AI t
 # Generate development tasks from PRD
 ai "Break down these product requirements into Kanban-ready GitHub issues:
 - Clear titles and acceptance criteria  
-- Cycle time targets (8-16 hours max per task)
-- If any task would take >16 hours, split it further
+- Cycle time targets (4-8 hours max per task)
+- If any task would take >8 hours, split it further
 - Frontend/backend/testing labels
 - Dependency mapping between tasks
 - Each task independently deployable
@@ -415,7 +415,7 @@ Allowing AI and humans to work on the same task simultaneously without clear han
 graph TD
     A[Requirements Document] --> B[AI Feature Analysis]
     B --> C[Work Item Splitting]
-    C --> D{<16 hours?}
+    C --> D{<8 hours?}
     D -->|No| E[Split Further]
     E --> C
     D -->|Yes| F[Story Generation]
@@ -481,7 +481,7 @@ ai "Break down this epic for optimal Kanban flow:
 Epic: User Dashboard with Analytics
 
 Kanban task requirements:
-- Maximum 8-16 hours per task (1-2 days)
+- Maximum 4-8 hours per task (1 day)
 - If a task would take longer, split it
 - Each task independently deployable
 - Focus on flow over estimates
@@ -520,8 +520,8 @@ az boards work-item create --title "$title" \
 ai "Apply Kanban principles to split these work items:
 
 Kanban splitting rules:
-- Maximum cycle time: 8-16 hours (1-2 days)
-- If >16 hours, must split into smaller items
+- Maximum cycle time: 4-8 hours (1 day)
+- If >8 hours, must split into smaller items
 - Each item independently deployable
 - Measure actual cycle time, not estimates
 
@@ -533,7 +533,7 @@ Historical cycle times for reference:
 - Database migration: 3 hours per table
 
 For each task:
-1. Can it be completed in <16 hours?
+1. Can it be completed in <8 hours?
 2. If no, how to split it?
 3. What's the smallest valuable increment?
 
