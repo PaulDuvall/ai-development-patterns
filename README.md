@@ -49,8 +49,8 @@ graph TD
 | **[AI Failure Recovery Protocol](#ai-failure-recovery-protocol)** | Intermediate | Foundation | Systematic approach to detecting and recovering from AI-generated issues | AI Developer Lifecycle |
 | **[Human-AI Handoff Protocol](#human-ai-handoff-protocol)** | Intermediate | Foundation | Clear boundaries and procedures for transitioning work between human developers and AI | AI Developer Lifecycle |
 | **[AI Issue Generation](#ai-issue-generation)** | Beginner | Foundation | Generate Kanban-optimized work items (1-2 day max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies | AI Readiness Assessment |
-| **[ATDD-Driven AI Development](#atdd-driven-ai-development)** | Intermediate | Development | Use Acceptance Test-Driven Development to guide AI code generation with executable specifications | AI Developer Lifecycle |
-| **[Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)** | Intermediate | Development | Unified approach to test-first development, automated generation, and quality assurance | ATDD-Driven AI Development |
+| **[Specification Driven Development](#specification-driven-development)** | Intermediate | Development | Use executable specifications to guide AI code generation with clear acceptance criteria before implementation | AI Developer Lifecycle |
+| **[Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)** | Intermediate | Development | Unified approach to test-first development, automated generation, and quality assurance | Specification Driven Development |
 | **[Progressive AI Enhancement](#progressive-ai-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | AI Developer Lifecycle |
 | **[AI Workflow Orchestration](#ai-workflow-orchestration)** | Advanced | Development | Coordinate sequential pipelines, parallel workflows, and hybrid human-AI processes | Comprehensive AI Testing Strategy |
 | **[Context Window Optimization](#context-window-optimization)** | Intermediate | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive AI Enhancement |
@@ -189,7 +189,7 @@ Allowing AI tools full system access risks credential leaks, data breaches, and 
 **Maturity**: Intermediate  
 **Description**: AI development follows a structured lifecycle from problem definition through deployment, integrating all tactical patterns for systematic, testable, and maintainable AI-assisted development.
 
-**Related Patterns**: [Rules as Code](#rules-as-code), [ATDD-Driven AI Development](#atdd-driven-ai-development), [Observable AI Development](#observable-ai-development)
+**Related Patterns**: [Rules as Code](#rules-as-code), [Specification Driven Development](#specification-driven-development), [Observable AI Development](#observable-ai-development)
 
 **The Complete Lifecycle**
 
@@ -264,8 +264,8 @@ Format as JSON for automated issue creation."
 
 Apply [**AI Issue Generation**](#ai-issue-generation) to create comprehensive task breakdown. Use [**Progressive AI Enhancement**](#progressive-ai-enhancement) to ensure tasks are properly sized for iterative delivery.
 
-**Stage 5: Acceptance Test-Driven Development (ATDD)**
-*Patterns: [ATDD-Driven AI Development](#atdd-driven-ai-development), [Observable AI Development](#observable-ai-development)*
+**Stage 5: Specification Driven Development**
+*Patterns: [Specification Driven Development](#specification-driven-development), [Observable AI Development](#observable-ai-development)*
 
 Write executable acceptance tests before implementation to guide AI code generation.
 
@@ -405,7 +405,7 @@ Allowing AI and humans to work on the same task simultaneously without clear han
 **Maturity**: Beginner  
 **Description**: Generate structured work items optimized for Kanban flow using AI to break down features into small, rapidly completable tasks (1-2 days max) with clear acceptance criteria and dependencies. Focus on continuous flow rather than batch estimation.
 
-**Related Patterns**: [AI Readiness Assessment](#ai-readiness-assessment), [ATDD-Driven AI Development](#atdd-driven-ai-development)
+**Related Patterns**: [AI Readiness Assessment](#ai-readiness-assessment), [Specification Driven Development](#specification-driven-development)
 
 **Issue Generation Framework**
 
@@ -565,34 +565,55 @@ Creating generic tasks without specific acceptance criteria, proper sizing, or c
 
 Development patterns provide tactical approaches for day-to-day AI-assisted coding workflows, focusing on quality, maintainability, and team collaboration.
 
-## ATDD-Driven AI Development
+## Specification Driven Development
 
 **Maturity**: Intermediate  
-**Description**: Use Acceptance Test-Driven Development (ATDD) to guide AI code generation by writing executable specifications first, then prompting AI to create minimal implementations that satisfy the acceptance criteria. For detailed implementation guidance, see [ATDD-Driven AI Development: How Prompting and Tests Steer the Code](https://www.paulmduvall.com/atdd-driven-ai-development-how-prompting-and-tests-steer-the-code/).
+**Description**: Use executable specifications to guide AI code generation by writing clear acceptance criteria first, then prompting AI to create minimal implementations that satisfy those specifications. This approach ensures AI-generated code meets exact requirements before implementation begins.
+
+**Key Principle: Specifications Persist, Prompts are Ephemeral**
+
+Unlike prompts that vanish after each AI session, executable specifications become permanent project artifacts that:
+- Define system behavior independently of any AI tool
+- Serve as living documentation that evolves with the codebase
+- Provide regression testing throughout the project lifecycle
+- Act as the source of truth for what the system should do
+
+While you may refine prompts repeatedly to get the right implementation, the specifications remain constant, ensuring consistency across different AI tools and sessions.
 
 **Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy), [Observable AI Development](#observable-ai-development)
 
-**The ATDD-AI Workflow**
+**The Specification-Driven AI Workflow**
 
 ```mermaid
 graph TD
-    A[Write Gherkin Feature] --> B[Generate Step Definitions with AI]
-    B --> C[Prompt AI for Minimal Implementation]
-    C --> D[Run Acceptance Tests]
-    D --> E{Tests Pass?}
-    E -->|No| F[Refine AI Prompts]
-    F --> C
-    E -->|Yes| G[Refactor with AI]
-    G --> H[Verify Tests Still Pass]
-    H --> I[Next Feature]
-    I --> A
+    A[Write Persistent Specifications<br/>Gherkin/BDD Features] --> B[Version Control<br/>Specifications]
+    B --> C[Generate Step Definitions<br/>with AI]
+    C --> D[Ephemeral AI Prompts<br/>for Implementation]
+    D --> E[Run Specifications]
+    E --> F{Specs Pass?}
+    F -->|No| G[Refine Prompts<br/>Not Specs]
+    G --> D
+    F -->|Yes| H[Refactor with AI]
+    H --> I[Verify Specs Still Pass]
+    I --> J[Specifications Remain<br/>as Regression Tests]
+    J --> K[Next Feature]
+    K --> A
+    
+    style A fill:#e1f5e1
+    style B fill:#e1f5e1
+    style J fill:#e1f5e1
+    style D fill:#ffe6e6
+    style G fill:#ffe6e6
 ```
 
 **Examples**
 
-**Step 1: Write Executable Specifications First**
+**Step 1: Write Persistent Specifications (These Live Forever)**
 ```gherkin
 # features/user_authentication.feature
+# This specification will persist throughout the project lifecycle
+# It defines WHAT the system does, not HOW it's implemented
+
 Feature: User Authentication
   As a user
   I want to log into the system
@@ -611,10 +632,15 @@ Feature: User Authentication
     And I should remain on the login page
 ```
 
-**Step 2: AI-Generated Step Definitions**
+**Step 2: Generate Implementation with Ephemeral Prompts**
 ```python
 # features/steps/auth_steps.py
-# Prompt: "Generate pytest-bdd step definitions for the user authentication feature"
+# These prompts are temporary - used once and discarded
+# The specifications above remain the source of truth
+
+# Ephemeral Prompt 1: "Generate pytest-bdd step definitions for the user authentication feature"
+# Ephemeral Prompt 2: "Use bcrypt for password hashing"
+# Ephemeral Prompt 3: "Add rate limiting to prevent brute force"
 
 from pytest_bdd import given, when, then, scenarios
 from selenium import webdriver
@@ -640,8 +666,24 @@ def verify_dashboard_redirect(browser):
     assert "/dashboard" in browser.current_url
 ```
 
+**Why Specifications Persist While Prompts Don't**
+
+1. **Specifications are contracts**: They define what your system promises to do, regardless of implementation
+2. **Prompts are conversations**: They're tactical instructions that change based on AI capabilities and context
+3. **Specifications enable refactoring**: You can completely rewrite implementations while specifications ensure behavior remains correct
+4. **Prompts are tool-specific**: Different AI tools need different prompts, but they all must satisfy the same specifications
+
+**Benefits of Specification Persistence**
+- **AI Tool Independence**: Switch between Copilot, Cursor, Claude without losing your behavioral requirements
+- **Team Alignment**: New developers understand system behavior from specs, not from scattered prompts
+- **Regression Safety**: Specifications catch breaking changes regardless of how code was generated
+- **Living Documentation**: Specifications document actual system behavior, not intended behavior
+
 **Anti-pattern: Implementation-First AI**
 Writing code with AI first, then trying to retrofit tests, resulting in tests that mirror implementation rather than specify behavior.
+
+**Anti-pattern: Prompt Hoarding**
+Saving collections of prompts as if they were specifications. Prompts are implementation details; specifications are behavioral contracts.
 
 ---
 
@@ -650,7 +692,7 @@ Writing code with AI first, then trying to retrofit tests, resulting in tests th
 **Maturity**: Intermediate  
 **Description**: Unified approach combining test-first development, automated test generation, and quality assurance patterns to ensure AI-generated code meets quality and behavioral specifications.
 
-**Related Patterns**: [ATDD-Driven AI Development](#atdd-driven-ai-development), [Observable AI Development](#observable-ai-development)
+**Related Patterns**: [Specification Driven Development](#specification-driven-development), [Observable AI Development](#observable-ai-development)
 
 **Integrated Testing Framework**
 
@@ -1203,7 +1245,7 @@ Waiting for incidents to spike forces firefighting rather than proactive system 
 5. **[AI Issue Generation](#ai-issue-generation)** - Generate structured work items from requirements
 
 ### Phase 2: Development (Weeks 3-4)
-1. **[ATDD-Driven AI Development](#atdd-driven-ai-development)** - Implement acceptance test-first approach
+1. **[Specification Driven Development](#specification-driven-development)** - Implement specification-first approach
 2. **[Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)** - Establish unified testing framework
 3. **[Progressive AI Enhancement](#progressive-ai-enhancement)** - Practice iterative development
 4. **[Context Window Optimization](#context-window-optimization)** - Optimize AI tool selection
