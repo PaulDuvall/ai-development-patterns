@@ -1805,21 +1805,21 @@ print("It might have worked")  # Did it work or not?
 
 | Pattern | Description |
 |---------|-------------|
-| **AI Developer Lifecycle** | Structured 9-stage process from problem definition through deployment with AI assistance at each phase |
-| **Rules as Code** | Version and maintain AI coding standards as explicit files (.cursorrules, CLAUDE.md) to ensure consistency across sessions |
-| **Test-Driven AI Development** | Write failing tests first, then use AI to generate implementations that pass specific test criteria |
-| **Progressive AI Enhancement** | Build complex features through small, deployable iterations rather than big-bang generation |
-| **AI Security Sandbox** | Run AI tools in isolated environments without access to secrets or sensitive data |
-| **AI Prompt Pipeline** | Chain AI prompts in stages where each validates and improves the previous output |
-| **Context Window Optimization** | Match AI tool selection to task complexity (Copilot for simple, Claude for architecture) |
-| **Test-Driven Prompt Engineering** | Define expected AI output first, then systematically refine prompts to achieve it |
-| **AI Knowledge Persistence** | Capture successful patterns and failed attempts as versioned knowledge for future sessions |
-| **AI Commit Protocol** | Structure commits with clear attribution and checkpoints for easy rollback of AI changes |
-| **AI Pair Rotation** | Use different AI tools for different development phases based on their strengths |
-| **Constraint-Based AI Development** | Give AI specific constraints (lines of code, dependencies) to prevent over-engineering |
-| **Observable AI Development** | Strategic logging and debugging that makes system behavior visible to AI |
-| **Parallel AI Workflows** | Use multiple AI agents concurrently with shared contracts for different aspects of features |
-| **Everything as a Tool** | Design scripts and services as AI-accessible with structured output and self-documentation |
+| **[AI Developer Lifecycle](#ai-developer-lifecycle)** | Structured 9-stage process from problem definition through deployment with AI assistance at each phase |
+| **[Rules as Code](#rules-as-code)** | Version and maintain AI coding standards as explicit files (.cursorrules, CLAUDE.md) to ensure consistency across sessions |
+| **[Test-Driven AI Development](#test-driven-ai-development)** | Write failing tests first, then use AI to generate implementations that pass specific test criteria |
+| **[Progressive AI Enhancement](#progressive-ai-enhancement)** | Build complex features through small, deployable iterations rather than big-bang generation |
+| **[AI Security Sandbox](#ai-security-sandbox)** | Run AI tools in isolated environments without access to secrets or sensitive data |
+| **[AI Prompt Pipeline](#ai-prompt-pipeline)** | Chain AI prompts in stages where each validates and improves the previous output |
+| **[Context Window Optimization](#context-window-optimization)** | Match AI tool selection to task complexity (Copilot for simple, Claude for architecture) |
+| **[Test-Driven Prompt Engineering](#test-driven-prompt-engineering)** | Define expected AI output first, then systematically refine prompts to achieve it |
+| **[AI Knowledge Persistence](#ai-knowledge-persistence)** | Capture successful patterns and failed attempts as versioned knowledge for future sessions |
+| **[AI Commit Protocol](#ai-commit-protocol)** | Structure commits with clear attribution and checkpoints for easy rollback of AI changes |
+| **[AI Pair Rotation](#ai-pair-rotation)** | Use different AI tools for different development phases based on their strengths |
+| **[Constraint-Based AI Development](#constraint-based-ai-development)** | Give AI specific constraints (lines of code, dependencies) to prevent over-engineering |
+| **[Observable AI Development](#observable-ai-development)** | Strategic logging and debugging that makes system behavior visible to AI |
+| **[Parallel AI Workflows](#parallel-ai-workflows)** | Use multiple AI agents concurrently with shared contracts for different aspects of features |
+| **[Everything as a Tool](#everything-as-a-tool)** | Design scripts and services as AI-accessible with structured output and self-documentation |
 
 ## Implementation Guide
 
