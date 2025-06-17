@@ -164,6 +164,7 @@ Each developer maintains their own prompts and preferences, leading to inconsist
 
 **Default-Deny Network Isolation**
 ```yaml
+# See actual implementation: sandbox/docker-compose.ai-sandbox.yml
 # docker-compose.ai-sandbox.yml
 version: '3.8'
 
@@ -611,6 +612,7 @@ graph TD
 
 **Step 1: Write Persistent Specifications (These Live Forever)**
 ```gherkin
+# See actual implementation: specs/user_authentication.feature
 # features/user_authentication.feature
 # This specification will persist throughout the project lifecycle
 # It defines WHAT the system does, not HOW it's implemented
@@ -929,8 +931,8 @@ graph TD
 **Automated Code Smell Detection**
 
 ```bash
-# .refactoringrules.md - Define measurable thresholds
-cat > .refactoringrules.md << 'EOF'
+# .ai/rules/refactoring.md - Define measurable thresholds
+cat > .ai/rules/refactoring.md << 'EOF'
 # Refactoring Rules
 
 ## Long Method Smell
@@ -956,7 +958,7 @@ cat > .refactoringrules.md << 'EOF'
 EOF
 
 # AI smell detection
-ai "Analyze this codebase using .refactoringrules.md:
+ai "Analyze this codebase using .ai/rules/refactoring.md:
 1. Run static analysis tools (flake8, pylint, radon)
 2. Identify code smells per defined thresholds
 3. Prioritize by impact and complexity
@@ -1007,7 +1009,7 @@ pylint src/ --disable=all --enable=R0915,R0902,R0904  # Method/class size
 radon cc src/ --min=C  # Cyclomatic complexity
 
 echo "AI refactoring analysis..."
-ai "Analyze static analysis output and .refactoringrules.md:
+ai "Analyze static analysis output and .ai/rules/refactoring.md:
 1. List code smells by priority (impact × frequency)
 2. Suggest refactoring strategy for top 3 smells  
 3. Estimate effort and risk for each refactoring
@@ -1109,6 +1111,7 @@ Operations patterns focus on CI/CD, security, compliance, and production managem
 "Data at rest must be AES-256 encrypted in transit and at rest per SOC 2."
 
 # Generate policy
+# See actual policies: policies/iam_permissions.cedar
 ai "Convert policies/req.md into Cedar policy code" > policies/code/encryption.cedar
 opa test policies/code/encryption.cedar
 ```
@@ -1188,6 +1191,7 @@ Allowing auto-fix commands via chat can deploy untested changes.
 **Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration)
 
 ```bash
+# See actual spec: pipelines/ci_spec.md
 # ci.spec
 install dependencies -> pip install -r requirements.txt
 run tests -> pytest
@@ -1214,6 +1218,7 @@ Accepting every AI-suggested stage without pruning adds slow, unused steps to pi
 
 ```bash
 # Blue-green reference documentation
+# See actual guide: deployment/blue_green/blue_green_deployment.md
 cat > docs/blue-green-guide.md << 'EOF'
 # Blue-Green Deployment Pattern
 
@@ -1231,7 +1236,7 @@ cat > docs/blue-green-guide.md << 'EOF'
 EOF
 
 # AI prompt with validation
-ai "Using docs/blue-green-guide.md, create AWS deployment script that:
+ai "Using deployment/blue_green/blue_green_deployment.md, create AWS deployment script that:
 1. Deploys to IDLE environment only
 2. Runs health checks on idle
 3. Switches ALL traffic atomically via ALB
