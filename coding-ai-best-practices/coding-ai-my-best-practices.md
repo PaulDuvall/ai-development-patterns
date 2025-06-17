@@ -1630,176 +1630,56 @@ Multiple AI agents working without shared contracts or clear boundaries, resulti
 
 **Related Patterns**: [Observable AI Development](#observable-ai-development), [AI Workflow Orchestration](#ai-workflow-orchestration)
 
+**Key Principles**
+
+1. **Structured Output**: Return JSON or structured data instead of human-readable text
+2. **Self-Documentation**: Include help commands and capability discovery endpoints  
+3. **Clear Interfaces**: Use explicit parameters and predictable behavior
+4. **Error Handling**: Provide actionable error messages with suggestions
+
 **Examples**
-AI-friendly CLI tool:
-```python
-#!/usr/bin/env python3
-# deploy.py
 
-import click
-import json
-import sys
+**AI-Friendly CLI Tool**
+```bash
+# Traditional tool (hard for AI)
+deploy.sh production  # Returns: "Deployment completed successfully!"
 
-@click.command()
-@click.argument('environment', type=click.Choice(['dev', 'staging', 'prod']))
-@click.option('--dry-run', is_flag=True, help='Show what would happen')
-@click.option('--version', help='Specific version to deploy')
-def deploy(environment, dry_run, version):
-    """Deploy application to specified environment."""
-    # Structured output for AI
-    print(json.dumps({
-        "action": "deploy_start",
-        "environment": environment,
-        "dry_run": dry_run,
-        "version": version or "latest"
-    }))
-    
-    try:
-        # Deployment logic
-        if not dry_run:
-            perform_deployment(environment, version)
-            
-        print(json.dumps({
-            "action": "deploy_success",
-            "url": f"https://{environment}.example.com",
-            "version": version or get_latest_version()
-        }))
-        return 0
-        
-    except Exception as e:
-        print(json.dumps({
-            "action": "deploy_error",
-            "error": str(e),
-            "suggestion": get_error_suggestion(e)
-        }))
-        return 1
-
-if __name__ == '__main__':
-    sys.exit(deploy())
+# AI-friendly tool (easy for AI)
+deploy.py production --format=json
+# Returns: {"status": "success", "url": "https://prod.example.com", "version": "1.2.3"}
 ```
 
-Self-documenting service:
+**Self-Documenting Service**
 ```python
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-
-app = FastAPI()
-
-@app.get("/health")
-async def health_check():
-    """AI-readable health status."""
-    checks = await run_health_checks()
-    
+@app.get("/capabilities")
+def get_capabilities():
+    """AI discovers what this service can do."""
     return {
-        "healthy": all(c["ok"] for c in checks),
-        "checks": checks,
-        "timestamp": datetime.utcnow().isoformat(),
-        "suggested_actions": get_suggested_actions(checks)
-    }
-
-@app.get("/admin/capabilities")
-async def list_capabilities():
-    """Discover available admin actions."""
-    return {
-        "endpoints": [
-            {
-                "method": "POST",
-                "path": "/admin/cache/clear",
-                "description": "Clear all caches",
-                "confirmation_required": True
-            },
-            {
-                "method": "GET",
-                "path": "/admin/logs",
-                "description": "Retrieve logs",
-                "parameters": ["lines", "level", "service"]
-            }
-        ]
-    }
-
-class ClearCacheRequest(BaseModel):
-    confirm: str
-
-@app.post("/admin/cache/clear")
-async def clear_cache(request: ClearCacheRequest):
-    """Clear cache with confirmation."""
-    if request.confirm != "clear-cache":
-        raise HTTPException(400, detail={
-            "error": "Confirmation required",
-            "hint": 'POST {"confirm": "clear-cache"}'
-        })
-    
-    await cache.clear()
-    return {
-        "status": "success",
-        "next_steps": ["Check /health", "Monitor performance"]
+        "actions": ["deploy", "rollback", "status"],
+        "endpoints": ["/deploy", "/rollback", "/health"],
+        "formats": ["json"],
+        "examples": {
+            "deploy": "POST /deploy {'environment': 'prod', 'version': '1.2.3'}",
+            "status": "GET /status"
+        }
     }
 ```
 
-Migration tool example:
-```python
-#!/usr/bin/env python3
-# migrate.py
-
-import click
-import json
-
-@click.group()
-def cli():
-    """Database migration tool."""
-    pass
-
-@cli.command()
-def status():
-    """Show migration status in AI-readable format."""
-    pending = get_pending_migrations()
-    applied = get_applied_migrations()
-    
-    print(json.dumps({
-        "pending": pending,
-        "applied": applied,
-        "can_migrate": len(pending) > 0,
-        "next_migration": pending[0] if pending else None
-    }, indent=2))
-
-@cli.command()
-def capabilities():
-    """Show what this tool can do."""
-    print(json.dumps({
-        "commands": ["status", "up", "down", "create"],
-        "examples": [
-            "migrate.py status",
-            "migrate.py up --one",
-            "migrate.py down",
-            "migrate.py create add_user_table"
-        ]
-    }, indent=2))
-```
-
-Real-world AI usage:
-```
-"Check if we need to run migrations and apply them"
-# AI runs: ./migrate.py status
-# Sees pending migrations
-# AI runs: ./migrate.py up
-# Parses structured output, knows it succeeded
+**Usage Pattern**
+```bash
+# AI workflow
+ai "Deploy the latest version to production"
+# 1. AI calls: ./deploy.py capabilities
+# 2. AI learns: POST /deploy requires environment and version
+# 3. AI executes: ./deploy.py production --version=latest --format=json
+# 4. AI parses: {"status": "success", "url": "https://prod.example.com"}
 ```
 
 **Anti-pattern: Human-Only Interfaces**
-Tools that only work interactively or produce unstructured output that AI cannot reliably parse.
-
-```python
-# Anti-pattern: Interactive prompts
-name = input("Enter your name: ")  # AI can't respond
-if input("Are you sure? (y/n) ") != 'y':  # Blocks AI
-
-# Anti-pattern: Unstructured output  
-print("Something happened")  # What happened?
-print("It might have worked")  # Did it work or not?
-
-# Anti-pattern: No discovery
-# secret-tool.py with no --help, no docs, no way to know what it does
-```
+- Interactive prompts that require user input
+- Unstructured text output that AI cannot parse
+- No help commands or capability discovery
+- Tools that assume human interpretation of ambiguous results
 
 ## Pattern Summary
 
