@@ -1805,11 +1805,18 @@ print("It might have worked")  # Did it work or not?
 
 | Pattern | Description |
 |---------|-------------|
+| **[AI Readiness Assessment](#ai-readiness-assessment)** | Systematic evaluation of codebase and team readiness for AI-assisted development before implementing AI patterns |
 | **[AI Developer Lifecycle](#ai-developer-lifecycle)** | Structured 9-stage process from problem definition through deployment with AI assistance at each phase |
+| **[AI Failure Recovery Protocol](#ai-failure-recovery-protocol)** | Systematic approach to detecting and recovering from AI-generated issues with automated rollback triggers and learning capture mechanisms |
+| **[Human-AI Handoff Protocol](#human-ai-handoff-protocol)** | Clear boundaries and procedures for transitioning work between human developers and AI tools based on complexity, security requirements, and creative problem-solving needs |
+| **[AI Issue Generation](#ai-issue-generation)** | Generate structured work items and tickets from requirements using AI to break down features into actionable tasks with proper estimation, acceptance criteria, and dependencies |
 | **[Rules as Code](#rules-as-code)** | Version and maintain AI coding standards as explicit files (.cursorrules, CLAUDE.md) to ensure consistency across sessions |
+| **[ATDD-Driven AI Development](#atdd-driven-ai-development)** | Use Acceptance Test-Driven Development (ATDD) to guide AI code generation by writing executable specifications first, then prompting AI to create minimal implementations that satisfy the acceptance criteria |
+| **[Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)** | Unified approach combining test-first development, automated test generation, and quality assurance patterns to ensure AI-generated code meets quality and behavioral specifications |
 | **[Test-Driven AI Development](#test-driven-ai-development)** | Write failing tests first, then use AI to generate implementations that pass specific test criteria |
 | **[Progressive AI Enhancement](#progressive-ai-enhancement)** | Build complex features through small, deployable iterations rather than big-bang generation |
 | **[AI Security Sandbox](#ai-security-sandbox)** | Run AI tools in isolated environments without access to secrets or sensitive data |
+| **[AI Workflow Orchestration](#ai-workflow-orchestration)** | Coordinate sequential pipelines, parallel workflows, and hybrid human-AI processes for complex development tasks requiring multiple AI tools and human oversight |
 | **[AI Prompt Pipeline](#ai-prompt-pipeline)** | Chain AI prompts in stages where each validates and improves the previous output |
 | **[Context Window Optimization](#context-window-optimization)** | Match AI tool selection to task complexity (Copilot for simple, Claude for architecture) |
 | **[Test-Driven Prompt Engineering](#test-driven-prompt-engineering)** | Define expected AI output first, then systematically refine prompts to achieve it |
@@ -1820,6 +1827,7 @@ print("It might have worked")  # Did it work or not?
 | **[Observable AI Development](#observable-ai-development)** | Strategic logging and debugging that makes system behavior visible to AI |
 | **[Parallel AI Workflows](#parallel-ai-workflows)** | Use multiple AI agents concurrently with shared contracts for different aspects of features |
 | **[Everything as a Tool](#everything-as-a-tool)** | Design scripts and services as AI-accessible with structured output and self-documentation |
+| **[AI-Driven Refactoring](#ai-driven-refactoring)** | Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics, following established refactoring rules and maintaining test coverage throughout the process |
 
 ## Implementation Guide
 
