@@ -146,7 +146,7 @@ Each developer maintains their own prompts and preferences, leading to inconsist
 
 **Related Patterns**: [AI Security & Compliance](#ai-security--compliance), [Rules as Code](#rules-as-code)
 
-**Docker-Based Isolation**
+**Default-Deny Network Isolation**
 ```yaml
 # docker-compose.ai-sandbox.yml
 version: '3.8'
@@ -156,28 +156,38 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.ai-sandbox
+    # Complete network isolation - no egress or ingress
+    network_mode: none
     security_opt:
       - no-new-privileges:true
     cap_drop:
       - ALL
     volumes:
-      # Read-only source code access
+      # Read-only source code, read/write tests
       - ./src:/workspace/src:ro
       - ./tests:/workspace/tests:rw
-      # NO access to sensitive directories:
-      # - .env files, .aws credentials, .ssh keys, secrets/ directory
+      # DO NOT mount ~/.aws, .env, secrets/, etc.
     environment:
       - NODE_ENV=development
       - AI_SANDBOX=true
-    networks:
-      - ai-isolated
     restart: no
 
-networks:
-  ai-isolated:
-    driver: bridge
-    internal: true  # No external network access
+# If you need intra-container communication, define an explicit internal network:
+# networks:
+#   ai-isolated:
+#     driver: bridge
+#     internal: true
 ```
+
+**What Default-Deny Accomplishes**
+
+- **`network_mode: none`** cuts off ALL network access - no DNS, no HTTP, no callbacks
+- AI gets a fully functional environment for code generation and testing with zero risk of credential exfiltration
+- No "phone home" capabilities, no data leaks, no accidental API calls with embedded secrets
+- If inter-container communication is needed (e.g., mock services), use an explicit internal-only bridge network
+- Pair with Rules-as-Code to enforce these isolation settings in CI/CD pipelines
+
+**Result**: AI assistance lives in a complete network vault. Secrets stay put. Compliance stays intact.
 
 **Anti-pattern: Unrestricted Access**
 Allowing AI tools full system access risks credential leaks, data breaches, and security compliance violations.
