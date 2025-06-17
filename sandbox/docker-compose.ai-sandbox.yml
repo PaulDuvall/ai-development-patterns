@@ -1,0 +1,202 @@
+version: '3.8'
+
+# AI Security Sandbox - Complete network isolation for AI development
+# Based on the AI Security Sandbox pattern from README.md
+
+services:
+  ai-development:
+    build:
+      context: .
+      dockerfile: sandbox/Dockerfile.ai-sandbox
+    container_name: ai-dev-sandbox
+    
+    # Complete network isolation - no egress or ingress
+    network_mode: none
+    
+    # Security constraints
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: false  # Allow writing to specific mounted volumes
+    
+    # Volume mounts - read-only source, read/write for development artifacts
+    volumes:
+      # Source code - read only to prevent accidental modification
+      - ../src:/workspace/src:ro
+      - ../tests:/workspace/tests:rw
+      - ../specs:/workspace/specs:ro
+      - ../.ai:/workspace/.ai:ro
+      
+      # Development outputs - writable
+      - ../generated:/workspace/generated:rw
+      - ../logs:/workspace/logs:rw
+      
+      # Temporary workspace for AI operations
+      - ai-temp:/tmp/ai-workspace:rw
+      
+      # DO NOT mount sensitive directories:
+      # - ~/.aws (AWS credentials)
+      # - ~/.ssh (SSH keys) 
+      # - .env files (environment secrets)
+      # - /var/run/docker.sock (Docker daemon)
+      # - /etc/passwd, /etc/shadow (system files)
+      
+    # Environment variables - development only, no secrets
+    environment:
+      - NODE_ENV=development
+      - AI_SANDBOX=true
+      - WORKSPACE_DIR=/workspace
+      - PYTHONPATH=/workspace/src
+      - LOG_LEVEL=INFO
+      
+    # Prevent container from restarting automatically
+    restart: no
+    
+    # Resource limits to prevent resource exhaustion
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+    
+    # Health check to ensure container is responsive
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; print('AI Sandbox Ready')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Working directory
+    working_dir: /workspace
+    
+    # User context - run as non-root user
+    user: "1000:1000"
+    
+    # Labels for identification and management
+    labels:
+      - "ai.sandbox=true"
+      - "ai.network.isolated=true"
+      - "ai.security.level=high"
+      - "version=1.0"
+
+  # Optional: Internal-only services for AI development
+  # Use only if inter-container communication is absolutely necessary
+  mock-api:
+    image: mockserver/mockserver:latest
+    container_name: ai-mock-api
+    
+    # Connect to isolated network only
+    networks:
+      - ai-isolated
+    
+    # No external network access
+    environment:
+      - MOCKSERVER_PROPERTY_FILE=/config/mockserver.properties
+    
+    volumes:
+      - ./mock-config:/config:ro
+    
+    # Security constraints
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    
+    # Only accessible from within ai-isolated network
+    expose:
+      - "1080"
+    
+    labels:
+      - "ai.sandbox=true"
+      - "ai.service.type=mock"
+
+  # Database for testing - isolated from production
+  test-database:
+    image: postgres:15-alpine
+    container_name: ai-test-db
+    
+    networks:
+      - ai-isolated
+    
+    environment:
+      - POSTGRES_DB=ai_test
+      - POSTGRES_USER=ai_test_user
+      - POSTGRES_PASSWORD=test_password_not_production
+      - POSTGRES_HOST_AUTH_METHOD=md5
+    
+    volumes:
+      - ai-test-data:/var/lib/postgresql/data
+      - ./test-data/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    
+    # Security constraints
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    
+    # Only accessible from within ai-isolated network
+    expose:
+      - "5432"
+    
+    labels:
+      - "ai.sandbox=true"
+      - "ai.service.type=database"
+      - "ai.data.classification=test"
+
+# Networks - isolated bridge network for inter-container communication
+networks:
+  ai-isolated:
+    driver: bridge
+    # Internal only - no external connectivity
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+    labels:
+      - "ai.network.type=isolated"
+      - "ai.security.level=high"
+
+# Volumes for persistent data within sandbox
+volumes:
+  ai-temp:
+    driver: local
+    labels:
+      - "ai.volume.type=temporary"
+      - "ai.cleanup=true"
+  
+  ai-test-data:
+    driver: local
+    labels:
+      - "ai.volume.type=test-database"
+      - "ai.data.classification=test"
+
+# Additional security configurations
+configs:
+  sandbox-security-config:
+    file: ./sandbox/security.conf
+    
+secrets:
+  # Only test secrets - never production credentials
+  test-api-key:
+    file: ./sandbox/test-secrets/api-key.txt
+
+# Logging configuration
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+    labels: "ai.sandbox,ai.service.type"

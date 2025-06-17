@@ -1,0 +1,282 @@
+# Unit Test Configuration for AI Development
+# Machine-parsable mapping of functions to test doubles and fixtures
+
+test_configuration:
+  framework: pytest
+  coverage_threshold: 90
+  test_discovery_pattern: "test_*.py"
+  
+test_mappings:
+  # Authentication Module Tests
+  auth_service:
+    module: "src.auth.service"
+    functions:
+      - name: "authenticate_user"
+        test_file: "tests/test_auth_service.py"
+        fixtures:
+          - valid_user
+          - invalid_user
+          - expired_token
+        mocks:
+          - database_session
+          - bcrypt_verify
+          - jwt_encode
+        test_cases:
+          - happy_path_valid_credentials
+          - invalid_password
+          - user_not_found
+          - rate_limiting_active
+        coverage_target: 95
+
+      - name: "generate_jwt_token"
+        test_file: "tests/test_auth_service.py"
+        fixtures:
+          - user_payload
+          - private_key
+        mocks:
+          - datetime_now
+        test_cases:
+          - valid_token_generation
+          - token_expiration_set
+          - rs256_algorithm_used
+        coverage_target: 100
+
+      - name: "refresh_token"
+        test_file: "tests/test_auth_service.py"
+        fixtures:
+          - valid_refresh_token
+          - expired_refresh_token
+        mocks:
+          - token_store
+          - jwt_decode
+        test_cases:
+          - successful_refresh
+          - expired_token_rejection
+          - invalid_token_format
+        coverage_target: 95
+
+  # User Service Tests
+  user_service:
+    module: "src.users.service"
+    functions:
+      - name: "create_user"
+        test_file: "tests/test_user_service.py"
+        fixtures:
+          - user_data
+          - database_session
+        mocks:
+          - email_validator
+          - password_hasher
+          - user_repository
+        test_cases:
+          - successful_user_creation
+          - duplicate_email_rejection
+          - invalid_email_format
+          - weak_password_rejection
+        coverage_target: 90
+
+      - name: "get_user_profile"
+        test_file: "tests/test_user_service.py"
+        fixtures:
+          - existing_user
+          - user_id
+        mocks:
+          - user_repository
+        test_cases:
+          - existing_user_retrieval
+          - non_existent_user
+          - database_error_handling
+        coverage_target: 95
+
+      - name: "update_user_profile"
+        test_file: "tests/test_user_service.py"
+        fixtures:
+          - user_update_data
+          - existing_user
+        mocks:
+          - user_repository
+          - audit_logger
+        test_cases:
+          - successful_update
+          - partial_update
+          - invalid_data_rejection
+          - concurrent_update_conflict
+        coverage_target: 90
+
+  # API Controller Tests
+  auth_controller:
+    module: "src.api.auth_controller"
+    functions:
+      - name: "login_endpoint"
+        test_file: "tests/test_auth_controller.py"
+        fixtures:
+          - client
+          - login_payload
+        mocks:
+          - auth_service
+          - rate_limiter
+        test_cases:
+          - successful_login_response
+          - invalid_credentials_400
+          - rate_limit_exceeded_429
+          - malformed_request_400
+        coverage_target: 85
+
+      - name: "refresh_endpoint"
+        test_file: "tests/test_auth_controller.py"
+        fixtures:
+          - client
+          - refresh_payload
+        mocks:
+          - auth_service
+        test_cases:
+          - successful_token_refresh
+          - expired_refresh_token_401
+          - missing_token_400
+        coverage_target: 90
+
+  # Database Repository Tests
+  user_repository:
+    module: "src.repositories.user_repository"
+    functions:
+      - name: "find_by_email"
+        test_file: "tests/test_user_repository.py"
+        fixtures:
+          - database_session
+          - sample_users
+        mocks:
+          - sqlalchemy_query
+        test_cases:
+          - existing_user_found
+          - user_not_found_returns_none
+          - database_connection_error
+        coverage_target: 95
+
+      - name: "create_user"
+        test_file: "tests/test_user_repository.py"
+        fixtures:
+          - database_session
+          - user_model
+        mocks:
+          - sqlalchemy_session
+        test_cases:
+          - successful_user_creation
+          - duplicate_key_constraint_error
+          - database_transaction_rollback
+        coverage_target: 90
+
+# Test Fixtures Configuration
+fixtures:
+  valid_user:
+    type: "User"
+    data:
+      id: 1
+      email: "test@example.com"
+      password_hash: "$2b$12$test_hash"
+      role: "user"
+      created_at: "2024-01-01T00:00:00Z"
+
+  invalid_user:
+    type: "dict"
+    data:
+      email: "invalid@example.com"
+      password: "wrongpassword"
+
+  user_payload:
+    type: "dict"
+    data:
+      user_id: 1
+      email: "test@example.com"
+      role: "user"
+      exp: 1641024000
+
+  login_payload:
+    type: "dict"
+    data:
+      email: "test@example.com"
+      password: "testpassword123"
+
+  user_data:
+    type: "dict"
+    data:
+      email: "newuser@example.com"
+      password: "SecurePass123!"
+      first_name: "Test"
+      last_name: "User"
+
+# Mock Configuration
+mocks:
+  database_session:
+    type: "sqlalchemy.orm.Session"
+    methods:
+      - add
+      - commit
+      - rollback
+      - query
+
+  bcrypt_verify:
+    type: "function"
+    return_value: true
+    side_effects:
+      - valid_password: true
+      - invalid_password: false
+
+  jwt_encode:
+    type: "function"
+    return_value: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.test_token"
+
+  email_validator:
+    type: "function"
+    side_effects:
+      - valid_email: true
+      - invalid_email: false
+
+  rate_limiter:
+    type: "class"
+    methods:
+      - is_allowed: true
+      - increment_attempts: null
+
+# Test Data Factories
+factories:
+  user_factory:
+    model: "User"
+    fields:
+      email: "user{sequence}@example.com"
+      password_hash: "$2b$12$factory_hash_{sequence}"
+      first_name: "User"
+      last_name: "{sequence}"
+      role: "user"
+      created_at: "now()"
+
+  admin_user_factory:
+    model: "User"
+    base: "user_factory"
+    overrides:
+      role: "admin"
+      email: "admin{sequence}@example.com"
+
+# Test Execution Configuration
+execution:
+  parallel: true
+  max_workers: 4
+  test_timeout: 30
+  retry_flaky: 3
+  coverage_report: true
+  coverage_format: ["html", "xml", "term"]
+
+# Quality Gates
+quality_gates:
+  minimum_coverage: 90
+  maximum_test_duration: 5
+  flaky_test_threshold: 2
+  complexity_threshold: 10
+  duplicate_code_threshold: 5
+
+# Test Environment
+environment:
+  database_url: "sqlite:///:memory:"
+  test_data_path: "tests/data/"
+  fixtures_path: "tests/fixtures/"
+  log_level: "WARNING"
+  disable_migrations: true

@@ -1,0 +1,127 @@
+# AI Security Sandbox Dockerfile
+# Secure, isolated environment for AI-assisted development
+# Based on AI Security Sandbox pattern from README.md
+
+# Use official Python slim image for smaller attack surface
+FROM python:3.11-slim-bullseye
+
+# Metadata
+LABEL maintainer="AI Development Team"
+LABEL description="AI Security Sandbox - Isolated development environment"
+LABEL ai.sandbox="true"
+LABEL ai.security.level="high"
+LABEL version="1.0"
+
+# Security: Create non-root user for running applications
+RUN groupadd -r aiuser && useradd -r -g aiuser -u 1000 aiuser
+
+# Install system dependencies (minimal set)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Essential build tools
+    gcc \
+    g++ \
+    # Version control
+    git \
+    # Network utilities (for testing only)
+    curl \
+    # Text processing
+    jq \
+    # Process management
+    procps \
+    # Clean up
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Set up Python environment
+COPY requirements-sandbox.txt /tmp/requirements-sandbox.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r /tmp/requirements-sandbox.txt && \
+    rm /tmp/requirements-sandbox.txt
+
+# Create secure workspace directory structure
+RUN mkdir -p /workspace/{src,tests,specs,generated,logs,.ai} && \
+    chown -R aiuser:aiuser /workspace
+
+# Security: Remove unnecessary packages and files
+RUN apt-get remove -y gcc g++ && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Security: Set secure permissions
+RUN chmod 755 /workspace && \
+    chmod -R 644 /workspace/.ai 2>/dev/null || true
+
+# Install AI development tools in user space
+USER aiuser
+WORKDIR /workspace
+
+# Install additional Python packages as non-root user
+RUN pip install --user --no-cache-dir \
+    # Code quality tools
+    black \
+    flake8 \
+    mypy \
+    pytest \
+    pytest-cov \
+    # AI/ML libraries (development versions)
+    requests \
+    pydantic \
+    # Development utilities
+    ipython \
+    jinja2
+
+# Add user pip bin to PATH
+ENV PATH="/home/aiuser/.local/bin:${PATH}"
+
+# Environment variables for AI sandbox
+ENV AI_SANDBOX=true
+ENV PYTHONPATH=/workspace/src
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PIP_NO_CACHE_DIR=1
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Security: Disable network access from within container
+# This is enforced at container runtime with network_mode: none
+ENV NO_PROXY="*"
+ENV HTTP_PROXY=""
+ENV HTTPS_PROXY=""
+
+# Health check script
+COPY --chown=aiuser:aiuser sandbox/healthcheck.py /workspace/healthcheck.py
+RUN chmod +x /workspace/healthcheck.py
+
+# Create AI workspace initialization script
+COPY --chown=aiuser:aiuser sandbox/init-workspace.sh /workspace/init-workspace.sh
+RUN chmod +x /workspace/init-workspace.sh
+
+# Security: Final permission lockdown
+USER root
+RUN chmod 755 /workspace/healthcheck.py /workspace/init-workspace.sh && \
+    find /workspace -type d -exec chmod 755 {} \; && \
+    find /workspace -type f -name "*.py" -exec chmod 644 {} \; && \
+    find /workspace -type f -name "*.sh" -exec chmod 755 {} \;
+
+# Switch back to non-root user
+USER aiuser
+
+# Health check configuration
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python /workspace/healthcheck.py
+
+# Default command - interactive shell for AI development
+CMD ["/bin/bash", "-c", "/workspace/init-workspace.sh && exec /bin/bash"]
+
+# Security notes:
+# 1. Container runs as non-root user (UID 1000)
+# 2. No network access (enforced by docker-compose network_mode: none)
+# 3. Read-only filesystem for source code
+# 4. Minimal system packages installed
+# 5. No secrets or credentials mounted
+# 6. Resource limits enforced at runtime
+# 7. No privileged capabilities
+# 8. Health checks ensure container responsiveness
+
+# Usage:
+# docker-compose -f sandbox/docker-compose.ai-sandbox.yml up ai-development
+# docker exec -it ai-dev-sandbox /bin/bash

@@ -1,0 +1,242 @@
+# CI Pipeline Validation Rules
+# Machine-parsable configuration for testing CI/CD pipeline behavior
+
+pipeline_config:
+  name: "AI Development Pipeline Tests"
+  version: "1.0"
+  framework: "github_actions"
+
+# Build Validation Rules
+build_validation:
+  success_criteria:
+    - name: "build_exits_zero"
+      description: "Build must exit with status code 0"
+      command: "docker build -t aiapp:test ."
+      expected_exit_code: 0
+      timeout: 300
+      
+    - name: "no_build_warnings"
+      description: "Build should not produce warnings"
+      command: "docker build -t aiapp:test . 2>&1"
+      fail_on_pattern: "WARNING|WARN"
+      allow_patterns: []
+      
+    - name: "security_scan_passes"
+      description: "Container security scan must pass"
+      command: "trivy image aiapp:test"
+      expected_exit_code: 0
+      fail_on_pattern: "HIGH|CRITICAL"
+
+# Test Execution Rules
+test_execution:
+  success_criteria:
+    - name: "unit_tests_pass"
+      description: "All unit tests must pass"
+      command: "pytest tests/unit/ -v --cov=src --cov-report=xml"
+      expected_exit_code: 0
+      coverage_threshold: 90
+      
+    - name: "integration_tests_pass"
+      description: "Integration tests must pass"
+      command: "pytest tests/integration/ -v"
+      expected_exit_code: 0
+      timeout: 600
+      
+    - name: "acceptance_tests_pass"
+      description: "Acceptance tests must pass"
+      command: "pytest tests/acceptance/ -v --maxfail=1"
+      expected_exit_code: 0
+      timeout: 900
+      
+    - name: "security_tests_pass"
+      description: "Security tests must pass with no critical findings"
+      command: "bandit -r src/ -f json"
+      expected_exit_code: 0
+      fail_on_pattern: '"severity": "HIGH"'
+
+# Code Quality Gates
+quality_gates:
+  linting:
+    - name: "flake8_compliance"
+      description: "Code must pass flake8 linting"
+      command: "flake8 src/ tests/"
+      expected_exit_code: 0
+      
+    - name: "black_formatting"
+      description: "Code must be formatted with black"
+      command: "black --check src/ tests/"
+      expected_exit_code: 0
+      
+    - name: "isort_imports"
+      description: "Imports must be sorted with isort"
+      command: "isort --check-only src/ tests/"
+      expected_exit_code: 0
+      
+    - name: "mypy_typing"
+      description: "Type hints must pass mypy validation"
+      command: "mypy src/"
+      expected_exit_code: 0
+
+  complexity:
+    - name: "cyclomatic_complexity"
+      description: "Functions must not exceed complexity threshold"
+      command: "radon cc src/ -a -nb"
+      fail_on_pattern: "C|D|E|F"
+      
+    - name: "maintainability_index"
+      description: "Code maintainability must be acceptable"
+      command: "radon mi src/ -nb"
+      fail_on_pattern: "C|D|E|F"
+
+# Security Validation
+security_validation:
+  static_analysis:
+    - name: "dependency_check"
+      description: "Dependencies must not have known vulnerabilities"
+      command: "safety check --json"
+      expected_exit_code: 0
+      fail_on_pattern: '"vulnerabilities_found": true'
+      
+    - name: "secrets_detection"
+      description: "No secrets should be present in code"
+      command: "trufflehog filesystem src/ --json"
+      expected_exit_code: 0
+      fail_on_pattern: '"Verified": true'
+      
+    - name: "license_compliance"
+      description: "All dependencies must have approved licenses"
+      command: "pip-licenses --format=json"
+      allowed_licenses: ["MIT", "Apache-2.0", "BSD-3-Clause", "BSD-2-Clause"]
+
+# Performance Benchmarks
+performance_tests:
+  - name: "api_response_time"
+    description: "API endpoints must respond within SLA"
+    command: "pytest tests/performance/ -v --benchmark-json=benchmark.json"
+    expected_exit_code: 0
+    post_validation:
+      - check: "max_response_time < 500ms"
+        file: "benchmark.json"
+        
+  - name: "memory_usage"
+    description: "Application memory usage must be within limits"
+    command: "pytest tests/performance/test_memory.py -v"
+    expected_exit_code: 0
+    memory_limit: "512MB"
+    
+  - name: "database_query_performance"
+    description: "Database queries must complete within acceptable time"
+    command: "pytest tests/performance/test_db_performance.py -v"
+    expected_exit_code: 0
+    query_timeout: "100ms"
+
+# Deployment Validation
+deployment_validation:
+  - name: "container_starts"
+    description: "Container must start successfully"
+    command: "docker run -d --name test-container aiapp:test"
+    expected_exit_code: 0
+    post_check:
+      command: "docker ps --filter name=test-container --format '{{.Status}}'"
+      expected_pattern: "Up"
+      
+  - name: "health_check_passes"
+    description: "Application health check must pass"
+    command: "curl -f http://localhost:8000/health"
+    expected_exit_code: 0
+    retry_count: 5
+    retry_delay: 10
+    
+  - name: "database_migration"
+    description: "Database migrations must run successfully"
+    command: "alembic upgrade head"
+    expected_exit_code: 0
+    
+  - name: "environment_variables"
+    description: "Required environment variables must be set"
+    required_vars: ["DATABASE_URL", "SECRET_KEY", "JWT_PRIVATE_KEY"]
+    validation_command: "env | grep -E '^(DATABASE_URL|SECRET_KEY|JWT_PRIVATE_KEY)='"
+
+# Environment-Specific Rules
+environments:
+  development:
+    skip_tests: []
+    required_coverage: 80
+    allow_warnings: true
+    
+  staging:
+    skip_tests: ["performance_tests"]
+    required_coverage: 90
+    allow_warnings: false
+    additional_checks:
+      - name: "staging_data_integrity"
+        command: "pytest tests/staging/ -v"
+        
+  production:
+    skip_tests: ["performance_tests"]
+    required_coverage: 95
+    allow_warnings: false
+    additional_checks:
+      - name: "production_readiness"
+        command: "pytest tests/production_readiness/ -v"
+      - name: "disaster_recovery_test"
+        command: "pytest tests/disaster_recovery/ -v"
+
+# Failure Handling
+failure_handling:
+  notification:
+    slack_webhook: "${SLACK_WEBHOOK_URL}"
+    email_recipients: ["devops@example.com", "dev-team@example.com"]
+    
+  retry_policy:
+    max_retries: 2
+    retry_on_exit_codes: [1, 125, 126, 127]
+    backoff_strategy: "exponential"
+    base_delay: 30
+    
+  rollback:
+    enabled: true
+    trigger_on: ["deployment_validation"]
+    rollback_command: "kubectl rollout undo deployment/aiapp"
+
+# Reporting
+reporting:
+  test_results:
+    format: ["junit", "json", "html"]
+    output_dir: "test-results/"
+    
+  coverage:
+    format: ["html", "xml", "lcov"]
+    output_dir: "coverage/"
+    threshold: 90
+    
+  security:
+    format: ["json", "sarif"]
+    output_dir: "security-reports/"
+    
+  performance:
+    format: ["json", "html"]
+    output_dir: "performance-reports/"
+    baseline_comparison: true
+
+# Pipeline Optimization
+optimization:
+  caching:
+    enabled: true
+    cache_keys:
+      - dependencies: "requirements.txt"
+      - docker_layers: "Dockerfile"
+      - test_data: "tests/fixtures/"
+      
+  parallelization:
+    test_execution: true
+    max_parallel_jobs: 4
+    job_distribution: "by_test_time"
+    
+  conditional_execution:
+    - condition: "changes_in_paths(['src/'])"
+      run: ["unit_tests", "integration_tests"]
+    - condition: "changes_in_paths(['tests/'])"
+      run: ["unit_tests"]
+    - condition: "pull_request_to_main"
+      run: ["all_tests", "security_validation"]
