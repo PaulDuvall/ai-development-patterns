@@ -55,7 +55,7 @@ CI/CD, security, and production management with AI:
 
 This isn't another "10 ChatGPT Prompts for Developers" listicle. These patterns represent:
 
-- **Working practices** from my development workflow (not yet widely validated)
+- **Working practices** from my codebases (not yet widely validated)
 - **Clear anti-patterns** showing what hasn't worked for me and why
 - **Maturity levels** (Beginner/Intermediate/Advanced) for adoption guidance
 - **Pattern relationships** showing how practices build on each other
