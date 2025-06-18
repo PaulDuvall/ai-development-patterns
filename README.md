@@ -225,25 +225,23 @@ graph TD
 
 ### Team Size Considerations
 
-**Solo Developer (1 person)**:
+**Solo Teams**:
 - Focus on **Progressive AI Enhancement** and **AI Choice Generation**
 - Add **Observable AI Development** for debugging
 - Skip parallel orchestration patterns
 
-**Small Team (2-5 people)**:
+**Two-Pizza Teams** (small, autonomous teams):
 - Implement **AI Issue Generation** for coordination
 - Use **Specification Driven Development** for quality
 - Consider **Human-AI Handoff Protocol** for role clarity
-
-**Medium Team (6-15 people)**:
 - Full **AI Developer Lifecycle** implementation
 - **AI Workflow Orchestration** for complex features
 - **Comprehensive AI Testing Strategy** for quality gates
 
-**Large Team (15+ people)**:
-- **Atomic Task Decomposition** for parallel work
-- **AI-Driven Traceability** for coordination
-- All **Operations Patterns** for scale management
+**Multi Two-Pizza Team Organizations**:
+- **Atomic Task Decomposition** for parallel work across teams
+- **AI-Driven Traceability** for coordination at scale
+- All **Operations Patterns** for organizational management
 
 ### Technology Stack Considerations
 
