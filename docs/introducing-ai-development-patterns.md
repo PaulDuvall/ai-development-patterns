@@ -2,13 +2,13 @@
 
 ## The Journey from ATDD to AI Patterns
 
-I recently wrote about ATDD-Driven AI Development and was overwhelmed by the response. The feedback ranged from enthusiastic adoption stories to thoughtful critiques about implementation challenges. What struck me most was how many developers were grappling with similar questions: How do we effectively code with AI? What practices actually work? What pitfalls should we avoid?
+I recently wrote about ATDD-Driven AI Development and received a lot of feedback. It ranged from others who are adopting this approach as well as those asking how it might be applied to other contexts. What struck me most was how many builders were grappling with similar questions: How do we effectively code with AI? What practices actually work? What pitfalls should we avoid?
 
 This feedback sparked a realization: we're all pioneering this new frontier together, yet our learnings remain scattered across blog posts, tweets, and closed-door team retrospectives. We needed a centralized, evolving resource that captures these emerging practices.
 
 ## Why Patterns?
 
-Over the past several months, I've been meticulously documenting the practices that help me code most effectively with AI. Rather than keeping these as personal notes, I decided to structure them as patterns—a time-tested format that clearly articulates:
+Over the past several months, I've been documenting the practices that help me code most effectively with AI. Rather than keeping these as personal notes, I decided to structure them as patterns—a time-tested format that clearly articulates:
 
 - **Context**: When does this pattern apply?
 - **Problem**: What challenge does it address?
@@ -65,18 +65,18 @@ This isn't another "10 ChatGPT Prompts for Developers" listicle. These patterns 
 
 This repository represents my current understanding, but it's far from complete. I'm actively seeking feedback on:
 
-- **Which patterns resonate with your experience?** Have you successfully applied similar approaches?
-- **What's missing?** What patterns have you discovered that aren't captured here?
-- **What doesn't work?** Have you tried any of these patterns and found them lacking?
-- **Context matters**: How do these patterns need to adapt for your specific environment?
+- **Which patterns resonate with your experience?** Have you successfully applied similar practices?
+- **What's missing?** What practices have you discovered that aren't captured here?
+- **What doesn't work?** Have you tried any of these practices and found them lacking?
+- **Context matters**: How do these practices need to adapt for your specific environment?
 
 ## Contributing
 
 The repository is intentionally open for contributions. Whether through:
-- Opening issues to discuss pattern effectiveness
-- Submitting PRs with new patterns or improvements
-- Sharing case studies of pattern application
-- Suggesting anti-patterns based on painful experiences
+- Opening issues to discuss practice effectiveness
+- Submitting PRs with new practices or improvements
+- Sharing case studies of practice application
+- Suggesting anti-practices based on painful experiences
 
 Every contribution helps the community navigate this new landscape more effectively.
 
@@ -93,8 +93,8 @@ The goal isn't to create rigid rules but to capture flexible practices that team
 
 ## Get Started
 
-Visit https://github.com/PaulDuvall/coding-with-ai-patterns to explore the current patterns. Star the repository to stay updated, and consider contributing your own experiences. Together, we can chart a path through this exciting new frontier of software development.
+Visit https://github.com/PaulDuvall/coding-with-ai-patterns to explore the current practices. Star the repository to stay updated, and consider contributing your own experiences. Together, we can chart a path through this exciting new frontier of software development.
 
 ---
 
-*What patterns have you discovered in your AI development journey? I'd love to hear about your experiences and add them to this growing collection.*
+*What practices have you discovered in your AI development journey? I'd love to hear about your experiences and add them to this growing collection.*
