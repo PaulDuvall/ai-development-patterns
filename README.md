@@ -1170,7 +1170,7 @@ Refactoring code for hypothetical future requirements rather than addressing cur
 
 ```mermaid
 graph LR
-    A[Business Requirements] --> B[User Stories]
+    A[Product Requirements] --> B[User Stories]
     B --> C[Acceptance Criteria]
     C --> D[Test Specifications]
     D --> E[Implementation Code]
@@ -1216,7 +1216,7 @@ Output as structured JSON for automated tracking."
 # .ai/traceability/requirements_map.yml
 traceability_rules:
   requirements:
-    - pattern: "REQ-\\d+"
+    - pattern: "\\[\\^[a-zA-Z0-9]+\\]"
       link_to: ["user_stories", "acceptance_tests", "code_modules"]
     - pattern: "US-\\d+"  
       link_to: ["acceptance_criteria", "test_files", "implementation"]
@@ -1224,9 +1224,9 @@ traceability_rules:
       link_to: ["test_cases", "code_functions"]
       
   code_annotations:
-    - comment_format: "# Implements: REQ-123, US-456"
-    - docstring_format: "Satisfies AC-789"
-    - test_format: "@pytest.mark.requirement('REQ-123')"
+    - comment_format: "# Implements: [^au3f], US-456"
+    - docstring_format: "Satisfies [^pm7a]"
+    - test_format: "@pytest.mark.requirement('[^sc7a]')"
     
   automated_checks:
     - verify_requirement_coverage: true
@@ -1240,7 +1240,7 @@ traceability_rules:
 # Analyze change impact across entire codebase
 ai "Perform impact analysis for this requirement change:
 
-CHANGED REQUIREMENT: REQ-456
+CHANGED REQUIREMENT: [^au3f]
 'User sessions must expire after 30 minutes (changed from 60 minutes)'
 
 Trace through:
@@ -1327,7 +1327,7 @@ echo "Scanning for unlinked code..."
 git diff --name-only HEAD~1 | while read file; do
     if [[ $file == *.py ]] && ! grep -q "# Implements:\|# Satisfies:" "$file"; then
         ai "Analyze $file and suggest requirement links:
-        - What business requirement does this code satisfy?
+        - What product requirement does this code satisfy?
         - Which user story does it implement?
         - What acceptance criteria does it fulfill?
         
@@ -1337,7 +1337,7 @@ done
 
 # 2. Validate existing links are still valid  
 echo "Validating existing traceability links..."
-ai "Check all REQ-* and US-* references in codebase:
+ai "Check all [^*] footnote and US-* references in codebase:
 - Do referenced requirements still exist?
 - Are requirement descriptions current?
 - Do linked tests still pass?
@@ -1376,8 +1376,8 @@ Create change impact summary for stakeholders."
 commit_message=$(cat "$1")
 
 # Check if commit references requirements
-if ! echo "$commit_message" | grep -qE "(REQ-|US-|AC-)[0-9]+"; then
-    echo "❌ Commit must reference requirement (REQ-), user story (US-), or acceptance criteria (AC-)"
+if ! echo "$commit_message" | grep -qE "(\[\^[a-zA-Z0-9]+\]|US-[0-9]+|AC-[0-9]+)"; then
+    echo "❌ Commit must reference requirement footnote [^id], user story (US-), or acceptance criteria (AC-)"
     
     # AI suggestion for traceability
     ai "Analyze this commit and suggest traceability links:
@@ -1449,12 +1449,12 @@ import pytest
 
 class TestTraceability:
     
-    @pytest.mark.requirement("REQ-001")
+    @pytest.mark.requirement("[^au3f]")
     @pytest.mark.user_story("US-123")
     def test_user_login_jwt_expiration(self):
         """
         AC-456: JWT tokens must expire after 30 minutes
-        Links: REQ-001 (Security), US-123 (User Authentication)
+        Links: [^au3f] (Security), US-123 (User Authentication)
         """
         # Test implementation validates both requirement and acceptance criteria
         pass
@@ -1483,7 +1483,7 @@ class TestTraceability:
 # Generate visual traceability map
 ai "Create Mermaid diagram showing traceability relationships:
 
-Requirements: $(grep -o 'REQ-[0-9]*' requirements.md | sort -u)
+Requirements: $(grep -o '\[\^[a-zA-Z0-9]*\]' requirements.md | sort -u)
 User Stories: $(grep -o 'US-[0-9]*' user_stories.md | sort -u)
 Test Files: $(find tests/ -name '*.py' | head -10)
 Code Modules: $(find src/ -name '*.py' | head -10)
@@ -1505,18 +1505,18 @@ Output as Mermaid graph syntax for README.md"
 compliance_requirements:
   SOX_404:
     description: "Internal controls over financial reporting"
-    linked_requirements: ["REQ-101", "REQ-102", "REQ-105"]
+    linked_requirements: ["[^sx4a]", "[^sx4b]", "[^sx4c]"]
     test_evidence: ["tests/audit/", "tests/financial/"]
     documentation: ["docs/compliance/sox.md"]
     
   PCI_DSS:
     description: "Payment card data security"
-    linked_requirements: ["REQ-201", "REQ-202", "REQ-203"]
+    linked_requirements: ["[^pc3a]", "[^pc3b]", "[^pc3c]"]
     test_evidence: ["tests/security/payment/"]
     documentation: ["docs/security/pci.md"]
     
   audit_trail:
-    requirement_changes: "git log --grep='REQ-'"
+    requirement_changes: "git log --grep='\\[\\^'"
     test_changes: "git log -- tests/"
     documentation_updates: "git log -- docs/"
 ```

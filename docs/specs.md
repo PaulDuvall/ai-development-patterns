@@ -1,6 +1,6 @@
 These topics are covered in a talk by OpenAI here: https://www.youtube.com/live/U-fMsbY-kHY?t=29432s
 
-OpenAI wrote a paper on Model Specification here: https://arxiv.org/pdf/2412.16339 
+OpenAI wrote a paper called Deliberative Alignment: Reasoning Enables Safer Language Models here: https://arxiv.org/pdf/2412.16339 
 
 Below are the core specification patterns and components from "Deliberative Alignment" adapted for application development specifications—transforming model behavior patterns into system behavior requirements:
 
