@@ -2,7 +2,7 @@
 
 ## The Journey from ATDD to AI Patterns
 
-I recently wrote about [ATDD-Driven AI Development](https://www.paulmduvall.com/atdd-driven-ai-development-how-prompting-and-tests-steer-the-code/) and received a lot of feedback. It ranged from others who are adopting this approach as well as those asking how it might be applied to other contexts. What struck me most was how many builders were grappling with similar questions: How do we effectively code with AI? What practices actually work? What pitfalls should we avoid?
+My recent post on [ATDD-driven AI development](https://www.paulmduvall.com/atdd-driven-ai-development-how-prompting-and-tests-steer-the-code/) sparked feedback from adopters and inquiries about applying it elsewhere. What stood out was how many builders share the same core questions: How do we code effectively with AI? Which practices deliver real results? Which pitfalls must we avoid?
 
 This feedback sparked a realization: we're all pioneering this new frontier together, yet our learnings remain scattered across blog posts, tweets, and closed-door team retrospectives. We needed a centralized, evolving resource that captures these emerging practices.
 
