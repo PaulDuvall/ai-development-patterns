@@ -8,7 +8,7 @@ This feedback sparked a realization: we're all pioneering this new frontier toge
 
 ## Why Patterns?
 
-Over the past several months, I've been documenting the practices that help me code most effectively with AI. Rather than keeping these as personal notes, I decided to structure them as patterns—a time-tested format that clearly articulates:
+Over the past several months, I've been documenting the practices that are working for me as I code with AI. These aren't battle-tested practices validated across hundreds of teams—they're personal discoveries from my own development workflow. Rather than keeping these as private notes, I decided to structure them as patterns—a time-tested format that clearly articulates:
 
 - **Context**: When does this pattern apply?
 - **Problem**: What challenge does it address?
@@ -23,11 +23,11 @@ I've published these patterns in a public GitHub repository: https://github.com/
 
 Why make it public while it's still evolving? Three reasons:
 
-1. **Collective Intelligence**: The AI development community is discovering best practices in real-time. By sharing early and often, we can learn from each other's experiences rather than repeating the same mistakes.
+1. **Collective Intelligence**: The AI development community is discovering what works in real-time. By sharing my experiences early, others can test these practices in their contexts and share what works (or doesn't) for them.
 
-2. **Rapid Evolution**: AI tools are advancing at breakneck speed. What works today might be obsolete tomorrow. A public repository allows us to iterate quickly and keep pace with the changing landscape.
+2. **Rapid Evolution**: AI tools are advancing at breakneck speed. What works for me today might be obsolete tomorrow. A public repository allows us to iterate quickly and keep pace with the changing landscape.
 
-3. **Diverse Perspectives**: Every team has unique constraints and contexts. What works brilliantly for a startup might fail in an enterprise setting. Community feedback helps identify which patterns are truly universal versus context-specific.
+3. **Diverse Perspectives**: Every team has unique constraints and contexts. What's working in my environment might need adaptation elsewhere. Community feedback helps identify which practices have broader applicability.
 
 ## Current Pattern Categories
 
@@ -55,11 +55,11 @@ CI/CD, security, and production management with AI:
 
 This isn't another "10 ChatGPT Prompts for Developers" listicle. These patterns represent:
 
-- **Battle-tested practices** from real production codebases
-- **Clear anti-patterns** showing what to avoid and why
+- **Working practices** from my production codebases (not yet widely validated)
+- **Clear anti-patterns** showing what hasn't worked for me and why
 - **Maturity levels** (Beginner/Intermediate/Advanced) for adoption guidance
 - **Pattern relationships** showing how practices build on each other
-- **Concrete examples** with actual code and configurations
+- **Concrete examples** with actual code and configurations I'm using
 
 ## Join the Conversation
 
