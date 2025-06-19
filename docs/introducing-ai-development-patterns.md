@@ -4,11 +4,11 @@
 
 My recent post on [ATDD-driven AI development](https://www.paulmduvall.com/atdd-driven-ai-development-how-prompting-and-tests-steer-the-code/) sparked feedback from adopters and inquiries about applying it elsewhere. What stood out was how many builders share the same core questions: How do we code effectively with AI? Which practices deliver real results? Which pitfalls must we avoid?
 
-This feedback sparked a realization: we're all pioneering this new frontier together, yet our learnings remain scattered across blog posts, tweets, and closed-door team retrospectives. We needed a centralized, evolving resource that captures these emerging practices.
+This feedback sparked a realization: we're all pioneering this new frontier together, yet our learnings remain scattered across blog posts, tweets, and closed-door team retrospectives. I wanted a centralized, evolving resource that captures these emerging practices and thought others might benefit from it too.
 
 ## Why Patterns?
 
-Over the past several months, I've been documenting the practices that are working for me as I code with AI. These aren't battle-tested practices validated across hundreds of teams—they're personal discoveries from my own development workflow. Rather than keeping these as private notes, I decided to structure them as patterns—a time-tested format that clearly articulates:
+Over the past several months, I've been documenting the practices that are working for me as I code with AI. These patterns emerge from my personal development experience and observations of how others are adapting to AI-assisted coding. Rather than keeping these as private notes, I decided to structure them as patterns—a time-tested format that clearly articulates:
 
 - **Context**: When does this pattern apply?
 - **Problem**: What challenge does it address?
