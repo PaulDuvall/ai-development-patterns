@@ -4,7 +4,7 @@
 
 My recent post on [ATDD-driven AI development](https://www.paulmduvall.com/atdd-driven-ai-development-how-prompting-and-tests-steer-the-code/) sparked feedback from adopters and inquiries about applying it elsewhere. What stood out was how many builders share the same core questions: How do we code effectively with AI? Which practices deliver real results? Which pitfalls must we avoid?
 
-We're not even sure what to call this new paradigm yet. Is it AI-Native Development? Vibe Coding?Coding with AI? AI-Assisted Development? Agentic Development? Agentic Coding? Something else entirely? The terminology is still evolving as rapidly as the practices themselves.
+We're not even sure what to call this new paradigm yet. Is it AI-Native Development? Vibe Coding? Coding with AI? AI-Assisted Development? Agentic Development? Agentic Coding? Something else entirely? The terminology is still evolving as rapidly as the practices themselves.
 
 This feedback led to a realization: we're all pioneering this new frontier together, yet our learnings remain scattered across blog posts, tweets, and closed-door team retrospectives. I wanted a centralized, evolving resource that captures these emerging practices and thought others might benefit from it too.
 
