@@ -19,7 +19,7 @@ Equally important are the **anti-patterns**—those seemingly reasonable approac
 
 ## Open Source from Day One
 
-I've published these patterns in a public GitHub repository: https://github.com/PaulDuvall/coding-with-ai-patterns
+I've published these patterns in a public GitHub repository: https://github.com/PaulDuvall/ai-development-patterns
 
 Why make it public while it's still evolving? Three reasons:
 
@@ -93,7 +93,7 @@ The goal isn't to create rigid rules but to capture flexible practices that team
 
 ## Get Started
 
-Visit https://github.com/PaulDuvall/coding-with-ai-patterns to explore the current practices. Star the repository to stay updated, and consider contributing your own experiences. Together, we can chart a path through this exciting new frontier of software development.
+Visit https://github.com/PaulDuvall/ai-development-patterns to explore the current practices. Star the repository to stay updated, and consider contributing your own experiences. Together, we can chart a path through this exciting new frontier of software development.
 
 ---
 
