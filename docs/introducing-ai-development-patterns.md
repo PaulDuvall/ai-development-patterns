@@ -1,10 +1,12 @@
-# Introducing AI Development Patterns: A Community-Driven Approach
+# Introducing AI Development Patterns
 
 ## The Journey from ATDD to AI Patterns
 
 My recent post on [ATDD-driven AI development](https://www.paulmduvall.com/atdd-driven-ai-development-how-prompting-and-tests-steer-the-code/) sparked feedback from adopters and inquiries about applying it elsewhere. What stood out was how many builders share the same core questions: How do we code effectively with AI? Which practices deliver real results? Which pitfalls must we avoid?
 
-This feedback sparked a realization: we're all pioneering this new frontier together, yet our learnings remain scattered across blog posts, tweets, and closed-door team retrospectives. I wanted a centralized, evolving resource that captures these emerging practices and thought others might benefit from it too.
+We're not even sure what to call this new paradigm yet. Is it AI-Native Development? Coding with AI? AI-Assisted Development? Agentic Development? Agentic Coding? Something else entirely? The terminology is still evolving as rapidly as the practices themselves.
+
+This feedback led to a realization: we're all pioneering this new frontier together, yet our learnings remain scattered across blog posts, tweets, and closed-door team retrospectives. I wanted a centralized, evolving resource that captures these emerging practices and thought others might benefit from it too.
 
 ## Why Patterns?
 
@@ -55,7 +57,7 @@ CI/CD, security, and production management with AI:
 
 This isn't another "10 ChatGPT Prompts for Developers" listicle. These patterns represent:
 
-- **Working practices** from my codebases (not yet widely validated)
+- **Working practices** from my codebases and what I've seen from others
 - **Clear anti-patterns** showing what hasn't worked for me and why
 - **Maturity levels** (Beginner/Intermediate/Advanced) for adoption guidance
 - **Pattern relationships** showing how practices build on each other
@@ -70,16 +72,6 @@ This repository represents my current understanding, but it's far from complete.
 - **What doesn't work?** Have you tried any of these practices and found them lacking?
 - **Context matters**: How do these practices need to adapt for your specific environment?
 
-## Contributing
-
-The repository is intentionally open for contributions. Whether through:
-- Opening issues to discuss practice effectiveness
-- Submitting PRs with new practices or improvements
-- Sharing case studies of practice application
-- Suggesting anti-practices based on painful experiences
-
-Every contribution helps the community navigate this new landscape more effectively.
-
 ## Looking Forward
 
 We're in the early days of AI-assisted development. The patterns that seem revolutionary today might be table stakes tomorrow. By documenting and sharing our collective experiences, we can:
@@ -93,7 +85,7 @@ The goal isn't to create rigid rules but to capture flexible practices that team
 
 ## Get Started
 
-Visit https://github.com/PaulDuvall/ai-development-patterns to explore the current practices. Star the repository to stay updated, and consider contributing your own experiences. Together, we can chart a path through this exciting new frontier of software development.
+Visit https://github.com/PaulDuvall/ai-development-patterns to explore the current practices. Star the repository to stay updated, and consider contributing your own experiences.
 
 ---
 
