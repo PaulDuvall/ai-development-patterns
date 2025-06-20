@@ -61,6 +61,7 @@ graph TD
 | **[AI Choice Generation](#ai-choice-generation)** | Intermediate | Development | Generate multiple implementation options for exploration and comparison rather than accepting first AI solution | Progressive AI Enhancement, Context Window Optimization |
 | **[Atomic Task Decomposition](#atomic-task-decomposition)** | Intermediate | Development | Break complex features into atomic, independently implementable tasks for parallel AI agent execution | AI Workflow Orchestration, Progressive AI Enhancement |
 | **[AI Workflow Orchestration](#ai-workflow-orchestration)** | Advanced | Development | Coordinate sequential pipelines, parallel workflows, and hybrid human-AI processes | Comprehensive AI Testing Strategy |
+| **[Parallelized AI Coding Agents](#parallelized-ai-coding-agents)** | Advanced | Development | Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration | AI Workflow Orchestration, Atomic Task Decomposition |
 | **[Context Window Optimization](#context-window-optimization)** | Advanced | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive AI Enhancement |
 | **[AI Knowledge Persistence](#ai-knowledge-persistence)** | Intermediate | Development | Capture successful patterns and failed attempts as versioned knowledge for future sessions | Rules as Code |
 | **[Constraint-Based AI Development](#constraint-based-ai-development)** | Beginner | Development | Give AI specific constraints to prevent over-engineering and ensure focused solutions | Progressive AI Enhancement |
@@ -1622,6 +1623,218 @@ Running parallel agents without proper isolation, conflict detection, or sync po
 
 ---
 
+## Parallelized AI Coding Agents
+
+**Maturity**: Advanced  
+**Description**: Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration.
+
+**Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration), [Atomic Task Decomposition](#atomic-task-decomposition), [AI Security Sandbox](#ai-security-sandbox)
+
+**Container-Based Agent Isolation**
+```yaml
+# docker-compose.parallel-agents.yml
+version: '3.8'
+
+services:
+  agent-1:
+    image: ai-dev-environment:latest
+    container_name: agent-feature-auth
+    volumes:
+      - ./feature-auth:/workspace:rw
+      - shared-memory:/shared:ro
+    environment:
+      - AGENT_ID=auth-feature
+      - TASK_ID=implement-oauth2
+    networks:
+      - agent-network
+
+  agent-2:
+    image: ai-dev-environment:latest
+    container_name: agent-feature-api
+    volumes:
+      - ./feature-api:/workspace:rw
+      - shared-memory:/shared:ro
+    environment:
+      - AGENT_ID=api-feature
+      - TASK_ID=implement-rest-endpoints
+    networks:
+      - agent-network
+
+  agent-3:
+    image: ai-dev-environment:latest
+    container_name: agent-tests
+    volumes:
+      - ./tests:/workspace:rw
+      - shared-memory:/shared:ro
+    environment:
+      - AGENT_ID=test-suite
+      - TASK_ID=generate-integration-tests
+    networks:
+      - agent-network
+
+volumes:
+  shared-memory:
+    driver: local
+
+networks:
+  agent-network:
+    driver: bridge
+    internal: true
+```
+
+**Git Worktree Parallelization**
+```bash
+# Create parallel worktrees for agent isolation
+git worktree add -b agent/auth ../agent-auth
+git worktree add -b agent/api ../agent-api
+git worktree add -b agent/tests ../agent-tests
+
+# Launch agents in separate worktrees
+parallel --jobs 3 << EOF
+cd ../agent-auth && ai-agent implement-oauth2
+cd ../agent-api && ai-agent implement-rest-endpoints
+cd ../agent-tests && ai-agent generate-integration-tests
+EOF
+
+# Review and merge completed work
+git worktree list
+for worktree in agent-auth agent-api agent-tests; do
+  cd ../$worktree
+  git diff main
+  git push origin agent/$worktree
+done
+
+# Clean up worktrees after merging
+git worktree remove ../agent-auth
+git worktree remove ../agent-api
+git worktree remove ../agent-tests
+```
+
+**Shared Memory Architecture**
+```python
+# shared_memory.py
+import json
+import fcntl
+from pathlib import Path
+from datetime import datetime
+
+class AgentMemory:
+    def __init__(self, memory_path="/shared/agent_memory.json"):
+        self.memory_path = Path(memory_path)
+        self.memory_path.parent.mkdir(parents=True, exist_ok=True)
+        
+    def record_learning(self, agent_id, key, value):
+        """Record discovered patterns or solutions"""
+        with open(self.memory_path, 'a+') as f:
+            fcntl.flock(f, fcntl.LOCK_EX)
+            try:
+                f.seek(0)
+                memory = json.load(f) if f.read() else {}
+            except:
+                memory = {}
+            
+            if agent_id not in memory:
+                memory[agent_id] = {}
+            
+            memory[agent_id][key] = {
+                'value': value,
+                'timestamp': datetime.utcnow().isoformat(),
+                'agent': agent_id
+            }
+            
+            f.seek(0)
+            f.truncate()
+            json.dump(memory, f, indent=2)
+            fcntl.flock(f, fcntl.LOCK_UN)
+    
+    def get_shared_knowledge(self):
+        """Retrieve all shared knowledge across agents"""
+        if not self.memory_path.exists():
+            return {}
+        
+        with open(self.memory_path, 'r') as f:
+            fcntl.flock(f, fcntl.LOCK_SH)
+            memory = json.load(f)
+            fcntl.flock(f, fcntl.LOCK_UN)
+        return memory
+```
+
+**Parallel Task Distribution**
+```yaml
+# tasks.yaml - Define parallel tasks for agents
+tasks:
+  - id: auth-service
+    agent_count: 1
+    isolation: container
+    dependencies: []
+    instructions: |
+      Implement OAuth2 authentication service with:
+      - JWT token generation
+      - Refresh token flow
+      - User session management
+    
+  - id: api-endpoints
+    agent_count: 2
+    isolation: worktree
+    dependencies: [auth-service]
+    instructions: |
+      Implement REST API endpoints:
+      Agent 1: User management endpoints
+      Agent 2: Resource CRUD endpoints
+    
+  - id: test-generation
+    agent_count: 3
+    isolation: container
+    dependencies: []
+    instructions: |
+      Generate comprehensive test suites:
+      Agent 1: Unit tests for auth service
+      Agent 2: Integration tests for API
+      Agent 3: End-to-end test scenarios
+```
+
+**Conflict Resolution Strategy**
+```bash
+#!/bin/bash
+# merge-parallel-work.sh
+
+# Automated conflict detection and resolution
+for branch in $(git branch -r | grep 'agent/'); do
+  echo "Checking $branch for conflicts..."
+  
+  # Create temporary merge branch
+  git checkout -b temp-merge main
+  
+  # Attempt merge
+  if git merge --no-commit --no-ff $branch; then
+    echo "✓ No conflicts in $branch"
+    git merge --abort
+  else
+    echo "⚠ Conflicts detected in $branch"
+    
+    # Use AI to suggest resolution
+    git diff --name-only --diff-filter=U | while read file; do
+      echo "Analyzing conflict in $file..."
+      ai-agent resolve-conflict $file
+    done
+  fi
+  
+  git checkout main
+  git branch -D temp-merge
+done
+```
+
+**Source**: [AI Native Dev - How to Parallelize AI Coding Agents](https://ainativedev.io/news/how-to-parallelize-ai-coding-agents)
+
+**Anti-pattern: Uncoordinated Parallel Execution**
+Running multiple agents without isolation, shared memory, or conflict resolution leads to:
+- Race conditions when agents modify the same files
+- Lost work from merge conflicts
+- Inconsistent implementations across features
+- Resource contention and system instability
+
+---
+
 ## Context Window Optimization
 
 **Maturity**: Advanced  
@@ -2568,7 +2781,7 @@ Posting every low-severity finding buries real issues and frustrates developers.
 **Maturity**: Intermediate  
 **Description**: Automate the review process for parallel agent outputs using AI to detect conflicts, verify consistency, and coordinate integration. Essential for maintaining quality when multiple agents work simultaneously on the same codebase.
 
-**Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration), [Atomic Task Decomposition](#atomic-task-decomposition), [Security Scanning Orchestration](#security-scanning-orchestration)
+**Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration), [Atomic Task Decomposition](#atomic-task-decomposition), [Parallelized AI Coding Agents](#parallelized-ai-coding-agents), [Security Scanning Orchestration](#security-scanning-orchestration)
 
 **Parallel Output Review Framework**
 
