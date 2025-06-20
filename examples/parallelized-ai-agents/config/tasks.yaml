@@ -1,0 +1,204 @@
+# Task definitions for parallel AI agents
+# Real-world example: Building a Task Management SaaS Application
+
+project:
+  name: "TaskFlow - Task Management SaaS"
+  description: "A modern task management application with team collaboration features"
+  tech_stack:
+    frontend: ["React", "TypeScript", "TailwindCSS", "Redux Toolkit"]
+    backend: ["Node.js", "Express", "TypeScript", "Prisma"]
+    database: ["PostgreSQL"]
+    testing: ["Jest", "React Testing Library", "Supertest"]
+
+tasks:
+  # Frontend Tasks
+  - id: frontend-components
+    agent_count: 1
+    isolation: container
+    dependencies: []
+    priority: high
+    estimated_hours: 4
+    instructions: |
+      Implement the core React components for TaskFlow:
+      
+      1. TaskList component with:
+         - Display tasks in a kanban board layout
+         - Drag and drop functionality
+         - Filter by status, assignee, and labels
+         - Real-time updates via WebSocket
+      
+      2. TaskDetail component with:
+         - Rich text editor for descriptions
+         - Comment system with mentions
+         - File attachment support
+         - Activity timeline
+      
+      3. TeamView component with:
+         - Team member list with online status
+         - Workload visualization
+         - Permission management UI
+      
+      Use TypeScript for type safety and TailwindCSS for styling.
+      Follow React best practices and ensure accessibility.
+    success_criteria:
+      - All components are fully typed with TypeScript
+      - Components are responsive and accessible
+      - State management uses Redux Toolkit
+      - Components have proper error boundaries
+
+  # Backend Tasks
+  - id: backend-api
+    agent_count: 1
+    isolation: container
+    dependencies: [database-schema]
+    priority: high
+    estimated_hours: 6
+    instructions: |
+      Implement the REST API for TaskFlow using Node.js and Express:
+      
+      1. Authentication endpoints:
+         - POST /api/auth/register
+         - POST /api/auth/login
+         - POST /api/auth/refresh
+         - POST /api/auth/logout
+         
+      2. Task management endpoints:
+         - GET /api/tasks (with pagination and filtering)
+         - POST /api/tasks
+         - PUT /api/tasks/:id
+         - DELETE /api/tasks/:id
+         - PATCH /api/tasks/:id/status
+         - POST /api/tasks/:id/comments
+         
+      3. Team collaboration endpoints:
+         - GET /api/teams
+         - POST /api/teams
+         - PUT /api/teams/:id/members
+         - GET /api/teams/:id/activity
+         
+      4. Real-time features:
+         - WebSocket server for live updates
+         - Event broadcasting for task changes
+         - Presence system for online users
+         
+      Use Prisma as ORM, implement proper error handling,
+      input validation with Joi or Zod, and rate limiting.
+    success_criteria:
+      - All endpoints follow RESTful conventions
+      - Proper authentication and authorization
+      - Input validation on all endpoints
+      - Error responses follow consistent format
+      - API documentation generated
+
+  # Database Tasks
+  - id: database-schema
+    agent_count: 1
+    isolation: container
+    dependencies: []
+    priority: critical
+    estimated_hours: 2
+    instructions: |
+      Design the PostgreSQL database schema for TaskFlow:
+      
+      1. Core tables:
+         - users (id, email, password_hash, name, avatar_url, created_at, updated_at)
+         - teams (id, name, description, created_by, created_at)
+         - team_members (team_id, user_id, role, joined_at)
+         - tasks (id, title, description, status, priority, team_id, assignee_id, 
+                  due_date, labels, created_by, created_at, updated_at)
+         - comments (id, task_id, user_id, content, created_at, updated_at)
+         - attachments (id, task_id, comment_id, file_url, file_name, file_size, 
+                        uploaded_by, uploaded_at)
+         
+      2. Support tables:
+         - task_activities (id, task_id, user_id, action, details, created_at)
+         - user_sessions (id, user_id, token, expires_at, created_at)
+         - notifications (id, user_id, type, data, read, created_at)
+         
+      3. Create Prisma schema file with:
+         - Proper relations and constraints
+         - Indexes for performance
+         - Enums for status and priority
+         - Soft delete support
+         
+      Include migration files and seed data for testing.
+    success_criteria:
+      - Schema supports all application requirements
+      - Proper indexes for query performance
+      - Foreign key constraints maintain data integrity
+      - Prisma schema validates without errors
+
+  # Testing Tasks
+  - id: test-suite
+    agent_count: 1
+    isolation: container
+    dependencies: [frontend-components, backend-api]
+    priority: medium
+    estimated_hours: 4
+    instructions: |
+      Generate comprehensive test suites for TaskFlow:
+      
+      1. Frontend tests (Jest + React Testing Library):
+         - Unit tests for all components
+         - Integration tests for user workflows
+         - Redux store tests
+         - Accessibility tests
+         
+      2. Backend tests (Jest + Supertest):
+         - Unit tests for all service functions
+         - API endpoint integration tests
+         - Authentication flow tests
+         - WebSocket connection tests
+         
+      3. E2E tests (Playwright or Cypress):
+         - User registration and login flow
+         - Complete task lifecycle (create, update, delete)
+         - Team collaboration scenarios
+         - Real-time update verification
+         
+      Aim for >80% code coverage. Include performance tests
+      for critical paths. Generate test data factories.
+    success_criteria:
+      - Test coverage > 80%
+      - All critical paths have tests
+      - Tests are maintainable and well-documented
+      - CI-friendly test execution
+
+# Coordination rules for agents
+coordination:
+  conflict_resolution: "coordinator"  # coordinator agent resolves conflicts
+  merge_strategy: "feature-branch"    # each agent works on feature branch
+  communication: "shared-memory"      # agents share discoveries via shared memory
+  
+  checkpoints:
+    - name: "schema-complete"
+      after: [database-schema]
+      validation: "prisma validate"
+      
+    - name: "api-complete" 
+      after: [backend-api]
+      validation: "npm run test:api"
+      
+    - name: "frontend-complete"
+      after: [frontend-components]
+      validation: "npm run test:frontend"
+      
+    - name: "all-tests-pass"
+      after: [test-suite]
+      validation: "npm run test:all"
+
+# Quality gates
+quality_gates:
+  - name: "code-quality"
+    tools: ["eslint", "prettier", "typescript"]
+    fail_on_error: true
+    
+  - name: "security"
+    tools: ["npm audit", "semgrep"]
+    fail_on_error: true
+    
+  - name: "performance"
+    metrics:
+      - "API response time < 200ms"
+      - "Frontend bundle size < 500KB"
+      - "Test execution time < 5 minutes"

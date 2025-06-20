@@ -726,7 +726,6 @@ Transform problem definitions into concrete technical architectures with clear i
 ai "Create a technical plan for [problem] using [technology stack]:
 - Include architecture diagrams
 - Detail security considerations
-- Break into 3-week development phases
 - Identify technical risks and mitigation strategies"
 ```
 

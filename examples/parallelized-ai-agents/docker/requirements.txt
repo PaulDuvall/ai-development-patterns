@@ -1,0 +1,8 @@
+anthropic>=0.18.0
+openai>=1.0.0
+pyyaml>=6.0
+python-dotenv>=1.0.0
+rich>=13.0.0
+click>=8.0.0
+watchdog>=3.0.0
+aiofiles>=23.0.0

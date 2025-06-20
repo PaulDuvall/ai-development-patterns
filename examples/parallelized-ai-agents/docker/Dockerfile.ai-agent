@@ -1,0 +1,30 @@
+FROM python:3.11-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js for JavaScript/TypeScript support
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
+
+# Create working directory
+WORKDIR /workspace
+
+# Install Python dependencies
+COPY requirements.txt /tmp/
+RUN pip install -r /tmp/requirements.txt
+
+# Copy scripts
+COPY scripts/ /scripts/
+RUN chmod +x /scripts/*.py
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV NODE_ENV=development
+
+# Default command
+CMD ["python", "/scripts/agent_runner.py"]

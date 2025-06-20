@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  # Agent 1: Frontend Development
+  agent-frontend:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.ai-agent
+    container_name: agent-frontend
+    volumes:
+      - ./workspace/frontend:/workspace:rw
+      - ./shared-memory:/shared:rw
+      - ./config:/config:ro
+    environment:
+      - AGENT_ID=frontend
+      - TASK_ID=implement-react-components
+      - AGENT_MODEL=claude-3-sonnet
+      - SHARED_MEMORY_PATH=/shared/agent_memory.json
+    networks:
+      - agent-network
+    command: ["python", "/scripts/agent_runner.py", "--task-file", "/config/tasks.yaml", "--task-id", "frontend-components"]
+
+  # Agent 2: Backend API Development
+  agent-backend:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.ai-agent
+    container_name: agent-backend
+    volumes:
+      - ./workspace/backend:/workspace:rw
+      - ./shared-memory:/shared:rw
+      - ./config:/config:ro
+    environment:
+      - AGENT_ID=backend
+      - TASK_ID=implement-rest-api
+      - AGENT_MODEL=claude-3-sonnet
+      - SHARED_MEMORY_PATH=/shared/agent_memory.json
+    networks:
+      - agent-network
+    command: ["python", "/scripts/agent_runner.py", "--task-file", "/config/tasks.yaml", "--task-id", "backend-api"]
+
+  # Agent 3: Database Schema Design
+  agent-database:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.ai-agent
+    container_name: agent-database
+    volumes:
+      - ./workspace/database:/workspace:rw
+      - ./shared-memory:/shared:rw
+      - ./config:/config:ro
+    environment:
+      - AGENT_ID=database
+      - TASK_ID=design-schema
+      - AGENT_MODEL=claude-3-sonnet
+      - SHARED_MEMORY_PATH=/shared/agent_memory.json
+    networks:
+      - agent-network
+    command: ["python", "/scripts/agent_runner.py", "--task-file", "/config/tasks.yaml", "--task-id", "database-schema"]
+
+  # Agent 4: Test Generation
+  agent-tests:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.ai-agent
+    container_name: agent-tests
+    volumes:
+      - ./workspace/tests:/workspace:rw
+      - ./workspace/frontend:/frontend:ro
+      - ./workspace/backend:/backend:ro
+      - ./shared-memory:/shared:rw
+      - ./config:/config:ro
+    environment:
+      - AGENT_ID=tests
+      - TASK_ID=generate-tests
+      - AGENT_MODEL=claude-3-sonnet
+      - SHARED_MEMORY_PATH=/shared/agent_memory.json
+    networks:
+      - agent-network
+    depends_on:
+      - agent-frontend
+      - agent-backend
+    command: ["python", "/scripts/agent_runner.py", "--task-file", "/config/tasks.yaml", "--task-id", "test-suite"]
+
+  # Coordinator service to monitor progress
+  coordinator:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.ai-agent
+    container_name: agent-coordinator
+    volumes:
+      - ./shared-memory:/shared:rw
+      - ./workspace:/workspace:ro
+      - ./reports:/reports:rw
+    environment:
+      - AGENT_ID=coordinator
+      - ROLE=monitor
+    networks:
+      - agent-network
+    command: ["python", "/scripts/coordinator.py", "--watch-dir", "/workspace", "--report-dir", "/reports"]
+
+volumes:
+  shared-memory:
+    driver: local
+
+networks:
+  agent-network:
+    driver: bridge
+    internal: false  # Set to true for complete isolation
