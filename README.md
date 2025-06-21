@@ -3554,7 +3554,3 @@ Have a pattern that's working well for your team? Open an issue or PR to share y
 ## License
 
 MIT License - See LICENSE file for details.
-
----
-
-*The patterns in this collection represent collective wisdom from teams pioneering AI-assisted development. They're designed to be adapted and evolved as the AI development landscape continues to mature.*
