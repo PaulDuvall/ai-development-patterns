@@ -27,51 +27,68 @@ Claude Code represents a paradigm shift in development tooling. Rather than simp
 
 Your `CLAUDE.md` file is the cornerstone of effective Claude Code usage. Think of it as a comprehensive onboarding document for your AI collaborator.
 
-**Essential Sections to Include:**
+**Essential Sections Based on Paul Hammond's Approach:**
 
 ```markdown
 # Project: [Your Project Name]
 
+## Core Development Philosophy
+TEST-DRIVEN DEVELOPMENT IS NON-NEGOTIABLE. Every single line of production code must be written in response to a failing test.
+
+## Non-Negotiable Principles
+- **Type Safety**: Strict TypeScript with no `any` types
+- **Test-First**: Write failing tests before implementation
+- **Immutability**: No data mutation in production code
+- **Schema-First**: Define data structures before implementation
+
 ## Quick Start
-- **Setup**: `pip install -r requirements.txt` or `poetry install`
-- **Development**: `python manage.py runserver` or `uvicorn main:app --reload`
-- **Testing**: `pytest` or `python -m pytest`
-- **Build**: `python setup.py build` or `poetry build`
+- **Setup**: `npm install` or `yarn install`
+- **Development**: `npm run dev` with hot reload
+- **Testing**: `npm test -- --watch` for continuous testing
+- **Build**: `npm run build` with type checking
 
-## Architecture Overview
-- Framework: Django/FastAPI/Flask
-- Database: PostgreSQL with SQLAlchemy
-- Task Queue: Celery + Redis
-- Key patterns: Repository pattern, dependency injection, clean architecture
+## TypeScript Guidelines
+- Use `type` over `interface` for consistency
+- Create domain-specific types (e.g., `UserId = string`, `PaymentId = string`)
+- Derive types from Zod schemas: `type User = z.infer<typeof UserSchema>`
+- Maximum type safety: strict mode, no implicit any, exact optional property types
 
-## Coding Conventions
-- Style guide: PEP 8 (enforced with Black)
-- Naming: snake_case for functions/variables, PascalCase for classes
-- File structure: Domain-driven design
-- Import order: Standard library → Third party → Local
+## Testing Strategy (Critical)
+- **Factory Functions**: Create test data with factory functions
+- **Complete Objects**: Always return complete objects with sensible defaults
+- **Schema Validation**: Validate test data against production schemas
+- **Behavior Testing**: Test behavior, not implementation details
+
+Example Factory Pattern:
+```typescript
+const createUser = (overrides: Partial<User> = {}): User => ({
+  id: 'user-123' as UserId,
+  email: 'test@example.com',
+  createdAt: new Date(),
+  ...overrides
+});
+```
+
+## Functional Programming Style ("Functional Light")
+- **Pure Functions**: No side effects wherever possible
+- **Immutable Data**: Use readonly types and immutable updates
+- **Composition**: Prefer function composition over complex abstractions
+- **Array Methods**: Use map, filter, reduce over imperative loops
 
 ## Critical Context
-- Main entry points: main.py, wsgi.py, manage.py
-- Configuration: config/, settings.py, .env.example
-- Core business logic: src/domain/, src/services/
-- Shared utilities: src/utils/, src/common/
+- **Schema Definitions**: src/schemas/ - Zod schemas define all data structures
+- **Test Factories**: tests/factories/ - Data creation functions
+- **Type Definitions**: src/types/ - Domain-specific types
+- **Pure Functions**: src/utils/ - Side-effect free utilities
 
 ## Common Tasks
-- Add new feature: `python manage.py startapp [name]`
-- Database migration: `alembic upgrade head` or `python manage.py migrate`
-- Update dependencies: `pip-compile requirements.in` or `poetry update`
-
-## Testing Strategy
-- Unit tests: pytest with fixtures
-- Integration tests: pytest-django or pytest-asyncio
-- E2E tests: Selenium or Playwright
-- Coverage target: 80% (pytest-cov)
-
-## Deployment
-- Staging: Automated on PR merge via GitHub Actions
-- Production: Manual trigger with approval
-- Rollback: `git revert` + redeploy or database migration rollback
+- **New Feature**: Start with schema definition, then test, then implementation
+- **Data Types**: Define in Zod schema first, derive TypeScript types
+- **Test Data**: Use factory functions, never inline object literals
+- **Refactoring**: Ensure immutability and type safety throughout
 ```
+
+*Note: This approach is based on Paul Hammond's proven practices for maintainable, type-safe development.*
 
 ### Context Priming Automation
 
@@ -155,6 +172,20 @@ claude "refactor module" --context "src/legacy/**" --analyze-deps
 
 ## 💬 Communication & Reasoning Patterns
 
+### Paul Hammond's Communication Approach
+
+Paul Hammond emphasizes clear, principled communication with Claude. Key insights from his approach:
+
+**Non-Negotiable Language:** Use absolute terms for critical principles:
+- "TEST-DRIVEN DEVELOPMENT IS NON-NEGOTIABLE"
+- "Every single line of production code must be written in response to a failing test"
+- "No `any` types" - clear, unambiguous boundaries
+
+**Structured Constraints:** Provide specific, actionable guidelines:
+- Prefer specific patterns: "Use `type` over `interface`"
+- Define exact approaches: "Factory functions for test data"
+- Set clear boundaries: "Pure functions wherever possible"
+
 ### The Reasoning Hierarchy
 
 Different tasks require different levels of reasoning. Use these patterns to engage the appropriate tier:
@@ -165,6 +196,23 @@ Different tasks require different levels of reasoning. Use these patterns to eng
 | **Moderate** | `think` prefix | "think about refactoring this function" |
 | **Complex** | `think harder` | "think harder about the system architecture" |
 | **Critical** | `ultrathink` | "ultrathink about security implications" |
+
+### Schema-First Communication Pattern
+
+Following Paul Hammond's schema-first approach, structure your requests:
+
+```typescript
+// 1. Define the schema first
+const FeatureSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  enabled: z.boolean()
+});
+
+// 2. Ask Claude to implement based on schema
+"Implement a feature toggle system using this schema. 
+Use factory functions for test data and ensure complete type safety."
+```
 
 ### Effective Prompt Engineering
 
@@ -561,9 +609,52 @@ Create team-wide patterns and templates:
 4. Claude refines based on feedback
 5. Both validate the final solution
 
+### Paul Hammond's Test-Driven Approach
+
+Based on Paul Hammond's methodology, create prompts that enforce test-first development:
+
+```markdown
+# .claude/prompts/test-driven-development.md
+
+## Test-Driven Development Prompts (Paul Hammond's Approach)
+
+### Feature Implementation
+"I need to implement [feature]. Following test-driven development:
+1. Start by creating a failing test that describes the expected behavior
+2. Use factory functions for test data - no inline object literals
+3. Ensure the test validates against our Zod schemas
+4. Implement the minimal code to make the test pass
+5. Refactor while keeping tests green
+Remember: Every line of production code must be in response to a failing test."
+
+### Factory Function Creation
+"Create a factory function for [type] that:
+- Returns complete objects with sensible defaults
+- Accepts optional partial overrides
+- Validates output against the Zod schema
+- Uses domain-specific types (e.g., UserId, not string)
+Example pattern:
+```typescript
+const createUser = (overrides: Partial<User> = {}): User => ({
+  id: 'user-123' as UserId,
+  email: 'test@example.com',
+  // ... complete object
+  ...overrides
+});
+```"
+
+### Type-Safe Refactoring
+"Refactor this code following functional programming principles:
+- No data mutation - use immutable updates
+- Pure functions with no side effects
+- Strict TypeScript - no any types
+- Derive types from Zod schemas where possible
+- Use array methods (map, filter, reduce) over imperative loops"
+```
+
 ### Knowledge Sharing
 
-Document and share effective prompts:
+Document and share effective prompts based on proven practices:
 
 ```markdown
 # .claude/prompts/performance-optimization.md
@@ -578,14 +669,14 @@ Document and share effective prompts:
 - Connection pooling and caching strategies
 Profile the query and suggest improvements with SQLAlchemy optimizations."
 
-### Python Performance Optimization
-"analyze this Python code for performance issues:
-- CPU profiling with cProfile results
-- Memory usage patterns
-- Algorithmic complexity
-- Vectorization opportunities with NumPy
-- Async/await optimization potential
-Provide optimized version with benchmarks using timeit."
+### TypeScript Performance Optimization (Paul Hammond Style)
+"analyze this TypeScript code for performance while maintaining type safety:
+- Identify any mutations that could be made immutable
+- Look for opportunities to use pure functions
+- Check for proper use of array methods vs imperative loops
+- Ensure strict typing throughout
+- Suggest functional composition improvements
+Provide optimized version that maintains our 'functional light' principles."
 ```
 
 ---
@@ -922,6 +1013,12 @@ claude report --format md --include-metrics
 ### Video Tutorials
 - **[My TOP 6 Claude Code PRO tips for AI Coding](http://www.youtube.com/watch?v=wFQ_i9XdkXU)**: Comprehensive walkthrough of advanced techniques
 
+### Real-World Practices
+- **[Paul Hammond's CLAUDE.md](https://github.com/citypaul/.dotfiles/blob/main/claude/.claude/CLAUDE.md)**: Production-tested practices for type-safe, test-driven development with Claude Code
+- **Test-Driven Development**: Paul Hammond's non-negotiable approach to TDD with Claude
+- **TypeScript Best Practices**: Schema-first development with Zod and strict typing
+- **Functional Programming**: "Functional light" patterns for maintainable code
+
 ### Documentation
 - Official Claude Code documentation
 - MCP Protocol specification
@@ -933,6 +1030,19 @@ claude report --format md --include-metrics
 - Best practices repository
 - Workflow sharing platform
 - Monthly webinar series
+
+---
+
+## 🙏 Acknowledgments
+
+Special thanks to **Paul Hammond** ([@paulhammond](https://github.com/citypaul)) for sharing his production-tested CLAUDE.md configuration and development practices. His rigorous approach to test-driven development, type safety, and functional programming principles has significantly influenced the practical sections of this guide.
+
+Key contributions from Paul Hammond's approach:
+- Non-negotiable test-driven development methodology
+- Schema-first development with Zod validation
+- Factory function patterns for test data
+- "Functional light" programming style
+- Strict TypeScript practices that eliminate runtime errors
 
 ---
 
