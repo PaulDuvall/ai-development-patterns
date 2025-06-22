@@ -34,9 +34,10 @@ Each pattern MUST follow this exact structure:
 
 ### Required Content Sections
 
-1. **Core Implementation** - Primary example showing pattern in action
+1. **Core Implementation** - Single primary example showing pattern in action
 2. **Anti-pattern** - What NOT to do, with specific example
-3. **Optional**: Additional examples, frameworks, or variations
+
+**Note**: Each pattern should contain exactly ONE core implementation example to maintain clarity and focus. Multiple examples create confusion and dilute the pattern's message.
 
 ### Pattern Categories
 
@@ -70,10 +71,11 @@ Patterns are organized into three main categories:
 - Avoid circular references
 
 ### Core Implementation
-- Provide concrete, runnable examples
+- Provide ONE concrete, runnable example that demonstrates the pattern
 - Use real commands, file paths, and tool names
-- Include bash scripts, configuration files, or code snippets
+- Include bash scripts, configuration files, or code snippets as a single cohesive example
 - Show input/output where relevant
+- Focus on the most important use case rather than showing multiple approaches
 
 ### Anti-patterns
 - Name the anti-pattern with a descriptive title
@@ -97,9 +99,11 @@ Patterns are organized into three main categories:
 - Use consistent anchor naming: convert pattern names to lowercase with hyphens replacing spaces and special characters
 
 ### Examples
+- Each pattern should have exactly ONE example to maintain focus and clarity
 - Prefer real-world scenarios over abstract examples
 - Use consistent naming conventions (e.g., "myapp" for applications)
 - Include file paths, command outputs, and error messages where relevant
+- If multiple approaches exist, choose the most representative or commonly used one
 
 ## Quality Standards
 
@@ -162,18 +166,19 @@ Before adding a new pattern, verify:
 - [ ] Follows exact header structure
 - [ ] Has clear, single-sentence description
 - [ ] Includes appropriate maturity level
-- [ ] Contains working code examples
+- [ ] Contains exactly ONE working code example
 - [ ] Defines specific anti-pattern
 - [ ] Uses correct markdown formatting
 - [ ] Links to related patterns correctly
 - [ ] Addresses specific, actionable problem
 - [ ] Dependencies are clearly stated
-- [ ] Examples are realistic and testable
+- [ ] Example is realistic and testable
 - [ ] Writing is clear and concise
 - [ ] Fits logically within existing pattern organization
 - [ ] Added to Complete Pattern Reference table with correct hyperlink
 - [ ] All pattern references throughout document are hyperlinked
 - [ ] Internal anchor link works correctly from reference table
+- [ ] Does not include multiple examples or implementation approaches
 
 ## Pattern Evolution
 

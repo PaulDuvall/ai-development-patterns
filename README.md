@@ -686,155 +686,63 @@ Allowing multiple parallel agents to write to the same directories creates race 
 ## AI Developer Lifecycle
 
 **Maturity**: Intermediate  
-**Description**: AI development follows a structured lifecycle from problem definition through deployment, integrating all tactical patterns for systematic, testable, and maintainable AI-assisted development.
+**Description**: Structured 9-stage process from problem definition through deployment with AI assistance.
 
-**Related Patterns**: [Rules as Code](#rules-as-code), [Specification Driven Development](#specification-driven-development), [Observable AI Development](#observable-ai-development), [AI-Driven Architecture Design](#ai-driven-architecture-design)
+**Related Patterns**: [Rules as Code](#rules-as-code), [Specification Driven Development](#specification-driven-development), [Observable AI Development](#observable-ai-development)
 
-**The Complete Lifecycle**
-
-```mermaid
-graph TD
-    A[Problem Definition] --> B[Technical Plan]
-    B --> C[Product Requirements]
-    C --> D[AI Issue Generation]
-    D --> E[Acceptance Tests]
-    E --> F[Implementation]
-    F --> G[Testing & Validation]
-    G --> H[Deployment]
-    H --> I[Monitoring]
-    I --> J[Iteration]
-    J --> A
-```
-
-**Stage 1: AI-Assisted Problem Definition**
-*Patterns: [Constraint-Based AI Development](#constraint-based-ai-development)*
-
-Define clear problem statements and success criteria before any implementation work begins.
+**Complete Development Workflow**
 
 ```bash
-ai "Analyze this problem statement for technical feasibility:
-- Suggest alternative approaches
-- Identify potential risks
-- Estimate complexity and effort"
-```
+#!/bin/bash
+# ai_development_workflow.sh - Complete AI-assisted development lifecycle
 
-**Stage 2: AI-Generated Technical Plan**
-*Patterns: [Context Window Optimization](#context-window-optimization), [Rules as Code](#rules-as-code)*
+echo "=== AI Developer Lifecycle: Feature Development ==="
 
-Transform problem definitions into concrete technical architectures with clear implementation paths.
+# Stage 1-3: Problem → Plan → Requirements
+ai "Analyze user request and create complete development plan:
 
-```bash
-ai "Create a technical plan for [problem] using [technology stack]:
-- Include architecture diagrams
-- Detail security considerations
-- Identify technical risks and mitigation strategies"
-```
+REQUEST: Add user authentication with JWT tokens
 
-**Stage 3: Product Requirements Document (PRD)**
-*Patterns: [AI Knowledge Persistence](#ai-knowledge-persistence), [Progressive AI Enhancement](#progressive-ai-enhancement)*
+Generate:
+1. Technical architecture (React frontend, Node.js API, PostgreSQL)
+2. Product requirements with acceptance criteria
+3. Kanban tasks (4-8 hour max, with dependencies)
+4. API specifications in OpenAPI format
+5. Security considerations and compliance requirements
 
-Translate technical plans into detailed product specifications with measurable acceptance criteria.
+Output structured JSON for automated task creation."
 
-```bash
-ai "Convert this technical plan into detailed product requirements:
-- Include API specifications with OpenAPI format
-- Define user interaction flows
-- Specify error handling patterns
-- Add acceptance criteria for each feature"
-```
+# Stage 4-5: Issues → Specifications  
+ai "Generate executable acceptance tests:
+- Gherkin scenarios for login/logout/token refresh
+- API endpoint tests with expected responses
+- Security test cases (invalid tokens, expired sessions)
+- Performance criteria (< 200ms response time)
 
-**Stage 4: AI Issue Generation**
-*Patterns: [AI Issue Generation](#ai-issue-generation), [Progressive AI Enhancement](#progressive-ai-enhancement)*
+Make tests runnable before implementation begins."
 
-Transform product requirements into structured, actionable work items using AI to break down features into properly sized tasks with clear acceptance criteria and dependencies.
+# Stage 6: Implementation
+ai "Implement JWT authentication following specifications:
+- Use tests as implementation guide
+- Follow security best practices
+- Add proper error handling
+- Include logging for debugging
+- Ensure code matches acceptance criteria exactly"
 
-```bash
-# Generate development tasks from PRD
-ai "Break down these product requirements into Kanban-ready GitHub issues:
-- Clear titles and acceptance criteria  
-- Cycle time targets (4-8 hours max per task)
-- If any task would take >8 hours, split it further
-- Frontend/backend/testing labels
-- Dependency mapping between tasks
-- Each task independently deployable
+# Stage 7-9: Testing → Deployment → Monitoring
+ai "Complete quality assurance and deployment:
+- Run all tests and fix failures
+- Security scan for vulnerabilities  
+- Performance benchmark against criteria
+- Generate deployment checklist
+- Create monitoring alerts for auth endpoints
+- Document rollback procedures"
 
-Format as JSON for automated issue creation."
-```
-
-Apply [**AI Issue Generation**](#ai-issue-generation) to create comprehensive task breakdown. Use [**Progressive AI Enhancement**](#progressive-ai-enhancement) to ensure tasks are properly sized for iterative delivery.
-
-**Stage 5: Specification Driven Development**
-*Patterns: [Specification Driven Development](#specification-driven-development), [Observable AI Development](#observable-ai-development)*
-
-Write executable acceptance tests before implementation to guide AI code generation.
-
-```bash
-ai "Generate acceptance tests for user story:
-- Use Gherkin format for clarity
-- Cover happy path and edge cases
-- Include performance criteria
-- Make tests executable with minimal setup"
-```
-
-**Stage 6: AI-Driven Implementation**
-*Patterns: [AI Security Sandbox](#ai-security-sandbox), [Rules as Code](#rules-as-code), [Progressive AI Enhancement](#progressive-ai-enhancement)*
-
-Use AI to implement features that satisfy the acceptance tests while maintaining code quality.
-
-```bash
-# Implementation workflow
-ai-checkpoint "Before implementing user authentication"
-ai-implement "Create JWT-based authentication following our security patterns"
-ai-test "Run tests and fix any failures"
-ai-review "Review code for security vulnerabilities"
-ai-commit "Add authentication with security review"
-```
-
-**Stage 7: Comprehensive Testing Strategy**
-*Patterns: [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy), [AI Workflow Orchestration](#ai-workflow-orchestration), [Context Window Optimization](#context-window-optimization)*
-
-Execute multi-layered testing approach with AI assistance for thorough quality assurance.
-
-```bash
-ai "Generate comprehensive test suite:
-- Unit tests with edge cases
-- Integration tests for API endpoints
-- End-to-end user journey tests
-- Security vulnerability scans
-- Performance benchmarks"
-```
-
-**Stage 8: Deployment Pipeline**
-*Patterns: [Deployment Automation](#deployment-automation), [AI Security Sandbox](#ai-security-sandbox)*
-
-Automate deployment with AI validation at each stage to ensure production readiness.
-
-```bash
-ai "Review deployment checklist:
-- Validate all tests passing
-- Check security compliance
-- Verify performance metrics
-- Generate deployment notes
-- Create rollback plan"
-```
-
-**Stage 9: AI-Monitored Production**
-*Patterns: [Observable AI Development](#observable-ai-development), [AI Knowledge Persistence](#ai-knowledge-persistence), [Monitoring & Maintenance](#monitoring--maintenance)*
-
-Continuous monitoring with AI-powered analysis for proactive issue detection and resolution.
-
-```bash
-ai "Analyze production metrics:
-- Identify performance anomalies
-- Detect error rate increases
-- Suggest optimization opportunities
-- Generate incident reports"
+echo "✅ Complete feature development lifecycle with AI assistance"
 ```
 
 **Anti-pattern: Ad-Hoc AI Development**
 Jumping straight to coding with AI without proper planning, requirements, or testing strategy.
-
-**Note**: Some patterns referenced in the lifecycle stages are advanced patterns documented in separate resources. The patterns linked above provide the foundation for the AI Developer Lifecycle.
 
 ---
 
@@ -1306,233 +1214,45 @@ Asking AI to "create a complete user management system" results in 5000 lines of
 ## AI Choice Generation
 
 **Maturity**: Intermediate  
-**Description**: Generate multiple implementation options for exploration and comparison rather than accepting the first AI solution. Focus on discovery over delivery by creating alternatives that reveal different trade-offs and approaches.
+**Description**: Generate multiple implementation options for exploration and comparison rather than accepting the first AI solution.
 
-**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Context Window Optimization](#context-window-optimization), [Constraint-Based AI Development](#constraint-based-ai-development)
+**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Context Window Optimization](#context-window-optimization)
 
-**Choice Generation Framework**
-
-```mermaid
-graph TD
-    A[Feature Requirement] --> B[Generate Multiple Options]
-    B --> C[Option 1: Performance Focus]
-    B --> D[Option 2: Simplicity Focus]  
-    B --> E[Option 3: Security Focus]
-    B --> F[Option 4: Maintainability Focus]
-    
-    C --> G[Comparative Analysis]
-    D --> G
-    E --> G
-    F --> G
-    
-    G --> H[Trade-off Assessment]
-    H --> I[Informed Decision]
-    I --> J[Implementation]
-```
-
-**Multi-Option Generation Examples**
+**Multi-Option Implementation Comparison**
 
 ```bash
-# Generate authentication implementation choices
-ai_choices "Generate 4 different approaches for user authentication:
+# Generate and compare multiple implementation approaches
+ai "Generate 3 different authentication approaches for user management:
 
-Option 1: Performance-optimized
-- Focus: Minimal latency and high throughput
-- Trade-offs: May sacrifice some security features
-- Target: High-traffic applications
+Option 1 (Performance-focused):
+- In-memory JWT with Redis caching
+- Sub-10ms token validation, horizontal scaling ready
+- Trade-off: Memory intensive, Redis dependency
+- Best for: High-traffic APIs (>10k req/sec)
 
-Option 2: Security-first
-- Focus: Maximum security and compliance
-- Trade-offs: Additional complexity and latency
-- Target: Financial or healthcare applications  
+Option 2 (Security-focused):
+- Database-backed sessions with audit trail
+- Immediate revocation, multi-factor authentication
+- Trade-off: Higher latency, complex session management
+- Best for: Banking, healthcare, government
 
-Option 3: Developer experience
-- Focus: Simple integration and maintenance
-- Trade-offs: May use more standard but less optimal patterns
-- Target: Rapid prototyping and small teams
+Option 3 (Simplicity-focused):
+- Standard JWT with established libraries
+- Well-documented patterns, minimal custom code
+- Trade-off: Less optimization opportunities
+- Best for: Startups, MVPs, small teams
 
-Option 4: Vendor-neutral
-- Focus: No external dependencies or cloud services
-- Trade-offs: More code to maintain
-- Target: Air-gapped or compliance-restricted environments
+For each option provide:
+- 30-minute working prototype
+- Performance benchmarks (response time, memory usage)
+- Implementation complexity assessment (LOC, dependencies)
+- Specific trade-offs and when to choose this approach
 
-For each option, provide:
-- Architecture diagram
-- Implementation approach
-- Key trade-offs
-- When to choose this option"
+Recommend best option based on project constraints and team experience."
 ```
-
-**Structured Choice Comparison**
-
-```yaml
-# .ai/choices/authentication-options.yml
-authentication_choices:
-  option_1_performance:
-    approach: "In-memory JWT with Redis caching"
-    pros:
-      - "Sub-10ms token validation"
-      - "Horizontal scaling ready"
-      - "Minimal database hits"
-    cons:
-      - "Memory intensive"
-      - "Complex cache invalidation"
-      - "Redis dependency"
-    best_for: "High-traffic APIs (>10k req/sec)"
-    
-  option_2_security:
-    approach: "Database-backed sessions with MFA"
-    pros:
-      - "Audit trail for all sessions"
-      - "Immediate revocation capability"
-      - "Multi-factor authentication built-in"
-    cons:
-      - "Database load for every request"
-      - "Complex session management"
-      - "Higher latency"
-    best_for: "Banking, healthcare, government"
-    
-  option_3_simple:
-    approach: "Standard JWT with Passport.js"
-    pros:
-      - "Well-documented patterns"
-      - "Large community support"
-      - "Minimal custom code"
-    cons:
-      - "Less optimization opportunities"
-      - "Framework lock-in"
-      - "Standard security model only"
-    best_for: "Startups, MVPs, small teams"
-    
-  option_4_standalone:
-    approach: "Custom token system with local storage"
-    pros:
-      - "No external dependencies"
-      - "Full control over implementation"
-      - "Air-gap compatible"
-    cons:
-      - "More code to maintain"
-      - "Custom security implementation risk"
-      - "No ecosystem benefits"
-    best_for: "Government, defense, offline systems"
-```
-
-**Rapid Prototyping for Choice Validation**
-
-```bash
-# Generate minimal prototypes for each option
-ai_prototype "Create 30-minute prototypes for each authentication option:
-
-For each option (1-4):
-1. Create minimal working implementation
-2. Include basic test cases
-3. Document key architectural decisions
-4. Measure and report:
-   - Lines of code
-   - External dependencies
-   - Setup complexity
-   - Performance characteristics
-
-Goal: Quick validation of assumptions before full implementation"
-
-# Example prototype validation
-./validate_choices.sh
-# Output:
-# Option 1 (Performance): 125 LOC, 3 deps, 8ms avg response
-# Option 2 (Security): 200 LOC, 5 deps, 25ms avg response  
-# Option 3 (Simple): 75 LOC, 8 deps, 15ms avg response
-# Option 4 (Standalone): 300 LOC, 0 deps, 12ms avg response
-```
-
-**Choice-Driven Development Workflow**
-
-```bash
-# 1. Generate multiple implementation approaches
-ai_choices "Generate 3 different database schema designs for user management"
-
-# 2. Create rapid prototypes
-ai_prototype "Implement minimal versions of each schema design"
-
-# 3. Evaluate trade-offs
-ai_evaluate "Compare prototypes across dimensions:
-- Query performance
-- Storage efficiency  
-- Migration complexity
-- Developer experience"
-
-# 4. Make informed decision
-ai_decide "Based on evaluation, recommend which schema to implement and why"
-
-# 5. Implement chosen approach with full features
-ai_implement "Build production version of recommended schema design"
-```
-
-**UI/UX Choice Generation**
-
-```bash
-# Generate multiple UI approaches
-ai_ui_choices "Design 4 different user onboarding flows:
-
-Flow 1: Progressive disclosure
-- Minimal initial form, expand as needed
-- Best for: Complex products with many options
-
-Flow 2: Single-page wizard
-- All steps visible, scroll to progress
-- Best for: Simple workflows with few steps
-
-Flow 3: Multi-step modal
-- Overlay approach with step indicators
-- Best for: Adding features to existing interfaces
-
-Flow 4: Embedded progressive
-- Integrated into main application flow
-- Best for: Converting existing users to new features
-
-For each flow, provide:
-- Wireframe or mockup
-- Conversion rate expectations
-- Implementation complexity
-- A/B testing strategy"
-```
-
-**Benefits of Choice Generation**
-
-1. **Better Decisions**: Compare multiple approaches before committing
-2. **Risk Mitigation**: Identify problems early through rapid prototyping
-3. **Learning Acceleration**: Explore different patterns and trade-offs
-4. **Team Alignment**: Discuss options with concrete examples
-5. **Innovation Discovery**: Find unexpected solutions through exploration
-6. **Context Awareness**: Match solutions to specific requirements
-
-**Integration with Existing Patterns**
-
-```bash
-# Choice generation works with other patterns
-ai_choices + progressive_enhancement:
-  "Generate 3 progressive enhancement paths for the chosen authentication option"
-
-ai_choices + atomic_decomposition:
-  "Break down each authentication option into atomic tasks for parallel implementation"
-
-ai_choices + specification_driven:
-  "Create acceptance tests that work with any of the 4 authentication options"
-```
-
-**When to Use Choice Generation**
-
-- **Architecture decisions** with significant long-term impact
-- **New technology adoption** where team lacks experience
-- **Performance-critical** implementations with unclear optimal approach
-- **User experience** designs that affect conversion or engagement
-- **Security implementations** where multiple valid approaches exist
-- **Vendor selection** decisions with lock-in implications
 
 **Anti-pattern: Analysis Paralysis**
-Generating so many choices that decision-making becomes delayed indefinitely, or spending more time evaluating options than implementing them.
-
-**Anti-pattern: False Choices**
-Creating options that appear different but are fundamentally the same approach with minor variations, providing no real decision value.
+Generating too many choices or spending more time evaluating options than implementing them.
 
 ---
 
@@ -2528,394 +2248,54 @@ ai-assistant design-architecture \
 ## AI-Driven Traceability
 
 **Maturity**: Intermediate  
-**Description**: Maintain automated bidirectional links between requirements, specifications, tests, implementation code, and documentation using AI to ensure complete visibility and change impact analysis throughout the development lifecycle.
+**Description**: Maintain automated links between requirements, specifications, tests, implementation, and documentation using AI.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Specification Driven Development](#specification-driven-development), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy), [Observable AI Development](#observable-ai-development), [AI Knowledge Persistence](#ai-knowledge-persistence)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Specification Driven Development](#specification-driven-development), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)
 
-**Traceability Matrix Framework**
-
-```mermaid
-graph LR
-    A[Product Requirements] --> B[User Stories]
-    B --> C[Acceptance Criteria]
-    C --> D[Test Specifications]
-    D --> E[Implementation Code]
-    E --> F[Test Execution]
-    F --> G[Documentation]
-    
-    G -.-> A
-    F -.-> C
-    E -.-> B
-    D -.-> A
-    
-    H[AI Traceability Engine] --> A
-    H --> B  
-    H --> C
-    H --> D
-    H --> E
-    H --> F
-    H --> G
-```
-
-**Automated Link Generation**
-
-```bash
-# Generate traceability links during development
-ai "Analyze this code change and create traceability links:
-
-Code: src/auth/login.py
-Commit: feat: add JWT token expiration handling
-
-Map this change to:
-1. Which user stories does this fulfill?
-2. Which acceptance criteria are satisfied?
-3. Which tests validate this functionality?
-4. Which documentation needs updates?
-5. Which requirements are now complete?
-
-Output as structured JSON for automated tracking."
-```
-
-**Requirements-to-Code Mapping**
-
-```yaml
-# .ai/traceability/requirements_map.yml
-traceability_rules:
-  requirements:
-    - pattern: "\\[\\^[a-zA-Z0-9]+\\]"
-      link_to: ["user_stories", "acceptance_tests", "code_modules"]
-    - pattern: "US-\\d+"  
-      link_to: ["acceptance_criteria", "test_files", "implementation"]
-    - pattern: "AC-\\d+"
-      link_to: ["test_cases", "code_functions"]
-      
-  code_annotations:
-    - comment_format: "# Implements: [^au3f], US-456"
-    - docstring_format: "Satisfies [^pm7a]"
-    - test_format: "@pytest.mark.requirement('[^sc7a]')"
-    
-  automated_checks:
-    - verify_requirement_coverage: true
-    - detect_orphaned_code: true
-    - validate_test_mapping: true
-```
-
-**AI-Powered Impact Analysis**
-
-```bash
-# Analyze change impact across entire codebase
-ai "Perform impact analysis for this requirement change:
-
-CHANGED REQUIREMENT: [^au3f]
-'User sessions must expire after 30 minutes (changed from 60 minutes)'
-
-Trace through:
-1. Which user stories are affected?
-2. Which acceptance criteria need updates?  
-3. Which test cases require modification?
-4. Which code modules need changes?
-5. Which documentation needs revision?
-6. What is the risk level of this change?
-
-Provide migration plan with estimated effort."
-```
-
-**Real-time Traceability Dashboard**
-
-```python
-# traceability_dashboard.py
-class TraceabilityDashboard:
-    def __init__(self):
-        self.requirement_links = {}
-        self.coverage_metrics = {}
-        
-    def generate_coverage_report(self):
-        """AI-generated traceability coverage analysis"""
-        
-        coverage_prompt = f"""
-        Analyze traceability coverage for this project:
-        
-        Requirements: {len(self.get_requirements())} total
-        User Stories: {len(self.get_user_stories())} total  
-        Test Cases: {len(self.get_test_cases())} total
-        Code Modules: {len(self.get_code_modules())} total
-        
-        Calculate:
-        1. Requirements without linked user stories: X%
-        2. User stories without test coverage: Y%
-        3. Code modules without requirement links: Z%
-        4. Orphaned test cases: W count
-        5. Documentation coverage gaps: V%
-        
-        Highlight top 5 traceability risks and remediation actions.
-        """
-        
-        return self.ai_analyze(coverage_prompt)
-    
-    def detect_traceability_gaps(self):
-        """Find missing or broken traceability links"""
-        
-        gaps = {
-            'unlinked_requirements': [],
-            'orphaned_code': [],
-            'missing_tests': [],
-            'outdated_docs': []
-        }
-        
-        # AI analysis of link completeness
-        gap_analysis = f"""
-        Scan codebase for traceability gaps:
-        
-        1. Requirements without implementation
-        2. Code without requirement justification  
-        3. Tests not linked to specifications
-        4. Documentation that doesn't match code
-        
-        For each gap, provide:
-        - Severity (critical/medium/low)
-        - Recommended action
-        - Effort estimate to fix
-        """
-        
-        return self.ai_analyze(gap_analysis)
-```
-
-**Automated Traceability Maintenance**
+**Automated Traceability System**
 
 ```bash
 #!/bin/bash
-# maintain_traceability.sh
+# maintain_traceability.sh - Complete AI-driven traceability maintenance
 
-echo "=== AI-Driven Traceability Maintenance ==="
+echo "=== Scanning for traceability gaps ==="
 
-# 1. Scan for new code without requirements links
-echo "Scanning for unlinked code..."
+# 1. Check new code for requirement links
 git diff --name-only HEAD~1 | while read file; do
     if [[ $file == *.py ]] && ! grep -q "# Implements:\|# Satisfies:" "$file"; then
         ai "Analyze $file and suggest requirement links:
         - What product requirement does this code satisfy?
         - Which user story does it implement?
-        - What acceptance criteria does it fulfill?
-        
-        Generate proper traceability annotations."
+        - Generate proper traceability annotations: # Implements: [^req_id]"
     fi
 done
 
-# 2. Validate existing links are still valid  
-echo "Validating existing traceability links..."
-ai "Check all [^*] footnote and US-* references in codebase:
-- Do referenced requirements still exist?
-- Are requirement descriptions current?
-- Do linked tests still pass?
-- Is documentation still accurate?
+# 2. Validate existing links
+ai "Scan codebase for broken traceability links:
+- Check all [^*] footnotes and US-* references
+- Verify linked requirements still exist
+- Report orphaned code and missing tests
+- Calculate coverage: Requirements->Code->Tests->Docs
 
-Report any broken or stale links."
+Output gaps with remediation priority (critical/medium/low)."
 
-# 3. Update traceability matrix
-echo "Updating traceability matrix..."
-ai "Generate updated traceability matrix from current codebase:
-- Map all requirements to implementing code
-- Link user stories to test files
-- Connect acceptance criteria to functions
-- Show coverage percentages by area
+# 3. Generate impact analysis for changes
+ai "Analyze recent changes for traceability impact:
+Files changed: $(git diff --name-only HEAD~5)
 
-Output as markdown table for documentation."
+For each change:
+- Map to affected requirements [^id]
+- Identify dependent user stories (US-*)
+- List tests requiring updates
+- Flag documentation needing revision
 
-# 4. Generate change impact report
-echo "Analyzing change impact..."
-ai "Analyze git commits from last sprint:
-- Which requirements were modified?
-- What new user stories were added?
-- Which tests were updated?
-- What documentation changed?
-
-Create change impact summary for stakeholders."
-```
-
-**Git Integration for Traceability**
-
-```bash
-# .git/hooks/commit-msg
-#!/bin/bash
-# Enforce traceability in commit messages
-
-commit_message=$(cat "$1")
-
-# Check if commit references requirements
-if ! echo "$commit_message" | grep -qE "(\[\^[a-zA-Z0-9]+\]|US-[0-9]+|AC-[0-9]+)"; then
-    echo "❌ Commit must reference requirement footnote [^id], user story (US-), or acceptance criteria (AC-)"
-    
-    # AI suggestion for traceability
-    ai "Analyze this commit and suggest traceability links:
-    
-    Commit message: $commit_message
-    Changed files: $(git diff --cached --name-only)
-    
-    Which requirements/user stories does this commit relate to?
-    Suggest proper commit message format with traceability IDs."
-    
-    exit 1
-fi
-
-echo "✅ Traceability link found in commit message"
-```
-
-**Documentation Synchronization**
-
-```python
-# sync_documentation.py
-class DocumentationSync:
-    def __init__(self):
-        self.ai_client = AIClient()
-        
-    def sync_requirements_docs(self):
-        """Keep documentation in sync with requirements"""
-        
-        sync_prompt = """
-        Compare requirements.md with actual implementation:
-        
-        1. Identify requirements that changed since last doc update
-        2. Find new features not documented
-        3. Detect obsolete documentation sections
-        4. Suggest documentation updates needed
-        
-        For each discrepancy:
-        - Show specific differences
-        - Recommend exact text changes
-        - Estimate effort to update
-        """
-        
-        return self.ai_client.analyze(sync_prompt)
-    
-    def validate_example_accuracy(self):
-        """Ensure code examples in docs still work"""
-        
-        validation_prompt = """
-        Validate all code examples in documentation:
-        
-        1. Extract code snippets from markdown files
-        2. Check if examples use current API
-        3. Verify examples follow current patterns
-        4. Test examples against actual codebase
-        
-        Report:
-        - Outdated examples that need fixing
-        - Missing examples for new features
-        - Inconsistent naming/patterns
-        """
-        
-        return self.ai_client.analyze(validation_prompt)
-```
-
-**Testing Traceability**
-
-```python
-# test_traceability.py
-import pytest
-
-class TestTraceability:
-    
-    @pytest.mark.requirement("[^au3f]")
-    @pytest.mark.user_story("US-123")
-    def test_user_login_jwt_expiration(self):
-        """
-        AC-456: JWT tokens must expire after 30 minutes
-        Links: [^au3f] (Security), US-123 (User Authentication)
-        """
-        # Test implementation validates both requirement and acceptance criteria
-        pass
-    
-    def test_requirement_coverage(self):
-        """Ensure all requirements have test coverage"""
-        
-        coverage_check = """
-        Analyze test suite for requirement coverage:
-        
-        1. List all @pytest.mark.requirement decorators
-        2. Compare with requirements.md file
-        3. Identify requirements without tests
-        4. Calculate coverage percentage
-        
-        Fail test if coverage < 90%
-        """
-        
-        coverage_result = ai_analyze(coverage_check)
-        assert coverage_result.coverage_percentage >= 90
-```
-
-**Visual Traceability Mapping**
-
-```bash
-# Generate visual traceability map
-ai "Create Mermaid diagram showing traceability relationships:
-
-Requirements: $(grep -o '\[\^[a-zA-Z0-9]*\]' requirements.md | sort -u)
-User Stories: $(grep -o 'US-[0-9]*' user_stories.md | sort -u)
-Test Files: $(find tests/ -name '*.py' | head -10)
-Code Modules: $(find src/ -name '*.py' | head -10)
-
-Show:
-1. Requirements → User Stories connections
-2. User Stories → Test Files links  
-3. Test Files → Code Modules relationships
-4. Highlight any orphaned items
-5. Color-code by completion status
-
-Output as Mermaid graph syntax for README.md"
-```
-
-**Compliance Traceability**
-
-```yaml
-# .ai/traceability/compliance_map.yml
-compliance_requirements:
-  SOX_404:
-    description: "Internal controls over financial reporting"
-    linked_requirements: ["[^sx4a]", "[^sx4b]", "[^sx4c]"]
-    test_evidence: ["tests/audit/", "tests/financial/"]
-    documentation: ["docs/compliance/sox.md"]
-    
-  PCI_DSS:
-    description: "Payment card data security"
-    linked_requirements: ["[^pc3a]", "[^pc3b]", "[^pc3c]"]
-    test_evidence: ["tests/security/payment/"]
-    documentation: ["docs/security/pci.md"]
-    
-  audit_trail:
-    requirement_changes: "git log --grep='\\[\\^'"
-    test_changes: "git log -- tests/"
-    documentation_updates: "git log -- docs/"
-```
-
-**Metrics and Reporting**
-
-```bash
-# Generate traceability health report
-ai "Generate weekly traceability health report:
-
-Metrics to calculate:
-1. Forward traceability: Requirements → Code (target: >95%)
-2. Backward traceability: Code → Requirements (target: >90%)  
-3. Test coverage traceability: Requirements → Tests (target: >98%)
-4. Documentation currency: Docs ↔ Implementation (target: <7 days lag)
-5. Change impact accuracy: Predicted vs actual impact (target: >85%)
-
-Include:
-- Trend analysis vs last 4 weeks
-- Top 5 traceability risks
-- Recommended actions with effort estimates
-- Compliance coverage summary
-
-Format as executive dashboard for stakeholders."
+Create change impact matrix with effort estimates."
 ```
 
 **Anti-pattern: Manual Traceability Management**
-Relying on spreadsheets or manual documentation to maintain requirement links leads to stale, inaccurate traceability that becomes a compliance burden rather than a development aid.
+Maintaining requirement links in spreadsheets or manual documentation that becomes stale and inaccurate over time.
 
-**Anti-pattern: Traceability Theater**
-Creating traceability links only for audit purposes without using them for actual development decisions, impact analysis, or change management.
-
-----
+---
 
 ---
 
