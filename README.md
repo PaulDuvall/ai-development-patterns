@@ -2462,7 +2462,7 @@ Refactoring code for hypothetical future requirements rather than addressing cur
 
 **Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Rules as Code](#rules-as-code), [AI-Driven Refactoring](#ai-driven-refactoring)
 
-**Supported Frameworks**
+**Example Frameworks**
 - **Domain-Driven Design (DDD)**: Bounded contexts, entities, value objects
 - **AWS Well-Architected**: 6 pillars compliance assessment  
 - **12-Factor App**: Cloud-native application principles
