@@ -2462,235 +2462,62 @@ Refactoring code for hypothetical future requirements rather than addressing cur
 
 **Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Rules as Code](#rules-as-code), [AI-Driven Refactoring](#ai-driven-refactoring)
 
-**Architecture Framework Application**
+**Supported Frameworks**
+- **Domain-Driven Design (DDD)**: Bounded contexts, entities, value objects
+- **AWS Well-Architected**: 6 pillars compliance assessment  
+- **12-Factor App**: Cloud-native application principles
+- **Event-Driven Architecture**: Event sourcing and saga patterns
+- **ADRs**: Architecture Decision Records generation
 
-```mermaid
-graph TD
-    A[Requirements Analysis] --> B[Domain Modeling]
-    B --> C[Architecture Pattern Selection]
-    C --> D[AI Implementation]
-    D --> E[Architecture Validation]
-    E --> F{Compliance Check}
-    F -->|Pass| G[Document Decisions]
-    F -->|Fail| H[Refine Design]
-    H --> D
-    G --> I[Generate Code Structure]
-```
-
-**Domain-Driven Design with AI**
+**Core Implementation: Domain-Driven Design Analysis**
 
 ```bash
-# Generate bounded contexts from user stories
+# Create DDD analysis prompt
 cat > .ai/prompts/ddd-analysis.md << 'EOF'
 # Domain-Driven Design Analysis
 
-## Context
-You are a domain architect helping identify bounded contexts and domain models.
-
-## Task
-Analyze these user stories and identify:
-1. Core domain concepts (entities, value objects, aggregates)
-2. Bounded context boundaries
+Analyze user stories and generate:
+1. Bounded context boundaries
+2. Core entities and value objects  
 3. Domain services and repositories
-4. Anti-corruption layers between contexts
+4. Integration patterns between contexts
 
-## Format
-Return:
-- Bounded Context Map (ASCII or mermaid)
-- Entity definitions with properties and behaviors
-- Integration patterns between contexts
-- Suggested directory structure
+Return bounded context map and suggested code structure.
 EOF
 
-# Analyze user stories for domain modeling
+# Run domain analysis
 ai-assistant analyze-domain \
   --input requirements/user-stories.md \
   --framework ddd \
   --output architecture/domain-model.md
 ```
 
-**AWS Well-Architected Framework Implementation**
-
-```bash
-# Generate Well-Architected review checklist
-cat > .ai/prompts/well-architected.md << 'EOF'
-# AWS Well-Architected Analysis
-
-## Pillars to Analyze
-1. Operational Excellence
-2. Security  
-3. Reliability
-4. Performance Efficiency
-5. Cost Optimization
-6. Sustainability
-
-## Task
-Review the codebase and generate:
-- Compliance checklist for each pillar
-- Specific recommendations with code examples
-- Priority ranking (High/Medium/Low)
-- Implementation effort estimates
-EOF
-
-# Run Well-Architected assessment
-ai-assistant assess-architecture \
-  --framework well-architected \
-  --codebase src/ \
-  --output docs/architecture/well-architected-review.md
+**Example Output: E-commerce Domain Model**
 ```
+Bounded Contexts:
+- Order Management: Order, OrderItem, OrderStatus
+- Payment: Payment, PaymentMethod, Transaction  
+- Inventory: Product, Stock, Warehouse
+- Customer: Customer, Address, Preferences
 
-**12-Factor App Compliance**
-
-```bash
-# Analyze 12-Factor compliance
-cat > .ai/prompts/twelve-factor.md << 'EOF'
-# 12-Factor App Analysis
-
-## Factors to Evaluate
-1. Codebase - One codebase tracked in revision control
-2. Dependencies - Explicitly declare and isolate dependencies  
-3. Config - Store config in the environment
-4. Backing services - Treat backing services as attached resources
-5. Build, release, run - Strictly separate build and run stages
-6. Processes - Execute as one or more stateless processes
-7. Port binding - Export services via port binding
-8. Concurrency - Scale out via the process model
-9. Disposability - Maximize robustness with fast startup and graceful shutdown
-10. Dev/prod parity - Keep development, staging, and production as similar as possible
-11. Logs - Treat logs as event streams
-12. Admin processes - Run admin/management tasks as one-off processes
-
-## Task
-Generate compliance report with:
-- Current compliance level for each factor
-- Specific code changes needed
-- Configuration examples
-- Migration steps for non-compliant areas
-EOF
-
-# Check 12-Factor compliance
-ai-assistant validate-12factor \
-  --codebase . \
-  --output docs/architecture/12factor-compliance.md
-```
-
-**Event-Driven Architecture Design**
-
-```bash
-# Design event-driven architecture
-cat > .ai/prompts/event-driven.md << 'EOF'
-# Event-Driven Architecture Design
-
-## Task
-Based on the domain model, design an event-driven architecture:
-
-1. Identify domain events from business processes
-2. Design event schemas with versioning strategy
-3. Define event sourcing patterns where appropriate
-4. Create saga patterns for distributed transactions
-5. Specify event store and message broker requirements
-
-## Output Format
-- Event catalog with schemas
-- Sequence diagrams for key flows
-- Infrastructure requirements
-- Code generation templates
-EOF
-
-# Generate event-driven design
-ai-assistant design-events \
-  --domain-model architecture/domain-model.md \
-  --output architecture/event-driven-design.md
-```
-
-**Architecture Decision Records (ADRs)**
-
-```bash
-# Generate ADR from design decisions
-cat > .ai/prompts/adr-generation.md << 'EOF'
-# Architecture Decision Record Generation
-
-## Template
-Use this ADR template:
-
-# ADR-XXXX: [Decision Title]
-
-## Status
-[Proposed | Accepted | Deprecated | Superseded]
-
-## Context
-[What is the issue that we're seeing that is motivating this decision or change?]
-
-## Decision
-[What is the change that we're proposing and/or doing?]
-
-## Consequences
-[What becomes easier or more difficult to do because of this change?]
-
-## Task
-Generate ADRs for architectural decisions made during design.
-EOF
-
-# Create ADR from architecture discussion
-ai-assistant generate-adr \
-  --discussion architecture/design-discussion.md \
-  --template .ai/templates/adr-template.md \
-  --output docs/architecture/decisions/
-```
-
-**Microservices Decomposition**
-
-```bash
-# Decompose monolith into microservices
-cat > .ai/prompts/microservices.md << 'EOF'
-# Microservices Decomposition Strategy
-
-## Analysis Framework
-1. Identify service boundaries using DDD bounded contexts
-2. Analyze data coupling and shared databases
-3. Map communication patterns and dependencies
-4. Assess team ownership and Conway's Law implications
-5. Plan migration strategy (Strangler Fig pattern)
-
-## Output Requirements
-- Service boundary recommendations
-- Data migration strategy
-- API contract definitions
-- Deployment and monitoring considerations
-- Migration roadmap with phases
-EOF
-
-# Plan microservices decomposition
-ai-assistant decompose-services \
-  --monolith-codebase src/ \
-  --domain-model architecture/domain-model.md \
-  --output architecture/microservices-plan.md
+Integration:
+- Order → Payment (via PaymentRequested event)
+- Order → Inventory (via StockReservation command)
 ```
 
 **Anti-pattern: Architecture Astronaut AI**
 
 Letting AI generate over-engineered solutions with complex patterns and frameworks without considering business constraints, team capabilities, or actual requirements.
 
-**Why it's problematic:**
-- Creates unnecessary complexity
-- Introduces patterns the team can't maintain
-- Ignores performance and cost implications
-- Adds technical debt instead of reducing it
-
-**Instead:**
-- Provide specific business constraints to AI
-- Start with simple patterns and evolve
-- Validate AI suggestions against team capabilities
-- Focus on solving actual problems, not theoretical ones
+**Why it's problematic:** AI creates over-complex solutions (microservices + CQRS + event sourcing) when simple CRUD would suffice.
 
 ```bash
-# Good: Constrained architecture generation
+# Good: Constrained architecture
 ai-assistant design-architecture \
   --requirements requirements/user-stories.md \
-  --constraints "team_size=5,experience=intermediate,budget=low,timeline=3months" \
-  --patterns "keep_it_simple,prefer_conventions"
+  --constraints "team_size=5,experience=intermediate,timeline=3months"
 
-# Bad: Unconstrained architecture generation  
+# Bad: Unconstrained  
 ai-assistant design-architecture \
   --requirements requirements/user-stories.md \
   --generate "enterprise_patterns,microservices,event_sourcing,cqrs"
