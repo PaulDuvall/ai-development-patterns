@@ -67,6 +67,7 @@ graph TD
 | **[Constraint-Based AI Development](#constraint-based-ai-development)** | Beginner | Development | Give AI specific constraints to prevent over-engineering and ensure focused solutions | Progressive AI Enhancement |
 | **[Observable AI Development](#observable-ai-development)** | Intermediate | Development | Strategic logging and debugging that makes system behavior visible to AI | AI Developer Lifecycle |
 | **[AI-Driven Refactoring](#ai-driven-refactoring)** | Intermediate | Development | Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics | Rules as Code |
+| **[AI-Driven Architecture Design](#ai-driven-architecture-design)** | Intermediate | Development | Apply architectural frameworks (DDD, Well-Architected, 12-Factor) using AI to ensure sound system design | AI Developer Lifecycle, Rules as Code |
 | **[AI-Driven Traceability](#ai-driven-traceability)** | Intermediate | Development | Maintain automated links between requirements, specifications, tests, implementation, and documentation using AI | AI Developer Lifecycle |
 | **Security & Compliance** | | Operations | *Category containing security and compliance patterns* | |
 | **[Policy-as-Code Generation](#policy-as-code-generation)** | Advanced | Operations | Transform compliance requirements into executable Cedar/OPA policy files with AI assistance | AI Security Sandbox |
@@ -81,7 +82,7 @@ graph TD
 | **[Release Note Synthesis](#release-note-synthesis)** | Beginner | Operations | Automatically generate structured release notes by analyzing git commit history | Pipeline Synthesis |
 | **Monitoring & Maintenance** | | Operations | *Category containing monitoring and maintenance patterns* | |
 | **[Performance Baseline Management](#performance-baseline-management)** | Advanced | Operations | Establish intelligent performance baselines and configure monitoring thresholds automatically | Observable AI Development |
-| **[Technical Debt Forecasting](#technical-debt-forecasting)** | Intermediate | Operations | Proactively identify and prioritize technical debt using AI-powered code analysis | AI-Driven Refactoring |
+| **[Technical Debt Forecasting](#technical-debt-forecasting)** | Intermediate | Operations | Proactively identify and prioritize technical debt using AI-powered code analysis | AI-Driven Refactoring, AI-Driven Architecture Design |
 | **[Incident Response Automation](#incident-response-automation)** | Advanced | Operations | Generate actionable incident response playbooks from historical incident data | Performance Baseline Management |
 | **[Test Suite Health Management](#test-suite-health-management)** | Intermediate | Operations | Analyze build history to identify and remediate flaky tests automatically | Comprehensive AI Testing Strategy |
 | **[Dependency Upgrade Advisor](#dependency-upgrade-advisor)** | Intermediate | Operations | Intelligently manage dependency upgrades with compatibility analysis and risk assessment | Technical Debt Forecasting |
@@ -687,7 +688,7 @@ Allowing multiple parallel agents to write to the same directories creates race 
 **Maturity**: Intermediate  
 **Description**: AI development follows a structured lifecycle from problem definition through deployment, integrating all tactical patterns for systematic, testable, and maintainable AI-assisted development.
 
-**Related Patterns**: [Rules as Code](#rules-as-code), [Specification Driven Development](#specification-driven-development), [Observable AI Development](#observable-ai-development)
+**Related Patterns**: [Rules as Code](#rules-as-code), [Specification Driven Development](#specification-driven-development), [Observable AI Development](#observable-ai-development), [AI-Driven Architecture Design](#ai-driven-architecture-design)
 
 **The Complete Lifecycle**
 
@@ -1267,7 +1268,7 @@ Generating tests with AI without a coherent strategy leads to poor coverage, fla
 **Maturity**: Beginner  
 **Description**: Build complex features through small, deployable iterations with daily deployment cycles. Each AI interaction adds one specific enhancement rather than trying to build everything at once. Focus on rapid market feedback over granular task breakdown.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Constraint-Based AI Development](#constraint-based-ai-development), [AI Choice Generation](#ai-choice-generation)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Constraint-Based AI Development](#constraint-based-ai-development), [AI Choice Generation](#ai-choice-generation), [AI-Driven Architecture Design](#ai-driven-architecture-design)
 
 **Examples**
 Building authentication progressively:
@@ -2328,6 +2329,249 @@ Making widespread changes without systematic analysis leads to introduced bugs a
 
 **Anti-pattern: Speculative Refactoring**
 Refactoring code for hypothetical future requirements rather than addressing current code smells and quality issues.
+
+----
+
+## AI-Driven Architecture Design
+
+**Maturity**: Intermediate  
+**Description**: Apply architectural frameworks (DDD, Well-Architected, 12-Factor) using AI to ensure sound system design and maintainable code structure.
+
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Rules as Code](#rules-as-code), [AI-Driven Refactoring](#ai-driven-refactoring)
+
+**Architecture Framework Application**
+
+```mermaid
+graph TD
+    A[Requirements Analysis] --> B[Domain Modeling]
+    B --> C[Architecture Pattern Selection]
+    C --> D[AI Implementation]
+    D --> E[Architecture Validation]
+    E --> F{Compliance Check}
+    F -->|Pass| G[Document Decisions]
+    F -->|Fail| H[Refine Design]
+    H --> D
+    G --> I[Generate Code Structure]
+```
+
+**Domain-Driven Design with AI**
+
+```bash
+# Generate bounded contexts from user stories
+cat > .ai/prompts/ddd-analysis.md << 'EOF'
+# Domain-Driven Design Analysis
+
+## Context
+You are a domain architect helping identify bounded contexts and domain models.
+
+## Task
+Analyze these user stories and identify:
+1. Core domain concepts (entities, value objects, aggregates)
+2. Bounded context boundaries
+3. Domain services and repositories
+4. Anti-corruption layers between contexts
+
+## Format
+Return:
+- Bounded Context Map (ASCII or mermaid)
+- Entity definitions with properties and behaviors
+- Integration patterns between contexts
+- Suggested directory structure
+EOF
+
+# Analyze user stories for domain modeling
+ai-assistant analyze-domain \
+  --input requirements/user-stories.md \
+  --framework ddd \
+  --output architecture/domain-model.md
+```
+
+**AWS Well-Architected Framework Implementation**
+
+```bash
+# Generate Well-Architected review checklist
+cat > .ai/prompts/well-architected.md << 'EOF'
+# AWS Well-Architected Analysis
+
+## Pillars to Analyze
+1. Operational Excellence
+2. Security  
+3. Reliability
+4. Performance Efficiency
+5. Cost Optimization
+6. Sustainability
+
+## Task
+Review the codebase and generate:
+- Compliance checklist for each pillar
+- Specific recommendations with code examples
+- Priority ranking (High/Medium/Low)
+- Implementation effort estimates
+EOF
+
+# Run Well-Architected assessment
+ai-assistant assess-architecture \
+  --framework well-architected \
+  --codebase src/ \
+  --output docs/architecture/well-architected-review.md
+```
+
+**12-Factor App Compliance**
+
+```bash
+# Analyze 12-Factor compliance
+cat > .ai/prompts/twelve-factor.md << 'EOF'
+# 12-Factor App Analysis
+
+## Factors to Evaluate
+1. Codebase - One codebase tracked in revision control
+2. Dependencies - Explicitly declare and isolate dependencies  
+3. Config - Store config in the environment
+4. Backing services - Treat backing services as attached resources
+5. Build, release, run - Strictly separate build and run stages
+6. Processes - Execute as one or more stateless processes
+7. Port binding - Export services via port binding
+8. Concurrency - Scale out via the process model
+9. Disposability - Maximize robustness with fast startup and graceful shutdown
+10. Dev/prod parity - Keep development, staging, and production as similar as possible
+11. Logs - Treat logs as event streams
+12. Admin processes - Run admin/management tasks as one-off processes
+
+## Task
+Generate compliance report with:
+- Current compliance level for each factor
+- Specific code changes needed
+- Configuration examples
+- Migration steps for non-compliant areas
+EOF
+
+# Check 12-Factor compliance
+ai-assistant validate-12factor \
+  --codebase . \
+  --output docs/architecture/12factor-compliance.md
+```
+
+**Event-Driven Architecture Design**
+
+```bash
+# Design event-driven architecture
+cat > .ai/prompts/event-driven.md << 'EOF'
+# Event-Driven Architecture Design
+
+## Task
+Based on the domain model, design an event-driven architecture:
+
+1. Identify domain events from business processes
+2. Design event schemas with versioning strategy
+3. Define event sourcing patterns where appropriate
+4. Create saga patterns for distributed transactions
+5. Specify event store and message broker requirements
+
+## Output Format
+- Event catalog with schemas
+- Sequence diagrams for key flows
+- Infrastructure requirements
+- Code generation templates
+EOF
+
+# Generate event-driven design
+ai-assistant design-events \
+  --domain-model architecture/domain-model.md \
+  --output architecture/event-driven-design.md
+```
+
+**Architecture Decision Records (ADRs)**
+
+```bash
+# Generate ADR from design decisions
+cat > .ai/prompts/adr-generation.md << 'EOF'
+# Architecture Decision Record Generation
+
+## Template
+Use this ADR template:
+
+# ADR-XXXX: [Decision Title]
+
+## Status
+[Proposed | Accepted | Deprecated | Superseded]
+
+## Context
+[What is the issue that we're seeing that is motivating this decision or change?]
+
+## Decision
+[What is the change that we're proposing and/or doing?]
+
+## Consequences
+[What becomes easier or more difficult to do because of this change?]
+
+## Task
+Generate ADRs for architectural decisions made during design.
+EOF
+
+# Create ADR from architecture discussion
+ai-assistant generate-adr \
+  --discussion architecture/design-discussion.md \
+  --template .ai/templates/adr-template.md \
+  --output docs/architecture/decisions/
+```
+
+**Microservices Decomposition**
+
+```bash
+# Decompose monolith into microservices
+cat > .ai/prompts/microservices.md << 'EOF'
+# Microservices Decomposition Strategy
+
+## Analysis Framework
+1. Identify service boundaries using DDD bounded contexts
+2. Analyze data coupling and shared databases
+3. Map communication patterns and dependencies
+4. Assess team ownership and Conway's Law implications
+5. Plan migration strategy (Strangler Fig pattern)
+
+## Output Requirements
+- Service boundary recommendations
+- Data migration strategy
+- API contract definitions
+- Deployment and monitoring considerations
+- Migration roadmap with phases
+EOF
+
+# Plan microservices decomposition
+ai-assistant decompose-services \
+  --monolith-codebase src/ \
+  --domain-model architecture/domain-model.md \
+  --output architecture/microservices-plan.md
+```
+
+**Anti-pattern: Architecture Astronaut AI**
+
+Letting AI generate over-engineered solutions with complex patterns and frameworks without considering business constraints, team capabilities, or actual requirements.
+
+**Why it's problematic:**
+- Creates unnecessary complexity
+- Introduces patterns the team can't maintain
+- Ignores performance and cost implications
+- Adds technical debt instead of reducing it
+
+**Instead:**
+- Provide specific business constraints to AI
+- Start with simple patterns and evolve
+- Validate AI suggestions against team capabilities
+- Focus on solving actual problems, not theoretical ones
+
+```bash
+# Good: Constrained architecture generation
+ai-assistant design-architecture \
+  --requirements requirements/user-stories.md \
+  --constraints "team_size=5,experience=intermediate,budget=low,timeline=3months" \
+  --patterns "keep_it_simple,prefer_conventions"
+
+# Bad: Unconstrained architecture generation  
+ai-assistant design-architecture \
+  --requirements requirements/user-stories.md \
+  --generate "enterprise_patterns,microservices,event_sourcing,cqrs"
+```
 
 ----
 
