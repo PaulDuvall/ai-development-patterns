@@ -2352,410 +2352,93 @@ Posting every low-severity finding buries real issues and frustrates developers.
 ### AI Review Automation
 
 **Maturity**: Intermediate  
-**Description**: Automate the review process for parallel agent outputs using AI to detect conflicts, verify consistency, and coordinate integration. Essential for maintaining quality when multiple agents work simultaneously on the same codebase.
+**Description**: Automate review process for parallel agent outputs using AI to detect conflicts and coordinate integration.
 
-**Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration), [Atomic Task Decomposition](#atomic-task-decomposition), [Parallelized AI Coding Agents](#parallelized-ai-coding-agents), [Security Scanning Orchestration](#security-scanning-orchestration)
+**Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration), [Atomic Task Decomposition](#atomic-task-decomposition), [Parallelized AI Coding Agents](#parallelized-ai-coding-agents)
 
-**Parallel Output Review Framework**
-
-```mermaid
-graph TD
-    A[Agent 1 Output] --> D[Conflict Detection]
-    B[Agent 2 Output] --> D
-    C[Agent 3 Output] --> D
-    
-    D --> E[Contract Validation]
-    E --> F[Integration Testing]
-    F --> G{Review Passed?}
-    
-    G -->|Yes| H[Automated Merge]
-    G -->|No| I[Human Review Required]
-    
-    H --> J[Deployment Pipeline]
-    I --> K[Review Comments]
-    K --> L[Agent Refinement]
-    L --> D
-```
-
-**Automated Conflict Detection**
-
-```python
-# ai-review-automation.py
-import ast
-import json
-from pathlib import Path
-from typing import Dict, List, Set
-
-class ParallelOutputReviewer:
-    def __init__(self, workspace_dir: str):
-        self.workspace_path = Path(workspace_dir)
-        self.conflicts = []
-        self.integration_issues = []
-        
-    def detect_file_conflicts(self) -> List[Dict]:
-        """Detect when multiple agents modified the same files"""
-        file_modifications = {}
-        
-        for agent_dir in self.workspace_path.glob("agent-*"):
-            agent_id = agent_dir.name
-            
-            for modified_file in agent_dir.glob("**/*.py"):
-                relative_path = modified_file.relative_to(agent_dir)
-                
-                if relative_path not in file_modifications:
-                    file_modifications[relative_path] = []
-                file_modifications[relative_path].append({
-                    "agent": agent_id,
-                    "file_path": str(modified_file),
-                    "content": modified_file.read_text()
-                })
-        
-        # Find files modified by multiple agents
-        conflicts = []
-        for file_path, modifications in file_modifications.items():
-            if len(modifications) > 1:
-                conflicts.append({
-                    "file": str(file_path),
-                    "agents": [mod["agent"] for mod in modifications],
-                    "modifications": modifications
-                })
-        
-        return conflicts
-    
-    def validate_api_contracts(self) -> List[Dict]:
-        """Ensure parallel implementations maintain API compatibility"""
-        api_definitions = {}
-        contract_violations = []
-        
-        for agent_dir in self.workspace_path.glob("agent-*"):
-            agent_id = agent_dir.name
-            
-            for python_file in agent_dir.glob("**/*.py"):
-                try:
-                    tree = ast.parse(python_file.read_text())
-                    
-                    for node in ast.walk(tree):
-                        if isinstance(node, ast.FunctionDef):
-                            func_signature = {
-                                "name": node.name,
-                                "args": [arg.arg for arg in node.args.args],
-                                "returns": ast.get_source_segment(
-                                    python_file.read_text(), node.returns
-                                ) if node.returns else None
-                            }
-                            
-                            func_key = f"{python_file.stem}.{node.name}"
-                            if func_key not in api_definitions:
-                                api_definitions[func_key] = []
-                            api_definitions[func_key].append({
-                                "agent": agent_id,
-                                "signature": func_signature
-                            })
-                except SyntaxError as e:
-                    contract_violations.append({
-                        "type": "syntax_error",
-                        "agent": agent_id,
-                        "file": str(python_file),
-                        "error": str(e)
-                    })
-        
-        # Check for signature mismatches
-        for func_key, definitions in api_definitions.items():
-            if len(definitions) > 1:
-                signatures = [d["signature"] for d in definitions]
-                if not all(sig == signatures[0] for sig in signatures):
-                    contract_violations.append({
-                        "type": "signature_mismatch",
-                        "function": func_key,
-                        "agents": [d["agent"] for d in definitions],
-                        "signatures": signatures
-                    })
-        
-        return contract_violations
-    
-    def generate_integration_tests(self) -> str:
-        """Generate tests that validate parallel outputs work together"""
-        integration_prompt = f"""
-        Generate integration tests for parallel agent outputs in {self.workspace_path}:
-        
-        1. Test that all agent outputs can be imported without conflicts
-        2. Verify API contracts are maintained across implementations
-        3. Check that shared dependencies are compatible
-        4. Validate that combined functionality works end-to-end
-        
-        Agents found: {[d.name for d in self.workspace_path.glob("agent-*")]}
-        
-        Create pytest test cases that:
-        - Import all agent outputs
-        - Test cross-agent functionality
-        - Verify no naming conflicts
-        - Check integration points
-        """
-        
-        # In real implementation, this would call AI service
-        return self.ai_generate(integration_prompt)
-    
-    def generate_review_report(self) -> Dict:
-        """Generate comprehensive review report for human reviewers"""
-        conflicts = self.detect_file_conflicts()
-        contract_issues = self.validate_api_contracts()
-        
-        report = {
-            "timestamp": "2024-01-01T12:00:00Z",
-            "review_status": "pending" if conflicts or contract_issues else "approved",
-            "conflicts": {
-                "file_conflicts": len(conflicts),
-                "contract_violations": len(contract_issues),
-                "details": conflicts + contract_issues
-            },
-            "recommendations": [],
-            "integration_tests": self.generate_integration_tests(),
-            "merge_strategy": "human_review" if conflicts else "auto_merge"
-        }
-        
-        # Generate AI recommendations
-        if conflicts:
-            report["recommendations"].append({
-                "type": "conflict_resolution",
-                "priority": "high", 
-                "description": "Resolve file conflicts before integration",
-                "action": "Manual merge required with conflict resolution"
-            })
-        
-        if contract_issues:
-            report["recommendations"].append({
-                "type": "api_alignment",
-                "priority": "high",
-                "description": "Align API contracts across agents",
-                "action": "Standardize function signatures and return types"
-            })
-            
-        return report
-
-# Usage
-reviewer = ParallelOutputReviewer("/workspace")
-report = reviewer.generate_review_report()
-
-if report["review_status"] == "approved":
-    print("✅ Parallel outputs approved for automatic merge")
-else:
-    print("⚠️  Manual review required")
-    with open("/workspace/review-report.json", "w") as f:
-        json.dump(report, f, indent=2)
-```
-
-**AI-Powered Conflict Resolution**
+**Automated Review and Merge System**
 
 ```bash
-# conflict-resolution.sh
 #!/bin/bash
-# Automated conflict resolution for parallel agent outputs
+# automated-review.sh - Complete parallel agent review and integration
 
-resolve_conflicts() {
-    local review_report="/workspace/review-report.json"
-    
-    if [[ ! -f "$review_report" ]]; then
-        echo "No review report found"
-        return 1
-    fi
-    
-    local conflict_count=$(jq '.conflicts.file_conflicts' "$review_report")
-    
-    if [[ $conflict_count -gt 0 ]]; then
-        echo "Resolving $conflict_count file conflicts..."
-        
-        # AI-assisted conflict resolution
-        ai_resolve "Analyze conflicts in $review_report and suggest resolution:
-        
-        For each conflicting file:
-        1. Determine if changes are complementary or conflicting
-        2. If complementary, merge automatically
-        3. If conflicting, suggest which version to keep and why
-        4. Generate unified version that combines best of both
-        
-        Prioritize:
-        - Security-focused implementations over performance
-        - More comprehensive error handling
-        - Better test coverage
-        - Cleaner, more maintainable code
-        
-        Output executable merge commands."
-        
-    else
-        echo "No conflicts detected - proceeding with automatic merge"
-        auto_merge_outputs
-    fi
-}
+echo "=== AI Review Automation for Parallel Agents ==="
 
-auto_merge_outputs() {
-    echo "Automatically merging parallel agent outputs..."
+# 1. Detect conflicts between agent outputs
+echo "Scanning for conflicts across agent workspaces..."
+
+ai "Analyze parallel agent outputs for integration issues:
+
+Agent workspaces: $(ls -d workspace/agent-* 2>/dev/null || echo 'none')
+
+Check for:
+1. File conflicts (same files modified by multiple agents)
+2. API contract mismatches (function signatures, return types)
+3. Dependency version conflicts
+4. Naming collisions (classes, functions, variables)
+5. Integration compatibility issues
+
+For each conflict found:
+- Identify which agents are involved
+- Assess conflict severity (critical/medium/low)
+- Suggest resolution strategy
+- Generate merge commands when possible
+
+Output structured JSON with conflicts and resolutions."
+
+# 2. Run quality gates and validation
+echo "Running quality gates on combined outputs..."
+
+ai "Validate merged agent outputs meet quality standards:
+
+Quality checks:
+- Syntax validation (python -m py_compile)
+- Type checking (mypy)
+- Security scan (bandit)
+- Test coverage (>80% requirement)
+- Performance regression check
+
+Generate integration tests that:
+- Import all agent outputs without conflicts
+- Test cross-agent functionality
+- Verify API compatibility
+- Check end-to-end workflows
+
+Return pass/fail status with specific issues found."
+
+# 3. Auto-merge or request human review
+if [ $? -eq 0 ]; then
+    echo "✅ Quality gates passed - proceeding with automatic merge"
     
-    # Create merged directory structure
-    mkdir -p /workspace/merged
-    
-    # Merge non-conflicting files
-    for agent_dir in /workspace/agent-*; do
-        agent_id=$(basename "$agent_dir")
-        
-        # Copy unique files from each agent
-        rsync -av --ignore-existing "$agent_dir/" /workspace/merged/
-        
-        echo "Merged outputs from $agent_id"
+    # Merge agent outputs
+    mkdir -p workspace/merged
+    for agent_dir in workspace/agent-*; do
+        rsync -av --ignore-existing "$agent_dir/" workspace/merged/
     done
     
-    # Run integration tests on merged output
-    cd /workspace/merged
-    python -m pytest tests/integration/ -v
+    # Run integration tests
+    cd workspace/merged && python -m pytest tests/integration/ -v
     
-    if [[ $? -eq 0 ]]; then
+    if [ $? -eq 0 ]; then
         echo "✅ Integration tests passed - merge complete"
-        
-        # Copy to main source tree
-        rsync -av /workspace/merged/ /workspace/src/
-        
-        # Clean up agent workspaces
-        rm -rf /workspace/agent-*
+        rsync -av workspace/merged/ src/
+        rm -rf workspace/agent-*
     else
         echo "❌ Integration tests failed - manual review required"
-        exit 1
     fi
-}
-
-# Execute conflict resolution
-resolve_conflicts
+else
+    echo "⚠️ Quality gates failed - human review required"
+    # Create review report for humans
+    ai "Generate human-readable review report with:
+    - Summary of all conflicts found
+    - Recommended resolution steps
+    - Risk assessment for each issue
+    - Estimated effort to resolve manually"
+fi
 ```
-
-**Quality Gates for Parallel Outputs**
-
-```yaml
-# .ai/review-automation/quality-gates.yml
-quality_gates:
-  automated_checks:
-    - name: "syntax_validation"
-      command: "python -m py_compile {file}"
-      required: true
-      
-    - name: "type_checking"
-      command: "mypy {file}"
-      required: true
-      
-    - name: "security_scan"
-      command: "bandit -r {directory}"
-      required: true
-      
-    - name: "test_coverage"
-      command: "pytest --cov={module} --cov-min=80"
-      required: true
-      
-  cross_agent_validation:
-    - name: "api_compatibility"
-      description: "Verify API contracts match across agents"
-      implementation: "contract_validator.py"
-      
-    - name: "dependency_conflicts"
-      description: "Check for conflicting package versions"
-      implementation: "dependency_checker.py"
-      
-    - name: "naming_conflicts"
-      description: "Ensure no duplicate class/function names"
-      implementation: "namespace_validator.py"
-      
-  integration_requirements:
-    - name: "end_to_end_tests"
-      description: "Full workflow tests with all agent outputs"
-      timeout: "300s"
-      
-    - name: "performance_regression"
-      description: "Ensure combined output doesn't degrade performance"
-      baseline_file: "performance_baseline.json"
-      
-    - name: "security_integration"
-      description: "Verify security across integrated components"
-      tools: ["semgrep", "safety", "bandit"]
-
-  approval_criteria:
-    automatic_approval:
-      - all_automated_checks_pass: true
-      - no_file_conflicts: true
-      - api_compatibility_maintained: true
-      - performance_regression_threshold: "5%"
-      
-    human_review_required:
-      - file_conflicts_detected: true
-      - api_breaking_changes: true
-      - security_violations_found: true
-      - performance_regression: ">5%"
-      - test_coverage_below: "80%"
-```
-
-**CI/CD Integration**
-
-```yaml
-# .github/workflows/parallel-agent-review.yml
-name: Parallel Agent Review
-
-on:
-  push:
-    paths:
-      - 'workspace/agent-**'
-
-jobs:
-  automated-review:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Review Environment
-        run: |
-          pip install -r requirements-review.txt
-          mkdir -p /tmp/review-workspace
-          
-      - name: Run Parallel Output Review
-        run: |
-          python ai-review-automation.py \
-            --workspace ./workspace \
-            --output /tmp/review-workspace/report.json
-            
-      - name: Check Review Status
-        id: review-check
-        run: |
-          status=$(jq -r '.review_status' /tmp/review-workspace/report.json)
-          echo "review_status=$status" >> $GITHUB_OUTPUT
-          
-      - name: Auto-merge on Approval
-        if: steps.review-check.outputs.review_status == 'approved'
-        run: |
-          ./conflict-resolution.sh
-          echo "✅ Parallel outputs automatically merged"
-          
-      - name: Request Human Review
-        if: steps.review-check.outputs.review_status == 'pending'
-        run: |
-          gh pr comment --body-file /tmp/review-workspace/report.json
-          gh pr edit --add-label "needs-human-review"
-          echo "⚠️ Human review requested due to conflicts"
-          
-      - name: Archive Review Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: review-report
-          path: /tmp/review-workspace/
-```
-
-**Benefits of Review Automation**
-
-1. **Faster Integration**: Automatic conflict detection and resolution
-2. **Quality Assurance**: Consistent quality gates across all parallel outputs  
-3. **Risk Reduction**: Early detection of integration issues
-4. **Team Efficiency**: Reduces manual review overhead for clean merges
-5. **Consistency**: Standardized review criteria and processes
-6. **Traceability**: Complete audit trail of review decisions
 
 **Anti-pattern: Manual-Only Review**
 Relying entirely on human reviewers for parallel agent outputs creates bottlenecks and misses systematic integration issues that automated tools can catch.
-
-**Anti-pattern: Auto-Merge Without Validation**
-Automatically merging parallel outputs without proper conflict detection and quality validation can introduce bugs and break system functionality.
 
 ---
 
