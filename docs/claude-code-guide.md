@@ -52,12 +52,17 @@ TEST-DRIVEN DEVELOPMENT IS NON-NEGOTIABLE. Every single line of production code 
 - Create domain-specific types (e.g., `UserId = string`, `PaymentId = string`)
 - Derive types from Zod schemas: `type User = z.infer<typeof UserSchema>`
 - Maximum type safety: strict mode, no implicit any, exact optional property types
+- **Zero Type Assertions**: No `any` types or type assertions allowed
+- **Schema-First**: Use Zod for schema-first type definitions
+- **Self-Documenting**: Write self-documenting code to avoid comments
 
 ## Testing Strategy (Critical)
-- **Factory Functions**: Create test data with factory functions
+- **100% Coverage Goal**: Aim for 100% test coverage based on business behavior
+- **Factory Functions**: Create test data with factory functions using real schemas
 - **Complete Objects**: Always return complete objects with sensible defaults
 - **Schema Validation**: Validate test data against production schemas
-- **Behavior Testing**: Test behavior, not implementation details
+- **Behavior Testing**: Test behavior through public APIs, not implementation details
+- **Jest/Vitest + RTL**: Use Jest/Vitest with React Testing Library for component testing
 
 Example Factory Pattern:
 ```typescript
@@ -72,8 +77,11 @@ const createUser = (overrides: Partial<User> = {}): User => ({
 ## Functional Programming Style ("Functional Light")
 - **Pure Functions**: No side effects wherever possible
 - **Immutable Data**: Use readonly types and immutable updates
-- **Composition**: Prefer function composition over complex abstractions
+- **Composition**: Prefer function composition as primary code reuse mechanism
 - **Array Methods**: Use map, filter, reduce over imperative loops
+- **Small Functions**: Write small, focused functions with descriptive names
+- **Options Objects**: Prefer options objects for function parameters
+- **Avoid Abstractions**: Avoid complex functional programming abstractions unless clearly beneficial
 
 ## Critical Context
 - **Schema Definitions**: src/schemas/ - Zod schemas define all data structures
@@ -85,7 +93,9 @@ const createUser = (overrides: Partial<User> = {}): User => ({
 - **New Feature**: Start with schema definition, then test, then implementation
 - **Data Types**: Define in Zod schema first, derive TypeScript types
 - **Test Data**: Use factory functions, never inline object literals
-- **Refactoring**: Ensure immutability and type safety throughout
+- **Refactoring**: Refactor incrementally while maintaining immutability and type safety
+- **Code Style**: Write self-documenting code with meaningful, descriptive naming
+- **Commits**: Maintain clean, consistent commit history with descriptive messages
 ```
 
 *Note: This approach is based on Paul Hammond's proven practices for maintainable, type-safe development.*
@@ -179,7 +189,9 @@ Paul Hammond emphasizes clear, principled communication with Claude. Key insight
 **Non-Negotiable Language:** Use absolute terms for critical principles:
 - "TEST-DRIVEN DEVELOPMENT IS NON-NEGOTIABLE"
 - "Every single line of production code must be written in response to a failing test"
-- "No `any` types" - clear, unambiguous boundaries
+- "No `any` types or type assertions" - clear, unambiguous boundaries
+- "100% test coverage based on business behavior"
+- "All data structures must be immutable"
 
 **Structured Constraints:** Provide specific, actionable guidelines:
 - Prefer specific patterns: "Use `type` over `interface`"
