@@ -1866,31 +1866,220 @@ Context: Full codebase
 ## AI Knowledge Persistence
 
 **Maturity**: Intermediate  
-**Description**: Capture successful patterns and failed attempts as versioned knowledge for future sessions.
+**Description**: Capture successful patterns and failed attempts as versioned knowledge for future AI sessions to accelerate development and avoid repeating mistakes.
 
 **Related Patterns**: [Rules as Code](#rules-as-code), [AI-Driven Traceability](#ai-driven-traceability)
 
-**Examples**
-`.ai/knowledge/authentication.md`:
-```markdown
+**Knowledge Repository Structure**
+
+```bash
+# Create standardized knowledge structure
+mkdir -p .ai/knowledge/{patterns,failures,gotchas,prompts}
+
+# Knowledge capture workflow
+cat > .ai/scripts/capture-knowledge.sh << 'EOF'
+#!/bin/bash
+KNOWLEDGE_TYPE=$1  # patterns|failures|gotchas
+DOMAIN=$2          # authentication|database|api|testing
+TITLE=$3
+
+KNOWLEDGE_FILE=".ai/knowledge/${KNOWLEDGE_TYPE}/${DOMAIN}.md"
+
+# Ensure file exists with template
+if [[ ! -f "$KNOWLEDGE_FILE" ]]; then
+    cat > "$KNOWLEDGE_FILE" << TEMPLATE
+# ${DOMAIN^} Knowledge Base
+
+## Successful Patterns
+<!-- Working prompts and approaches -->
+
+## Failed Patterns  
+<!-- What doesn't work and why -->
+
+## Gotchas
+<!-- Common AI mistakes and corrections -->
+
+## Context Dependencies
+<!-- When these patterns apply vs don't apply -->
+TEMPLATE
+fi
+
+# Add new knowledge entry
+echo "### $TITLE" >> "$KNOWLEDGE_FILE"
+echo "Date: $(date)" >> "$KNOWLEDGE_FILE"
+echo "" >> "$KNOWLEDGE_FILE"
+EOF
+
+chmod +x .ai/scripts/capture-knowledge.sh
+```
+
+**Core Implementation: Session-Based Knowledge Capture**
+
+```bash
+# Real-time knowledge capture during AI sessions
+cat > .ai/prompts/knowledge-capture.md << 'EOF'
+# Knowledge Capture Protocol
+
+## After Each AI Interaction
+1. If the AI solution worked well, capture the effective prompt
+2. If the AI solution failed, document why and what was tried
+3. If you discovered an AI gotcha, record the mistake and correction
+4. Update relevant knowledge files immediately
+
+## Capture Format
+**Working Pattern**: Exact prompt + context + outcome
+**Failed Pattern**: What was tried + why it failed + better approach
+**Gotcha**: AI's mistake + correct approach + prevention tip
+EOF
+
+# Automated knowledge extraction from git history
+cat > .ai/scripts/extract-knowledge.sh << 'EOF'
+#!/bin/bash
+# Extract knowledge from successful commits
+git log --oneline --since="1 week ago" --grep="AI:" | while read commit; do
+    echo "## $(git show --format="%s" -s $commit)"
+    echo "**Date**: $(git show --format="%ad" -s $commit)"
+    echo "**Changes**: $(git show --name-only --format="" $commit | head -3)"
+    echo "**Pattern**: Document effective prompts used"
+    echo ""
+done > .ai/knowledge/recent-successes.md
+EOF
+
+chmod +x .ai/scripts/extract-knowledge.sh
+```
+
+**Domain-Specific Knowledge Examples**
+
+```bash
+# Authentication knowledge base
+cat > .ai/knowledge/patterns/authentication.md << 'EOF'
+# Authentication Knowledge Base
+
 ## Successful Patterns
 
-### JWT Implementation
-Prompt that works 95% of the time:
-"Implement JWT auth:
-- RS256 algorithm (never HS256)
-- 15 min access token
-- 7 day refresh token in httpOnly cookie
-- Include user.id and role in payload"
+### JWT Implementation (95% success rate)
+**Prompt**: "Implement JWT auth with RS256, 15min access token, 7day refresh in httpOnly cookie, include user.id and role"
+**Context**: Node.js/Express applications
+**Why it works**: Specific algorithm, timing, and payload requirements prevent AI confusion
+
+### Password Hashing (90% success rate)  
+**Prompt**: "Hash password using bcrypt with salt rounds=12, validate with bcrypt.compare, handle async properly"
+**Context**: Any backend language
+**Why it works**: Explicit salt rounds prevent AI from using deprecated methods
 
 ## Failed Patterns
 
-### ❌ "Make authentication secure"
-Too vague - AI adds unnecessary complexity
+### ❌ "Make authentication secure" 
+**Why it fails**: Too vague, AI adds unnecessary complexity (OAuth, JWT + sessions, etc.)
+**Better approach**: Specify exact requirements and constraints
+
+### ❌ "Add session management"
+**Why it fails**: AI often mixes sessions with JWT or creates memory leaks
+**Better approach**: Choose one approach and specify storage mechanism
 
 ## Gotchas
-- AI defaults to HS256 (insecure)
-- Often uses deprecated bcrypt methods
+
+### AI Defaults to HS256
+**Problem**: Symmetric algorithm inappropriate for distributed systems
+**Solution**: Always specify RS256 or ES256 in prompts
+**Prevention**: Include algorithm in authentication knowledge templates
+
+### Deprecated bcrypt Methods
+**Problem**: AI uses older bcrypt.hashSync instead of async methods
+**Solution**: Explicitly request async/await or Promise-based approach
+**Prevention**: Include async specification in all password-related prompts
+EOF
+
+# API Design knowledge base  
+cat > .ai/knowledge/patterns/api-design.md << 'EOF'
+# API Design Knowledge Base
+
+## Successful Patterns
+
+### REST Endpoint Generation (85% success rate)
+**Prompt**: "Create REST API: GET/POST/PUT/DELETE /users, use 200/201/400/404 status codes, include request validation, return consistent JSON format"
+**Context**: CRUD operations
+**Why it works**: Explicit HTTP methods, status codes, and response format
+
+### Error Handling (90% success rate)
+**Prompt**: "Add error handling: try/catch blocks, log errors with context, return {error: message, code: number}, don't expose internal errors"
+**Context**: Any API framework
+**Why it works**: Specific error structure prevents AI from creating inconsistent responses
+
+## Failed Patterns
+
+### ❌ "Create good API"
+**Why it fails**: AI adds unnecessary features (versioning, rate limiting, etc.)
+**Better approach**: Specify exact endpoints and requirements
+
+## Gotchas
+
+### AI Over-Engineers Response Formats
+**Problem**: Creates nested objects when simple values suffice
+**Solution**: Provide exact JSON response examples in prompts
+**Prevention**: Include response format specifications
+EOF
+```
+
+**Knowledge Evolution and Maintenance**
+
+```bash
+# Weekly knowledge review process
+cat > .ai/scripts/knowledge-review.sh << 'EOF'
+#!/bin/bash
+echo "=== AI Knowledge Review ==="
+echo "Date: $(date)"
+echo ""
+
+# Check for stale knowledge (older than 3 months)
+find .ai/knowledge -name "*.md" -mtime +90 | while read file; do
+    echo "REVIEW NEEDED: $file (last modified: $(stat -f "%Sm" "$file"))"
+done
+
+# Identify most-used patterns  
+echo ""
+echo "=== Most Referenced Patterns ==="
+grep -r "### " .ai/knowledge/patterns/ | cut -d: -f2 | sort | uniq -c | sort -nr | head -5
+
+# Find patterns without recent usage
+echo ""
+echo "=== Unused Patterns (consider deprecation) ==="
+find .ai/knowledge/patterns -name "*.md" -mtime +30 | head -5
+EOF
+
+chmod +x .ai/scripts/knowledge-review.sh
+```
+
+**Anti-pattern: Knowledge Hoarding**
+
+Creating extensive knowledge bases that become maintenance burdens instead of accelerating development through selective, actionable knowledge capture.
+
+**Why it's problematic:**
+- Knowledge bases become outdated and misleading
+- Developers spend more time documenting than developing
+- Overly detailed entries are ignored in favor of quick experimentation
+- Knowledge becomes siloed and not easily discoverable
+
+**Signs of Knowledge Hoarding:**
+- Knowledge files haven't been accessed in months
+- Entries are extremely detailed but rarely referenced
+- Multiple overlapping knowledge bases with conflicting information
+- Knowledge capture takes longer than the original development work
+
+**Instead, focus on:**
+- Capture only high-impact patterns (>80% success rate)
+- Document failures that wasted significant time (>30 minutes)
+- Keep entries concise and immediately actionable
+- Review and prune knowledge quarterly
+
+```bash
+# Good: Focused, actionable knowledge
+echo "### JWT Auth Success" >> .ai/knowledge/auth.md
+echo "Prompt: 'JWT with RS256, 15min expiry' - 95% success" >> .ai/knowledge/auth.md
+
+# Bad: Exhaustive documentation  
+echo "### Complete JWT Implementation Guide" >> .ai/knowledge/auth.md
+echo "Full JWT specification with 47 configuration options..." >> .ai/knowledge/auth.md
 ```
 
 ---
@@ -2107,43 +2296,357 @@ Breaking tasks so small that coordination overhead exceeds the benefits of paral
 ## Observable AI Development
 
 **Maturity**: Intermediate  
-**Description**: Make your system's behavior visible to AI through strategic logging and debugging. AI can't fix what it can't see.
+**Description**: Design systems with comprehensive logging, tracing, and debugging capabilities that enable AI to understand system behavior and diagnose issues effectively.
 
 **Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy), [AI-Driven Traceability](#ai-driven-traceability)
 
-**Examples**
-```python
-# Good: Observable operations
-import logging
-logger = logging.getLogger(__name__)
+**Core Implementation: Structured Observability Framework**
 
+```bash
+# Set up observability infrastructure
+mkdir -p .ai/observability/{logging,tracing,metrics,debugging}
+
+# Create observability configuration
+cat > .ai/observability/config.json << 'EOF'
+{
+  "logging": {
+    "level": "INFO",
+    "format": "structured",
+    "fields": ["timestamp", "level", "component", "operation", "context", "message"],
+    "ai_friendly": true
+  },
+  "tracing": {
+    "enabled": true,
+    "sample_rate": 0.1,
+    "include_ai_context": true
+  },
+  "metrics": {
+    "business_metrics": true,
+    "performance_metrics": true,
+    "error_rates": true
+  }
+}
+EOF
+```
+
+**Strategic Logging for AI Understanding**
+
+```python
+# AI-friendly logging implementation
+import logging
+import json
+import time
+from datetime import datetime
+from functools import wraps
+
+class AIObservableLogger:
+    def __init__(self, name):
+        self.logger = logging.getLogger(name)
+        self.context = {}
+    
+    def with_context(self, **kwargs):
+        """Add context that AI can use for debugging"""
+        new_logger = AIObservableLogger(self.logger.name)
+        new_logger.context = {**self.context, **kwargs}
+        return new_logger
+    
+    def log_operation(self, operation, **details):
+        """Log with operation context for AI analysis"""
+        log_data = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "operation": operation,
+            "context": self.context,
+            "details": details
+        }
+        self.logger.info(json.dumps(log_data))
+
+# Observable business logic
 def process_order(order):
-    logger.info(f"[ORDER] Processing {order.id} for {order.customer_email}")
+    logger = AIObservableLogger("order_service").with_context(
+        order_id=order.id,
+        customer_id=order.customer_id,
+        order_total=order.total
+    )
+    
+    logger.log_operation("order_start", 
+                        customer_email=order.customer_email,
+                        item_count=len(order.items))
     
     try:
-        logger.info("[ORDER] Validating...")
+        # Validation with detailed context
+        logger.log_operation("validation_start")
         validate_order(order)
-        logger.info("[ORDER] ✓ Validation passed")
+        logger.log_operation("validation_success")
         
-        logger.info(f"[PAYMENT] Charging ${order.total} via {order.payment_method}")
+        # Payment processing with timing
+        start_time = time.time()
+        logger.log_operation("payment_start", 
+                           method=order.payment_method,
+                           amount=order.total)
+        
         result = charge_payment(order)
-        logger.info(f"[PAYMENT] ✓ Transaction: {result.transaction_id}")
+        duration = time.time() - start_time
+        
+        logger.log_operation("payment_success",
+                           transaction_id=result.transaction_id,
+                           duration_ms=duration * 1000)
+        
+        return result
         
     except ValidationError as e:
-        logger.error(f"[ORDER] ✗ Validation failed: {e.field} - {e.message}")
+        logger.log_operation("validation_error",
+                           field=e.field,
+                           error=str(e),
+                           error_type="ValidationError")
+        raise
+    except PaymentError as e:
+        logger.log_operation("payment_error",
+                           error=str(e),
+                           error_type="PaymentError",
+                           error_code=e.code)
         raise
 ```
 
-**When to Use Observable AI Development**
+**Performance and State Monitoring**
 
-- **AI Debugging**: When AI-generated code has bugs that are difficult to understand
-- **System Integration**: When AI needs to understand complex system interactions
-- **Performance Optimization**: When AI needs to identify performance bottlenecks
-- **Error Investigation**: When AI needs to diagnose and fix production issues
-- **Legacy System Work**: When AI needs to understand existing system behavior
+```python
+# Observable performance tracking
+def observable_function(func_name):
+    """Decorator for AI-friendly performance monitoring"""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            logger = AIObservableLogger("performance")
+            start_time = time.time()
+            
+            logger.log_operation("function_start",
+                               function=func_name,
+                               args_count=len(args),
+                               kwargs_keys=list(kwargs.keys()))
+            
+            try:
+                result = func(*args, **kwargs)
+                duration = time.time() - start_time
+                
+                logger.log_operation("function_success",
+                                   function=func_name,
+                                   duration_ms=duration * 1000,
+                                   result_type=type(result).__name__)
+                return result
+                
+            except Exception as e:
+                duration = time.time() - start_time
+                logger.log_operation("function_error",
+                                   function=func_name,
+                                   duration_ms=duration * 1000,
+                                   error=str(e),
+                                   error_type=type(e).__name__)
+                raise
+        return wrapper
+    return decorator
 
-**Anti-pattern: Black Box Systems**
-Minimal or cryptic logging that leaves AI guessing about system state and failure causes.
+# Usage example
+@observable_function("database_query")
+def get_user_orders(user_id, limit=10):
+    # Database operation with automatic observability
+    return db.query("SELECT * FROM orders WHERE user_id = ? LIMIT ?", 
+                   user_id, limit)
+```
+
+**AI-Debugging Configuration**
+
+```bash
+# Create debugging aids for AI
+cat > .ai/observability/debug-helpers.py << 'EOF'
+#!/usr/bin/env python3
+"""
+AI-friendly debugging utilities
+"""
+
+import json
+import sys
+from datetime import datetime, timedelta
+
+def analyze_logs_for_ai(log_file, error_pattern=None, time_window_minutes=30):
+    """Extract relevant log context for AI analysis"""
+    cutoff = datetime.utcnow() - timedelta(minutes=time_window_minutes)
+    relevant_logs = []
+    
+    with open(log_file, 'r') as f:
+        for line in f:
+            try:
+                log_entry = json.loads(line)
+                log_time = datetime.fromisoformat(log_entry.get('timestamp'))
+                
+                if log_time > cutoff:
+                    if error_pattern and error_pattern in line:
+                        # Include context around errors
+                        relevant_logs.append(log_entry)
+                    elif log_entry.get('level') in ['ERROR', 'WARN']:
+                        relevant_logs.append(log_entry)
+                    elif 'operation' in log_entry:
+                        # Include all operations for context
+                        relevant_logs.append(log_entry)
+                        
+            except json.JSONDecodeError:
+                continue
+    
+    return {
+        "analysis_timestamp": datetime.utcnow().isoformat(),
+        "time_window_minutes": time_window_minutes,
+        "total_relevant_logs": len(relevant_logs),
+        "logs": relevant_logs[-50:]  # Last 50 relevant entries
+    }
+
+def generate_ai_debugging_prompt(log_analysis, error_description):
+    """Generate AI prompt with relevant context"""
+    return f"""
+# Debugging Request
+
+## Error Description
+{error_description}
+
+## Recent System Behavior
+Time Window: {log_analysis['time_window_minutes']} minutes
+Total Relevant Logs: {log_analysis['total_relevant_logs']}
+
+## Log Context (Last 50 entries)
+```json
+{json.dumps(log_analysis['logs'], indent=2)}
+```
+
+## Analysis Request
+Based on the logs above, please:
+1. Identify the root cause of the error
+2. Suggest specific fixes with code examples
+3. Recommend additional logging for better observability
+4. Identify patterns that might prevent similar issues
+"""
+
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        print("Usage: debug-helpers.py <log_file> <error_description>")
+        sys.exit(1)
+    
+    log_file = sys.argv[1]
+    error_description = sys.argv[2]
+    
+    analysis = analyze_logs_for_ai(log_file)
+    prompt = generate_ai_debugging_prompt(analysis, error_description)
+    
+    print(prompt)
+EOF
+
+chmod +x .ai/observability/debug-helpers.py
+```
+
+**Distributed Tracing for AI Context**
+
+```python
+# Simple distributed tracing for AI understanding
+import uuid
+from contextvars import ContextVar
+
+# Context variable for trace correlation
+trace_id: ContextVar[str] = ContextVar('trace_id')
+
+class TraceableOperation:
+    def __init__(self, operation_name):
+        self.operation_name = operation_name
+        self.trace_id = trace_id.get(str(uuid.uuid4()))
+        self.logger = AIObservableLogger("trace")
+    
+    def __enter__(self):
+        trace_id.set(self.trace_id)
+        self.logger.log_operation("trace_start",
+                                 operation=self.operation_name,
+                                 trace_id=self.trace_id)
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type:
+            self.logger.log_operation("trace_error",
+                                     operation=self.operation_name,
+                                     trace_id=self.trace_id,
+                                     error=str(exc_val),
+                                     error_type=exc_type.__name__)
+        else:
+            self.logger.log_operation("trace_success",
+                                     operation=self.operation_name,
+                                     trace_id=self.trace_id)
+
+# Usage in business logic
+def handle_user_request(user_id, action):
+    with TraceableOperation("user_request"):
+        with TraceableOperation("load_user"):
+            user = load_user(user_id)
+        
+        with TraceableOperation("validate_action"):
+            validate_user_action(user, action)
+        
+        with TraceableOperation("execute_action"):
+            return execute_action(user, action)
+```
+
+**Anti-pattern: Black Box Development**
+
+Building systems with minimal observability that provide insufficient context for AI to understand system behavior, diagnose issues, or suggest improvements.
+
+**Why it's problematic:**
+- AI cannot identify root causes without sufficient context
+- Debugging becomes trial-and-error rather than systematic analysis
+- Performance issues are invisible until they become critical
+- System behavior changes are undetectable
+- Error messages lack actionable details
+
+**Signs of Black Box Development:**
+- Generic error messages: "Something went wrong"
+- No timing or performance data in logs
+- Missing context about system state during failures
+- Logs that only show final outcomes, not intermediate steps
+- No correlation between related operations
+
+**Instead of Black Box approaches:**
+```python
+# Bad: Black box logging
+def process_payment(amount):
+    try:
+        result = payment_service.charge(amount)
+        logger.info("Payment processed")
+        return result
+    except Exception:
+        logger.error("Payment failed")
+        raise
+
+# Good: Observable implementation
+def process_payment(amount):
+    logger = AIObservableLogger("payment").with_context(amount=amount)
+    
+    logger.log_operation("payment_start", amount=amount)
+    
+    try:
+        logger.log_operation("validating_amount")
+        if amount <= 0:
+            raise ValueError("Invalid amount")
+        
+        logger.log_operation("calling_payment_service", provider="stripe")
+        result = payment_service.charge(amount)
+        
+        logger.log_operation("payment_success", 
+                           transaction_id=result.id,
+                           actual_amount=result.amount_charged)
+        return result
+        
+    except ValueError as e:
+        logger.log_operation("validation_error", error=str(e))
+        raise
+    except PaymentServiceError as e:
+        logger.log_operation("service_error", 
+                           error=str(e),
+                           error_code=e.code,
+                           retry_possible=e.retryable)
+        raise
+```
 
 ---
 
