@@ -1,0 +1,261 @@
+# AI Development Patterns - Comprehensive .gitignore
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.metadata
+.settings/
+*.sublime-project
+*.sublime-workspace
+.atom/
+
+# Temporary Files
+*.tmp
+*.temp
+*.log
+*.cache
+*.pid
+*.seed
+*.pid.lock
+
+# OS Generated Files
+Icon?
+.AppleDouble
+.LSOverride
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.node_repl_history
+*.tgz
+.yarn-integrity
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.coverage
+.pytest_cache/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+target/
+.mvn/
+mvnw
+mvnw.cmd
+
+# Go
+vendor/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Rust
+target/
+**/*.rs.bk
+Cargo.lock
+
+# Docker
+.dockerignore
+*.dockerfile
+
+# Kubernetes
+*.kubeconfig
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+.terraform.lock.hcl
+
+# AI and ML
+*.pkl
+*.h5
+*.model
+*.weights
+data/
+datasets/
+models/
+checkpoints/
+tensorboard/
+wandb/
+
+# Cloud Provider Configs
+.aws/
+.azure/
+.gcp/
+*.pem
+*.key
+*.crt
+
+# Security and Secrets
+*.env
+.env.*
+secrets/
+*.secret
+*.token
+.ssh/
+*.ppk
+credentials
+.credentials
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+dump.sql
+
+# Backup Files
+*.bak
+*.backup
+*.old
+*.orig
+
+# Build and Distribution
+build/
+dist/
+out/
+bin/
+obj/
+*.o
+*.a
+*.lib
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Package Managers
+bower_components/
+.bower-cache
+.bower-registry
+.bower-tmp
+
+# Testing
+coverage/
+.nyc_output
+*.lcov
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+.jest/
+
+# Documentation
+docs/_build/
+site/
+
+# Local Configuration
+.local
+config.local.*
+*.local
+
+# AI Development Specific
+.ai/logs/
+.ai/cache/
+.ai/temp/
+.ai/secrets/
+ai-output/
+generated/
+experiments/
+sandbox/
+
+# Version Control
+.git/
+.svn/
+.hg/
+.bzr/
+
+# Archives
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and Runtime
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+lib-cov/
+coverage/
+.grunt/
+.lock-wscript/
+
+# Miscellaneous
+.vagrant/
+.terraform/
+.pulumi/
+*.retry
+*.rescue
