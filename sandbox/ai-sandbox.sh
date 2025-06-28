@@ -45,8 +45,9 @@ USAGE:
     $0 [COMMAND] [OPTIONS]
 
 COMMANDS:
+    setup           Complete setup including Docker Compose installation
     build           Build the AI sandbox container
-    start           Start the AI sandbox environment
+    start           Start the AI sandbox environment (includes setup if needed)
     stop            Stop the AI sandbox environment
     shell           Open an interactive shell in the sandbox
     exec <cmd>      Execute a command in the sandbox
@@ -57,8 +58,11 @@ COMMANDS:
     demo            Run a demonstration of sandbox isolation
 
 EXAMPLES:
-    # Quick start - build and enter sandbox
+    # Complete automated setup and start
     $0 start
+
+    # Manual setup (installs Docker Compose if needed)
+    $0 setup
 
     # Run Claude Code in the sandbox
     $0 exec "claude --help"
@@ -83,31 +87,134 @@ https://github.com/PaulDuvall/ai-development-patterns/tree/main/sandbox
 EOF
 }
 
-# Check if Docker is available
-check_docker() {
-    if ! command -v docker &> /dev/null; then
-        log_error "Docker is not installed or not in PATH"
-        exit 1
-    fi
-
-    # Check for either docker-compose or docker compose
-    if ! command -v docker-compose &> /dev/null; then
-        if ! docker compose version &> /dev/null 2>&1; then
-            log_error "Docker Compose is not installed or not in PATH"
-            echo ""
-            log_info "To install Docker Compose, choose one of these options:"
-            echo "  • macOS: brew install docker-compose"
-            echo "  • Ubuntu/Debian: sudo apt-get install docker-compose-plugin"
-            echo "  • Manual: https://docs.docker.com/compose/install/"
-            echo ""
-            log_info "Or use Docker Desktop which includes Docker Compose"
-            exit 1
+# Auto-install Docker Compose if needed
+install_docker_compose() {
+    log_info "Installing Docker Compose automatically..."
+    
+    local os_type="$(uname -s)"
+    local arch="$(uname -m)"
+    local compose_version="v2.24.5"
+    
+    # Map architecture names for Docker Compose releases
+    case "$arch" in
+        x86_64) arch="x86_64" ;;
+        arm64|aarch64) arch="aarch64" ;;
+        *) 
+            log_error "Unsupported architecture: $arch"
+            return 1
+            ;;
+    esac
+    
+    # Create local bin directory if it doesn't exist
+    mkdir -p "$HOME/.local/bin"
+    
+    # Convert OS type to lowercase for URL
+    local os_lower=$(echo "$os_type" | tr '[:upper:]' '[:lower:]')
+    
+    # Download Docker Compose - use correct URL format
+    local download_url="https://github.com/docker/compose/releases/download/${compose_version}/docker-compose-${os_lower}-${arch}"
+    local install_path="$HOME/.local/bin/docker-compose"
+    
+    log_info "Downloading Docker Compose ${compose_version} for ${os_lower}-${arch}..."
+    log_info "URL: $download_url"
+    
+    if curl -L "$download_url" -o "$install_path" --progress-bar --fail; then
+        chmod +x "$install_path"
+        
+        # Add to PATH if not already there
+        if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+            export PATH="$HOME/.local/bin:$PATH"
+            
+            # Add to shell profile for persistence
+            local shell_profile=""
+            if [[ -f "$HOME/.zshrc" ]]; then
+                shell_profile="$HOME/.zshrc"
+            elif [[ -f "$HOME/.bashrc" ]]; then
+                shell_profile="$HOME/.bashrc"
+            elif [[ -f "$HOME/.bash_profile" ]]; then
+                shell_profile="$HOME/.bash_profile"
+            fi
+            
+            if [[ -n "$shell_profile" ]] && ! grep -q "HOME/.local/bin" "$shell_profile"; then
+                echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$shell_profile"
+                log_info "Added $HOME/.local/bin to PATH in $shell_profile"
+            fi
         fi
+        
+        log_success "Docker Compose installed successfully to $install_path"
+        return 0
+    else
+        log_error "Failed to download Docker Compose"
+        return 1
     fi
 }
 
-# Create requirements file if it doesn't exist
-create_requirements() {
+# Check if Docker is available and install Docker Compose if needed
+check_docker() {
+    if ! command -v docker &> /dev/null; then
+        log_error "Docker is not installed. Please install Docker first:"
+        echo ""
+        case "$(uname -s)" in
+            Darwin*)
+                log_info "macOS: Install Docker with Homebrew:"
+                echo "  brew install --cask docker"
+                echo "  open /Applications/Docker.app"
+                ;;
+            Linux*)
+                log_info "Linux: Install Docker with your package manager:"
+                echo "  Ubuntu/Debian: sudo apt-get install docker.io"
+                echo "  CentOS/RHEL: sudo yum install docker"
+                echo "  Arch: sudo pacman -S docker"
+                ;;
+            *)
+                log_info "Visit https://docs.docker.com/get-docker/ for installation instructions"
+                ;;
+        esac
+        echo ""
+        log_info "After installing Docker, run this script again"
+        exit 1
+    fi
+
+    # Check if Docker is running
+    if ! docker info &> /dev/null; then
+        log_error "Docker is installed but not running"
+        log_info "Please start Docker and try again:"
+        case "$(uname -s)" in
+            Darwin*)
+                echo "  open /Applications/Docker.app"
+                ;;
+            Linux*)
+                echo "  sudo systemctl start docker"
+                echo "  sudo usermod -aG docker $USER"
+                echo "  newgrp docker"
+                ;;
+        esac
+        exit 1
+    fi
+
+    # Check for either docker-compose or docker compose, install if needed
+    if ! command -v docker-compose &> /dev/null; then
+        if ! docker compose version &> /dev/null 2>&1; then
+            log_warning "Docker Compose not found, installing automatically..."
+            if install_docker_compose; then
+                # Verify installation
+                if ! command -v docker-compose &> /dev/null; then
+                    log_error "Docker Compose installation failed"
+                    exit 1
+                fi
+            else
+                log_error "Failed to install Docker Compose automatically"
+                exit 1
+            fi
+        fi
+    fi
+    
+    log_success "Docker and Docker Compose are ready"
+}
+
+# Create all necessary files if they don't exist
+create_sandbox_files() {
+    # Create requirements file
     local req_file="$SCRIPT_DIR/requirements-sandbox.txt"
     if [[ ! -f "$req_file" ]]; then
         log_info "Creating requirements-sandbox.txt..."
@@ -127,12 +234,120 @@ click==8.1.7
 EOF
         log_success "Created requirements-sandbox.txt"
     fi
+    
+    # Create healthcheck script
+    local healthcheck_file="$SCRIPT_DIR/healthcheck.py"
+    if [[ ! -f "$healthcheck_file" ]]; then
+        log_info "Creating healthcheck.py..."
+        cat > "$healthcheck_file" << 'EOF'
+#!/usr/bin/env python3
+"""
+AI Security Sandbox Health Check
+Validates that the sandbox environment is running correctly
+"""
+import sys
+import os
+import subprocess
+
+def check_python():
+    """Check Python is working"""
+    return sys.version_info >= (3, 8)
+
+def check_workspace():
+    """Check workspace directory exists and is accessible"""
+    workspace_dir = os.environ.get('WORKSPACE_DIR', '/workspace')
+    return os.path.exists(workspace_dir) and os.access(workspace_dir, os.R_OK | os.W_OK)
+
+def check_network_isolation():
+    """Verify network isolation is working"""
+    try:
+        # This should fail in a properly isolated container
+        result = subprocess.run(['ping', '-c', '1', '-W', '1', '8.8.8.8'], 
+                              capture_output=True, timeout=5)
+        # If ping succeeds, network isolation is NOT working
+        return result.returncode != 0
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        # Timeout or no ping command means isolation is working
+        return True
+
+def main():
+    """Run all health checks"""
+    checks = [
+        ("Python version", check_python),
+        ("Workspace access", check_workspace),
+        ("Network isolation", check_network_isolation)
+    ]
+    
+    all_passed = True
+    
+    for name, check_func in checks:
+        try:
+            result = check_func()
+            status = "✅ PASS" if result else "❌ FAIL"
+            print(f"{name}: {status}")
+            if not result:
+                all_passed = False
+        except Exception as e:
+            print(f"{name}: ❌ ERROR - {e}")
+            all_passed = False
+    
+    if all_passed:
+        print("\n🔒 AI Security Sandbox is healthy and properly isolated")
+        sys.exit(0)
+    else:
+        print("\n⚠️ AI Security Sandbox has issues")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
+EOF
+        chmod +x "$healthcheck_file"
+        log_success "Created healthcheck.py"
+    fi
+    
+    # Create workspace initialization script
+    local init_file="$SCRIPT_DIR/init-workspace.sh"
+    if [[ ! -f "$init_file" ]]; then
+        log_info "Creating init-workspace.sh..."
+        cat > "$init_file" << 'EOF'
+#!/bin/bash
+# AI Security Sandbox Workspace Initialization
+
+echo "🔒 Initializing AI Security Sandbox..."
+echo "Workspace: $(pwd)"
+echo "User: $(whoami) ($(id))"
+echo "Python: $(python --version)"
+
+# Create workspace subdirectories
+mkdir -p logs generated
+
+# Set up environment
+export AI_SANDBOX=true
+export PYTHONPATH="/workspace/src:$PYTHONPATH"
+
+# Display security status
+echo ""
+echo "🛡️ Security Status:"
+echo "✅ Network isolation: $(if ping -c 1 -W 1 8.8.8.8 &>/dev/null; then echo 'DISABLED ⚠️'; else echo 'ENABLED'; fi)"
+echo "✅ Non-root user: $(if [[ $(id -u) -eq 0 ]]; then echo 'DISABLED ⚠️'; else echo 'ENABLED'; fi)"
+echo "✅ Read-only source: $(if [[ -w /workspace/src 2>/dev/null ]]; then echo 'DISABLED ⚠️'; else echo 'ENABLED'; fi)"
+
+echo ""
+echo "🚀 AI Security Sandbox ready for secure development!"
+echo "   Use 'python /workspace/healthcheck.py' to run full health check"
+echo ""
+EOF
+        chmod +x "$init_file"
+        log_success "Created init-workspace.sh"
+    fi
 }
 
 # Build the sandbox container
 build_sandbox() {
     log_info "Building AI Security Sandbox container..."
-    create_requirements
+    
+    # Create all necessary files automatically
+    create_sandbox_files
     
     cd "$PROJECT_ROOT"
     if command -v docker-compose &> /dev/null; then
@@ -404,6 +619,57 @@ main() {
     case "${1:-help}" in
         help|--help|-h)
             show_help
+            exit 0
+            ;;
+        setup)
+            # Setup can run without Docker being started
+            log_info "Running complete AI Security Sandbox setup..."
+            
+            # Check if Docker is installed (but don't require it to be running)
+            if ! command -v docker &> /dev/null; then
+                log_error "Docker is not installed. Please install Docker first:"
+                echo ""
+                case "$(uname -s)" in
+                    Darwin*)
+                        log_info "macOS: Install Docker with Homebrew:"
+                        echo "  brew install --cask docker"
+                        ;;
+                    Linux*)
+                        log_info "Linux: Install Docker with your package manager:"
+                        echo "  Ubuntu/Debian: sudo apt-get install docker.io"
+                        echo "  CentOS/RHEL: sudo yum install docker"
+                        echo "  Arch: sudo pacman -S docker"
+                        ;;
+                    *)
+                        log_info "Visit https://docs.docker.com/get-docker/ for installation instructions"
+                        ;;
+                esac
+                echo ""
+                log_info "After installing Docker, run '$0 setup' again"
+                exit 1
+            fi
+            
+            # Install Docker Compose if needed
+            if ! command -v docker-compose &> /dev/null; then
+                if ! docker compose version &> /dev/null 2>&1; then
+                    log_warning "Docker Compose not found, installing automatically..."
+                    if install_docker_compose; then
+                        log_success "Docker Compose installed successfully"
+                    else
+                        log_error "Failed to install Docker Compose automatically"
+                        exit 1
+                    fi
+                fi
+            fi
+            
+            # Create all necessary files
+            create_sandbox_files
+            
+            log_success "Setup complete!"
+            echo ""
+            log_info "Next steps:"
+            echo "  1. Start Docker: open /Applications/Docker.app (macOS) or sudo systemctl start docker (Linux)"
+            echo "  2. Run the sandbox: $0 start"
             exit 0
             ;;
     esac

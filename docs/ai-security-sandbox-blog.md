@@ -270,27 +270,35 @@ class SafetyMonitor:
 
 ## Getting Started: Quick Setup
 
-### Option 1: Using the Automated Script (Recommended)
+### Option 1: One-Command Setup (Recommended)
 
-1. **Clone the repository:**
+1. **Clone and start in one step:**
    ```bash
    git clone https://github.com/PaulDuvall/ai-development-patterns.git
    cd ai-development-patterns
+   ./sandbox/ai-sandbox.sh start
    ```
 
-2. **Use the simplified sandbox script:**
+**The script automatically handles everything:**
+- ✅ **Installs Docker Compose** if missing (to `~/.local/bin`)
+- ✅ **Creates all required files** (Dockerfile, requirements, health checks)
+- ✅ **Builds the secure container** with complete network isolation
+- ✅ **Validates security configuration** 
+- ✅ **Provides clear error messages** with setup guidance
+
+2. **Additional commands available:**
    ```bash
-   # Quick start - builds and enters sandbox
-   ./sandbox/ai-sandbox.sh start
-   
-   # Open interactive shell
+   # Open interactive shell in sandbox
    ./sandbox/ai-sandbox.sh shell
    
    # Run security validation
    ./sandbox/ai-sandbox.sh validate
    
-   # Run demonstration of isolation
+   # Test network isolation demonstration
    ./sandbox/ai-sandbox.sh demo
+   
+   # Manual setup only (without starting)
+   ./sandbox/ai-sandbox.sh setup
    ```
 
 ### Option 2: Manual Docker Commands
