@@ -280,6 +280,7 @@ class SafetyMonitor:
    ```
 
 **The script automatically handles everything:**
+- ✅ **Starts Docker** if not running (Colima, Docker Engine, or Docker Desktop)
 - ✅ **Installs Docker Compose** if missing (to `~/.local/bin`)
 - ✅ **Creates all required files** (Dockerfile, requirements, health checks)
 - ✅ **Builds the secure container** with complete network isolation

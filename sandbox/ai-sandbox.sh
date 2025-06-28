@@ -73,6 +73,12 @@ EXAMPLES:
     # Clean up everything
     $0 clean
 
+AUTOMATION FEATURES:
+    ✓ Automatically starts Docker if not running
+    ✓ Installs Docker Compose if missing
+    ✓ Creates all required configuration files
+    ✓ Builds secure container with validation
+
 SECURITY FEATURES:
     ✓ Complete network isolation (network_mode: none)
     ✓ Non-root user execution (UID 1000)
@@ -156,18 +162,19 @@ check_docker() {
         echo ""
         case "$(uname -s)" in
             Darwin*)
-                log_info "macOS: Install Docker with Homebrew:"
-                echo "  brew install --cask docker"
-                echo "  open /Applications/Docker.app"
+                log_info "macOS: Install Docker Engine with Homebrew:"
+                echo "  brew install docker"
+                echo "  brew install docker-buildx"
+                echo "  Or use Colima: brew install colima && colima start"
                 ;;
             Linux*)
-                log_info "Linux: Install Docker with your package manager:"
+                log_info "Linux: Install Docker Engine with your package manager:"
                 echo "  Ubuntu/Debian: sudo apt-get install docker.io"
                 echo "  CentOS/RHEL: sudo yum install docker"
                 echo "  Arch: sudo pacman -S docker"
                 ;;
             *)
-                log_info "Visit https://docs.docker.com/get-docker/ for installation instructions"
+                log_info "Visit https://docs.docker.com/engine/install/ for Docker Engine installation"
                 ;;
         esac
         echo ""
@@ -175,21 +182,100 @@ check_docker() {
         exit 1
     fi
 
-    # Check if Docker is running
+    # Check if Docker is running, start it automatically if not
     if ! docker info &> /dev/null; then
-        log_error "Docker is installed but not running"
-        log_info "Please start Docker and try again:"
+        log_warning "Docker is not running, starting it automatically..."
+        
         case "$(uname -s)" in
             Darwin*)
-                echo "  open /Applications/Docker.app"
+                log_info "Starting Docker on macOS..."
+                
+                # Check for Colima first (preferred alternative to Docker Desktop)
+                if command -v colima &> /dev/null; then
+                    log_info "Found Colima, starting Docker with Colima..."
+                    if colima start --cpu 2 --memory 4 2>/dev/null; then
+                        log_success "Colima started successfully"
+                    else
+                        log_warning "Colima failed to start, checking if already running..."
+                        if colima status | grep -q "Running"; then
+                            log_success "Colima is already running"
+                        else
+                            log_error "Failed to start Colima"
+                            exit 1
+                        fi
+                    fi
+                    
+                # Check for Docker Desktop as fallback
+                elif [[ -d "/Applications/Docker.app" ]]; then
+                    log_info "Starting Docker Desktop..."
+                    open /Applications/Docker.app
+                    log_info "Waiting for Docker to start..."
+                    
+                    # Wait up to 60 seconds for Docker to start
+                    local timeout=60
+                    local elapsed=0
+                    while ! docker info &> /dev/null && [[ $elapsed -lt $timeout ]]; do
+                        sleep 2
+                        elapsed=$((elapsed + 2))
+                        echo -n "."
+                    done
+                    echo ""
+                    
+                    if docker info &> /dev/null; then
+                        log_success "Docker started successfully"
+                    else
+                        log_error "Docker failed to start within ${timeout} seconds"
+                        exit 1
+                    fi
+                    
+                # No Docker runtime found
+                else
+                    log_error "No Docker runtime found on macOS"
+                    log_info "Install Docker Engine alternatives:"
+                    echo "  Option 1 (Recommended): brew install colima && colima start"
+                    echo "  Option 2: brew install docker && start Docker daemon manually"
+                    exit 1
+                fi
                 ;;
             Linux*)
-                echo "  sudo systemctl start docker"
-                echo "  sudo usermod -aG docker $USER"
-                echo "  newgrp docker"
+                log_info "Starting Docker daemon on Linux..."
+                # Try to start Docker daemon
+                if command -v systemctl &> /dev/null; then
+                    if sudo systemctl start docker 2>/dev/null; then
+                        log_success "Docker daemon started successfully"
+                        
+                        # Add user to docker group if not already
+                        if ! groups | grep -q docker; then
+                            log_info "Adding user to docker group..."
+                            sudo usermod -aG docker "$USER"
+                            log_warning "You may need to log out and back in for group changes to take effect"
+                            log_info "For now, trying with sudo..."
+                        fi
+                    else
+                        log_error "Failed to start Docker daemon. Please run:"
+                        echo "  sudo systemctl start docker"
+                        exit 1
+                    fi
+                elif command -v service &> /dev/null; then
+                    if sudo service docker start 2>/dev/null; then
+                        log_success "Docker service started successfully"
+                    else
+                        log_error "Failed to start Docker service. Please run:"
+                        echo "  sudo service docker start"
+                        exit 1
+                    fi
+                else
+                    log_error "Cannot start Docker automatically on this Linux distribution"
+                    log_info "Please start Docker manually and try again"
+                    exit 1
+                fi
+                ;;
+            *)
+                log_error "Cannot start Docker automatically on this platform"
+                log_info "Please start Docker manually and try again"
+                exit 1
                 ;;
         esac
-        exit 1
     fi
 
     # Check for either docker-compose or docker compose, install if needed
@@ -631,17 +717,18 @@ main() {
                 echo ""
                 case "$(uname -s)" in
                     Darwin*)
-                        log_info "macOS: Install Docker with Homebrew:"
-                        echo "  brew install --cask docker"
+                        log_info "macOS: Install Docker Engine with Homebrew:"
+                        echo "  brew install docker"
+                        echo "  Or use Colima: brew install colima && colima start"
                         ;;
                     Linux*)
-                        log_info "Linux: Install Docker with your package manager:"
+                        log_info "Linux: Install Docker Engine with your package manager:"
                         echo "  Ubuntu/Debian: sudo apt-get install docker.io"
                         echo "  CentOS/RHEL: sudo yum install docker"
                         echo "  Arch: sudo pacman -S docker"
                         ;;
                     *)
-                        log_info "Visit https://docs.docker.com/get-docker/ for installation instructions"
+                        log_info "Visit https://docs.docker.com/engine/install/ for Docker Engine installation"
                         ;;
                 esac
                 echo ""
@@ -667,9 +754,9 @@ main() {
             
             log_success "Setup complete!"
             echo ""
-            log_info "Next steps:"
-            echo "  1. Start Docker: open /Applications/Docker.app (macOS) or sudo systemctl start docker (Linux)"
-            echo "  2. Run the sandbox: $0 start"
+            log_info "Next step:"
+            echo "  Run the sandbox: $0 start"
+            echo "  (Docker will be started automatically if needed)"
             exit 0
             ;;
     esac
