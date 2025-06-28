@@ -46,138 +46,240 @@ The pattern implements `network_mode: none` in Docker, which provides:
 
 ## Implementation: Ready-to-Use Code
 
-The complete implementation is available in the [AI Development Patterns repository](https://github.com/PaulDuvall/ai-development-patterns/tree/main/sandbox). Here are the key components:
+The complete implementation is available in the [AI Development Patterns repository](https://github.com/PaulDuvall/ai-development-patterns/tree/main/sandbox). The `/sandbox` directory contains six critical files that work together to create a secure AI development environment:
 
-### 1. Docker Compose Configuration
+### Implementation Files Overview
 
-```yaml
-# sandbox/docker-compose.ai-sandbox.yml
-version: '3.8'
-
-services:
-  ai-development:
-    build:
-      context: .
-      dockerfile: sandbox/Dockerfile.ai-sandbox
-    container_name: ai-dev-sandbox
-    
-    # Complete network isolation - THE KEY SECURITY FEATURE
-    network_mode: none
-    
-    # Security constraints
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    read_only: false
-    
-    # Volume mounts - read-only source, read/write for outputs
-    volumes:
-      # Source code - read only to prevent modification
-      - ../src:/workspace/src:ro
-      - ../tests:/workspace/tests:rw
-      - ../specs:/workspace/specs:ro
-      - ../.ai:/workspace/.ai:ro
-      
-      # Development outputs - writable
-      - ../generated:/workspace/generated:rw
-      - ../logs:/workspace/logs:rw
-      
-      # Temporary workspace
-      - ai-temp:/tmp/ai-workspace:rw
-      
-      # CRITICAL: DO NOT mount these directories:
-      # - ~/.aws (AWS credentials)
-      # - ~/.ssh (SSH keys) 
-      # - .env files (environment secrets)
-      # - /var/run/docker.sock (Docker daemon)
-    
-    # Environment - development only, no secrets
-    environment:
-      - NODE_ENV=development
-      - AI_SANDBOX=true
-      - WORKSPACE_DIR=/workspace
-      - PYTHONPATH=/workspace/src
-    
-    # Resource limits
-    deploy:
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 4G
-    
-    # Run as non-root user
-    user: "1000:1000"
-    working_dir: /workspace
+```
+sandbox/
+├── ai-sandbox.sh              # 750+ line automation script
+├── docker-compose.ai-sandbox.yml  # Complete isolation configuration
+├── Dockerfile.ai-sandbox      # Hardened container definition
+├── requirements-sandbox.txt   # Minimal AI development dependencies
+├── healthcheck.py            # Security validation script
+└── init-workspace.sh         # Environment initialization
 ```
 
-### 2. Secure Dockerfile
+Here's how each component contributes to security:
+
+### 1. Complete Network Isolation (docker-compose.ai-sandbox.yml)
+
+The Docker Compose configuration implements **defense-in-depth security**:
+
+```yaml
+# Key Security Features in docker-compose.ai-sandbox.yml
+
+# COMPLETE NETWORK ISOLATION - No external access possible
+network_mode: none
+
+# PRIVILEGE RESTRICTIONS - Zero elevated permissions  
+security_opt:
+  - no-new-privileges:true
+cap_drop:
+  - ALL
+
+# NON-ROOT EXECUTION - Runs as UID 1000
+user: "1000:1000"
+
+# RESOURCE LIMITS - Prevents resource exhaustion attacks
+deploy:
+  resources:
+    limits:
+      cpus: '2.0'
+      memory: 4G
+
+# SELECTIVE VOLUME MOUNTS - Only necessary directories, with controlled access
+volumes:
+  - ./src:/workspace/src:ro          # Read-only source code
+  - ./generated:/workspace/generated:rw  # AI output directory
+  # EXPLICITLY EXCLUDES:
+  # - ~/.aws (AWS credentials)
+  # - ~/.ssh (SSH keys)
+  # - .env files (secrets)
+  # - /var/run/docker.sock (Docker daemon access)
+```
+
+**Security Demonstration:** The `network_mode: none` setting is the critical security boundary. Even if an AI tool attempts to make network calls, they will fail completely - no DNS resolution, no HTTP requests, no data exfiltration possible.
+
+### 2. Hardened Container (Dockerfile.ai-sandbox)
+
+The Dockerfile implements **multiple security layers** to minimize attack surface:
 
 ```dockerfile
-# sandbox/Dockerfile.ai-sandbox
+# Security Features in Dockerfile.ai-sandbox
+
+# MINIMAL BASE IMAGE - Python slim reduces attack surface
 FROM python:3.11-slim-bullseye
 
-# Security: Create non-root user
+# NON-ROOT USER CREATION - UID 1000 matches host user
 RUN groupadd -r aiuser && useradd -r -g aiuser -u 1000 aiuser
 
-# Install minimal dependencies
+# MINIMAL DEPENDENCIES - Only essential packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc g++ git curl jq procps \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+    gcc g++ git curl jq procps
 
-# Install Python packages
-COPY requirements-sandbox.txt /tmp/
-RUN pip install --no-cache-dir -r /tmp/requirements-sandbox.txt
-
-# Create secure workspace
-RUN mkdir -p /workspace/{src,tests,specs,generated,logs,.ai} && \
-    chown -R aiuser:aiuser /workspace
-
-# Security cleanup
+# SECURITY CLEANUP - Remove build tools after use
 RUN apt-get remove -y gcc g++ && \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Switch to non-root user
+# USER PRIVILEGE DOWNGRADE - Never run as root
 USER aiuser
-WORKDIR /workspace
 
-# Install AI development tools as user
-RUN pip install --user --no-cache-dir \
-    black flake8 mypy pytest pytest-cov \
-    requests pydantic ipython jinja2
-
-# Security environment variables
-ENV AI_SANDBOX=true
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+# NETWORK ISOLATION ENFORCEMENT - Block proxy usage
 ENV NO_PROXY="*"
 ENV HTTP_PROXY=""
 ENV HTTPS_PROXY=""
 
-# Health check
+# HEALTH MONITORING - Container responsiveness validation
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-    CMD python -c "import sys; print('AI Sandbox Ready')"
-
-CMD ["/bin/bash"]
+    CMD python /workspace/healthcheck.py
 ```
 
-### 3. Requirements File
+**Security Demonstration:** The Dockerfile creates a minimal environment where even if code execution is compromised, the attacker has no network access, no root privileges, and no access to host resources.
 
-```txt
-# requirements-sandbox.txt
-# AI development dependencies (no production secrets)
-black==23.11.0
-flake8==6.1.0
-mypy==1.7.0
-pytest==7.4.3
-pytest-cov==4.1.0
-requests==2.31.0
-pydantic==2.5.0
-ipython==8.17.2
-jinja2==3.1.2
+### 3. Automated Security Validation (healthcheck.py)
+
+The health check script **actively validates security boundaries**:
+
+```python
+# Key Security Checks in healthcheck.py
+
+def check_network_isolation():
+    """Verify network isolation is working"""
+    try:
+        # This should FAIL in a properly isolated container
+        result = subprocess.run(['ping', '-c', '1', '-W', '1', '8.8.8.8'], 
+                              capture_output=True, timeout=5)
+        # If ping succeeds, network isolation is BROKEN
+        return result.returncode != 0
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        # Timeout or no ping command means isolation is working
+        return True
+
+def check_workspace():
+    """Validate secure workspace setup"""
+    workspace_dir = os.environ.get('WORKSPACE_DIR', '/workspace')
+    return os.path.exists(workspace_dir) and os.access(workspace_dir, os.R_OK | os.W_OK)
+
+# Security validation runs automatically every 30 seconds via Docker HEALTHCHECK
 ```
+
+**Security Demonstration:** This script continuously validates that:
+- ✅ Network isolation is functioning (ping fails)
+- ✅ Workspace permissions are correct
+- ✅ Python environment is secure
+- ✅ Container is responsive and not compromised
+
+### 4. Complete Automation (ai-sandbox.sh)
+
+The 750+ line automation script provides **zero-configuration security**:
+
+```bash
+# Key Security Features in ai-sandbox.sh
+
+# AUTOMATIC DOCKER MANAGEMENT - No manual setup required
+install_docker_compose() {
+    # Downloads correct Docker Compose for OS/architecture
+    # Installs to ~/.local/bin (no system privileges needed)
+}
+
+# SECURITY VALIDATION - Built-in security checks
+validate_security() {
+    # Network isolation verification
+    # User privilege validation  
+    # Resource limit confirmation
+    # Sensitive mount detection
+}
+
+# ISOLATION TESTING - Demonstrates security boundaries
+run_demo() {
+    # Tests network isolation (all should fail)
+    ping 8.8.8.8        # Should fail - no network
+    curl google.com     # Should fail - no DNS
+    nslookup example.com # Should fail - no resolution
+}
+```
+
+**Security Demonstration:** The script not only sets up security but actively proves it works through automated testing.
+
+## Practical Security Demonstration
+
+You can verify the security boundaries yourself by running these commands:
+
+### Test 1: Network Isolation Verification
+
+```bash
+# Start the sandbox
+./sandbox/ai-sandbox.sh start
+
+# Enter the sandbox
+./sandbox/ai-sandbox.sh shell
+
+# Inside the sandbox - these should ALL FAIL
+ping 8.8.8.8                    # ❌ No network access
+curl https://google.com         # ❌ No DNS resolution  
+wget http://example.com         # ❌ No HTTP access
+nslookup github.com            # ❌ No DNS queries
+python -c "import requests; requests.get('http://google.com')"  # ❌ No Python HTTP
+```
+
+### Test 2: Privilege Isolation Verification
+
+```bash
+# Inside the sandbox - verify non-root execution
+whoami                         # ✅ Shows "aiuser" (not root)
+id                            # ✅ Shows UID 1000 (not 0)
+sudo ls                       # ❌ No sudo access
+docker ps                     # ❌ No Docker daemon access
+cat /etc/shadow              # ❌ No system file access
+```
+
+### Test 3: File System Protection Verification
+
+```bash
+# Inside the sandbox - test file system boundaries
+ls /workspace/src             # ✅ Can read source code
+echo "test" > /workspace/src/test.txt  # ❌ Cannot modify source (read-only)
+echo "test" > /workspace/generated/output.txt  # ✅ Can write to output directories
+ls ~/.aws                     # ❌ No AWS credentials mounted
+ls ~/.ssh                     # ❌ No SSH keys accessible
+```
+
+### Test 4: Automated Security Validation
+
+```bash
+# Run the built-in security validation
+./sandbox/ai-sandbox.sh validate
+
+# Expected output:
+# ✅ Network isolation: ENABLED (network_mode: none)
+# ✅ Non-root user: ENABLED (UID 1000)
+# ✅ Capabilities dropped: ALL
+# ✅ No sensitive mounts detected
+# ✅ Memory limit: 4GB
+
+# Run the demonstration
+./sandbox/ai-sandbox.sh demo
+
+# Expected output shows all network attempts failing:
+# ❌ SECURITY BREACH: Network access is available! 
+# ✅ Network isolation working: ping failed as expected
+```
+
+### Test 5: Resource Limit Verification
+
+```bash
+# Inside the sandbox - verify resource constraints
+python -c "
+import psutil
+print(f'Memory limit: {psutil.virtual_memory().total / 1024**3:.1f}GB')
+print(f'CPU cores available: {psutil.cpu_count()}')
+"
+# Should show: Memory limit: 4.0GB, CPU cores: 2
+```
+
+**Critical Security Validation:** If any of the network tests succeed, the sandbox is compromised and should not be used. The automation script includes built-in validation to detect and report such failures.
 
 ## Advanced: Multi-Agent Coordination
 
