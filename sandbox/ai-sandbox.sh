@@ -435,7 +435,9 @@ build_sandbox() {
     # Create all necessary files automatically
     create_sandbox_files
     
+    # Change to project root for build context
     cd "$PROJECT_ROOT"
+    
     if command -v docker-compose &> /dev/null; then
         docker-compose -f "$COMPOSE_FILE" build ai-development
     else

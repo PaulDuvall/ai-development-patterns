@@ -6,7 +6,7 @@ version: '3.8'
 services:
   ai-development:
     build:
-      context: .
+      context: ..
       dockerfile: sandbox/Dockerfile.ai-sandbox
     container_name: ai-dev-sandbox
     
@@ -23,14 +23,14 @@ services:
     # Volume mounts - read-only source, read/write for development artifacts
     volumes:
       # Source code - read only to prevent accidental modification
-      - ../src:/workspace/src:ro
-      - ../tests:/workspace/tests:rw
-      - ../specs:/workspace/specs:ro
-      - ../.ai:/workspace/.ai:ro
+      - ./src:/workspace/src:ro
+      - ./tests:/workspace/tests:rw
+      - ./specs:/workspace/specs:ro
+      - ./.ai:/workspace/.ai:ro
       
       # Development outputs - writable
-      - ../generated:/workspace/generated:rw
-      - ../logs:/workspace/logs:rw
+      - ./generated:/workspace/generated:rw
+      - ./logs:/workspace/logs:rw
       
       # Temporary workspace for AI operations
       - ai-temp:/tmp/ai-workspace:rw

@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean
 
 # Set up Python environment
-COPY requirements-sandbox.txt /tmp/requirements-sandbox.txt
+COPY sandbox/requirements-sandbox.txt /tmp/requirements-sandbox.txt
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /tmp/requirements-sandbox.txt && \
     rm /tmp/requirements-sandbox.txt
