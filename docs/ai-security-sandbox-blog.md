@@ -18,10 +18,14 @@ This isn't theoretical—it's happening now. The industry has recognized these r
 Recent industry developments highlight the critical importance of AI agent isolation:
 
 ### Government Security Guidance
-The NSA/CISA/FBI best practices emphasize **secure AI deployment** with robust data governance, model validation, and monitoring mechanisms. Federal agencies have implemented "Responsible and Secure AI sandboxes" that decouple data handling from AI model training and deployment.
+The NSA/CISA/FBI best practices emphasize **secure AI deployment** with robust data governance, model validation, and monitoring mechanisms. According to the NSA's "Best Practices & Guidance For AI Security Deployment," federal agencies are implementing secure AI frameworks that emphasize isolation and risk management¹.
+
+Federal agencies have implemented "Responsible and Secure AI sandboxes" that decouple data handling from AI model training and deployment, as documented in Microsoft's Federal AI Safety initiatives².
 
 ### Enterprise Adoption
-Companies like Salesforce are launching dedicated AI agent sandboxes to test agents safely. As noted in their recent announcement, these sandboxes provide "an isolated environment to test agents while mirroring a company's data to reflect better how the agent will work for them."
+Companies like Salesforce are launching dedicated AI agent sandboxes to test agents safely. According to Salesforce's AgentForce sandbox announcement, these sandboxes provide "an isolated environment to test agents while mirroring a company's data to reflect better how the agent will work for them"³.
+
+Major cloud providers are also implementing sandbox approaches, with NVIDIA documenting WebAssembly-based sandboxing for agentic AI workflows⁴, and platforms like Hugging Face providing secure code execution environments⁵.
 
 ### Technical Solutions
 The industry is converging on several isolation approaches:
@@ -266,29 +270,124 @@ class SafetyMonitor:
 
 ## Getting Started: Quick Setup
 
+### Option 1: Using the Automated Script (Recommended)
+
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/PaulDuvall/ai-development-patterns.git
    cd ai-development-patterns
    ```
 
-2. **Build and run the sandbox:**
+2. **Use the simplified sandbox script:**
+   ```bash
+   # Quick start - builds and enters sandbox
+   ./sandbox/ai-sandbox.sh start
+   
+   # Open interactive shell
+   ./sandbox/ai-sandbox.sh shell
+   
+   # Run security validation
+   ./sandbox/ai-sandbox.sh validate
+   
+   # Run demonstration of isolation
+   ./sandbox/ai-sandbox.sh demo
+   ```
+
+### Option 2: Manual Docker Commands
+
+1. **Build and run the sandbox manually:**
    ```bash
    docker-compose -f sandbox/docker-compose.ai-sandbox.yml up ai-development
    ```
 
-3. **Enter the isolated environment:**
+2. **Enter the isolated environment:**
    ```bash
    docker exec -it ai-dev-sandbox /bin/bash
    ```
 
-4. **Verify isolation:**
+3. **Verify isolation:**
    ```bash
    # These should all fail (confirming network isolation)
    curl google.com
    ping 8.8.8.8
    nslookup example.com
    ```
+
+## Running Claude Code in the Sandbox
+
+The AI Security Sandbox is ideal for running AI development tools like Claude Code in a secure, isolated environment:
+
+### Basic Claude Code Usage
+
+```bash
+# Start the sandbox
+./sandbox/ai-sandbox.sh start
+
+# Run Claude Code commands safely in the sandbox
+./sandbox/ai-sandbox.sh exec "claude --help"
+
+# Interactive Claude Code session in isolated environment
+./sandbox/ai-sandbox.sh shell
+# Inside sandbox:
+claude "Analyze this Python code and suggest improvements" --file src/example.py
+```
+
+### Claude Code Development Workflow
+
+```bash
+# Secure AI-assisted development workflow
+./sandbox/ai-sandbox.sh exec "
+  cd /workspace &&
+  claude 'Review this code for security issues' --file src/auth.py &&
+  claude 'Generate unit tests for the authentication module' --output tests/test_auth.py &&
+  python -m pytest tests/test_auth.py
+"
+```
+
+### Benefits for Claude Code Users
+
+- **Credential Protection**: Your AWS keys, SSH keys, and environment variables remain isolated
+- **Safe Code Generation**: AI-generated code runs in isolation before you review and apply it
+- **Network Isolation**: Prevents accidental API calls or data exfiltration
+- **Version Control Safety**: Source code is mounted read-only, preventing accidental modifications
+
+## Alternative Approaches: Built-in AI Tool Sandboxing
+
+While the AI Security Sandbox pattern provides comprehensive isolation for any AI development tool, some AI tools are beginning to offer built-in sandboxing capabilities:
+
+### Gemini CLI Sandboxing
+
+Google's Gemini CLI includes built-in sandboxing features that allow you to control the tool's access to your files and system:
+
+```bash
+# Run Gemini CLI with restricted sandbox
+gemini --sandbox=restricted "Analyze the following code and suggest improvements"
+
+# Different sandbox levels for different security needs
+gemini --sandbox=minimal "Generate a Python function for data validation"
+gemini --sandbox=full "Review my entire project structure"
+```
+
+**Key Features of Gemini CLI Sandboxing:**
+- **Configurable access levels**: Control what files and systems the AI can access
+- **Built-in isolation**: No need for external containerization
+- **Simplified usage**: Security boundaries managed by the tool itself
+
+**When to Use Gemini CLI vs. AI Security Sandbox:**
+- **Gemini CLI**: Convenient for quick tasks with built-in Google AI models
+- **AI Security Sandbox**: Universal solution for any AI tool, maximum security, enterprise compliance
+
+### Comparison of Approaches
+
+| Feature | AI Security Sandbox | Gemini CLI Built-in |
+|---------|-------------------|-------------------|
+| **Network Isolation** | Complete (network_mode: none) | Configurable levels |
+| **Tool Compatibility** | Any AI tool (Claude, OpenAI, etc.) | Gemini CLI only |
+| **Enterprise Compliance** | Full audit trail & controls | Limited to Google's sandbox |
+| **Setup Complexity** | Docker required | Simple CLI flags |
+| **Customization** | Fully customizable | Predefined sandbox levels |
+
+Both approaches demonstrate the industry recognition that AI tool security is critical, with solutions ranging from universal containerized isolation to tool-specific built-in protections.
 
 ## Security Validation
 
@@ -363,6 +462,24 @@ The AI Security Sandbox pattern proves that you don't have to choose between AI 
 - **Maintain compliance** with government and industry frameworks
 
 The complete, production-ready implementation is available in the [AI Development Patterns repository](https://github.com/PaulDuvall/ai-development-patterns/tree/main/sandbox). Start securing your AI development workflow today—because AI security isn't optional, it's essential.
+
+---
+
+## References
+
+1. **NSA/CISA/FBI AI Security Guidelines**: [Best Practices & Guidance For AI Security Deployment](https://gbhackers.com/nsa-cisa-fbi-released-best-practices-for-ai-security-deployment/) - GBHackers analysis of official NSA/CISA/FBI security frameworks
+
+2. **Microsoft Federal AI Safety**: [Enhancing Federal AI Safety: Responsible and Secure AI Sandbox](https://techcommunity.microsoft.com/blog/publicsectorblog/enhancing-federal-ai-safety-responsible-and-secure-ai-sandbox/4279628) - Microsoft Community Hub
+
+3. **Salesforce AgentForce Sandbox**: [Salesforce launches new AgentForce sandbox to put AI agents through their paces](https://www.fanaticalfuturist.com/2024/12/salesforce-launches-new-sandbox-to-put-ai-agents-through-their-paces/) - Matthew Griffin | Keynote Speaker & Master Futurist
+
+4. **NVIDIA WebAssembly Sandboxing**: [Sandboxing Agentic AI Workflows with WebAssembly](https://developer.nvidia.com/blog/sandboxing-agentic-ai-workflows-with-webassembly) - NVIDIA Technical Blog
+
+5. **Hugging Face Secure Execution**: [Secure code execution](https://huggingface.co/docs/smolagents/tutorials/secure_code_execution) - Hugging Face Documentation
+
+6. **Industry AI Security Best Practices**: [7 AI Agent Security Best Practices](https://integrail.ai/blog/ai-agent-security-best-practices) - Integrail AI Blog
+
+7. **Code Sandboxes for AI**: [Code Sandboxes for LLMs and AI Agents](https://amirmalik.net/2025/03/07/code-sandboxes-for-llm-ai-agents) - Amir's Blog
 
 ---
 
