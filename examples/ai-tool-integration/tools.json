@@ -1,0 +1,54 @@
+{
+  "_comment": "AI Tool Integration Configuration",
+  "_description": "Secure configuration for tool access in AI systems",
+  
+  "database_url": "sqlite:///app_data.db",
+  
+  "allowed_apis": [
+    "api.github.com",
+    "api.openweathermap.org",
+    "jsonplaceholder.typicode.com",
+    "httpbin.org"
+  ],
+  
+  "file_access_paths": [
+    "./data/",
+    "./logs/",
+    "./generated/",
+    "./examples/ai-tool-integration/"
+  ],
+  
+  "max_query_results": 100,
+  
+  "security": {
+    "read_only_database": true,
+    "api_rate_limits": true,
+    "file_size_limits": "10MB",
+    "timeout_seconds": 10
+  },
+  
+  "mcp_servers": {
+    "_comment": "Model Context Protocol server configurations",
+    "filesystem": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-filesystem", "./data"],
+      "env": {
+        "ALLOWED_PATHS": "./data,./logs,./generated"
+      }
+    },
+    "github": {
+      "command": "npx", 
+      "args": ["@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "sqlite": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-sqlite", "app_data.db"],
+      "env": {
+        "READ_ONLY": "true"
+      }
+    }
+  }
+}

@@ -754,215 +754,41 @@ Jumping straight to coding with AI without proper planning, requirements, or tes
 
 **Related Patterns**: [AI Security Sandbox](#ai-security-sandbox), [AI Developer Lifecycle](#ai-developer-lifecycle), [Observable AI Development](#observable-ai-development)
 
-**Connected AI Architecture**
+**Core Concept**
 
 Modern AI development requires more than chat-based interactions. AI systems become significantly more capable when connected to real-world data sources and tools. This pattern demonstrates the architectural shift from isolated prompt-only AI to tool-augmented AI systems.
 
-```python
-# ai_tool_integration.py - Complete tool-augmented AI system
-import os
-import json
-import sqlite3
-import requests
-from pathlib import Path
-from datetime import datetime
+**Implementation Overview**
 
+```python
+# Core tool-augmented AI system with security controls
 class ToolAugmentedAI:
-    """AI system with integrated tool access for enhanced capabilities"""
-    
     def __init__(self, config_path: str = ".ai/tools.json"):
-        self.config = self._load_tool_config(config_path)
-        self.db_connection = self._setup_database()
         self.available_tools = {
-            "database_query": self._query_database,
-            "file_operations": self._file_operations,
-            "api_requests": self._api_requests,
-            "system_info": self._system_info
-        }
-    
-    def _load_tool_config(self, config_path: str) -> dict:
-        """Load tool configuration securely"""
-        config_file = Path(config_path)
-        if config_file.exists():
-            return json.loads(config_file.read_text())
-        return {
-            "database_url": "sqlite:///app_data.db",
-            "allowed_apis": ["api.github.com", "api.openweathermap.org"],
-            "file_access_paths": ["./data/", "./logs/"],
-            "max_query_results": 100
-        }
-    
-    def _setup_database(self) -> sqlite3.Connection:
-        """Initialize database connection with read-only access"""
-        conn = sqlite3.connect("app_data.db")
-        conn.row_factory = sqlite3.Row  # Enable column access by name
-        return conn
-    
-    def _query_database(self, query: str, params: tuple = ()) -> list:
-        """Execute database queries safely"""
-        # Whitelist allowed operations (read-only)
-        allowed_operations = ["SELECT", "WITH"]
-        query_upper = query.strip().upper()
-        
-        if not any(query_upper.startswith(op) for op in allowed_operations):
-            raise ValueError("Only SELECT queries allowed")
-        
-        cursor = self.db_connection.cursor()
-        cursor.execute(query, params)
-        results = cursor.fetchmany(self.config["max_query_results"])
-        return [dict(row) for row in results]
-    
-    def _file_operations(self, operation: str, path: str, content: str = None) -> dict:
-        """Safe file operations within allowed paths"""
-        file_path = Path(path)
-        
-        # Verify path is within allowed directories
-        allowed = any(str(file_path).startswith(allowed_path) 
-                     for allowed_path in self.config["file_access_paths"])
-        if not allowed:
-            raise ValueError(f"File access denied: {path}")
-        
-        if operation == "read":
-            if file_path.exists():
-                return {"content": file_path.read_text(), "size": file_path.stat().st_size}
-            return {"error": "File not found"}
-        
-        elif operation == "write":
-            file_path.parent.mkdir(parents=True, exist_ok=True)
-            file_path.write_text(content)
-            return {"status": "written", "path": str(file_path)}
-        
-        elif operation == "list":
-            if file_path.is_dir():
-                files = [str(f) for f in file_path.iterdir()]
-                return {"files": files, "count": len(files)}
-            return {"error": "Not a directory"}
-    
-    def _api_requests(self, url: str, method: str = "GET", data: dict = None) -> dict:
-        """Make HTTP requests to allowed APIs"""
-        from urllib.parse import urlparse
-        
-        # Verify API is in allowlist
-        parsed_url = urlparse(url)
-        if parsed_url.netloc not in self.config["allowed_apis"]:
-            raise ValueError(f"API not allowed: {parsed_url.netloc}")
-        
-        try:
-            if method == "GET":
-                response = requests.get(url, timeout=10)
-            elif method == "POST":
-                response = requests.post(url, json=data, timeout=10)
-            else:
-                raise ValueError("Only GET and POST methods allowed")
-            
-            return {
-                "status_code": response.status_code,
-                "data": response.json() if response.headers.get("content-type", "").startswith("application/json") else response.text,
-                "headers": dict(response.headers)
-            }
-        except requests.RequestException as e:
-            return {"error": str(e), "status": "failed"}
-    
-    def _system_info(self) -> dict:
-        """Get safe system information"""
-        return {
-            "timestamp": datetime.now().isoformat(),
-            "working_directory": os.getcwd(),
-            "environment": os.environ.get("NODE_ENV", "development"),
-            "python_version": f"{os.sys.version_info.major}.{os.sys.version_info.minor}",
-            "available_tools": list(self.available_tools.keys())
+            "database_query": self._query_database,     # Read-only SQL queries
+            "file_operations": self._file_operations,   # Controlled file access
+            "api_requests": self._api_requests,         # Allowlisted HTTP requests
+            "system_info": self._system_info            # Safe system information
         }
     
     def execute_with_tools(self, ai_request: str, tool_calls: list) -> dict:
-        """Execute AI request with tool augmentation"""
-        results = {
-            "request": ai_request,
-            "tool_results": [],
-            "timestamp": datetime.now().isoformat()
-        }
-        
-        for tool_call in tool_calls:
-            tool_name = tool_call.get("tool")
-            tool_args = tool_call.get("args", {})
-            
-            if tool_name in self.available_tools:
-                try:
-                    result = self.available_tools[tool_name](**tool_args)
-                    results["tool_results"].append({
-                        "tool": tool_name,
-                        "status": "success",
-                        "result": result
-                    })
-                except Exception as e:
-                    results["tool_results"].append({
-                        "tool": tool_name,
-                        "status": "error",
-                        "error": str(e)
-                    })
-            else:
-                results["tool_results"].append({
-                    "tool": tool_name,
-                    "status": "not_found",
-                    "error": f"Tool {tool_name} not available"
-                })
-        
-        return results
-
-# Usage Example: AI with Enhanced Capabilities
-if __name__ == "__main__":
-    # Initialize tool-augmented AI system
-    ai_system = ToolAugmentedAI()
-    
-    # Example: AI analyzing user behavior with real data
-    tool_calls = [
-        {
-            "tool": "database_query",
-            "args": {
-                "query": "SELECT user_id, last_login, feature_usage FROM users WHERE last_login > date('now', '-7 days')",
-                "params": ()
-            }
-        },
-        {
-            "tool": "file_operations",
-            "args": {
-                "operation": "read",
-                "path": "./logs/user_activity.log"
-            }
-        },
-        {
-            "tool": "api_requests",
-            "args": {
-                "url": "https://api.github.com/repos/myorg/myapp/issues",
-                "method": "GET"
-            }
-        }
-    ]
-    
-    # AI can now provide insights based on actual data, not just training knowledge
-    results = ai_system.execute_with_tools(
-        "Analyze user engagement patterns and suggest improvements",
-        tool_calls
-    )
-    
-    print("AI System with Tool Integration Results:")
-    print(json.dumps(results, indent=2))
+        """Execute AI request with secure tool access"""
+        # Process tool calls with security validation
+        # Return structured results with error handling
 ```
+
+**Tool Categories & Security**
+
+- **Database Access**: Read-only queries with operation whitelisting (`SELECT`, `WITH` only)
+- **File Operations**: Path-restricted read/write within configured directories
+- **API Integration**: HTTP requests limited to allowlisted domains with timeouts
+- **System Information**: Safe environment data without sensitive details
 
 **Configuration Example**
 ```json
-# .ai/tools.json - Tool access configuration
 {
-  "database_url": "sqlite:///app_data.db",
-  "allowed_apis": [
-    "api.github.com",
-    "api.openweathermap.org",
-    "jsonplaceholder.typicode.com"
-  ],
-  "file_access_paths": [
-    "./data/",
-    "./logs/",
-    "./generated/"
-  ],
+  "allowed_apis": ["api.github.com", "api.openweathermap.org"],
+  "file_access_paths": ["./data/", "./logs/", "./generated/"],
   "max_query_results": 100,
   "security": {
     "read_only_database": true,
@@ -972,32 +798,40 @@ if __name__ == "__main__":
 }
 ```
 
+**Model Context Protocol (MCP) Integration**
+
+This pattern can be implemented using [Anthropic's Model Context Protocol (MCP)](https://www.anthropic.com/news/model-context-protocol) for standardized tool integration across AI systems:
+
+```json
+{
+  "mcp_servers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-filesystem", "./data"]
+    },
+    "sqlite": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-sqlite", "app_data.db"]
+    }
+  }
+}
+```
+
 **What Tool Integration Enables**
 
-- **Real-time data access**: AI can query current database state, not just training data
+- **Real-time data access**: AI queries current database state, not training data
 - **File system interaction**: Read logs, write generated code, manage project files
 - **API integration**: Fetch live data from external services and APIs
 - **System awareness**: Access to current environment state and configuration
 - **Enhanced context**: AI decisions based on actual system state, not assumptions
 
-**Security Integration with AI Security Sandbox**
+**Complete Implementation**
 
-When deployed in the [AI Security Sandbox](#ai-security-sandbox), tool access remains secure:
-
-```yaml
-# Tool access within sandbox - secure by default
-services:
-  ai-with-tools:
-    network_mode: none  # No external network access
-    volumes:
-      - ./data:/workspace/data:ro     # Read-only data access
-      - ./generated:/workspace/output:rw  # Controlled output
-      # Explicitly exclude sensitive paths:
-      # - NO ~/.aws, ~/.ssh, .env files
-    environment:
-      - TOOL_CONFIG_PATH=/workspace/.ai/tools.json
-      - DATABASE_URL=sqlite:///workspace/data/app.db
-```
+See [examples/ai-tool-integration/](examples/ai-tool-integration/) for:
+- Full Python implementation with security controls
+- Configuration examples and MCP integration
+- Usage patterns and deployment guidelines
+- Integration with AI Security Sandbox
 
 **Anti-pattern: Prompt-Only AI Development**
 Attempting to solve complex data analysis, system integration, or real-time problems using only natural language prompts without providing AI access to actual data sources, APIs, or system tools. This leads to hallucinated responses, outdated information, and inability to interact with real systems.
