@@ -1040,185 +1040,120 @@ Development patterns provide tactical approaches for day-to-day AI-assisted codi
 ## Specification Driven Development
 
 **Maturity**: Intermediate  
-**Description**: Use executable specifications to guide AI code generation by writing clear acceptance criteria first, then prompting AI to create minimal implementations that satisfy those specifications. This approach ensures AI-generated code meets exact requirements before implementation begins.
+**Description**: Use machine-readable specifications with authority levels and rigorous Test-Driven Development (TDD) to guide AI code generation. Write persistent specifications first, then use ephemeral prompts to implement solutions that satisfy those specifications.
 
-**Key Principle: Specifications Persist, Prompts are Ephemeral**
+**Core Principle: Precision Enables Productivity**
 
-Unlike prompts that vanish after each AI session, executable specifications become permanent project artifacts that:
-- Define system behavior independently of any AI tool
-- Serve as living documentation that evolves with the codebase
-- Provide regression testing throughout the project lifecycle
-- Act as the source of truth for what the system should do
+SpecDriven AI combines three key elements:
+- **Machine-readable specifications** with unique identifiers and authority levels
+- **Rigorous Test-Driven Development** with coverage tracking and automated validation
+- **AI-powered implementation** with persistent context through structured specifications
 
-While you may refine prompts repeatedly to get the right implementation, the specifications remain constant, ensuring consistency across different AI tools and sessions.
+**Key Innovation: Authority Level System**
+
+Specifications use authority levels to resolve conflicts and establish precedence:
+- **`authority=system`**: Core business logic and security requirements (highest precedence)
+- **`authority=platform`**: Infrastructure and technical architecture decisions  
+- **`authority=feature`**: User interface and experience requirements (lowest precedence)
+
+When requirements conflict, higher authority levels take precedence, enabling clear decision-making for AI implementation.
 
 **Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Tool Integration](#ai-tool-integration), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy), [Observable AI Development](#observable-ai-development)
 
-**The Specification-Driven AI Workflow**
+**SpecDriven AI Workflow**
 
 ```mermaid
 graph TD
-    A[Write Persistent Specifications<br/>Gherkin/BDD Features] --> B[Version Control<br/>Specifications]
-    B --> C[Generate Step Definitions<br/>with AI]
-    C --> D[Ephemeral AI Prompts<br/>for Implementation]
-    D --> E[Run Specifications]
-    E --> F{Specs Pass?}
-    F -->|No| G[Refine Prompts<br/>Not Specs]
-    G --> D
-    F -->|Yes| H[Refactor with AI]
-    H --> I[Verify Specs Still Pass]
-    I --> J[Specifications Remain<br/>as Regression Tests]
-    J --> K[Next Feature]
-    K --> A
+    A[Machine-Readable Specifications<br/>with Authority Levels] --> B[Coverage Tracking<br/>& Validation]
+    B --> C[AI Implementation<br/>with Ephemeral Prompts]
+    C --> D[Automated Testing<br/>& Compliance Check]
+    D --> E{Specs Pass?}
+    E -->|No| F[Refine Prompts<br/>Not Specs]
+    F --> C
+    E -->|Yes| G[Coverage Report<br/>& Deployment]
+    G --> H[Specification Persistence<br/>for Regression]
     
     style A fill:#e1f5e1
     style B fill:#e1f5e1
-    style J fill:#e1f5e1
-    style D fill:#ffe6e6
-    style G fill:#ffe6e6
+    style H fill:#e1f5e1
+    style C fill:#ffe6e6
+    style F fill:#ffe6e6
 ```
 
-**Examples**
+**Core Implementation**
 
-**Step 1: Write Persistent Specifications (These Live Forever)**
-```gherkin
-# See actual implementations: 
-# specs/user_authentication.feature (Gherkin format)
-# specs/user_authentication_structured.md (OpenAI Model Spec format)
-# features/user_authentication.feature
-# This specification will persist throughout the project lifecycle
-# It defines WHAT the system does, not HOW it's implemented
-
-Feature: User Authentication
-  As a user
-  I want to log into the system
-  So that I can access my personal dashboard
-
-  Scenario: Successful login with valid credentials
-    Given a user exists with email "user@example.com" and password "securepass123"
-    When I submit login credentials "user@example.com" and "securepass123"
-    Then I should be redirected to the dashboard
-    And I should see a welcome message "Welcome back!"
-
-  Scenario: Failed login with invalid credentials
-    Given a user exists with email "user@example.com" and password "securepass123"
-    When I submit login credentials "user@example.com" and "wrongpassword"
-    Then I should see an error message "Invalid credentials"
-    And I should remain on the login page
-```
-
-**Step 2: Generate Implementation with Ephemeral Prompts**
-```python
-# features/steps/auth_steps.py
-# These prompts are temporary - used once and discarded
-# The specifications above remain the source of truth
-
-# Ephemeral Prompt 1: "Generate pytest-bdd step definitions for the user authentication feature"
-# Ephemeral Prompt 2: "Use bcrypt for password hashing"
-# Ephemeral Prompt 3: "Add rate limiting to prevent brute force"
-
-from pytest_bdd import given, when, then, scenarios
-from selenium import webdriver
-import pytest
-
-scenarios('../user_authentication.feature')
-
-@given('a user exists with email "<email>" and password "<password>"')
-def user_exists(email, password):
-    # AI generates user creation logic
-    user_service.create_user(email=email, password=password)
-
-@when('I submit login credentials "<email>" and "<password>"')
-def submit_login(browser, email, password):
-    # AI generates form interaction
-    browser.find_element_by_id("email").send_keys(email)
-    browser.find_element_by_id("password").send_keys(password)
-    browser.find_element_by_id("login-button").click()
-
-@then('I should be redirected to the dashboard')
-def verify_dashboard_redirect(browser):
-    # AI generates assertion logic
-    assert "/dashboard" in browser.current_url
-```
-
-**Machine-Readable Specification Structure**
-
-Following the OpenAI Model Spec pattern, specifications should be structured for both human comprehension and automated processing:
-
+**Machine-Readable Specification with Authority Levels**
 ```markdown
-# User Authentication Specification {#user_auth}
+# IAM Policy Generator Specification {#iam_policy_gen}
 
-## Overview {#overview}
-This specification defines the authentication system behavior, establishing the contract between user expectations and system implementation.
+## CLI Requirements {#cli_requirements authority=system}
+The system MUST provide a command-line interface that:
+- Accepts policy type via `--policy-type` flag
+- Validates input parameters against AWS IAM constraints
+- Generates syntactically correct IAM policy JSON [^test_iam_syntax]
+- Returns exit code 0 for success, 1 for validation errors
 
-**Strategic Goals:**
-- Secure user credential validation
-- Seamless user experience
-- Protection against brute force attacks
-- Clear error messaging for failed attempts
-
-## Definitions {#definitions}
-
-**User**: An entity with valid account credentials in the system  
-**Session**: A time-limited authenticated state after successful login  
-**Credentials**: Email address and password combination  
-**Dashboard**: The authenticated user's primary interface post-login  
-
-## Authentication Requirements {#auth_requirements authority=system}
-
-### Successful Authentication {#successful_auth authority=system}
+## Input Validation {#input_validation authority=platform}  
 The system MUST:
-- Validate credentials against stored user data
-- Create a secure session upon successful validation  
-- Redirect authenticated users to dashboard
-- Display personalized welcome message
+- Reject invalid AWS service names with clear error messages
+- Validate resource ARN format before policy generation
+- Implement rate limiting for API calls [^test_rate_limit]
 
-### Failed Authentication {#failed_auth authority=system}
-The system MUST:
-- Reject invalid credentials without revealing user existence
-- Display generic "Invalid credentials" message
-- Remain on login page after failed attempt
-- Implement rate limiting after 3 failed attempts [^rl2c]
-
-### Security Controls {#security_controls authority=platform}
-The system MUST:
-- Hash passwords using bcrypt with minimum cost factor 12
-- Implement CSRF protection on authentication endpoints
-- Log authentication attempts for security monitoring
-- Expire sessions after 30 minutes of inactivity
-
-## Evaluation Cases {#evaluation}
-
-[^rl2c]: tests/security/test_rate_limiting.py
-[^cv9g]: tests/security/test_csrf_authentication.py
-[^sl3f]: tests/auth/test_session_expiration.py
+[^test_iam_syntax]: tests/test_iam_policy_syntax.py
+[^test_rate_limit]: tests/test_rate_limiting.py
 ```
 
-**Why Specifications Persist While Prompts Don't**
+**Automated Coverage Tracking**
+```bash
+# Run specification compliance validation
+pytest --cov=src --cov-report=html --spec-coverage
+python spec_validator.py --check-coverage --authority-conflicts
 
-1. **Specifications are contracts**: They define what your system promises to do, regardless of implementation
-2. **Prompts are conversations**: They're tactical instructions that change based on AI capabilities and context  
-3. **Specifications enable refactoring**: You can completely rewrite implementations while specifications ensure behavior remains correct
-4. **Prompts are tool-specific**: Different AI tools need different prompts, but they all must satisfy the same specifications
-5. **Anchored sections enable traceability**: Each requirement has a unique identifier for automated testing and compliance linking
+# Output shows specification coverage
+# Specification Coverage Report:
+# ✅ cli_requirements: 100% (3/3 tests linked)
+# ✅ input_validation: 85% (6/7 tests linked) 
+# ⚠️  Missing test: [^test_malformed_arn] in line 23
+```
 
-**Key Elements of Machine-Readable Specifications** (inspired by OpenAI Model Spec):
+**Tooling Integration**
 
-1. **Anchored Headings**: Every section has explicit `{#anchor}` identifiers for unambiguous cross-referencing
-2. **Authority Levels**: Requirements annotated with `authority=platform|system|feature` to resolve conflicts
-3. **Explicit Language**: Use MUST/SHOULD/MAY for clear requirement strength
-4. **Linked Evaluation**: Footnotes `[^sy73]` connect requirements to automated test files
-5. **Definitions Section**: Concrete definitions for all domain terms used in specifications
-6. **Meta Commentary**: `!!! meta` blocks explain document structure without instructing implementation
-7. **Hierarchical Conflict Resolution**: Clear precedence rules when requirements conflict
+```bash
+# Pre-commit hook validates specification compliance
+# .pre-commit-config.yaml
+repos:
+  - repo: local
+    hooks:
+      - id: spec-coverage
+        name: Specification Coverage Check
+        entry: python spec_validator.py --check-coverage
+        language: python
+        pass_filenames: false
 
-**Benefits of Specification Persistence**
-- **AI Tool Independence**: Switch between Copilot, Cursor, Claude without losing your behavioral requirements
-- **Team Alignment**: New developers understand system behavior from specs, not from scattered prompts
-- **Automated Compliance**: Machine-readable structure enables automated requirement validation
-- **Precise Traceability**: Anchored sections link directly to test cases and implementation code
-- **Living Documentation**: Specifications evolve with the system while maintaining historical context
-- **Regression Safety**: Specifications catch breaking changes regardless of how code was generated
+# Git workflow with specification traceability  
+git commit -m "feat: implement rate limiting [spec:rl2c]
+  
+Implements rate limiting requirement from input_validation
+section. Closes specification anchor #failed_auth.
+
+Coverage: 94% (31/33 spec requirements covered)"
+```
+
+**Key Benefits**
+- **Authority-based conflict resolution** prevents requirement ambiguity
+- **Automated coverage tracking** ensures no specifications are missed
+- **AI tool independence** through persistent, machine-readable requirements
+- **Precise traceability** from specification anchors to test implementations
+- **Living documentation** that evolves with the system
+
+**Complete Implementation**
+
+See [examples/specification-driven-development/](examples/specification-driven-development/) for:
+- Complete IAM Policy Generator implementation
+- spec_validator.py tool for automated compliance checking
+- Pre-commit hooks and Git workflow integration
+- Full specification examples with authority levels
+- Coverage tracking and reporting tools
 
 **Anti-pattern: Implementation-First AI**
 Writing code with AI first, then trying to retrofit tests, resulting in tests that mirror implementation rather than specify behavior.

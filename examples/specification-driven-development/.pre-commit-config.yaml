@@ -1,0 +1,69 @@
+# Pre-commit configuration for Specification Driven Development
+# Ensures specification compliance before commits
+
+repos:
+  # Specification validation
+  - repo: local
+    hooks:
+      - id: spec-coverage
+        name: Specification Coverage Check
+        entry: python spec_validator.py --check-coverage
+        language: python
+        pass_filenames: false
+        additional_dependencies: []
+        
+      - id: spec-conflicts
+        name: Authority Conflict Check
+        entry: python spec_validator.py --authority-conflicts
+        language: python
+        pass_filenames: false
+        
+      - id: spec-syntax
+        name: Specification Syntax Validation
+        entry: python spec_validator.py --validate-syntax iam_policy_spec.md
+        language: python
+        pass_filenames: false
+
+  # Code quality checks
+  - repo: https://github.com/psf/black
+    rev: 23.11.0
+    hooks:
+      - id: black
+        language_version: python3
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        args: [--max-line-length=88, --extend-ignore=E203]
+
+  # Test validation
+  - repo: local
+    hooks:
+      - id: pytest-check
+        name: Run Tests
+        entry: pytest
+        language: python
+        pass_filenames: false
+        additional_dependencies: [pytest, pytest-cov]
+
+  # Commit message validation for specification traceability
+  - repo: local
+    hooks:
+      - id: commit-msg-spec
+        name: Validate Commit Message for Spec References
+        entry: python -c "
+import sys, re
+msg = open(sys.argv[1]).read()
+if '[spec:' not in msg and 'feat:' in msg:
+    print('❌ Commit implementing features must reference specifications with [spec:anchor_id]')
+    print('Example: feat: implement rate limiting [spec:test_rate_limiting]')
+    sys.exit(1)
+"
+        language: python
+        stages: [commit-msg]
+        pass_filenames: false
+
+# Global configuration
+default_stages: [commit]
+fail_fast: false

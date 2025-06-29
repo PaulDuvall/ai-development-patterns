@@ -1,0 +1,20 @@
+# Requirements for Specification Driven Development Example
+# Core testing and validation dependencies
+
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+
+# Code quality and formatting
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.0
+
+# Pre-commit hooks
+pre-commit==3.6.0
+
+# CLI and JSON handling
+click==8.1.7
+
+# Development dependencies
+ipython==8.17.2

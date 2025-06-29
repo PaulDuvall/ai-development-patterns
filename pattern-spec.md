@@ -71,10 +71,11 @@ Patterns are organized into three main categories:
 - Avoid circular references
 
 ### Core Implementation
-- Provide ONE concrete, runnable example that demonstrates the pattern
+- Provide ONE concrete, focused example that demonstrates the pattern's key concepts
+- Keep examples concise enough to understand quickly while being specific enough to implement
 - Use real commands, file paths, and tool names
-- Include bash scripts, configuration files, or code snippets as a single cohesive example
-- Show input/output where relevant
+- Show essential code snippets that illustrate the pattern, not complete implementations
+- For complex patterns, reference detailed implementations in `examples/pattern-name/` directories
 - Focus on the most important use case rather than showing multiple approaches
 
 ### Anti-patterns
@@ -99,11 +100,27 @@ Patterns are organized into three main categories:
 - Use consistent anchor naming: convert pattern names to lowercase with hyphens replacing spaces and special characters
 
 ### Examples
-- Each pattern should have exactly ONE example to maintain focus and clarity
+- Each pattern should have exactly ONE example in the README to maintain focus and clarity
+- Keep README examples concise: 20-50 lines of code maximum
+- Show the pattern's essence, not exhaustive implementation details
+- For complex patterns requiring extensive code, create `examples/pattern-name/` directories
+- Reference detailed implementations with clear links: "See [examples/pattern-name/](examples/pattern-name/) for complete implementation"
 - Prefer real-world scenarios over abstract examples
 - Use consistent naming conventions (e.g., "myapp" for applications)
-- Include file paths, command outputs, and error messages where relevant
-- If multiple approaches exist, choose the most representative or commonly used one
+- Include essential file paths and command outputs, not comprehensive listings
+
+### Examples Directory Structure
+For complex patterns requiring extensive implementation details:
+
+- Create `examples/pattern-name/` directory with complete, working implementations
+- Include `README.md` in examples directory explaining the full implementation
+- Provide all necessary configuration files, scripts, and dependencies
+- Examples directory should be immediately runnable with clear setup instructions
+- Use examples directory for:
+  - Multi-file implementations (>3 files)
+  - Complex configuration setups
+  - Complete working applications demonstrating the pattern
+  - Advanced usage scenarios and variations
 
 ## Quality Standards
 
