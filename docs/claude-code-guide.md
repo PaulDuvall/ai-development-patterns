@@ -202,12 +202,30 @@ Paul Hammond emphasizes clear, principled communication with Claude. Key insight
 
 Different tasks require different levels of reasoning. Use these patterns to engage the appropriate tier:
 
-| Task Complexity | Command Pattern | Use Cases |
-|----------------|-----------------|-----------|
-| **Simple** | Direct request | "Fix this syntax error" |
-| **Moderate** | `think` prefix | "think about refactoring this function" |
-| **Complex** | `think harder` | "think harder about the system architecture" |
-| **Critical** | `ultrathink` | "ultrathink about security implications" |
+| Task Complexity | Command Pattern | Use Cases | When to Use |
+|----------------|-----------------|-----------|-------------|
+| **Simple** | Direct request | "Fix this syntax error" | Straightforward, single-step tasks |
+| **Moderate** | `think` | "think about refactoring this function" | Multi-step analysis, design decisions |
+| **Complex** | `think hard` | "think hard about the system architecture" | Complex system design, integration challenges |
+| **Advanced** | `think harder` | "think harder about security implications" | Critical decisions with multiple trade-offs |
+| **Critical** | `ultrathink` | "ultrathink about performance optimization" | Mission-critical analysis requiring deep reasoning |
+
+**Pro Tip**: The thinking commands activate increasingly sophisticated reasoning patterns. Use `ultrathink` for architectural decisions, security reviews, and complex problem-solving where multiple approaches need careful evaluation.
+
+### Creating Tasks (Subagents)
+
+Claude Code supports creating autonomous subagents for complex workflows:
+
+```bash
+# Create a subagent for specific tasks
+claude task create --name "code-reviewer" \
+  --description "Automated code review with security focus" \
+  --tools "analyze,security-scan,suggest" \
+  --context ".claude/review-checklist.md"
+
+# Execute task with subagent
+claude task run code-reviewer --target "src/auth/"
+```
 
 ### Schema-First Communication Pattern
 
@@ -225,6 +243,45 @@ const FeatureSchema = z.object({
 "Implement a feature toggle system using this schema. 
 Use factory functions for test data and ensure complete type safety."
 ```
+
+### Specification-Driven AI Development (SDAI)
+
+Extend schema-first development with complete specification-driven workflows:
+
+**SDAI Pattern for Complex Features:**
+```markdown
+# Example: Authentication Service Specification
+
+## Business Requirements
+- Support OAuth2 and local authentication
+- Role-based access control (RBAC)
+- Session management with configurable expiry
+
+## Technical Specification
+- Zod schemas for all auth-related types
+- 100% test coverage for security-critical paths
+- Immutable user session state
+- Zero-trust security model
+
+## Implementation Contract
+```typescript
+const AuthServiceSpec = z.object({
+  authenticate: z.function()
+    .args(z.object({ email: z.string().email(), password: z.string() }))
+    .returns(z.promise(z.union([AuthSuccess, AuthFailure]))),
+  authorize: z.function()
+    .args(z.object({ token: z.string(), resource: z.string() }))
+    .returns(z.promise(z.boolean()))
+});
+```
+
+## Acceptance Criteria
+- All endpoints return consistent error formats
+- Authentication attempts are rate-limited
+- Audit trail for all auth events
+```
+
+**Reference Implementation**: See [Policy Sentry Scanner SDAI PRD](https://github.com/PaulDuvall/policy-sentry-scanner/blob/main/docs/sdai-prd.md) for a complete specification-driven AI development example.
 
 ### Effective Prompt Engineering
 
@@ -266,6 +323,25 @@ Claude Code implements multiple security layers:
 2. **Scoped Access**: Limited to current directory tree
 3. **Command Allowlisting**: Explicit approval for system commands
 4. **Audit Trail**: All actions logged for review
+
+### CLI Optimization & Permissions
+
+**Speed Up Development with Smart Defaults:**
+
+```bash
+# Skip permission prompts for trusted workflows
+claude --dangerously-skip-permissions
+
+# Continue previous session context
+claude --continue
+
+# Interactive permissions management
+/permissions
+```
+
+**Configuration Files:**
+- **Project-level**: `.claude/settings.json`
+- **Global user settings**: `~/.claude.json`
 
 ### Permission Configuration
 
@@ -453,6 +529,53 @@ class SafeTestRunner:
                 "execution_time": result.execution_time
             }
 ```
+
+### Custom Claude Commands
+
+Create reusable command templates for common workflows:
+
+```bash
+# Set up custom commands directory
+mkdir -p .claude/commands
+
+# Create an Add-Commit-Push command
+cat > .claude/commands/acp.md << 'EOF'
+# Add, Commit, Push Command
+
+## Description
+Streamlined git workflow with automated commit messages
+
+## Usage
+acp [files] [message]
+
+## Implementation
+```bash
+# Add files (or all if none specified)
+git add ${files:-"."}
+
+# Generate or use provided commit message
+if [ -n "$message" ]; then
+  git commit -m "$message"
+else
+  # AI-generated commit message based on diff
+  claude analyze-diff --format commit-message | git commit -F -
+fi
+
+# Push to current branch
+git push
+```
+EOF
+
+# Make command available
+claude command register acp
+```
+
+**Example Custom Commands:**
+- `acp`: Add, commit, push with AI-generated messages
+- `review`: Automated code review with checklist
+- `test-gen`: Generate comprehensive test suites
+- `refactor`: Intelligent code refactoring
+- `docs`: Auto-generate documentation
 
 ### Tool Composition Patterns
 
@@ -712,6 +835,37 @@ claude analyze --parallel \
   --files "src/**/*.ts" \
   --task "identify performance bottlenecks" \
   --output-format "json" | jq '.bottlenecks | sort_by(.severity)'
+```
+
+### IDE Integration & Development Environment
+
+**VS Code Integration:**
+```bash
+# Install Claude Code extension
+code --install-extension anthropic.claude-code
+
+# Reload VS Code window after configuration changes (macOS)
+# Press: Cmd + Shift + P
+# Type: "Developer: Reload Window"
+# Press: Enter
+```
+
+**Optimize for Development Workflow:**
+```json
+// .vscode/settings.json
+{
+  "claude.autoContext": true,
+  "claude.contextFiles": [
+    "CLAUDE.md",
+    "src/**/*.ts",
+    "tests/**/*.test.ts"
+  ],
+  "claude.excludePatterns": [
+    "node_modules/**",
+    "dist/**",
+    "*.log"
+  ]
+}
 ```
 
 ### Resource Management
@@ -1032,7 +1186,8 @@ claude report --format md --include-metrics
 - **Functional Programming**: "Functional light" patterns for maintainable code
 
 ### Documentation
-- Official Claude Code documentation
+- **[Official Claude Code CLI Reference](https://docs.anthropic.com/en/docs/claude-code/cli-reference)**: Complete command reference and options
+- **[Official Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)**: Comprehensive guides and tutorials
 - MCP Protocol specification
 - Security best practices guide
 - Team collaboration playbook
