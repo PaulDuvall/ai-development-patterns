@@ -8,16 +8,16 @@ Claude Code represents a paradigm shift in development tooling. Rather than simp
 
 ## 📋 Table of Contents
 
-1. [Foundation: Environment Setup](#foundation-environment-setup)
-2. [Context Management Strategies](#context-management-strategies)
-3. [Communication & Reasoning Patterns](#communication-reasoning-patterns)
-4. [Security Architecture & Permissions](#security-architecture-permissions)
-5. [Advanced Tool Integration](#advanced-tool-integration)
-6. [Workflow Automation Patterns](#workflow-automation-patterns)
-7. [Team Collaboration Best Practices](#team-collaboration-best-practices)
-8. [Performance Optimization](#performance-optimization)
-9. [Troubleshooting & Common Pitfalls](#troubleshooting-common-pitfalls)
-10. [Future-Proofing Your Setup](#future-proofing-your-setup)
+1. [Foundation: Environment Setup](#️-foundation-environment-setup)
+2. [Context Management Strategies](#-context-management-strategies)
+3. [Communication & Reasoning Patterns](#-communication--reasoning-patterns)
+4. [Security Architecture & Permissions](#-security-architecture--permissions)
+5. [Advanced Tool Integration](#-advanced-tool-integration)
+6. [Workflow Automation Patterns](#-workflow-automation-patterns)
+7. [Team Collaboration Best Practices](#-team-collaboration-best-practices)
+8. [Performance Optimization](#-performance-optimization)
+9. [Troubleshooting & Common Pitfalls](#-troubleshooting--common-pitfalls)
+10. [Future-Proofing Your Setup](#-future-proofing-your-setup)
 
 ---
 
@@ -167,7 +167,7 @@ Claude's effectiveness is directly proportional to the quality of context you pr
 
 Instead of loading everything upfront, use dynamic context loading:
 
-```python
+```bash
 # For bug fixing
 claude "analyze bug" --context "git diff HEAD~1" --files "src/**/*.py"
 
@@ -249,6 +249,9 @@ Use factory functions for test data and ensure complete type safety."
 Extend schema-first development with complete specification-driven workflows:
 
 **SDAI Pattern for Complex Features:**
+
+Create comprehensive specifications before implementation:
+
 ```markdown
 # Example: Authentication Service Specification
 
@@ -263,7 +266,13 @@ Extend schema-first development with complete specification-driven workflows:
 - Immutable user session state
 - Zero-trust security model
 
-## Implementation Contract
+## Acceptance Criteria
+- All endpoints return consistent error formats
+- Authentication attempts are rate-limited
+- Audit trail for all auth events
+```
+
+**Implementation Contract:**
 ```typescript
 const AuthServiceSpec = z.object({
   authenticate: z.function()
@@ -273,12 +282,6 @@ const AuthServiceSpec = z.object({
     .args(z.object({ token: z.string(), resource: z.string() }))
     .returns(z.promise(z.boolean()))
 });
-```
-
-## Acceptance Criteria
-- All endpoints return consistent error formats
-- Authentication attempts are rate-limited
-- Audit trail for all auth events
 ```
 
 **Reference Implementation**: See [Policy Sentry Scanner SDAI PRD](https://github.com/PaulDuvall/policy-sentry-scanner/blob/main/docs/sdai-prd.md) for a complete specification-driven AI development example.
@@ -292,7 +295,7 @@ const AuthServiceSpec = z.object({
 - **O**ptions: Constraints or preferences
 - **R**eview: How to validate success
 
-Example:
+**Example:**
 ```
 Action: Refactor the user authentication module
 Context: Current implementation has performance issues with 1000+ concurrent users
@@ -549,7 +552,7 @@ Streamlined git workflow with automated commit messages
 acp [files] [message]
 
 ## Implementation
-```bash
+#!/bin/bash
 # Add files (or all if none specified)
 git add ${files:-"."}
 
@@ -563,7 +566,6 @@ fi
 
 # Push to current branch
 git push
-```
 EOF
 
 # Make command available
@@ -754,21 +756,28 @@ Based on Paul Hammond's methodology, create prompts that enforce test-first deve
 ## Test-Driven Development Prompts (Paul Hammond's Approach)
 
 ### Feature Implementation
-"I need to implement [feature]. Following test-driven development:
+```
+I need to implement [feature]. Following test-driven development:
 1. Start by creating a failing test that describes the expected behavior
 2. Use factory functions for test data - no inline object literals
 3. Ensure the test validates against our Zod schemas
 4. Implement the minimal code to make the test pass
 5. Refactor while keeping tests green
-Remember: Every line of production code must be in response to a failing test."
+
+Remember: Every line of production code must be in response to a failing test.
+```
 
 ### Factory Function Creation
-"Create a factory function for [type] that:
+```
+Create a factory function for [type] that:
 - Returns complete objects with sensible defaults
 - Accepts optional partial overrides
 - Validates output against the Zod schema
 - Uses domain-specific types (e.g., UserId, not string)
+
 Example pattern:
+```
+
 ```typescript
 const createUser = (overrides: Partial<User> = {}): User => ({
   id: 'user-123' as UserId,
@@ -776,15 +785,17 @@ const createUser = (overrides: Partial<User> = {}): User => ({
   // ... complete object
   ...overrides
 });
-```"
+```
 
 ### Type-Safe Refactoring
-"Refactor this code following functional programming principles:
+```
+Refactor this code following functional programming principles:
 - No data mutation - use immutable updates
 - Pure functions with no side effects
 - Strict TypeScript - no any types
 - Derive types from Zod schemas where possible
-- Use array methods (map, filter, reduce) over imperative loops"
+- Use array methods (map, filter, reduce) over imperative loops
+```
 ```
 
 ### Knowledge Sharing
@@ -797,21 +808,27 @@ Document and share effective prompts based on proven practices:
 ## Effective Performance Optimization Prompts
 
 ### Database Query Optimization
-"think harder about optimizing this query. Consider:
+```
+think harder about optimizing this query. Consider:
 - Current execution plan using EXPLAIN ANALYZE
 - Index usage and potential missing indexes
 - Query patterns and N+1 problems
 - Connection pooling and caching strategies
-Profile the query and suggest improvements with SQLAlchemy optimizations."
+
+Profile the query and suggest improvements with SQLAlchemy optimizations.
+```
 
 ### TypeScript Performance Optimization (Paul Hammond Style)
-"analyze this TypeScript code for performance while maintaining type safety:
+```
+analyze this TypeScript code for performance while maintaining type safety:
 - Identify any mutations that could be made immutable
 - Look for opportunities to use pure functions
 - Check for proper use of array methods vs imperative loops
 - Ensure strict typing throughout
 - Suggest functional composition improvements
-Provide optimized version that maintains our 'functional light' principles."
+
+Provide optimized version that maintains our 'functional light' principles.
+```
 ```
 
 ---
