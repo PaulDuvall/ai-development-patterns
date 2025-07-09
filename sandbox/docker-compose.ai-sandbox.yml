@@ -77,6 +77,9 @@ services:
     # User context - run as non-root user
     user: "1000:1000"
     
+    # Keep container running for interactive use
+    command: ["/bin/bash", "-c", "/workspace/init-workspace.sh && tail -f /dev/null"]
+    
     # Labels for identification and management
     labels:
       - "ai.sandbox=true"
