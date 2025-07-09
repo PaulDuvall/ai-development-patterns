@@ -417,11 +417,10 @@ You can verify the security boundaries yourself by running these commands:
 ./sandbox/ai-sandbox.sh shell
 
 # Inside the sandbox - these should ALL FAIL
-ping 8.8.8.8                    # ❌ No network access
-curl https://google.com         # ❌ No DNS resolution  
-wget http://example.com         # ❌ No HTTP access
-nslookup github.com            # ❌ No DNS queries
-python -c "import requests; requests.get('http://google.com')"  # ❌ No Python HTTP
+python3 -c "import socket; socket.create_connection(('8.8.8.8', 53), timeout=5)"  # ❌ No network access
+python3 -c "import urllib.request; urllib.request.urlopen('https://google.com')"  # ❌ No HTTP access
+python3 -c "import socket; print(socket.gethostbyname('google.com'))"  # ❌ No DNS queries
+python3 -c "import requests; requests.get('http://google.com', timeout=5)" 2>/dev/null  # ❌ No HTTP access (if requests available)
 ```
 
 ### Test 2: Privilege Isolation Verification
@@ -509,9 +508,9 @@ Run these tests inside your sandbox to verify security boundaries:
 ./sandbox/ai-sandbox.sh shell
 
 # Test 1: Network Isolation (Should ALL FAIL)
-ping -c 1 8.8.8.8                 # ❌ Should fail
-curl -m 5 https://google.com       # ❌ Should fail  
-nslookup github.com               # ❌ Should fail
+python3 -c "import socket; socket.create_connection(('8.8.8.8', 53), timeout=5)"  # ❌ Should fail
+python3 -c "import urllib.request; urllib.request.urlopen('https://google.com')"  # ❌ Should fail
+python3 -c "import socket; print(socket.gethostbyname('github.com'))"  # ❌ Should fail
 
 # Test 2: Privilege Checks (Should show non-root)
 whoami                            # ✅ Should show "aiuser"
@@ -932,7 +931,7 @@ docker exec ai-dev-sandbox top
 ```bash
 # Test network isolation (should fail)
 ./sandbox/ai-sandbox.sh shell
-curl https://api.example.com  # Should fail
+python3 -c "import urllib.request; urllib.request.urlopen('https://api.example.com')"  # Should fail
 ```
 
 **Solutions**:
@@ -1229,6 +1228,369 @@ The sandbox implements multiple security layers:
 - Testing: Full access to test frameworks and development tools
 - Code generation: AI can create files in designated output directories
 - Internal services: Optional isolated network for testing with mock services
+
+## Limitations and Mitigations
+
+While the AI Security Sandbox provides excellent security isolation, it does introduce some limitations. Here's how to work around them:
+
+### Limitation 1: No Internet Access for AI Documentation Reading
+
+**The Problem**: AI tools can't read online documentation, tutorials, or API references due to network isolation.
+
+**Impact**: 
+- AI can't access Stack Overflow, GitHub issues, or documentation sites
+- Can't fetch the latest API documentation
+- Can't read recent blog posts or tutorials
+
+**Mitigations**:
+
+```bash
+# Option 1: Pre-download documentation
+# Download docs before entering sandbox
+curl https://docs.python.org/3/library/index.html > /tmp/python-docs.html
+mkdir -p ./docs/
+mv /tmp/python-docs.html ./docs/
+
+# Mount docs directory in sandbox
+# Edit sandbox/docker-compose.ai-sandbox.yml:
+volumes:
+  - ./docs:/workspace/docs:ro
+
+# Now AI can read: /workspace/docs/python-docs.html
+```
+
+```bash
+# Option 2: Use offline documentation tools
+# Install documentation packages in sandbox
+pip install pydoc-markdown
+pip install sphinx
+
+# Generate local docs
+./sandbox/ai-sandbox.sh shell
+python -m pydoc -w urllib  # Creates urllib.html locally
+```
+
+```bash
+# Option 3: Create curated reference files
+# Build a reference directory with common patterns
+mkdir -p ./reference/
+echo "# Python HTTP Requests
+import urllib.request
+response = urllib.request.urlopen('https://example.com')
+data = response.read()
+" > ./reference/python-http.md
+
+# Mount reference directory
+# Edit sandbox/docker-compose.ai-sandbox.yml:
+volumes:
+  - ./reference:/workspace/reference:ro
+```
+
+### Limitation 2: No Real-time API Testing
+
+**The Problem**: Can't test against live APIs or services during development.
+
+**Impact**:
+- Can't validate API integrations in real-time
+- Can't test with live data or services
+- Can't use external testing services
+
+**Mitigations**:
+
+```bash
+# Option 1: Mock servers inside sandbox
+# Create mock API responses
+mkdir -p ./mocks/api/
+echo '{"status": "success", "data": {"id": 123}}' > ./mocks/api/user.json
+
+# Start simple HTTP server inside sandbox
+./sandbox/ai-sandbox.sh shell
+cd /workspace/mocks && python -m http.server 8000 &
+# Now AI can test against http://localhost:8000/api/user.json
+```
+
+```bash
+# Option 2: Use fixture files
+# Create test fixtures for common API responses
+mkdir -p ./fixtures/
+echo '{"users": [{"id": 1, "name": "Alice"}]}' > ./fixtures/users.json
+
+# AI can read fixtures and generate code accordingly
+```
+
+```bash
+# Option 3: Two-phase development
+# Phase 1: Develop logic in sandbox with mocks
+./sandbox/ai-sandbox.sh shell
+# Generate core logic against mock data
+
+# Phase 2: Test outside sandbox with real APIs
+./sandbox/ai-sandbox.sh stop
+# Test generated code against real APIs
+```
+
+### Limitation 3: No Package Installation During Development
+
+**The Problem**: Can't install new packages dynamically during AI sessions.
+
+**Impact**:
+- Can't add dependencies discovered during development
+- Can't experiment with new libraries
+- Can't install packages suggested by AI
+
+**Mitigations**:
+
+```bash
+# Option 1: Pre-install common packages
+# Edit sandbox/requirements-sandbox.txt to include:
+requests==2.31.0
+pandas==2.0.3
+numpy==1.24.3
+pytest==7.4.3
+fastapi==0.104.1
+# Add packages you commonly use
+
+# Rebuild sandbox
+./sandbox/ai-sandbox.sh stop
+./sandbox/ai-sandbox.sh build
+./sandbox/ai-sandbox.sh start
+```
+
+```bash
+# Option 2: Use user-space pip installation
+# Install packages without root privileges inside sandbox
+./sandbox/ai-sandbox.sh shell
+pip install --user package-name
+# Packages install to ~/.local/lib/python3.11/site-packages
+```
+
+```bash
+# Option 3: Development cycle with package updates
+# 1. Develop in sandbox, note needed packages
+# 2. Exit sandbox, update requirements-sandbox.txt
+# 3. Rebuild sandbox with new packages
+# 4. Continue development
+
+# Example workflow:
+./sandbox/ai-sandbox.sh stop
+echo "beautifulsoup4==4.12.2" >> sandbox/requirements-sandbox.txt
+./sandbox/ai-sandbox.sh build
+./sandbox/ai-sandbox.sh start
+```
+
+### Limitation 4: No Direct Database Connections
+
+**The Problem**: Can't connect to external databases or services.
+
+**Impact**:
+- Can't test database queries against real data
+- Can't validate database schemas
+- Can't use cloud databases during development
+
+**Mitigations**:
+
+```bash
+# Option 1: In-memory databases
+# Use SQLite for development inside sandbox
+./sandbox/ai-sandbox.sh shell
+python3 -c "
+import sqlite3
+conn = sqlite3.connect(':memory:')
+# Create tables and test data
+conn.execute('CREATE TABLE users (id INTEGER, name TEXT)')
+conn.execute(\"INSERT INTO users VALUES (1, 'Alice')\")"
+```
+
+```bash
+# Option 2: Database dump files
+# Export database schema and sample data
+mysqldump --no-data mydb > ./fixtures/schema.sql
+mysqldump --no-create-info --limit=100 mydb > ./fixtures/sample_data.sql
+
+# Load into sandbox SQLite
+./sandbox/ai-sandbox.sh shell
+sqlite3 development.db < /workspace/fixtures/schema.sql
+sqlite3 development.db < /workspace/fixtures/sample_data.sql
+```
+
+```bash
+# Option 3: Database mocking
+# Create mock database classes
+mkdir -p ./mocks/
+echo "
+class MockDatabase:
+    def query(self, sql):
+        # Return mock data based on SQL patterns
+        if 'SELECT * FROM users' in sql:
+            return [{'id': 1, 'name': 'Alice'}]
+        return []
+" > ./mocks/database.py
+
+# AI can use mock database for development
+```
+
+### Limitation 5: No Email or Communication Services
+
+**The Problem**: Can't send emails, notifications, or use communication APIs.
+
+**Impact**:
+- Can't test email functionality
+- Can't validate notification systems
+- Can't use communication APIs like Slack, Discord
+
+**Mitigations**:
+
+```bash
+# Option 1: Mock email services
+# Create mock email sender
+mkdir -p ./mocks/
+echo "
+class MockEmailSender:
+    def send_email(self, to, subject, body):
+        print(f'MOCK EMAIL: To={to}, Subject={subject}')
+        return {'status': 'sent', 'message_id': 'mock-123'}
+" > ./mocks/email.py
+
+# AI can develop against mock email service
+```
+
+```bash
+# Option 2: Log-based testing
+# Create logging email service
+echo "
+import logging
+logging.basicConfig(level=logging.INFO)
+
+class LoggingEmailSender:
+    def send_email(self, to, subject, body):
+        logging.info(f'Email to {to}: {subject}')
+        return {'status': 'logged'}
+" > ./mocks/log_email.py
+```
+
+### Limitation 6: No File Uploads or External File Access
+
+**The Problem**: Can't upload files to external services or access files from URLs.
+
+**Impact**:
+- Can't test file upload functionality
+- Can't download files from URLs
+- Can't use cloud storage services
+
+**Mitigations**:
+
+```bash
+# Option 1: Mock file upload services
+# Create mock file upload handler
+mkdir -p ./mocks/uploads/
+echo "
+class MockFileUploader:
+    def upload_file(self, file_path, destination):
+        # Simulate file upload
+        import shutil
+        shutil.copy(file_path, f'/workspace/mocks/uploads/{destination}')
+        return {'status': 'uploaded', 'url': f'mock://uploads/{destination}'}
+" > ./mocks/file_upload.py
+```
+
+```bash
+# Option 2: Local file system simulation
+# Create local directories that mimic cloud storage
+mkdir -p ./storage/{buckets,uploads,downloads}
+# AI can use local file system for development
+```
+
+### Best Practices for Working with Limitations
+
+#### 1. Prepare Your Environment
+```bash
+# Before starting development, prepare offline resources
+./scripts/prepare-offline-env.sh
+# Downloads docs, creates mocks, sets up fixtures
+```
+
+#### 2. Use Hybrid Development Approach
+```bash
+# Secure development in sandbox
+./sandbox/ai-sandbox.sh shell
+# Develop core logic with mocks and fixtures
+
+# Integration testing outside sandbox
+./sandbox/ai-sandbox.sh stop
+# Test with real APIs, databases, services
+```
+
+#### 3. Maintain Resource Libraries
+```bash
+# Create reusable mock libraries
+mkdir -p ./libraries/mocks/
+# Standard mocks for common services (email, database, APIs)
+
+# Create fixture collections
+mkdir -p ./libraries/fixtures/
+# Sample data for common use cases
+```
+
+#### 4. Document Your Workarounds
+```bash
+# Create team documentation
+echo "# AI Development Workarounds
+1. For API testing: Use ./mocks/api/
+2. For database work: Use ./fixtures/schema.sql
+3. For email testing: Use ./mocks/email.py
+" > DEVELOPMENT-GUIDE.md
+```
+
+### When to Consider Selective Network Access
+
+For teams that need more flexibility, consider these controlled approaches:
+
+#### Option 1: Whitelist-based Network Access
+```yaml
+# Advanced configuration (requires additional setup)
+# Edit sandbox/docker-compose.ai-sandbox.yml
+networks:
+  restricted:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+# Only allows access to specific internal services
+```
+
+#### Option 2: Proxy-based Documentation Access
+```bash
+# Set up documentation proxy server
+# Proxy serves only approved documentation sites
+# AI can access docs through proxy at http://docs-proxy:8080
+```
+
+#### Option 3: Time-limited Network Access
+```bash
+# Temporarily enable network for specific tasks
+# Edit docker-compose.ai-sandbox.yml to use bridge network
+# Re-enable network isolation after task completion
+```
+
+### The Security vs. Usability Trade-off
+
+The AI Security Sandbox prioritizes security over convenience. This is intentional:
+
+**Security Benefits (What You Gain)**:
+- ✅ Zero credential exposure risk
+- ✅ Complete network isolation
+- ✅ Controlled file system access
+- ✅ Audit trail of all activities
+- ✅ Compliance with security frameworks
+
+**Usability Trade-offs (What You Lose)**:
+- ❌ Real-time documentation access
+- ❌ Live API testing
+- ❌ Dynamic package installation
+- ❌ External service integration
+- ❌ File upload/download capabilities
+
+**The Bottom Line**: These limitations are features, not bugs. Each limitation represents a potential security vulnerability that has been eliminated. The mitigations above show how to maintain productivity while keeping security boundaries intact.
 
 ## Common Anti-Patterns to Avoid
 
