@@ -66,7 +66,7 @@ This isn't theoretical—it's happening now. The industry has recognized these r
 
 ## War Stories: When AI Security Goes Wrong
 
-These anonymized but realistic scenarios demonstrate how AI tools can compromise security in ways developers never expected:
+Here are scenarios that demonstrate how AI tools can compromise security in ways developers never expected:
 
 ### War Story 1: The Copilot Credential Leak
 **The Setup**: Senior developer at a fintech startup using GitHub Copilot for rapid API development.
