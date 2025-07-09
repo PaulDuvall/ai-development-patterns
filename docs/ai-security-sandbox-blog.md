@@ -64,48 +64,42 @@ logger.debug(f"Database connection: {DATABASE_URL}")
 
 This isn't theoretical—it's happening now. The industry has recognized these risks, with major organizations like NSA, CISA, and FBI having released comprehensive AI security frameworks.
 
-## War Stories: When AI Security Goes Wrong
+## Security Risk Scenarios: Understanding AI Vulnerabilities
 
-Here are scenarios that demonstrate how AI tools can compromise security in ways developers never expected:
+These scenarios illustrate potential security risks when using AI tools without proper isolation:
 
-### War Story 1: The Copilot Credential Leak
-**The Setup**: Senior developer at a fintech startup using GitHub Copilot for rapid API development.
+### Scenario 1: AI Auto-completion with Embedded Secrets
+**The Risk**: AI tools trained on public repositories may suggest code completions that contain real credentials from their training data.
 
-**The Incident**: While implementing a new payment processing feature, the developer started typing:
+**How it happens**: While implementing API integration, a developer types:
 ```python
-# Configure Stripe API connection
-stripe.api_key = "sk_live_"
+# Configure payment API connection
+api_key = "pk_live_"
 ```
 
-GitHub Copilot, trained on millions of repositories, auto-completed with what appeared to be a realistic test key. The developer, focused on the logic flow, accepted the suggestion and continued coding. Three commits later, the "test" key was in production.
+The AI tool, having processed thousands of repositories, auto-completes with a realistic-looking key. The developer, focused on functionality, accepts the suggestion without verification.
 
-**The Revelation**: The key wasn't randomly generated—it was a real Stripe production key from a public repository leak that had been indexed in Copilot's training data.
+**Potential Impact**: If the suggested key is real (from leaked repositories in training data), it could lead to unauthorized access, fraudulent transactions, or data breaches.
 
-**The Damage**: $47,000 in fraudulent charges processed before the key was revoked. 16 hours of downtime. Emergency security audit costing $120,000.
+**How AI Security Sandbox prevents this**: The sandbox's `network_mode: none` ensures that even if real credentials are suggested, they cannot be used to make actual API calls or validate against live systems.
 
-**This wouldn't happen with AI Security Sandbox because**: The sandbox's `network_mode: none` prevents AI tools from accessing any external resources, including their training data context. Even if the AI suggests real credentials, they can't be validated or used for actual API calls.
+### Scenario 2: Multi-Agent Credential Cross-contamination
+**The Risk**: Multiple AI agents sharing workspace access may inadvertently share credentials between different system components.
 
-### War Story 2: The Multi-Agent Cross-Contamination
-**The Setup**: Development team using three parallel AI agents to accelerate microservices development.
+**How it happens**: Development team runs parallel AI agents for different microservices. Agent A working on authentication reads environment variables, Agent B working on payments begins suggesting those same database credentials in payment service code.
 
-**The Incident**: Agent 1 was working on user authentication service, Agent 2 on payment processing, and Agent 3 on data analytics. Due to shared workspace access, Agent 2 "learned" from Agent 1's environment variables and began suggesting the authentication service's database credentials when generating payment service code.
+**Potential Impact**: Services end up with inappropriate cross-system access, violating the principle of least privilege and creating security vulnerabilities.
 
-**The Revelation**: All three microservices ended up with hardcoded production credentials for different systems. The payment service had user database access, the analytics service had payment processor keys, and the auth service had data warehouse credentials.
+**How AI Security Sandbox prevents this**: Each agent runs in complete isolation with separate workspace directories. Agent A's environment is never visible to Agent B, and read-only source mounts prevent credential embedding.
 
-**The Damage**: Complete system compromise. All services had to be rebuilt from scratch. Customer data exposure led to $2.3 million in GDPR fines.
+### Scenario 3: AI-Generated Debug Code with Secret Exposure
+**The Risk**: AI tools generating debugging code may inadvertently capture and expose sensitive information.
 
-**This wouldn't happen with AI Security Sandbox because**: Each agent runs in complete isolation with separate workspace directories. Agent 1's credentials are never visible to Agent 2, and the read-only source mounts prevent accidental credential embedding.
+**How it happens**: During incident response, an engineer asks AI to generate comprehensive debugging code. The AI creates logging statements that capture environment variables, connection strings, and configuration data.
 
-### War Story 3: The Debug Log Catastrophe
-**The Setup**: DevOps engineer using Claude Code to debug a production issue during a critical outage.
+**Potential Impact**: Debug logs containing secrets get shipped to centralized logging, cloud storage, and third-party monitoring services, spreading credentials across multiple systems.
 
-**The Incident**: Under pressure to resolve a system failure, the engineer asked Claude to generate comprehensive debugging code. Claude helpfully created logging statements that would capture "all relevant system state" for analysis.
-
-**The Revelation**: The debugging code logged environment variables, connection strings, and API keys to multiple log files. These logs were automatically shipped to a centralized logging service, then backed up to cloud storage, and included in error reports sent to third-party monitoring services.
-
-**The Damage**: Production credentials were scattered across 12 different systems, 6 different companies, and 3 different cloud providers. Complete credential rotation took 72 hours. The outage lasted 4 days.
-
-**This wouldn't happen with AI Security Sandbox because**: The sandbox's credential isolation ensures no real credentials are ever available to AI tools. Even if the AI generates debugging code that attempts to capture secrets, there are no real secrets to capture—only isolated development data.
+**How AI Security Sandbox prevents this**: The sandbox's credential isolation ensures no real credentials are available to AI tools. Generated debugging code can only capture isolated development data, not production secrets.
 
 ## Industry Perspective: Why Isolation Matters
 
@@ -1716,53 +1710,49 @@ AFTER AI Security Sandbox:
 ✅ Developer onboarding: 5 minutes
 ```
 
-### Enterprise Case Studies
+### Implementation Examples
 
-#### Case Study 1: Fortune 500 Financial Services
-**Challenge**: 200 developers wanted to use AI tools, but security team blocked all AI adoption due to credential exposure risks.
+These examples illustrate how different types of organizations might benefit from AI Security Sandbox implementation:
 
-**Solution**: Implemented Level 3 Enterprise Fort Knox with SOC 2 compliance.
+#### Example 1: Large Financial Services Organization
+**Scenario**: 200-developer organization where security team initially blocked AI tool adoption due to credential exposure concerns.
 
-**Results**:
-- AI tool adoption: 0% → 95% in 3 months
-- Security incidents: 12/month → 0/month
-- Developer productivity: +31% measured improvement
-- Compliance audit: Perfect score (first time ever)
-- ROI: 847% in first year
+**Hypothetical Implementation**: Level 3 Enterprise deployment with SOC 2 compliance features.
 
-**Quote**: *"The AI Security Sandbox transformed us from AI-resistant to AI-first. We now have 200 developers using AI tools daily with zero security incidents."* - CISO
+**Potential Benefits**:
+- Enable AI tool adoption while maintaining security standards
+- Reduce security incidents through complete credential isolation
+- Improve developer productivity with secure AI assistance
+- Achieve compliance audit requirements
+- Demonstrate measurable ROI through risk reduction
 
-#### Case Study 2: Healthcare Startup (HIPAA-Compliant)
-**Challenge**: Needed AI-assisted development while maintaining strict HIPAA compliance.
+#### Example 2: Healthcare Development Team
+**Scenario**: Development team needing AI assistance while maintaining HIPAA compliance.
 
-**Solution**: Implemented Level 3 with healthcare-specific configurations.
+**Hypothetical Implementation**: Level 3 with healthcare-specific security configurations.
 
-**Results**:
-- HIPAA compliance: Maintained 100% throughout AI adoption
-- Development speed: 2.3x faster time-to-market
-- Security audit: Zero findings across 18 months
-- Cost savings: $2.1M in avoided compliance violations
-- ROI: 2,047% over 18 months
+**Potential Benefits**:
+- Maintain HIPAA compliance throughout AI adoption
+- Accelerate development while preserving security boundaries
+- Pass security audits with documented isolation controls
+- Avoid compliance violations through proper data handling
+- Achieve competitive advantage through secure AI integration
 
-**Quote**: *"We went from 'AI is too risky' to 'AI is our competitive advantage' in 6 months. The sandbox made the impossible possible."* - CTO
+#### Example 3: Open Source Project
+**Scenario**: Open source project wanting to use AI for documentation and code generation while maintaining contributor trust.
 
-#### Case Study 3: Open Source Project
-**Challenge**: Wanted to use AI for documentation and code generation while maintaining contributor trust.
+**Hypothetical Implementation**: Level 1 with transparent, public documentation.
 
-**Solution**: Implemented Level 1 with public transparency.
+**Potential Benefits**:
+- Maintain contributor confidence through clear security boundaries
+- Improve documentation quality with AI assistance
+- Reduce code review overhead through automated checks
+- Accelerate new contributor onboarding
+- Preserve project sustainability through enhanced productivity
 
-**Results**:
-- Contributor confidence: 98% approval rating
-- Documentation quality: 400% improvement
-- Code review time: 65% reduction
-- New contributor onboarding: 80% faster
-- ROI: Immeasurable (project survival)
+### Implementation Considerations
 
-**Quote**: *"The AI Security Sandbox let us embrace AI productivity while maintaining the security standards our contributors expect."* - Project Maintainer
-
-### Industry Benchmarks
-
-Based on implementations across 500+ organizations:
+When planning your implementation, consider these factors:
 
 ```
 📊 ADOPTION METRICS
