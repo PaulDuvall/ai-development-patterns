@@ -148,15 +148,15 @@ echo "requests==2.31.0" >> sandbox/requirements-sandbox.txt
 
 ```mermaid
 graph TB
-    subgraph "Development Environment"
+    subgraph DevEnv["Development Environment"]
         Developer[Developer]
-        AI[AI Tools<br/>Claude Code, Copilot]
-        Credentials[AWS Keys, SSH Keys<br/>Database Passwords]
+        AI["AI Tools<br/>(Claude Code, Copilot)"]
+        Creds["AWS Keys, SSH Keys<br/>Database Passwords"]
     end
     
-    subgraph "AI Security Sandbox"
-        Container[Isolated Container<br/>network_mode: none]
-        Workspace[/workspace<br/>Read-only source<br/>Write-only output]
+    subgraph Sandbox["AI Security Sandbox"]
+        Container["Isolated Container<br/>(network_mode: none)"]
+        Workspace["/workspace<br/>Read-only source<br/>Write-only output"]
     end
     
     Developer --> AI
@@ -164,29 +164,29 @@ graph TB
     Container --> Workspace
     
     Container -.->|BLOCKED| Internet[Internet]
-    Container -.->|BLOCKED| Credentials
+    Container -.->|BLOCKED| Creds
     
     classDef secure fill:#4ecdc4,stroke:#333,stroke-width:2px
     classDef blocked fill:#ff6b6b,stroke:#333,stroke-width:2px
     
     class Container,Workspace secure
-    class Internet,Credentials blocked
+    class Internet,Creds blocked
 ```
 
 ### Container Isolation
 
 ```mermaid
 graph LR
-    subgraph "Host System"
-        AWS[~/.aws/credentials]
-        SSH[~/.ssh/id_rsa]
-        ENV[Environment Variables]
+    subgraph HostSys["Host System"]
+        AWS["~/.aws/credentials"]
+        SSH["~/.ssh/id_rsa"]
+        ENV["Environment Variables"]
     end
     
-    subgraph "AI Sandbox Container"
-        AI[AI Tools]
-        Code[/workspace/src<br/>read-only]
-        Output[/workspace/generated<br/>write-only]
+    subgraph SandboxContainer["AI Sandbox Container"]
+        AI["AI Tools"]
+        Code["/workspace/src<br/>(read-only)"]
+        Output["/workspace/generated<br/>(write-only)"]
     end
     
     Code --> AI
@@ -198,39 +198,38 @@ graph LR
     
     classDef protected fill:#ffd700,stroke:#333,stroke-width:3px
     classDef isolated fill:#4ecdc4,stroke:#333,stroke-width:2px
-    classDef blocked fill:#ff6b6b,stroke:#333,stroke-width:2px
     
     class AWS,SSH,ENV protected
-    class Code,Output isolated
+    class Code,Output,AI isolated
 ```
 
 ### Network Isolation
 
 ```mermaid
 graph TB
-    subgraph "External World"
-        Internet[Internet APIs]
-        GitHub[GitHub.com]
-        OpenAI[OpenAI API]
-        AWS_API[AWS APIs]
+    subgraph ExtWorld["External World"]
+        Internet["Internet APIs"]
+        GitHub["GitHub.com"]
+        OpenAI["OpenAI API"]
+        AWSAPI["AWS APIs"]
     end
     
-    subgraph "AI Sandbox"
-        AI[AI Tools]
-        Local[Local Services<br/>Mock APIs<br/>Test Data]
+    subgraph AISandbox["AI Sandbox"]
+        AI["AI Tools"]
+        Local["Local Services<br/>(Mock APIs, Test Data)"]
     end
     
     AI --> Local
-    AI -.->|BLOCKED<br/>network_mode: none| Internet
+    AI -.->|BLOCKED| Internet
     AI -.->|BLOCKED| GitHub
     AI -.->|BLOCKED| OpenAI
-    AI -.->|BLOCKED| AWS_API
+    AI -.->|BLOCKED| AWSAPI
     
     classDef secure fill:#4ecdc4,stroke:#333,stroke-width:2px
     classDef blocked fill:#ff6b6b,stroke:#333,stroke-width:2px
     
     class AI,Local secure
-    class Internet,GitHub,OpenAI,AWS_API blocked
+    class Internet,GitHub,OpenAI,AWSAPI blocked
 ```
 
 ## Anti-Patterns to Avoid
