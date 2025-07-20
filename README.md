@@ -335,9 +335,10 @@ Each developer maintains their own prompts and preferences, leading to inconsist
 
 **Related Patterns**: [AI Security & Compliance](#ai-security--compliance), [Rules as Code](#rules-as-code)
 
-**Default-Deny Network Isolation**
+**Core Security Implementation**
+
 ```yaml
-# See actual implementation: sandbox/docker-compose.ai-sandbox.yml
+# Basic AI isolation container
 # docker-compose.ai-sandbox.yml
 version: '3.8'
 
@@ -346,162 +347,70 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.ai-sandbox
-    # Complete network isolation - no egress or ingress
-    network_mode: none
+    network_mode: none                    # Complete network isolation
     security_opt:
       - no-new-privileges:true
-    cap_drop:
-      - ALL
+    cap_drop: [ALL]                       # Drop all capabilities
     volumes:
-      # Read-only source code, read/write tests
-      - ./src:/workspace/src:ro
-      - ./tests:/workspace/tests:rw
+      - ./src:/workspace/src:ro           # Read-only source code
+      - ./tests:/workspace/tests:rw       # Read/write tests only
       # DO NOT mount ~/.aws, .env, secrets/, etc.
     environment:
       - NODE_ENV=development
       - AI_SANDBOX=true
     restart: no
-
-# If you need intra-container communication, define an explicit internal network:
-# networks:
-#   ai-isolated:
-#     driver: bridge
-#     internal: true
 ```
 
-**What Default-Deny Accomplishes**
+**What This Accomplishes**
+- **`network_mode: none`** - Zero network access, no DNS, HTTP, or callbacks
+- **`cap_drop: [ALL]`** - No system privileges, prevents privilege escalation
+- **Read-only source** - AI can read code but not modify production files
+- **No secret access** - Secrets, credentials, and config files not mounted
 
-- **`network_mode: none`** cuts off ALL network access - no DNS, no HTTP, no callbacks
-- AI gets a fully functional environment for code generation and testing with zero risk of credential exfiltration
-- No "phone home" capabilities, no data leaks, no accidental API calls with embedded secrets
-- If inter-container communication is needed (e.g., mock services), use an explicit internal-only bridge network
-- Pair with Rules-as-Code to enforce these isolation settings in CI/CD pipelines
+**Multi-Agent Isolation**
 
-**Result**: AI assistance lives in a complete network vault. Secrets stay put. Compliance stays intact.
+```bash
+# Launch isolated agents for parallel work
+docker-compose -f docker-compose.parallel-ai-sandbox.yml up -d
 
-**Parallel Agent Isolation**
-
-**Parallel Agent Isolation** requires additional safety measures:
-
-```yaml
+# Each agent gets isolated workspace and resource limits
 services:
   ai-agent-backend:
-    network_mode: none                    # Complete network isolation
+    network_mode: none
     volumes:
-      - ./src/backend:/workspace:ro       # Read-only source access
-      - ./workspace/agent-1:/output:rw    # Isolated output workspace
+      - ./workspace/agent-1:/output:rw    # Isolated output only
+    ulimits: {nproc: 256, nofile: 1024}   # Resource constraints
     environment:
       - AGENT_ID=backend-specialist
       - MAX_EXECUTION_TIME=7200           # 2-hour timeout
-    cap_drop: [ALL]                       # Drop all capabilities
-    ulimits: {nproc: 256, nofile: 1024}   # Resource constraints
-```
 
-**Complete Implementation**: See [sandbox/docker-compose.parallel-ai-sandbox.yml](sandbox/docker-compose.parallel-ai-sandbox.yml) for full multi-agent isolation with coordination service, conflict detection, and resource monitoring.
-
-**Cross-Agent Resource Protection**
-
-```bash
+# Resource locking prevents conflicts
 acquire_lock() {
-    local resource_path="$1"
-    local agent_id="$2"
-    # Atomic lock using shell's noclobber (set -C)
-    if (set -C; echo "$agent_id" > "$lock_file") 2>/dev/null; then
-        return 0  # Lock acquired
-    else
-        return 1  # Resource locked by another agent
-    fi
+    local resource="$1" agent="$2"
+    (set -C; echo "$agent" > "$resource.lock") 2>/dev/null
 }
 
-# Usage: Prevent concurrent package.json modifications
 if acquire_lock "package.json" "$AGENT_ID"; then
-    modify_package_json && release_lock "package.json" "$AGENT_ID"
+    modify_package_json && release_lock "package.json"
 fi
 ```
 
-**Complete Implementation**: See [examples/parallelized-ai-agents/](examples/parallelized-ai-agents/) for full resource locking system with timeout handling, deadlock detection, and automatic lock cleanup.
-
-**Agent Communication Security**
-
-```yaml
-# .ai/parallel-safety/agent-communication.yml
-communication_rules:
-  allowed_channels:
-    - "file_system_workspace"  # Agents can write to separate workspace dirs
-    - "coordination_api"       # Structured API for status updates
-  
-  forbidden_channels:
-    - "direct_network"         # No agent-to-agent network communication
-    - "shared_memory"          # No shared memory segments
-    - "process_signals"        # No inter-process signaling
-    
-  message_format:
-    type: "structured_json"
-    schema: "/schemas/agent-message.json"
-    encryption: "not_required"  # Internal coordination only
-    
-  coordination_api:
-    endpoint: "http://coordinator:8080/api/v1"
-    authentication: "agent_token"
-    rate_limit: "10_requests_per_minute"
-    timeout: "30_seconds"
-```
-
-**Parallel Safety Monitoring**
-
-```python
-class ParallelSafetyMonitor:
-    def monitor_resource_conflicts(self):
-        """Detect when multiple agents try to modify same files"""
-        # Check file access patterns across agent workspaces
-        # Log violations when concurrent access detected
-        
-    def check_resource_limits(self):
-        """Monitor resource usage per agent container"""
-        # Monitor memory (512MB limit) and CPU (80% limit)
-        # Alert on threshold breaches
-        
-    def report_violations(self):
-        """Report safety violations and trigger emergency shutdown if needed"""
-        # Generate violation report, alert coordination service
-        # Return False to trigger agent shutdown on critical violations
-```
-
-**Complete Implementation**: See [examples/parallelized-ai-agents/](examples/parallelized-ai-agents/) for full parallel safety monitoring system with Docker API integration, resource tracking, and automated emergency shutdown procedures.
-
-**Emergency Agent Shutdown**
+**Emergency Safety**
 
 ```bash
-# emergency-shutdown.sh
-#!/bin/bash
-# Emergency shutdown for parallel agents
-
-shutdown_all_agents() {
-    echo "EMERGENCY: Shutting down all AI agents"
-    
-    # Stop all agent containers
-    docker-compose -f docker-compose.parallel-ai-sandbox.yml down --timeout 10
-    
-    # Kill any runaway processes
-    pkill -f "ai-agent"
-    
-    # Clear shared workspaces
-    rm -rf /workspace/agent-*/
-    
-    # Archive logs for investigation
-    tar -czf "/logs/emergency-shutdown-$(date +%s).tar.gz" /workspace/logs/
-    
-    echo "All agents shut down. Workspace cleared."
-}
-
-# Monitor for safety violations
-if [[ -f "/workspace/safety-violations.json" ]]; then
-    violation_count=$(jq '.violations | length' /workspace/safety-violations.json)
-    if [[ $violation_count -gt 5 ]]; then
-        shutdown_all_agents
-    fi
+# Monitor for violations and emergency shutdown
+if [[ $(jq '.violations | length' safety-violations.json) -gt 5 ]]; then
+    docker-compose down --timeout 10     # Emergency stop
+    pkill -f "ai-agent"                   # Kill runaway processes  
+    rm -rf /workspace/agent-*/            # Clear workspaces
 fi
 ```
+
+**Complete Implementation**: See [sandbox/](sandbox/) for:
+- Full Docker isolation configurations
+- Multi-agent coordination and conflict resolution
+- Resource locking and emergency shutdown procedures
+- Security monitoring and violation detection
 
 **Anti-pattern: Unrestricted Access**
 Allowing AI tools full system access risks credential leaks, data breaches, and security compliance violations.
@@ -1058,69 +967,35 @@ sequenceDiagram
     participant A3 as Test Agent
     participant SM as Shared Memory
     participant CS as Conflict Scanner
-    participant MR as Merge Runner
     
-    Note over M,MR: Agent Initialization
     M->>A1: Start (OAuth2 Task)
     M->>A2: Start (REST API Task)
     M->>A3: Start (Test Suite Task)
-    A1->>SM: Register Agent (auth-feature)
-    A2->>SM: Register Agent (api-feature)
-    A3->>SM: Register Agent (test-suite)
     
-    Note over M,MR: Parallel Development
-    par Auth Development
+    par Parallel Development
         A1->>A1: Implement OAuth2 Flow
-        A1->>SM: Record Learning (JWT best practices)
-        A1->>A1: Complete Auth Service
-        A1->>SM: Signal Completion
-    and API Development
-        A2->>SM: Query Shared Knowledge
+        A1->>SM: Record Learning
+    and
         A2->>A2: Implement REST Endpoints
         A2->>SM: Record API Patterns
-        A2->>A2: Complete API Layer
-        A2->>SM: Signal Completion
-    and Test Development
-        A3->>SM: Access Both Agent Outputs
+    and
         A3->>A3: Generate Integration Tests
-        A3->>A3: Create E2E Test Suite
-        A3->>SM: Signal Completion
+        A3->>SM: Record Test Patterns
     end
     
-    Note over M,MR: Conflict Detection & Resolution
     SM->>CS: Trigger Conflict Analysis
-    CS->>CS: Scan for API Contract Mismatches
-    alt Conflicts Detected
-        CS->>M: Report: API Version Mismatch
-        M->>A1: Resolve OAuth/API Contract
-        A1->>SM: Updated Contract
-        M->>A2: Align API Version
-        A2->>SM: Updated Implementation
-        CS->>CS: Re-scan
-    else No Conflicts
-        CS->>M: All Clear for Merge
-    end
-    
-    Note over M,MR: Integration & Cleanup
-    M->>MR: Initiate Merge Process
-    MR->>SM: Retrieve All Outputs
-    MR->>MR: Merge Components
-    MR->>M: Integration Complete
-    M->>A1: Shutdown Agent
-    M->>A2: Shutdown Agent
-    M->>A3: Shutdown Agent
-    M->>SM: Archive Session Learning
+    CS->>M: Report Conflicts/All Clear
+    M->>M: Merge Components & Cleanup
 ```
 
-**Container-Based Agent Isolation**
-```yaml
-# docker-compose.parallel-agents.yml
-version: '3.8'
+**Core Implementation Approaches**
 
+```yaml
+# Container-based isolation
+# docker-compose.parallel-agents.yml
 services:
-  agent-1:
+  agent-auth:
     image: ai-dev-environment:latest
-    container_name: agent-feature-auth
     volumes:
       - ./feature-auth:/workspace:rw
       - shared-memory:/shared:ro
@@ -1130,34 +1005,18 @@ services:
     networks:
       - agent-network
 
-  agent-2:
+  agent-api:
     image: ai-dev-environment:latest
-    container_name: agent-feature-api
     volumes:
       - ./feature-api:/workspace:rw
       - shared-memory:/shared:ro
     environment:
       - AGENT_ID=api-feature
       - TASK_ID=implement-rest-endpoints
-    networks:
-      - agent-network
-
-  agent-3:
-    image: ai-dev-environment:latest
-    container_name: agent-tests
-    volumes:
-      - ./tests:/workspace:rw
-      - shared-memory:/shared:ro
-    environment:
-      - AGENT_ID=test-suite
-      - TASK_ID=generate-integration-tests
-    networks:
-      - agent-network
 
 volumes:
   shared-memory:
     driver: local
-
 networks:
   agent-network:
     driver: bridge
@@ -1165,122 +1024,85 @@ networks:
 ```
 
 **Git Worktree Parallelization**
+
 ```bash
-# Create parallel worktrees for agent isolation
+# Create isolated branches for parallel work
 git worktree add -b agent/auth ../agent-auth
 git worktree add -b agent/api ../agent-api
 git worktree add -b agent/tests ../agent-tests
 
-# Launch agents in separate worktrees
+# Launch agents in parallel
 parallel --jobs 3 << EOF
 cd ../agent-auth && ai-agent implement-oauth2
 cd ../agent-api && ai-agent implement-rest-endpoints
 cd ../agent-tests && ai-agent generate-integration-tests
 EOF
 
-# Review and merge completed work
-git worktree list
-for worktree in agent-auth agent-api agent-tests; do
-  cd ../$worktree
-  git diff main
-  git push origin agent/$worktree
-done
-
-# Clean up worktrees after merging
-git worktree remove ../agent-auth
-git worktree remove ../agent-api
-git worktree remove ../agent-tests
-```
-
-**Shared Memory Architecture**
-```python
-class AgentMemory:
-    def record_learning(self, agent_id, key, value):
-        """Record discovered patterns with thread-safe file locking"""
-        # Use fcntl.flock() for atomic file operations
-        # Store timestamped learning entries per agent
-        
-    def get_shared_knowledge(self):
-        """Retrieve consolidated knowledge from all agents"""
-        # Return shared memory accessible to all parallel agents
-        # Enable knowledge transfer between agent sessions
-```
-
-**Complete Implementation**: See [examples/parallelized-ai-agents/](examples/parallelized-ai-agents/) for full shared memory system with file locking, conflict resolution, and agent session persistence.
-
-**Parallel Task Distribution**
-```yaml
-# tasks.yaml - Define parallel tasks for agents
-tasks:
-  - id: auth-service
-    agent_count: 1
-    isolation: container
-    dependencies: []
-    instructions: |
-      Implement OAuth2 authentication service with:
-      - JWT token generation
-      - Refresh token flow
-      - User session management
-    
-  - id: api-endpoints
-    agent_count: 2
-    isolation: worktree
-    dependencies: [auth-service]
-    instructions: |
-      Implement REST API endpoints:
-      Agent 1: User management endpoints
-      Agent 2: Resource CRUD endpoints
-    
-  - id: test-generation
-    agent_count: 3
-    isolation: container
-    dependencies: []
-    instructions: |
-      Generate comprehensive test suites:
-      Agent 1: Unit tests for auth service
-      Agent 2: Integration tests for API
-      Agent 3: End-to-end test scenarios
-```
-
-**Conflict Resolution Strategy**
-```bash
-#!/bin/bash
-# merge-parallel-work.sh
-
-# Automated conflict detection and resolution
+# Automated conflict detection and merge
 for branch in $(git branch -r | grep 'agent/'); do
-  echo "Checking $branch for conflicts..."
-  
-  # Create temporary merge branch
   git checkout -b temp-merge main
-  
-  # Attempt merge
   if git merge --no-commit --no-ff $branch; then
     echo "✓ No conflicts in $branch"
     git merge --abort
   else
-    echo "⚠ Conflicts detected in $branch"
-    
-    # Use AI to suggest resolution
-    git diff --name-only --diff-filter=U | while read file; do
-      echo "Analyzing conflict in $file..."
-      ai-agent resolve-conflict $file
-    done
+    echo "⚠ Conflicts detected - using AI resolution"
+    ai-agent resolve-conflicts --branch $branch
   fi
-  
-  git checkout main
-  git branch -D temp-merge
+  git checkout main && git branch -D temp-merge
 done
+
+# Cleanup
+git worktree remove ../agent-auth ../agent-api ../agent-tests
 ```
+
+**Shared Memory & Coordination**
+
+```python
+# Agent coordination with shared knowledge
+class AgentMemory:
+    def record_learning(self, agent_id, key, value):
+        """Thread-safe learning capture with file locking"""
+        with fcntl.flock(self.lock_file, fcntl.LOCK_EX):
+            self.memory[agent_id][key] = value
+        
+    def get_shared_knowledge(self):
+        """Consolidated knowledge from all agents"""
+        return self.consolidated_memory
+
+# Task definition
+tasks = {
+    "auth-service": {
+        "agent_count": 1,
+        "isolation": "container", 
+        "dependencies": [],
+        "instructions": "Implement OAuth2 with JWT tokens"
+    },
+    "api-endpoints": {
+        "agent_count": 2,
+        "isolation": "worktree",
+        "dependencies": ["auth-service"],
+        "instructions": "REST endpoints: user mgmt + CRUD"
+    }
+}
+```
+
+**Complete Implementation**: See [examples/parallelized-ai-agents/](examples/parallelized-ai-agents/) for:
+- Full Docker isolation and coordination setup
+- Git worktree management and conflict resolution
+- Shared memory system with file locking
+- Emergency shutdown and safety monitoring
+- Task distribution and dependency management
+
+**When to Use Parallel Agents**
+- **Complex features** requiring multiple specialized implementations
+- **Time-critical projects** where speed trumps coordination overhead
+- **Exploration phases** testing multiple approaches simultaneously
+- **Large teams** with strong DevOps and coordination processes
 
 **Source**: [AI Native Dev - How to Parallelize AI Coding Agents](https://ainativedev.io/news/how-to-parallelize-ai-coding-agents)
 
 **Anti-pattern: Uncoordinated Parallel Execution**
-Running multiple agents without isolation, shared memory, or conflict resolution leads to:
-- Race conditions when agents modify the same files
-- Lost work from merge conflicts
-- Inconsistent implementations across features
-- Resource contention and system instability
+Running multiple agents without isolation, shared memory, or conflict resolution leads to race conditions, lost work, and system instability.
 
 ---
 
@@ -1425,141 +1247,103 @@ graph TD
     G --> I
 ```
 
-**Decomposition Examples**
+**Core Decomposition Process**
 
 ```bash
 # Feature: User Authentication System
-# Bad: Single monolithic task
+# Bad: Monolithic task
 ❌ "Implement complete user authentication with JWT, password hashing, rate limiting, and email verification"
 
-# Good: Atomic task breakdown
-✅ ai_decompose "Break down user authentication into atomic tasks:
+# Good: Atomic breakdown with AI validation
+ai_decompose "Break down user authentication into atomic tasks:
 
-Task 1: Password validation service
+Task 1: Password validation service (1.5h)
 - Input: plain text password, validation rules
 - Output: validation result object
-- No dependencies on other authentication components
-- Time estimate: 1.5 hours
+- Dependencies: None (pure function)
 
-Task 2: JWT token generation service  
+Task 2: JWT token generation service (1h)  
 - Input: user ID, role, expiration config
 - Output: signed JWT token
-- Independent crypto operations only
-- Time estimate: 1 hour
+- Dependencies: None (crypto operations only)
 
-Task 3: Rate limiting middleware
+Task 3: Rate limiting middleware (2h)
 - Input: request metadata, rate limit config
 - Output: allow/deny decision
-- No user data dependencies
-- Time estimate: 2 hours
+- Dependencies: None (stateless logic)
 
-Task 4: Login endpoint controller
-- Input: credentials, dependencies from tasks 1-3
-- Output: HTTP response with token or error
-- Integration task (runs after 1-3 complete)
-- Time estimate: 1 hour"
+Task 4: Login endpoint integration (1h)
+- Input: credentials, services from tasks 1-3
+- Output: HTTP response with token/error
+- Dependencies: Tasks 1-3 (integration only)"
+
+# Validate atomicity
+ai_task_validator "Check each task for:
+1. <2 hour completion time
+2. No shared mutable state
+3. Clear input/output contracts
+4. Testable in isolation
+5. No circular dependencies"
 ```
 
-**Parallel Agent Assignment**
+**Agent Assignment & Coordination**
 
 ```yaml
 # .ai/task-assignment.yml
 authentication_feature:
-  tasks:
-    - id: "auth-001"
-      name: "Password validation service"
+  parallel_tasks:
+    - id: "auth-001" # Password validation
       agent: "backend-specialist-1"
-      dependencies: []
       estimated_hours: 1.5
+      dependencies: []
       
-    - id: "auth-002" 
-      name: "JWT token generation"
+    - id: "auth-002" # JWT generation
       agent: "security-specialist"
-      dependencies: []
       estimated_hours: 1
-      
-    - id: "auth-003"
-      name: "Rate limiting middleware"
-      agent: "backend-specialist-2" 
       dependencies: []
+      
+    - id: "auth-003" # Rate limiting
+      agent: "backend-specialist-2"
       estimated_hours: 2
+      dependencies: []
       
-    - id: "auth-004"
-      name: "Login endpoint integration"
+  integration_tasks:
+    - id: "auth-004" # Login endpoint
       agent: "integration-specialist"
-      dependencies: ["auth-001", "auth-002", "auth-003"]
       estimated_hours: 1
-      
-  coordination:
-    parallel_execution: ["auth-001", "auth-002", "auth-003"]
-    sequential_after: ["auth-004"]
-    sync_points:
-      - after_parallel_completion
-      - before_integration_testing
+      dependencies: ["auth-001", "auth-002", "auth-003"]
 ```
 
-**Atomic Task Validation**
-
-```bash
-# Validate tasks meet atomic criteria
-ai_task_validator "Review task breakdown for authentication feature:
-
-Validation criteria:
-1. Each task completable in <2 hours
-2. No shared mutable state between parallel tasks  
-3. Clear input/output contracts defined
-4. Testable in isolation
-5. No circular dependencies
-
-For each task that fails validation:
-- Explain why it's not atomic
-- Suggest how to split it further
-- Recommend dependency restructuring"
-
-# Example validation output
-✓ auth-001: Password validation - ATOMIC (isolated function, clear I/O)
-✓ auth-002: JWT generation - ATOMIC (crypto operation, no external deps)  
-✗ auth-003: Rate limiting - NOT ATOMIC (requires shared cache, >2hr estimate)
-  → Split: 3a) Rate limit logic, 3b) Cache integration
-✓ auth-004: Integration - ATOMIC (assembly task with clear dependencies)
-```
-
-**Task Interface Contracts**
+**Task Contract Validation**
 
 ```python
+# Ensure tasks meet atomic criteria
 class TaskContract:
     def validate_atomic(self) -> bool:
-        """Validate task meets atomic criteria"""
         return all([
             len(self.side_effects) == 0,    # No side effects
             self.estimated_hours <= 2,      # Rapid completion
             self.has_clear_io_contract()    # Testable interface
         ])
 
-# Example: Password validation task contract
+# Example validation
 task = TaskContract("auth-001")
 task.inputs = {"password": str, "rules": PasswordRules}  
 task.outputs = {"is_valid": bool, "errors": List[str]}
+assert task.validate_atomic()  # ✓ Passes atomic criteria
 ```
 
-**Complete Implementation**: See [examples/atomic-task-decomposition/](examples/atomic-task-decomposition/) for full contract validation system, task dependency resolution, and parallel execution coordination.
+**Complete Implementation**: See [examples/atomic-task-decomposition/](examples/atomic-task-decomposition/) for:
+- Contract validation system with automated checking
+- Task dependency resolution and scheduling
+- Parallel execution coordination and monitoring
+- Agent assignment and resource management
 
-**When to Use Atomic Task Decomposition**
-
-- **Parallel Agent Implementation**: When using multiple AI agents simultaneously
-- **Complex Feature Development**: Large features that can benefit from parallel work
-- **Time-Critical Projects**: When faster delivery through parallelization is essential
-- **Team Scaling**: When you need to distribute work across multiple developers/agents
-- **Risk Mitigation**: When you want to reduce the blast radius of individual task failures
-
-**Benefits of Atomic Decomposition**
-
-1. **Parallel Execution**: Independent tasks can run simultaneously across multiple agents
-2. **Rapid Feedback**: 1-2 hour tasks provide quick validation cycles
-3. **Conflict Prevention**: No shared state eliminates merge conflicts
-4. **Clear Testing**: Each atomic task has testable inputs/outputs
-5. **Easy Recovery**: Failed tasks can be retried without affecting others
-6. **Progress Visibility**: Fine-grained progress tracking and estimation
+**When to Use Atomic Decomposition**
+- **Parallel Agent Implementation**: Multiple AI agents working simultaneously
+- **Complex Feature Development**: Large features benefiting from parallel work
+- **Time-Critical Projects**: Speed through parallelization essential
+- **Risk Mitigation**: Reduce blast radius of individual task failures
 
 **Anti-pattern: Pseudo-Atomic Tasks**
 Creating tasks that appear independent but secretly share state, require specific execution order, or have hidden dependencies on other concurrent work.
@@ -1697,159 +1481,60 @@ graph TD
     I --> C
 ```
 
-**Automated Code Smell Detection**
+**Core Workflow**
 
 ```bash
-# .ai/rules/refactoring.md - Define measurable thresholds
+# 1. Define refactoring rules
 cat > .ai/rules/refactoring.md << 'EOF'
-# Refactoring Rules
-
 ## Long Method Smell
 - Max lines: 20 (excluding docstrings)
 - Max cyclomatic complexity: 10
 - Detection: flake8 C901, pylint R0915
 
 ## Large Class Smell  
-- Max class lines: 250
-- Max methods: 20
-- Max instance variables: 10
+- Max class lines: 250, Max methods: 20
 - Detection: pylint R0902, R0904
-
-## Primitive Obsession Smell
-- String validation patterns in multiple places
-- Dictionaries as pseudo-objects
-- Lists of primitives that always travel together
-
-## Refactoring Strategies
-- Extract Method for long methods
-- Extract Class for large classes
-- Replace Primitive with Object for primitive obsession
 EOF
 
-# AI smell detection
-ai "Analyze this codebase using .ai/rules/refactoring.md:
-1. Run static analysis tools (flake8, pylint, radon)
-2. Identify code smells per defined thresholds
-3. Prioritize by impact and complexity
-4. Suggest specific refactoring strategy for each smell"
-```
+# 2. Detect code smells with AI
+flake8 --select=C901 src/ > smells.txt
+pylint src/ --disable=all --enable=R0915,R0902,R0904 >> smells.txt
 
-**Long Method Refactoring Example**
+ai "Analyze smells.txt using .ai/rules/refactoring.md:
+1. Prioritize by impact and complexity
+2. Suggest specific refactoring strategy for each smell
+3. Generate implementation plan with risk assessment"
 
-```bash
-# AI refactoring prompt for long methods
-ai "Refactor process_user_data() method:
-- 35 lines (exceeds 20 line threshold)
-- Multiple responsibilities: validation, database, notifications
-- Apply Extract Method pattern
-- Maintain test coverage and API contract"
-```
+# 3. Apply refactoring with test preservation
+pytest --cov=src tests/  # Baseline coverage
 
-**Large Class Refactoring Example**
+ai "Refactor process_user_data() method (35 lines, exceeds threshold):
+- Apply Extract Method pattern for validation, database, notifications
+- Maintain test coverage >90% and API contract
+- Create atomic commits for each extracted method"
 
-```bash
-# AI refactoring prompt for large classes
-ai "Extract cohesive classes from UserManager:
-- 320 lines, 25 methods, 12 variables (all exceed thresholds)
-- Apply Extract Class pattern
-- Maintain API compatibility"
-```
-
-**Primitive Obsession Refactoring**
-
-```bash
-# AI refactoring prompt for primitive obsession
-ai "Replace primitive strings/dicts with value objects:
-- Create Email, Phone, Address classes
-- Encapsulate validation logic
-- Replace primitive parameters with objects"
-```
-
-**Refactoring Workflow Integration**
-
-```bash
-# Automated refactoring pipeline
-#!/bin/bash
-# refactor-pipeline.sh
-
-echo "Running code smell detection..."
-flake8 --select=C901 src/  # Complexity
-pylint src/ --disable=all --enable=R0915,R0902,R0904  # Method/class size
-radon cc src/ --min=C  # Cyclomatic complexity
-
-echo "AI refactoring analysis..."
-ai "Analyze static analysis output and .ai/rules/refactoring.md:
-1. List code smells by priority (impact × frequency)
-2. Suggest refactoring strategy for top 3 smells  
-3. Estimate effort and risk for each refactoring
-4. Generate implementation plan"
-
-echo "Running tests before refactoring..."
+# 4. Validate and track improvements
 pytest --cov=src tests/
+flake8 src/ && pylint src/
 
-echo "AI refactoring implementation..."
-ai "Implement highest priority refactoring:
-- Maintain test coverage >90%
-- Preserve existing API contracts  
-- Create atomic commits for each smell
-- Document refactoring decisions"
-
-echo "Validate refactoring..."
-pytest --cov=src tests/
-flake8 src/
-pylint src/
-
-echo "Update knowledge base..."
-ai "Document refactoring outcome in .ai/knowledge/refactoring.md:
-- What was refactored and why
-- Metrics before/after
-- Lessons learned
-- Patterns to reuse"
-```
-
-**Quality Metrics Tracking**
-
-```bash
-# Before/after metrics comparison
 ai "Generate refactoring impact report:
-
-Before refactoring:
-- Cyclomatic complexity: 12
-- Method length: 35 lines
-- Test coverage: 85%
-- Code duplication: 15%
-
-After refactoring:
-- Cyclomatic complexity: 4 (main) + 2 (extracted methods)
-- Method length: 8 lines (main) + 4 extracted methods <10 lines each
-- Test coverage: 92% 
-- Code duplication: 8%
-
-Calculate:
-- Maintainability improvement score
-- Technical debt reduction
-- Risk assessment for future changes"
+Before: complexity=12, length=35 lines, coverage=85%
+After: complexity=4+2+2, length=8+6+7 lines, coverage=92%
+Document lessons learned in .ai/knowledge/refactoring.md"
 ```
 
-**When to Apply Refactoring**
+**Common Refactoring Patterns**
 
-- **During Development**: Red-Green-Refactor cycle with AI assistance
-- **Feature Work**: Refactor smelly code before adding features
-- **Bug Fixes**: Clean up code while fixing issues
-- **Code Reviews**: Automated PR quality checks
-- **Scheduled**: Weekly code health assessments
+- **Extract Method**: Break down long methods (>20 lines)
+- **Extract Class**: Split large classes (>250 lines, >20 methods)  
+- **Replace Primitive**: Convert strings/dicts to value objects
+- **Consolidate Duplicates**: Merge similar code patterns
 
-**Integration with Development Workflow**
-
-- **Pre-commit hooks**: Check staged files for code smells
-- **IDE integration**: Real-time refactoring suggestions
-- **CI pipeline**: Automated quality gates and technical debt tracking
-
-**Risk Assessment for Refactoring Timing**
-
-- **Low Risk**: Extract Method, rename, constants, type hints
-- **Medium Risk**: Extract Class, replace conditionals, parameter objects  
-- **High Risk**: Large decomposition, inheritance changes, schema refactoring
+**Complete Implementation**: See [examples/ai-driven-refactoring/](examples/ai-driven-refactoring/) for:
+- Automated refactoring pipeline with CI integration
+- Quality metrics tracking and reporting
+- Risk assessment guidelines and rollback procedures
+- Knowledge base templates for refactoring outcomes
 
 **Anti-pattern: Shotgun Surgery**
 Making widespread changes without systematic analysis leads to introduced bugs and degraded code quality.
