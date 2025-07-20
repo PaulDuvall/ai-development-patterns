@@ -9,7 +9,7 @@ This repository provides a structured approach to AI-assisted development throug
 - **[Foundation Patterns](#foundation-patterns)** - Essential patterns for team readiness and basic AI integration
 - **[Development Patterns](#development-patterns)** - Daily practice patterns for AI-assisted coding workflows  
 - **[Operations Patterns](#operations-patterns)** - CI/CD, security, and production management with AI
-- **[Experimental Patterns](experimental-patterns.md)** - Advanced and experimental patterns under active development
+- **[Experimental Patterns](experimental-patterns.md)** - Advanced and experimental patterns under active development and/or consideration.
 
 ## Pattern Dependencies & Implementation Order
 
