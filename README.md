@@ -52,16 +52,16 @@ graph TD
 | **[AI Readiness Assessment](#ai-readiness-assessment)** | Beginner | Foundation | Systematic evaluation of codebase and team readiness for AI integration | None |
 | **[Rules as Code](#rules-as-code)** | Beginner | Foundation | Version and maintain AI coding standards as explicit configuration files | AI Readiness Assessment |
 | **[AI Security Sandbox](#ai-security-sandbox)** | Beginner | Foundation | Run AI tools in isolated environments without access to secrets or sensitive data | Rules as Code |
-| **[AI Developer Lifecycle](#ai-developer-lifecycle)** | Intermediate | Foundation | Structured 9-stage process from problem definition through deployment with AI assistance | Rules as Code, AI Security Sandbox |
+| **[AI Developer Lifecycle](#ai-developer-lifecycle)** | Intermediate | Workflow | Structured 9-stage process from problem definition through deployment with AI assistance | Rules as Code, AI Security Sandbox |
 | **[AI Tool Integration](#ai-tool-integration)** | Intermediate | Foundation | Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions | AI Security Sandbox, AI Developer Lifecycle |
 | **[Human-AI Handoff Protocol](#human-ai-handoff-protocol)** | Intermediate | Foundation | Clear boundaries and procedures for transitioning work between human developers and AI | AI Developer Lifecycle |
 | **[AI Issue Generation](#ai-issue-generation)** | Intermediate | Foundation | Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies | AI Readiness Assessment |
 | **[Specification Driven Development](#specification-driven-development)** | Intermediate | Development | Use executable specifications to guide AI code generation with clear acceptance criteria before implementation | AI Developer Lifecycle, AI Tool Integration |
-| **[Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)** | Intermediate | Development | Unified approach to test-first development, automated generation, and quality assurance | Specification Driven Development |
+| **[Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)** | Intermediate | Workflow | Unified approach to test-first development, automated generation, and quality assurance | Specification Driven Development |
 | **[Progressive AI Enhancement](#progressive-ai-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | AI Developer Lifecycle |
 | **[AI Choice Generation](#ai-choice-generation)** | Intermediate | Development | Generate multiple implementation options for exploration and comparison rather than accepting first AI solution | Progressive AI Enhancement, Context Window Optimization |
 | **[Atomic Task Decomposition](#atomic-task-decomposition)** | Intermediate | Development | Break complex features into atomic, independently implementable tasks for parallel AI agent execution | AI Workflow Orchestration, Progressive AI Enhancement |
-| **[AI Workflow Orchestration](#ai-workflow-orchestration)** | Advanced | Development | Coordinate sequential pipelines, parallel workflows, and hybrid human-AI processes | Comprehensive AI Testing Strategy, AI Tool Integration |
+| **[AI Workflow Orchestration](#ai-workflow-orchestration)** | Advanced | Workflow | Coordinate sequential pipelines, parallel workflows, and hybrid human-AI processes | Comprehensive AI Testing Strategy, AI Tool Integration |
 | **[Parallelized AI Coding Agents](#parallelized-ai-coding-agents)** | Advanced | Development | Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration | AI Workflow Orchestration, Atomic Task Decomposition |
 | **[Context Window Optimization](#context-window-optimization)** | Advanced | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive AI Enhancement |
 | **[AI Knowledge Persistence](#ai-knowledge-persistence)** | Intermediate | Development | Capture successful patterns and failed attempts as versioned knowledge for future sessions | Rules as Code |
@@ -72,12 +72,12 @@ graph TD
 | **[AI-Driven Traceability](#ai-driven-traceability)** | Intermediate | Development | Maintain automated links between requirements, specifications, tests, implementation, and documentation using AI | AI Developer Lifecycle |
 | **Security & Compliance** | | Operations | *Category containing security and compliance patterns* | |
 | **[Policy-as-Code Generation](#policy-as-code-generation)** | Advanced | Operations | Transform compliance requirements into executable Cedar/OPA policy files with AI assistance | AI Security Sandbox |
-| **[Security Scanning Orchestration](#security-scanning-orchestration)** | Intermediate | Operations | Aggregate multiple security tools and use AI to summarize findings for actionable insights | Policy-as-Code Generation |
+| **[Security Scanning Orchestration](#security-scanning-orchestration)** | Intermediate | Workflow | Aggregate multiple security tools and use AI to summarize findings for actionable insights | Policy-as-Code Generation |
 | **[AI Review Automation](#ai-review-automation)** | Intermediate | Operations | Automate review process for parallel agent outputs using AI to detect conflicts and coordinate integration | AI Workflow Orchestration, Atomic Task Decomposition |
 | **[Compliance Evidence Automation](#compliance-evidence-automation)** | Advanced | Operations | Generate audit evidence matrices from logs and configuration changes automatically | Security Scanning Orchestration |
 | **[ChatOps Security Integration](#chatops-security-integration)** | Beginner | Operations | Deploy security scanning capabilities through chat commands for immediate feedback | Security Scanning Orchestration |
 | **Deployment Automation** | | Operations | *Category containing deployment and pipeline patterns* | |
-| **[Pipeline Synthesis](#pipeline-synthesis)** | Intermediate | Operations | Convert plain-English build specifications into CI/CD pipeline configurations | AI Workflow Orchestration, AI Tool Integration |
+| **[Pipeline Synthesis](#pipeline-synthesis)** | Intermediate | Workflow | Convert plain-English build specifications into CI/CD pipeline configurations | AI Workflow Orchestration, AI Tool Integration |
 | **[AI-Guided Blue-Green Deployment](#ai-guided-blue-green-deployment)** | Advanced | Operations | Generate blue-green deployment scripts with validation to prevent AI misconceptions | Pipeline Synthesis |
 | **[Drift Detection & Remediation](#drift-detection--remediation)** | Advanced | Operations | Detect infrastructure configuration drift and generate corrective patches automatically | Pipeline Synthesis |
 | **[Release Note Synthesis](#release-note-synthesis)** | Beginner | Operations | Automatically generate structured release notes by analyzing git commit history | Pipeline Synthesis |
@@ -691,6 +691,49 @@ Allowing multiple parallel agents to write to the same directories creates race 
 
 **Related Patterns**: [Rules as Code](#rules-as-code), [Specification Driven Development](#specification-driven-development), [Observable AI Development](#observable-ai-development)
 
+**Workflow Interaction Sequence**
+
+```mermaid
+sequenceDiagram
+    participant D as Developer
+    participant AI as AI Assistant
+    participant S as System/CI
+    participant T as Tests
+    participant M as Monitoring
+    
+    Note over D,M: Stage 1-3: Problem → Plan → Requirements
+    D->>AI: Problem Definition (e.g., JWT Authentication)
+    AI->>D: Technical Architecture Plan
+    D->>AI: Requirements Clarification
+    AI->>D: API Specs + Kanban Tasks + Security Requirements
+    
+    Note over D,M: Stage 4-5: Issues → Specifications
+    D->>AI: Generate Executable Tests
+    AI->>T: Gherkin Scenarios + API Tests + Security Tests
+    T->>D: Test Suite Ready (Performance Criteria: <200ms)
+    
+    Note over D,M: Stage 6: Implementation
+    D->>AI: Implement Following Specifications
+    AI->>S: Code + Tests + Error Handling + Logging
+    S->>D: Implementation Results
+    
+    Note over D,M: Stage 7-9: Testing → Deployment → Monitoring
+    D->>S: Run All Tests
+    S->>D: Test Results + Security Scan + Performance Benchmark
+    alt Tests Pass
+        S->>S: Deploy to Production
+        S->>M: Setup Monitoring Alerts
+        M->>D: Deployment Complete + Monitoring Active
+    else Tests Fail
+        S->>D: Failure Report
+        D->>AI: Fix Issues
+        AI->>S: Updated Implementation
+    end
+    
+    Note over D,M: Continuous Monitoring
+    M->>D: Performance Alerts + Security Events
+```
+
 **Complete Development Workflow**
 
 ```bash
@@ -866,6 +909,68 @@ graph TD
     H -->|No| N[Human Takeover]
     I -->|Yes| O[Collaborative Mode]
     I -->|No| J
+```
+
+**Handoff Execution Sequence**
+
+```mermaid
+sequenceDiagram
+    participant H as Human
+    participant AS as Assessment System
+    participant AI as AI Assistant
+    participant QC as Quality Control
+    participant R as Repository
+    
+    Note over H,R: Task Assessment Phase
+    H->>AS: Submit Task Requirements
+    AS->>AS: Analyze Complexity & Risk
+    AS->>H: Handoff Recommendation (AI First/Human First/Collaborative)
+    
+    Note over H,R: AI-First Path (Low Complexity)
+    alt AI First Recommended
+        H->>AI: Execute Task with Constraints
+        AI->>AI: Generate Implementation
+        AI->>QC: Submit for Quality Check
+        QC->>QC: Run Automated Tests & Analysis
+        alt Quality Check Passes
+            QC->>R: Commit Implementation
+            QC->>H: Task Complete
+        else Quality Check Fails
+            QC->>H: Failed Quality - Human Review Required
+            H->>AI: Provide Feedback & Corrections
+            AI->>QC: Submit Revised Implementation
+            QC->>R: Commit Final Version
+        end
+    
+    Note over H,R: Human-First Path (High Complexity)
+    else Human First Recommended
+        H->>H: Initial Implementation
+        H->>AS: Assess Need for AI Assistance
+        alt AI Assistance Needed
+            H->>AI: Request Specific AI Help
+            AI->>H: Provide Targeted Assistance
+            H->>H: Integrate AI Suggestions
+            H->>R: Commit Human-Led Implementation
+        else No AI Assistance
+            H->>R: Commit Human-Only Implementation
+        end
+    
+    Note over H,R: Collaborative Path (Medium Complexity)
+    else Collaborative Recommended
+        H->>AI: Collaborative Development Session
+        loop Until Complete
+            AI->>H: Generate Code Segment
+            H->>H: Review & Modify
+            H->>AI: Provide Feedback
+            AI->>AI: Adjust Based on Feedback
+        end
+        H->>QC: Submit Collaborative Result
+        QC->>R: Commit Final Implementation
+    end
+    
+    Note over H,R: Continuous Learning
+    R->>AS: Update Success Metrics
+    AS->>AS: Refine Handoff Criteria
 ```
 
 **Anti-pattern: Unclear Boundaries**
@@ -1192,6 +1297,71 @@ graph TD
     J --> B
 ```
 
+**Testing Workflow Execution Sequence**
+
+```mermaid
+sequenceDiagram
+    participant D as Developer
+    participant AI as AI Assistant
+    participant TS as Test Suite
+    participant AT as Acceptance Tests
+    participant CI as CI/CD Pipeline
+    participant QG as Quality Gates
+    participant FD as Flakiness Detector
+    
+    Note over D,FD: Test-First Development Phase
+    D->>AI: Generate Acceptance Tests from Requirements
+    AI->>AT: Create Gherkin Scenarios + Expected Behaviors
+    AT->>D: Review Generated Tests
+    D->>AI: Generate Unit Tests from Acceptance Criteria
+    AI->>TS: Create Unit Test Suite
+    
+    Note over D,FD: Implementation & Test Generation
+    D->>AI: Implement Feature Following Tests
+    AI->>TS: Generate Implementation Code
+    D->>AI: Generate Integration Tests
+    AI->>TS: Add Integration Test Cases
+    D->>AI: Generate Performance Tests (Response Time, Memory)
+    AI->>TS: Add Performance Benchmarks
+    D->>AI: Generate Security Tests (Auth, Input Validation)
+    AI->>TS: Add Security Test Cases
+    
+    Note over D,FD: Execution & Quality Assessment
+    D->>CI: Trigger Test Pipeline
+    CI->>TS: Execute All Test Suites
+    TS->>TS: Run Unit → Integration → Performance → Security
+    alt All Tests Pass
+        TS->>QG: Submit Results for Quality Gates
+        QG->>QG: Check Coverage, Performance, Security Thresholds
+        alt Quality Gates Pass
+            QG->>CI: Approve for Deployment
+            CI->>D: Ready to Deploy
+        else Quality Gates Fail
+            QG->>D: Quality Issues (Coverage < 80%, Performance Regression)
+            D->>AI: Address Quality Issues
+            AI->>TS: Generate Additional Tests
+        end
+    else Tests Fail
+        TS->>FD: Analyze Test Failures
+        FD->>FD: Detect Flaky vs Real Failures
+        alt Real Failures Detected
+            FD->>D: Implementation Issues Found
+            D->>AI: Fix Implementation
+            AI->>TS: Updated Code
+        else Flaky Tests Detected
+            FD->>D: Flaky Test Report
+            D->>AI: Refine Flaky Tests
+            AI->>TS: Stabilized Tests
+        end
+        TS->>CI: Re-run Test Pipeline
+    end
+    
+    Note over D,FD: Continuous Improvement
+    CI->>FD: Archive Test Metrics
+    FD->>AI: Update Test Generation Patterns
+    AI->>AI: Learn from Test Success/Failure Patterns
+```
+
 **Anti-pattern: Test Generation Without Strategy**
 Generating tests with AI without a coherent strategy leads to poor coverage, flaky tests, and false confidence in code quality.
 
@@ -1316,6 +1486,60 @@ graph TD
     P --> Q[AI Refinement]
 ```
 
+**Parallel Agent Coordination Sequence**
+
+```mermaid
+sequenceDiagram
+    participant O as Orchestrator
+    participant A1 as Backend Agent
+    participant A2 as Frontend Agent  
+    participant A3 as Test Agent
+    participant C as Coordinator
+    participant R as Review System
+    participant H as Human
+    
+    Note over O,H: Task Breakdown & Assignment
+    O->>C: Analyze Feature Requirements
+    C->>O: Atomic Task Breakdown
+    O->>A1: Assign: Auth API (2hrs)
+    O->>A2: Assign: Login UI (1.5hrs)
+    O->>A3: Assign: Test Suite (2hrs)
+    
+    Note over O,H: Parallel Execution Phase
+    par Backend Development
+        A1->>C: Start Backend Task
+        A1->>A1: Implement JWT Auth API
+        A1->>C: Backend Complete
+    and Frontend Development
+        A2->>C: Start Frontend Task
+        A2->>A2: Build Login Components
+        A2->>C: Frontend Complete
+    and Test Development
+        A3->>C: Start Test Task
+        A3->>A3: Generate Test Suite
+        A3->>C: Tests Complete
+    end
+    
+    Note over O,H: Synchronization & Review
+    C->>R: Trigger Integration Review
+    R->>R: Analyze Outputs for Conflicts
+    alt No Conflicts Detected
+        R->>O: Integration Approved
+        O->>H: Ready for Human Review
+    else Conflicts Found
+        R->>O: Conflict Report (API mismatch)
+        O->>A1: Resolve API Contract Issue
+        A1->>C: Resolution Complete
+        C->>R: Re-trigger Review
+        R->>O: Integration Approved
+    end
+    
+    Note over O,H: Final Integration
+    H->>O: Approve Integration
+    O->>C: Merge All Components
+    C->>H: Feature Complete
+```
+
 **Parallel Agent Coordination Examples**
 
 ```bash
@@ -1375,6 +1599,70 @@ Running parallel agents without proper isolation, conflict detection, or sync po
 **Description**: Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration.
 
 **Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration), [Atomic Task Decomposition](#atomic-task-decomposition), [AI Security Sandbox](#ai-security-sandbox)
+
+**Agent Coordination Lifecycle**
+
+```mermaid
+sequenceDiagram
+    participant M as Manager
+    participant A1 as Auth Agent
+    participant A2 as API Agent  
+    participant A3 as Test Agent
+    participant SM as Shared Memory
+    participant CS as Conflict Scanner
+    participant MR as Merge Runner
+    
+    Note over M,MR: Agent Initialization
+    M->>A1: Start (OAuth2 Task)
+    M->>A2: Start (REST API Task)
+    M->>A3: Start (Test Suite Task)
+    A1->>SM: Register Agent (auth-feature)
+    A2->>SM: Register Agent (api-feature)
+    A3->>SM: Register Agent (test-suite)
+    
+    Note over M,MR: Parallel Development
+    par Auth Development
+        A1->>A1: Implement OAuth2 Flow
+        A1->>SM: Record Learning (JWT best practices)
+        A1->>A1: Complete Auth Service
+        A1->>SM: Signal Completion
+    and API Development
+        A2->>SM: Query Shared Knowledge
+        A2->>A2: Implement REST Endpoints
+        A2->>SM: Record API Patterns
+        A2->>A2: Complete API Layer
+        A2->>SM: Signal Completion
+    and Test Development
+        A3->>SM: Access Both Agent Outputs
+        A3->>A3: Generate Integration Tests
+        A3->>A3: Create E2E Test Suite
+        A3->>SM: Signal Completion
+    end
+    
+    Note over M,MR: Conflict Detection & Resolution
+    SM->>CS: Trigger Conflict Analysis
+    CS->>CS: Scan for API Contract Mismatches
+    alt Conflicts Detected
+        CS->>M: Report: API Version Mismatch
+        M->>A1: Resolve OAuth/API Contract
+        A1->>SM: Updated Contract
+        M->>A2: Align API Version
+        A2->>SM: Updated Implementation
+        CS->>CS: Re-scan
+    else No Conflicts
+        CS->>M: All Clear for Merge
+    end
+    
+    Note over M,MR: Integration & Cleanup
+    M->>MR: Initiate Merge Process
+    MR->>SM: Retrieve All Outputs
+    MR->>MR: Merge Components
+    MR->>M: Integration Complete
+    M->>A1: Shutdown Agent
+    M->>A2: Shutdown Agent
+    M->>A3: Shutdown Agent
+    M->>SM: Archive Session Learning
+```
 
 **Container-Based Agent Isolation**
 ```yaml
