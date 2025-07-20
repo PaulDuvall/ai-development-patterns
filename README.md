@@ -9,6 +9,7 @@ This repository provides a structured approach to AI-assisted development throug
 - **[Foundation Patterns](#foundation-patterns)** - Essential patterns for team readiness and basic AI integration
 - **[Development Patterns](#development-patterns)** - Daily practice patterns for AI-assisted coding workflows  
 - **[Operations Patterns](#operations-patterns)** - CI/CD, security, and production management with AI
+- **[Experimental Patterns](experimental-patterns.md)** - Advanced and experimental patterns under active development
 
 ## Pattern Dependencies & Implementation Order
 
@@ -21,25 +22,22 @@ graph TD
         B --> C[AI Security Sandbox]
         C --> D[AI Developer Lifecycle]
         A --> E[AI Issue Generation]
-        D --> F[Human-AI Handoff Protocol]
+        D --> F[AI Tool Integration]
     end
     
     subgraph "Phase 2: Development (Weeks 3-4)"
         D --> G[Specification Driven Development]
-        G --> H[Comprehensive AI Testing Strategy]
-        D --> I[Progressive AI Enhancement]
-        I --> J[AI Choice Generation]
-        H --> K[AI Workflow Orchestration]
-        K --> L[Atomic Task Decomposition]
-        J --> M[Context Window Optimization]
+        G --> H[Progressive AI Enhancement]
+        H --> I[AI Choice Generation]
+        G --> J[Atomic Task Decomposition]
+        J --> K[Parallelized AI Coding Agents]
     end
     
     subgraph "Phase 3: Operations (Weeks 5-6)"
-        K --> N[AI Review Automation]
-        C --> O[Policy-as-Code Generation]
-        O --> P[Security Scanning Orchestration]
-        M --> Q[Performance Baseline Management]
-        H --> R[Technical Debt Forecasting]
+        C --> L[Policy-as-Code Generation]
+        L --> M[Security Scanning Orchestration]
+        K --> N[Performance Baseline Management]
+        D --> O[AI-Driven Traceability]
     end
 ```
 
@@ -54,16 +52,12 @@ graph TD
 | **[AI Security Sandbox](#ai-security-sandbox)** | Beginner | Foundation | Run AI tools in isolated environments without access to secrets or sensitive data | Rules as Code |
 | **[AI Developer Lifecycle](#ai-developer-lifecycle)** | Intermediate | Workflow | Structured 9-stage process from problem definition through deployment with AI assistance | Rules as Code, AI Security Sandbox |
 | **[AI Tool Integration](#ai-tool-integration)** | Intermediate | Foundation | Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions | AI Security Sandbox, AI Developer Lifecycle |
-| **[Human-AI Handoff Protocol](#human-ai-handoff-protocol)** | Intermediate | Foundation | Clear boundaries and procedures for transitioning work between human developers and AI | AI Developer Lifecycle |
 | **[AI Issue Generation](#ai-issue-generation)** | Intermediate | Foundation | Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies | AI Readiness Assessment |
 | **[Specification Driven Development](#specification-driven-development)** | Intermediate | Development | Use executable specifications to guide AI code generation with clear acceptance criteria before implementation | AI Developer Lifecycle, AI Tool Integration |
-| **[Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)** | Intermediate | Workflow | Unified approach to test-first development, automated generation, and quality assurance | Specification Driven Development |
 | **[Progressive AI Enhancement](#progressive-ai-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | AI Developer Lifecycle |
-| **[AI Choice Generation](#ai-choice-generation)** | Intermediate | Development | Generate multiple implementation options for exploration and comparison rather than accepting first AI solution | Progressive AI Enhancement, Context Window Optimization |
-| **[Atomic Task Decomposition](#atomic-task-decomposition)** | Intermediate | Development | Break complex features into atomic, independently implementable tasks for parallel AI agent execution | AI Workflow Orchestration, Progressive AI Enhancement |
-| **[AI Workflow Orchestration](#ai-workflow-orchestration)** | Advanced | Workflow | Coordinate sequential pipelines, parallel workflows, and hybrid human-AI processes | Comprehensive AI Testing Strategy, AI Tool Integration |
-| **[Parallelized AI Coding Agents](#parallelized-ai-coding-agents)** | Advanced | Development | Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration | AI Workflow Orchestration, Atomic Task Decomposition |
-| **[Context Window Optimization](#context-window-optimization)** | Advanced | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive AI Enhancement |
+| **[AI Choice Generation](#ai-choice-generation)** | Intermediate | Development | Generate multiple implementation options for exploration and comparison rather than accepting first AI solution | Progressive AI Enhancement |
+| **[Atomic Task Decomposition](#atomic-task-decomposition)** | Intermediate | Development | Break complex features into atomic, independently implementable tasks for parallel AI agent execution | Progressive AI Enhancement |
+| **[Parallelized AI Coding Agents](#parallelized-ai-coding-agents)** | Advanced | Development | Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration | Atomic Task Decomposition |
 | **[AI Knowledge Persistence](#ai-knowledge-persistence)** | Intermediate | Development | Capture successful patterns and failed attempts as versioned knowledge for future sessions | Rules as Code |
 | **[Constraint-Based AI Development](#constraint-based-ai-development)** | Beginner | Development | Give AI specific constraints to prevent over-engineering and ensure focused solutions | Progressive AI Enhancement |
 | **[Observable AI Development](#observable-ai-development)** | Intermediate | Development | Strategic logging and debugging that makes system behavior visible to AI | AI Developer Lifecycle, AI Tool Integration |
@@ -73,22 +67,9 @@ graph TD
 | **Security & Compliance** | | Operations | *Category containing security and compliance patterns* | |
 | **[Policy-as-Code Generation](#policy-as-code-generation)** | Advanced | Operations | Transform compliance requirements into executable Cedar/OPA policy files with AI assistance | AI Security Sandbox |
 | **[Security Scanning Orchestration](#security-scanning-orchestration)** | Intermediate | Workflow | Aggregate multiple security tools and use AI to summarize findings for actionable insights | Policy-as-Code Generation |
-| **[AI Review Automation](#ai-review-automation)** | Intermediate | Operations | Automate review process for parallel agent outputs using AI to detect conflicts and coordinate integration | AI Workflow Orchestration, Atomic Task Decomposition |
-| **[Compliance Evidence Automation](#compliance-evidence-automation)** | Advanced | Operations | Generate audit evidence matrices from logs and configuration changes automatically | Security Scanning Orchestration |
-| **[ChatOps Security Integration](#chatops-security-integration)** | Beginner | Operations | Deploy security scanning capabilities through chat commands for immediate feedback | Security Scanning Orchestration |
 | **Deployment Automation** | | Operations | *Category containing deployment and pipeline patterns* | |
-| **[Pipeline Synthesis](#pipeline-synthesis)** | Intermediate | Workflow | Convert plain-English build specifications into CI/CD pipeline configurations | AI Workflow Orchestration, AI Tool Integration |
-| **[AI-Guided Blue-Green Deployment](#ai-guided-blue-green-deployment)** | Advanced | Operations | Generate blue-green deployment scripts with validation to prevent AI misconceptions | Pipeline Synthesis |
-| **[Drift Detection & Remediation](#drift-detection--remediation)** | Advanced | Operations | Detect infrastructure configuration drift and generate corrective patches automatically | Pipeline Synthesis |
-| **[Release Note Synthesis](#release-note-synthesis)** | Beginner | Operations | Automatically generate structured release notes by analyzing git commit history | Pipeline Synthesis |
 | **Monitoring & Maintenance** | | Operations | *Category containing monitoring and maintenance patterns* | |
 | **[Performance Baseline Management](#performance-baseline-management)** | Advanced | Operations | Establish intelligent performance baselines and configure monitoring thresholds automatically | Observable AI Development, AI Tool Integration |
-| **[Technical Debt Forecasting](#technical-debt-forecasting)** | Intermediate | Operations | Proactively identify and prioritize technical debt using AI-powered code analysis | AI-Driven Refactoring, AI-Driven Architecture Design, AI Tool Integration |
-| **[Incident Response Automation](#incident-response-automation)** | Advanced | Operations | Generate actionable incident response playbooks from historical incident data | Performance Baseline Management |
-| **[Test Suite Health Management](#test-suite-health-management)** | Intermediate | Operations | Analyze build history to identify and remediate flaky tests automatically | Comprehensive AI Testing Strategy |
-| **[Dependency Upgrade Advisor](#dependency-upgrade-advisor)** | Intermediate | Operations | Intelligently manage dependency upgrades with compatibility analysis and risk assessment | Technical Debt Forecasting |
-| **[On-Call Handoff Automation](#on-call-handoff-automation)** | Intermediate | Operations | Generate comprehensive handoff briefs that summarize system state and active issues | Incident Response Automation |
-| **[Chaos Engineering Scenarios](#chaos-engineering-scenarios)** | Advanced | Operations | Generate targeted chaos experiments based on system architecture and dependencies | Performance Baseline Management |
 
 ---
 
@@ -167,10 +148,10 @@ graph TD
     I -->|No| K[Progressive AI Enhancement]
     
     D --> L{Multiple Developers/Agents?}
-    L -->|Yes| M[AI Workflow Orchestration]
+    L -->|Yes| M[Parallelized AI Coding Agents]
     L -->|No| N[Specification Driven Development]
     M --> O[Atomic Task Decomposition]
-    N --> P[Comprehensive AI Testing Strategy]
+    N --> P[AI-Driven Traceability]
     
     E --> Q{Enterprise Requirements?}
     Q -->|Compliance| R[Policy-as-Code Generation]
@@ -190,19 +171,19 @@ graph TD
 1. **[AI Developer Lifecycle](#ai-developer-lifecycle)** - Structured development process
 2. **[Specification Driven Development](#specification-driven-development)** - Quality-focused development
 3. **[AI Issue Generation](#ai-issue-generation)** - Organized work breakdown
-4. **[Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)** - Quality assurance
+4. **[Comprehensive AI Testing Strategy](experimental-patterns.md#comprehensive-ai-testing-strategy)** - Quality assurance
 
 **For Parallel Implementation**:
 1. **[Atomic Task Decomposition](#atomic-task-decomposition)** - Ultra-small independent tasks
-2. **[AI Workflow Orchestration](#ai-workflow-orchestration)** - Agent coordination
-3. **[AI Review Automation](#ai-review-automation)** - Automated integration
+2. **[AI Workflow Orchestration](experimental-patterns.md#ai-workflow-orchestration)** - Agent coordination
+3. **[AI Review Automation](experimental-patterns.md#ai-review-automation)** - Automated integration
 4. **[AI Security Sandbox](#ai-security-sandbox)** - Enhanced with parallel safety
 
 **For Enterprise/Production (Month 2+)**:
 1. **[Policy-as-Code Generation](#policy-as-code-generation)** - Compliance automation
 2. **[Security Scanning Orchestration](#security-scanning-orchestration)** - Integrated security
 3. **[Performance Baseline Management](#performance-baseline-management)** - Production monitoring
-4. **[Technical Debt Forecasting](#technical-debt-forecasting)** - Proactive maintenance
+4. **[Technical Debt Forecasting](experimental-patterns.md#technical-debt-forecasting)** - Proactive maintenance
 
 ### Project Type Recommendations
 
@@ -222,7 +203,7 @@ graph TD
 - **Focus**: Learning and exploration over production readiness
 
 **High-Scale Production**:
-- **Primary**: AI Workflow Orchestration, Performance Baseline Management
+- **Primary**: Parallelized AI Coding Agents, Performance Baseline Management
 - **Secondary**: Chaos Engineering Scenarios, Incident Response Automation
 - **Critical**: All security and monitoring patterns
 
@@ -236,10 +217,10 @@ graph TD
 **Two-Pizza Teams** (small, autonomous teams):
 - Implement **AI Issue Generation** for coordination
 - Use **Specification Driven Development** for quality
-- Consider **Human-AI Handoff Protocol** for role clarity
+- Consider **AI Tool Integration** for role clarity
 - Full **AI Developer Lifecycle** implementation
-- **AI Workflow Orchestration** for complex features
-- **Comprehensive AI Testing Strategy** for quality gates
+- **Parallelized AI Coding Agents** for complex features
+- **AI-Driven Traceability** for quality gates
 
 **Multi Two-Pizza Team Organizations**:
 - **Atomic Task Decomposition** for parallel work across teams
@@ -259,7 +240,7 @@ graph TD
 - Use **Technical Debt Forecasting** for maintenance planning
 
 **Microservices Architecture**:
-- **AI Workflow Orchestration** for service coordination
+- **Parallelized AI Coding Agents** for service coordination
 - **Observable AI Development** across service boundaries
 - **Performance Baseline Management** for distributed monitoring
 
@@ -694,102 +675,6 @@ Attempting to solve complex data analysis, system integration, or real-time prob
 
 ---
 
-## Human-AI Handoff Protocol
-
-**Maturity**: Intermediate  
-**Description**: Clear boundaries and procedures for transitioning work between human developers and AI tools based on complexity, security requirements, and creative problem-solving needs.
-
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Observable AI Development](#observable-ai-development), [AI Workflow Orchestration](#ai-workflow-orchestration)
-
-**Handoff Decision Framework**
-
-```mermaid
-graph TD
-    A[Task Assessment] --> B{Complexity Level}
-    B -->|Low| C[AI First]
-    B -->|Medium| D[AI with Human Review]
-    B -->|High| E[Human First]
-    B -->|Critical| F[Human Only]
-    
-    C --> G{Quality Check}
-    D --> H{AI Success?}
-    E --> I{Need AI Assistance?}
-    F --> J[Human Implementation]
-    
-    G -->|Pass| K[Deploy]
-    G -->|Fail| L[Human Review]
-    H -->|Yes| M[Human Verification]
-    H -->|No| N[Human Takeover]
-    I -->|Yes| O[Collaborative Mode]
-    I -->|No| J
-```
-
-**Handoff Execution Sequence**
-
-```mermaid
-sequenceDiagram
-    participant H as Human
-    participant AS as Assessment System
-    participant AI as AI Assistant
-    participant QC as Quality Control
-    participant R as Repository
-    
-    Note over H,R: Task Assessment Phase
-    H->>AS: Submit Task Requirements
-    AS->>AS: Analyze Complexity & Risk
-    AS->>H: Handoff Recommendation (AI First/Human First/Collaborative)
-    
-    Note over H,R: AI-First Path (Low Complexity)
-    alt AI First Recommended
-        H->>AI: Execute Task with Constraints
-        AI->>AI: Generate Implementation
-        AI->>QC: Submit for Quality Check
-        QC->>QC: Run Automated Tests & Analysis
-        alt Quality Check Passes
-            QC->>R: Commit Implementation
-            QC->>H: Task Complete
-        else Quality Check Fails
-            QC->>H: Failed Quality - Human Review Required
-            H->>AI: Provide Feedback & Corrections
-            AI->>QC: Submit Revised Implementation
-            QC->>R: Commit Final Version
-        end
-    
-    Note over H,R: Human-First Path (High Complexity)
-    else Human First Recommended
-        H->>H: Initial Implementation
-        H->>AS: Assess Need for AI Assistance
-        alt AI Assistance Needed
-            H->>AI: Request Specific AI Help
-            AI->>H: Provide Targeted Assistance
-            H->>H: Integrate AI Suggestions
-            H->>R: Commit Human-Led Implementation
-        else No AI Assistance
-            H->>R: Commit Human-Only Implementation
-        end
-    
-    Note over H,R: Collaborative Path (Medium Complexity)
-    else Collaborative Recommended
-        H->>AI: Collaborative Development Session
-        loop Until Complete
-            AI->>H: Generate Code Segment
-            H->>H: Review & Modify
-            H->>AI: Provide Feedback
-            AI->>AI: Adjust Based on Feedback
-        end
-        H->>QC: Submit Collaborative Result
-        QC->>R: Commit Final Implementation
-    end
-    
-    Note over H,R: Continuous Learning
-    R->>AS: Update Success Metrics
-    AS->>AS: Refine Handoff Criteria
-```
-
-**Anti-pattern: Unclear Boundaries**
-Allowing AI and humans to work on the same task simultaneously without clear handoff points leads to conflicts, duplicated effort, and inconsistent quality.
-
----
 
 ## AI Issue Generation
 
@@ -964,7 +849,7 @@ Specifications use authority levels to resolve conflicts and establish precedenc
 
 When requirements conflict, higher authority levels take precedence, enabling clear decision-making for AI implementation.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Tool Integration](#ai-tool-integration), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy), [Observable AI Development](#observable-ai-development)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Tool Integration](#ai-tool-integration), [Comprehensive AI Testing Strategy](experimental-patterns.md#comprehensive-ai-testing-strategy), [Observable AI Development](#observable-ai-development)
 
 **SpecDriven AI Workflow**
 
@@ -1069,104 +954,6 @@ Saving collections of prompts as if they were specifications. Prompts are implem
 
 ---
 
-## Comprehensive AI Testing Strategy
-
-**Maturity**: Intermediate  
-**Description**: Unified approach combining test-first development, automated test generation, and quality assurance patterns to ensure AI-generated code meets quality and behavioral specifications.
-
-**Pattern Boundary Clarification**:
-- **This pattern** focuses on overall testing strategy and test generation
-- **Specification Driven Development** focuses on writing specs before implementation
-- **Observable AI Development** focuses on logging and debugging for AI understanding
-- **AI-Driven Traceability** focuses on linking requirements to tests and implementation
-
-**Related Patterns**: [Specification Driven Development](#specification-driven-development), [Observable AI Development](#observable-ai-development)
-
-**Integrated Testing Framework**
-
-```mermaid
-graph TD
-    A[Acceptance Tests] --> B[Unit Test Generation]
-    B --> C[Integration Tests]
-    C --> D[Performance Tests]
-    D --> E[Security Tests]
-    E --> F[Flakiness Detection]
-    F --> G[Quality Gates]
-    G --> H{All Tests Pass?}
-    H -->|Yes| I[Deploy]
-    H -->|No| J[AI Test Refinement]
-    J --> B
-```
-
-**Testing Workflow Execution Sequence**
-
-```mermaid
-sequenceDiagram
-    participant D as Developer
-    participant AI as AI Assistant
-    participant TS as Test Suite
-    participant AT as Acceptance Tests
-    participant CI as CI/CD Pipeline
-    participant QG as Quality Gates
-    participant FD as Flakiness Detector
-    
-    Note over D,FD: Test-First Development Phase
-    D->>AI: Generate Acceptance Tests from Requirements
-    AI->>AT: Create Gherkin Scenarios + Expected Behaviors
-    AT->>D: Review Generated Tests
-    D->>AI: Generate Unit Tests from Acceptance Criteria
-    AI->>TS: Create Unit Test Suite
-    
-    Note over D,FD: Implementation & Test Generation
-    D->>AI: Implement Feature Following Tests
-    AI->>TS: Generate Implementation Code
-    D->>AI: Generate Integration Tests
-    AI->>TS: Add Integration Test Cases
-    D->>AI: Generate Performance Tests (Response Time, Memory)
-    AI->>TS: Add Performance Benchmarks
-    D->>AI: Generate Security Tests (Auth, Input Validation)
-    AI->>TS: Add Security Test Cases
-    
-    Note over D,FD: Execution & Quality Assessment
-    D->>CI: Trigger Test Pipeline
-    CI->>TS: Execute All Test Suites
-    TS->>TS: Run Unit → Integration → Performance → Security
-    alt All Tests Pass
-        TS->>QG: Submit Results for Quality Gates
-        QG->>QG: Check Coverage, Performance, Security Thresholds
-        alt Quality Gates Pass
-            QG->>CI: Approve for Deployment
-            CI->>D: Ready to Deploy
-        else Quality Gates Fail
-            QG->>D: Quality Issues (Coverage < 80%, Performance Regression)
-            D->>AI: Address Quality Issues
-            AI->>TS: Generate Additional Tests
-        end
-    else Tests Fail
-        TS->>FD: Analyze Test Failures
-        FD->>FD: Detect Flaky vs Real Failures
-        alt Real Failures Detected
-            FD->>D: Implementation Issues Found
-            D->>AI: Fix Implementation
-            AI->>TS: Updated Code
-        else Flaky Tests Detected
-            FD->>D: Flaky Test Report
-            D->>AI: Refine Flaky Tests
-            AI->>TS: Stabilized Tests
-        end
-        TS->>CI: Re-run Test Pipeline
-    end
-    
-    Note over D,FD: Continuous Improvement
-    CI->>FD: Archive Test Metrics
-    FD->>AI: Update Test Generation Patterns
-    AI->>AI: Learn from Test Success/Failure Patterns
-```
-
-**Anti-pattern: Test Generation Without Strategy**
-Generating tests with AI without a coherent strategy leads to poor coverage, flaky tests, and false confidence in code quality.
-
----
 
 ## Progressive AI Enhancement
 
@@ -1213,7 +1000,7 @@ Asking AI to "create a complete user management system" results in 5000 lines of
 **Maturity**: Intermediate  
 **Description**: Generate multiple implementation options for exploration and comparison rather than accepting the first AI solution.
 
-**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Context Window Optimization](#context-window-optimization)
+**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Context Window Optimization](experimental-patterns.md#context-window-optimization)
 
 **Multi-Option Implementation Comparison**
 
@@ -1253,153 +1040,13 @@ Generating too many choices or spending more time evaluating options than implem
 
 ---
 
-## AI Workflow Orchestration
-
-**Maturity**: Advanced  
-**Description**: Coordinate sequential pipelines, parallel agent workflows, and hybrid human-AI processes for complex development tasks. Transform synchronous single-agent workflows into asynchronous, event-driven multi-agent architectures while maintaining safety and consistency.
-
-**Related Patterns**: [Human-AI Handoff Protocol](#human-ai-handoff-protocol), [AI Tool Integration](#ai-tool-integration), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy), [Atomic Task Decomposition](#atomic-task-decomposition)
-
-**Workflow Types & Selection**
-
-```mermaid
-graph TD
-    A[Task Analysis] --> B{Workflow Type}
-    B -->|Sequential| C[Pipeline Workflow]
-    B -->|Parallel| D[Multi-Agent Workflow]
-    B -->|Complex| E[Hybrid Workflow]
-    
-    C --> F[Stage 1: Generate]
-    F --> G[Stage 2: Review]
-    G --> H[Stage 3: Optimize]
-    H --> I[Stage 4: Test]
-    
-    D --> J[Agent 1: Backend]
-    D --> K[Agent 2: Frontend]
-    D --> L[Agent 3: Tests]
-    J --> M[Synchronization]
-    K --> M
-    L --> M
-    
-    E --> N[Human Planning]
-    N --> O[AI Implementation]
-    O --> P[Human Review]
-    P --> Q[AI Refinement]
-```
-
-**Parallel Agent Coordination Sequence**
-
-```mermaid
-sequenceDiagram
-    participant O as Orchestrator
-    participant A1 as Backend Agent
-    participant A2 as Frontend Agent  
-    participant A3 as Test Agent
-    participant C as Coordinator
-    participant R as Review System
-    participant H as Human
-    
-    Note over O,H: Task Breakdown & Assignment
-    O->>C: Analyze Feature Requirements
-    C->>O: Atomic Task Breakdown
-    O->>A1: Assign: Auth API (2hrs)
-    O->>A2: Assign: Login UI (1.5hrs)
-    O->>A3: Assign: Test Suite (2hrs)
-    
-    Note over O,H: Parallel Execution Phase
-    par Backend Development
-        A1->>C: Start Backend Task
-        A1->>A1: Implement JWT Auth API
-        A1->>C: Backend Complete
-    and Frontend Development
-        A2->>C: Start Frontend Task
-        A2->>A2: Build Login Components
-        A2->>C: Frontend Complete
-    and Test Development
-        A3->>C: Start Test Task
-        A3->>A3: Generate Test Suite
-        A3->>C: Tests Complete
-    end
-    
-    Note over O,H: Synchronization & Review
-    C->>R: Trigger Integration Review
-    R->>R: Analyze Outputs for Conflicts
-    alt No Conflicts Detected
-        R->>O: Integration Approved
-        O->>H: Ready for Human Review
-    else Conflicts Found
-        R->>O: Conflict Report (API mismatch)
-        O->>A1: Resolve API Contract Issue
-        A1->>C: Resolution Complete
-        C->>R: Re-trigger Review
-        R->>O: Integration Approved
-    end
-    
-    Note over O,H: Final Integration
-    H->>O: Approve Integration
-    O->>C: Merge All Components
-    C->>H: Feature Complete
-```
-
-**Parallel Agent Coordination Examples**
-
-```bash
-# Atomic task breakdown for parallel execution
-ai_task_manager "Break down user authentication feature into atomic tasks:
-- Each task <2 hours completion time
-- Independent implementation (no shared state)
-- Clear input/output contracts
-- Parallelizable across agents"
-
-# Parallel agent execution with safety
-ai_orchestrator --parallel --safe-mode \
-  --task="backend-auth-api" --agent="backend-specialist" \
-  --task="frontend-login-ui" --agent="frontend-specialist" \
-  --task="integration-tests" --agent="testing-specialist" \
-  --sync-point="integration-review"
-
-# Safety-first parallel review
-ai_reviewer --parallel-output \
-  --check-conflicts \
-  --verify-contracts \
-  --merge-strategy="human-approval"
-```
-
-**Parallel Agent Safety Framework**
-
-```yaml
-# .ai/parallel-config.yml
-parallel_safety:
-  max_concurrent_agents: 3
-  conflict_detection: enabled
-  shared_resources:
-    - "src/shared/"
-    - "package.json"
-    - "database/migrations/"
-  isolation_boundaries:
-    - backend: "src/api/"
-    - frontend: "src/components/"
-    - testing: "tests/"
-  sync_points:
-    - after_implementation
-    - before_integration
-    - before_deployment
-```
-
-**Anti-pattern: Uncoordinated Multi-Tool Usage**
-Using multiple AI tools without proper orchestration leads to inconsistent code, integration conflicts, and wasted effort from competing implementations.
-
-**Anti-pattern: Unsafe Parallel Execution**
-Running parallel agents without proper isolation, conflict detection, or sync points risks data corruption, merge conflicts, and system instability.
-
----
 
 ## Parallelized AI Coding Agents
 
 **Maturity**: Advanced  
 **Description**: Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration.
 
-**Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration), [Atomic Task Decomposition](#atomic-task-decomposition), [AI Security Sandbox](#ai-security-sandbox)
+**Related Patterns**: [AI Workflow Orchestration](experimental-patterns.md#ai-workflow-orchestration), [Atomic Task Decomposition](#atomic-task-decomposition), [AI Security Sandbox](#ai-security-sandbox)
 
 **Agent Coordination Lifecycle**
 
@@ -1637,33 +1284,6 @@ Running multiple agents without isolation, shared memory, or conflict resolution
 
 ---
 
-## Context Window Optimization
-
-**Maturity**: Advanced  
-**Description**: Match AI tool selection to task complexity and optimize cost/performance trade-offs. Using Claude for every task is like using a sledgehammer to hang a picture.
-
-**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Workflow Orchestration](#ai-workflow-orchestration)
-
-**Decision Matrix**
-```
-Task: Add null check
-Tool: GitHub Copilot (instant, cheap)
-Context: <100 tokens
-
-Task: Extract method
-Tool: Cursor Cmd+K (fast, focused)  
-Context: <1000 tokens
-
-Task: Refactor module
-Tool: Windsurf Cascade (handles dependencies)
-Context: <10000 tokens
-
-Task: Design architecture
-Tool: Claude Code (best reasoning)
-Context: Full codebase
-```
-
----
 
 ## AI Knowledge Persistence
 
@@ -1763,7 +1383,7 @@ echo "Full JWT specification with 47 configuration options..." >> .ai/knowledge/
 **Maturity**: Beginner  
 **Description**: Give AI specific constraints to prevent over-engineering and ensure focused solutions.
 
-**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Human-AI Handoff Protocol](#human-ai-handoff-protocol), [AI Choice Generation](#ai-choice-generation)
+**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Human-AI Handoff Protocol](experimental-patterns.md#human-ai-handoff-protocol), [AI Choice Generation](#ai-choice-generation)
 
 **Examples**
 ```
@@ -1784,7 +1404,7 @@ Good: "Reduce p99 latency to <50ms without new dependencies"
 **Maturity**: Intermediate  
 **Description**: Break complex features into atomic, independently implementable tasks (1-2 hours) that can be parallelized across multiple AI agents. Each task should be completable in isolation without dependencies on concurrent work. Use this pattern when implementing with parallel agents; for standard team development, use AI Issue Generation (4-8 hour tasks).
 
-**Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration), [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Issue Generation](#ai-issue-generation)
+**Related Patterns**: [AI Workflow Orchestration](experimental-patterns.md#ai-workflow-orchestration), [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Issue Generation](#ai-issue-generation)
 
 **Atomic Task Criteria**
 
@@ -1954,7 +1574,7 @@ Breaking tasks so small that coordination overhead exceeds the benefits of paral
 **Maturity**: Intermediate  
 **Description**: Design systems with comprehensive logging, tracing, and debugging capabilities that enable AI to understand system behavior and diagnose issues effectively.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Tool Integration](#ai-tool-integration), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy), [AI-Driven Traceability](#ai-driven-traceability)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Tool Integration](#ai-tool-integration), [Comprehensive AI Testing Strategy](experimental-patterns.md#comprehensive-ai-testing-strategy), [AI-Driven Traceability](#ai-driven-traceability)
 
 **Core Implementation**
 
@@ -2059,7 +1679,7 @@ def process_payment(amount):
 **Maturity**: Intermediate  
 **Description**: Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics, following established refactoring rules and maintaining test coverage throughout the process.
 
-**Related Patterns**: [Rules as Code](#rules-as-code), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy), [Technical Debt Forecasting](#technical-debt-forecasting)
+**Related Patterns**: [Rules as Code](#rules-as-code), [Comprehensive AI Testing Strategy](experimental-patterns.md#comprehensive-ai-testing-strategy), [Technical Debt Forecasting](experimental-patterns.md#technical-debt-forecasting)
 
 **Code Smell Detection Framework**
 
@@ -2314,7 +1934,7 @@ ai-assistant design-architecture \
 **Maturity**: Intermediate  
 **Description**: Maintain automated links between requirements, specifications, tests, implementation, and documentation using AI.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Specification Driven Development](#specification-driven-development), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Specification Driven Development](#specification-driven-development), [Comprehensive AI Testing Strategy](experimental-patterns.md#comprehensive-ai-testing-strategy)
 
 **Automated Traceability System**
 
@@ -2413,249 +2033,14 @@ Posting every low-severity finding buries real issues and frustrates developers.
 
 ---
 
-### AI Review Automation
 
-**Maturity**: Intermediate  
-**Description**: Automate review process for parallel agent outputs using AI to detect conflicts and coordinate integration.
 
-**Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration), [Atomic Task Decomposition](#atomic-task-decomposition), [Parallelized AI Coding Agents](#parallelized-ai-coding-agents)
-
-**Automated Review and Merge System**
-
-```bash
-#!/bin/bash
-# automated-review.sh - Complete parallel agent review and integration
-
-echo "=== AI Review Automation for Parallel Agents ==="
-
-# 1. Detect conflicts between agent outputs
-echo "Scanning for conflicts across agent workspaces..."
-
-ai "Analyze parallel agent outputs for integration issues:
-
-Agent workspaces: $(ls -d workspace/agent-* 2>/dev/null || echo 'none')
-
-Check for:
-1. File conflicts (same files modified by multiple agents)
-2. API contract mismatches (function signatures, return types)
-3. Dependency version conflicts
-4. Naming collisions (classes, functions, variables)
-5. Integration compatibility issues
-
-For each conflict found:
-- Identify which agents are involved
-- Assess conflict severity (critical/medium/low)
-- Suggest resolution strategy
-- Generate merge commands when possible
-
-Output structured JSON with conflicts and resolutions."
-
-# 2. Run quality gates and validation
-echo "Running quality gates on combined outputs..."
-
-ai "Validate merged agent outputs meet quality standards:
-
-Quality checks:
-- Syntax validation (python -m py_compile)
-- Type checking (mypy)
-- Security scan (bandit)
-- Test coverage (>80% requirement)
-- Performance regression check
-
-Generate integration tests that:
-- Import all agent outputs without conflicts
-- Test cross-agent functionality
-- Verify API compatibility
-- Check end-to-end workflows
-
-Return pass/fail status with specific issues found."
-
-# 3. Auto-merge or request human review
-if [ $? -eq 0 ]; then
-    echo "✅ Quality gates passed - proceeding with automatic merge"
-    
-    # Merge agent outputs
-    mkdir -p workspace/merged
-    for agent_dir in workspace/agent-*; do
-        rsync -av --ignore-existing "$agent_dir/" workspace/merged/
-    done
-    
-    # Run integration tests
-    cd workspace/merged && python -m pytest tests/integration/ -v
-    
-    if [ $? -eq 0 ]; then
-        echo "✅ Integration tests passed - merge complete"
-        rsync -av workspace/merged/ src/
-        rm -rf workspace/agent-*
-    else
-        echo "❌ Integration tests failed - manual review required"
-    fi
-else
-    echo "⚠️ Quality gates failed - human review required"
-    # Create review report for humans
-    ai "Generate human-readable review report with:
-    - Summary of all conflicts found
-    - Recommended resolution steps
-    - Risk assessment for each issue
-    - Estimated effort to resolve manually"
-fi
-```
-
-**Anti-pattern: Manual-Only Review**
-Relying entirely on human reviewers for parallel agent outputs creates bottlenecks and misses systematic integration issues that automated tools can catch.
-
----
-
-### Compliance Evidence Automation
-
-**Maturity**: Advanced  
-**Description**: Generate audit evidence matrices from logs and configuration changes automatically, creating comprehensive compliance documentation without manual effort.
-
-**Related Patterns**: [Security Scanning Orchestration](#security-scanning-orchestration)
-
-```bash
-# Automated compliance evidence collection
-aws configservice get-resource-config-history > awsconfig.json
-aws cloudtrail lookup-events > iam-changes.json
-ai "Generate SOC2 evidence sheet from awsconfig.json and iam-changes.json" > report.csv
-```
-
-**Anti-pattern: Manual Evidence Collection**
-Hand-crafted spreadsheets miss events or contain outdated entries under audit pressure.
-
----
-
-### ChatOps Security Integration
-
-**Maturity**: Beginner  
-**Description**: Deploy security scanning capabilities through chat commands for immediate feedback, making security assessment as easy as sending a message.
-
-**Related Patterns**: [Security Scanning Orchestration](#security-scanning-orchestration)
-
-```yaml
-# bot-config.yml
-commands:
-  - trigger: /sec scan {{repo}}
-    action: "./security-scan.sh && cat pr-comment.txt"
-```
-
-**Anti-pattern: Over-Automation**
-Allowing auto-fix commands via chat can deploy untested changes.
-
----
 
 ## Deployment Automation Patterns
 
-### Pipeline Synthesis
 
-**Maturity**: Intermediate  
-**Description**: Convert plain-English build specifications into CI/CD pipeline configurations, maintaining traceability between human-readable specs and generated pipelines.
 
-**Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration)
 
-```bash
-# See actual spec: pipelines/ci_spec.md
-# ci.spec
-install dependencies -> pip install -r requirements.txt
-run tests -> pytest
-build image -> docker build -t myapp .
-push image -> aws ecr get-login-password | docker push myapp:latest
-
-# Generate CI
-ai "Read ci.spec and output GitHub Actions YAML" > .github/workflows/ci.yml
-git add ci.spec .github/workflows/ci.yml
-git commit -m "chore: generate CI from spec"
-```
-
-**Anti-pattern: Over-Generation**
-Accepting every AI-suggested stage without pruning adds slow, unused steps to pipelines.
-
----
-
-### AI-Guided Blue-Green Deployment
-
-**Maturity**: Advanced  
-**Description**: Generate blue-green deployment scripts with validation to prevent AI misconceptions, ensuring proper atomic traffic switching rather than gradual rollouts.
-
-**Related Patterns**: [Pipeline Synthesis](#pipeline-synthesis)
-
-```bash
-# Blue-green reference documentation
-# See actual guide: deployment/blue_green/blue_green_deployment.md
-cat > docs/blue-green-guide.md << 'EOF'
-# Blue-Green Deployment Pattern
-
-## Key Principles (from Martin Fowler)
-1. Maintain two identical production environments: Blue (live) and Green (idle)
-2. Deploy new version to the idle environment
-3. Test thoroughly in idle environment
-4. Switch traffic from Blue to Green atomically
-5. Keep Blue as rollback option
-
-## Critical: This is NOT canary deployment
-- NO gradual traffic shifting
-- NO percentage-based rollout
-- Traffic switches 100% at once
-EOF
-
-# AI prompt with validation
-ai "Using deployment/blue_green/blue_green_deployment.md, create AWS deployment script that:
-1. Deploys to IDLE environment only
-2. Runs health checks on idle
-3. Switches ALL traffic atomically via ALB
-4. Keeps previous environment for rollback
-
-DO NOT create canary deployment." > deploy-blue-green.sh
-
-# Validate AI didn't confuse patterns
-if grep -q "canary\|gradual\|percentage" deploy-blue-green.sh; then
-    echo "ERROR: AI generated canary deployment, not blue-green"
-    exit 1
-fi
-```
-
-**Anti-pattern: Trusting AI Blue-Green Generation**
-LLMs frequently confuse blue-green with canary deployments, generating gradual traffic shifting instead of atomic switches.
-
----
-
-### Drift Detection & Remediation
-
-**Maturity**: Advanced  
-**Description**: Detect infrastructure configuration drift and generate corrective patches automatically, maintaining infrastructure as intended without manual intervention.
-
-**Related Patterns**: [Pipeline Synthesis](#pipeline-synthesis)
-
-```bash
-# Detect and fix infrastructure drift
-terraform plan -out=tf.plan
-terraform show -json tf.plan > drift.json
-ai "Create Terraform patch from drift.json to restore desired state" > patch.tf
-terraform apply patch.tf
-```
-
-**Anti-pattern: Automated Overwrite**
-Auto-applying AI patches without inspection can break resources you didn't intend to change.
-
----
-
-### Release Note Synthesis
-
-**Maturity**: Beginner  
-**Description**: Automatically generate structured release notes by analyzing git commit history, categorizing changes into meaningful sections for clear communication.
-
-**Related Patterns**: [Pipeline Synthesis](#pipeline-synthesis)
-
-```bash
-# Auto-generate structured release notes
-git log v1.3.2..HEAD --pretty=format:"%s" > commits.log
-ai "Group commits in commits.log under Added, Changed, Fixed" >> CHANGELOG.md
-```
-
-**Anti-pattern: Minimal Notes**
-Simply pasting commit hashes without context leaves users guessing what changed.
-
----
 
 ## Monitoring & Maintenance Patterns
 
@@ -2677,117 +2062,11 @@ Manual thresholds quickly become stale, causing alert storms or blind spots.
 
 ---
 
-### Technical Debt Forecasting
 
-**Maturity**: Intermediate  
-**Description**: Proactively identify and prioritize technical debt using AI-powered code analysis, ranking areas most in need of attention with specific remediation strategies.
 
-**Related Patterns**: [AI-Driven Refactoring](#ai-driven-refactoring)
 
-```bash
-cloc src > loc.txt
-coverage run -m pytest; coverage report > cov.txt
-ai "From loc.txt and cov.txt, list top-3 files needing refactor and tests" > debt.txt
-```
 
-**Anti-pattern: Reactive Fixes**
-Waiting for incidents to spike forces firefighting rather than long-term health management.
 
----
-
-### Incident Response Automation
-
-**Maturity**: Advanced  
-**Description**: Generate actionable incident response playbooks from historical incident data, extracting common patterns and successful resolution strategies for future use.
-
-**Related Patterns**: [Performance Baseline Management](#performance-baseline-management)
-
-```bash
-pd incidents:list --limit 10 > incidents.json
-ai "Create a step-by-step RDS failover runbook from incidents.json" > runbooks/rds-failover.md
-git add runbooks/rds-failover.md
-```
-
-**Anti-pattern: Stale Documentation**
-Failing to regenerate playbooks after new incidents yields outdated guidance.
-
----
-
-### Test Suite Health Management
-
-**Maturity**: Intermediate  
-**Description**: Analyze build history to identify and remediate flaky tests automatically, improving build reliability by distinguishing between legitimate failures and intermittent issues.
-
-**Related Patterns**: [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)
-
-```bash
-# Identify and fix flaky tests
-wget ci-server/logs/last50 > ci.log
-ai "Find intermittently failing tests in ci.log and suggest retry decorators" > flaky.txt
-# Apply fixes like: @pytest.mark.flaky(reruns=3)
-```
-
-**Anti-pattern: Skip Tests**
-Marking tests as skipped ignores root causes and shrinks coverage.
-
----
-
-### Dependency Upgrade Advisor
-
-**Maturity**: Intermediate  
-**Description**: Intelligently manage dependency upgrades with compatibility analysis and risk assessment, recommending safe upgrade paths while flagging potentially breaking changes.
-
-**Related Patterns**: [Technical Debt Forecasting](#technical-debt-forecasting)
-
-```bash
-# Intelligent dependency management
-npm outdated --json > deps.json
-ai "From deps.json, suggest npm install commands for lodash and axios without breaking changes" > deps-update.sh
-bash deps-update.sh
-```
-
-**Anti-pattern: Bulk Updates**
-Running `npm update` without understanding breaking changes causes runtime errors.
-
----
-
-### On-Call Handoff Automation
-
-**Maturity**: Intermediate  
-**Description**: Generate comprehensive handoff briefs that summarize system state and active issues, ensuring smooth transitions between on-call engineers with complete context.
-
-**Related Patterns**: [Incident Response Automation](#incident-response-automation)
-
-```bash
-# Generate comprehensive handoff briefs
-pd incidents:list --status triggered > alerts.json
-curl grafana/api/dashboards/home > dash.json
-ai "Create an on-call handoff brief from alerts.json and dash.json" > handoff.md
-slack-cli post --file handoff.md --channel oncall
-```
-
-**Anti-pattern: Fragmented Handoffs**
-Relying on chat logs or email threads skips critical context and action items.
-
----
-
-### Chaos Engineering Scenarios
-
-**Maturity**: Advanced  
-**Description**: Generate targeted chaos experiments based on system architecture and dependencies, creating focused scenarios that test resilience without unnecessary disruption.
-
-**Related Patterns**: [Performance Baseline Management](#performance-baseline-management)
-
-```bash
-# Generate targeted chaos experiments
-ai "From services.json, generate a Gremlin script to kill 1 of 3 instances of service-A every 5m" > chaos.json
-gremlin run chaos.json
-```
-
-**Anti-pattern: Blind Chaos Testing**
-Running random fault injection without understanding system dependencies yields noise rather than insights.
-
----
 
 # Anti-Patterns Reference
 
@@ -2830,9 +2109,9 @@ Running random fault injection without understanding system dependencies yields 
 
 ### Phase 2: Development (Weeks 3-4)
 1. **[Specification Driven Development](#specification-driven-development)** - Implement specification-first approach
-2. **[Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)** - Establish unified testing framework
-3. **[Progressive AI Enhancement](#progressive-ai-enhancement)** - Practice iterative development
-4. **[Context Window Optimization](#context-window-optimization)** - Optimize AI tool selection
+2. **[Progressive AI Enhancement](#progressive-ai-enhancement)** - Practice iterative development
+3. **[AI Choice Generation](#ai-choice-generation)** - Generate multiple implementation options
+4. **[Atomic Task Decomposition](#atomic-task-decomposition)** - Break down complex features
 
 ### Phase 3: Operations (Weeks 5-6)
 1. **[AI Security & Compliance](#ai-security--compliance)** - Implement unified security framework
