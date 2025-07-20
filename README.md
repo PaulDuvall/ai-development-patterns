@@ -400,130 +400,45 @@ services:
 
 **Parallel Agent Isolation**
 
-When running multiple AI agents simultaneously, additional isolation considerations become critical:
+**Parallel Agent Isolation** requires additional safety measures:
 
 ```yaml
-# docker-compose.parallel-ai-sandbox.yml
-version: '3.8'
-
 services:
   ai-agent-backend:
-    build: 
-      context: .
-      dockerfile: Dockerfile.ai-sandbox
-    network_mode: none
+    network_mode: none                    # Complete network isolation
     volumes:
-      - ./src/backend:/workspace/backend:ro
-      - ./workspace/agent-1:/workspace/output:rw
-      - type: tmpfs
-        target: /tmp
-        tmpfs:
-          size: 100M
+      - ./src/backend:/workspace:ro       # Read-only source access
+      - ./workspace/agent-1:/output:rw    # Isolated output workspace
     environment:
       - AGENT_ID=backend-specialist
-      - WORKSPACE_PATH=/workspace/output
-      - MAX_EXECUTION_TIME=7200  # 2 hours
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    ulimits:
-      nproc: 256
-      nofile: 1024
-    
-  ai-agent-frontend:
-    build: 
-      context: .
-      dockerfile: Dockerfile.ai-sandbox
-    network_mode: none
-    volumes:
-      - ./src/frontend:/workspace/frontend:ro
-      - ./workspace/agent-2:/workspace/output:rw
-      - type: tmpfs
-        target: /tmp
-        tmpfs:
-          size: 100M
-    environment:
-      - AGENT_ID=frontend-specialist
-      - WORKSPACE_PATH=/workspace/output
-      - MAX_EXECUTION_TIME=7200
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    ulimits:
-      nproc: 256
-      nofile: 1024
-
-  coordination-service:
-    build:
-      context: .
-      dockerfile: Dockerfile.coordinator
-    networks:
-      - ai-coordination
-    volumes:
-      - ./workspace:/workspace:rw
-      - coordination-logs:/logs:rw
-    environment:
-      - COORDINATOR_MODE=parallel
-      - MAX_CONCURRENT_AGENTS=3
-      - CONFLICT_DETECTION=enabled
-    depends_on:
-      - ai-agent-backend
-      - ai-agent-frontend
-
-networks:
-  ai-coordination:
-    driver: bridge
-    internal: true
-
-volumes:
-  coordination-logs:
+      - MAX_EXECUTION_TIME=7200           # 2-hour timeout
+    cap_drop: [ALL]                       # Drop all capabilities
+    ulimits: {nproc: 256, nofile: 1024}   # Resource constraints
 ```
+
+**Complete Implementation**: See [sandbox/docker-compose.parallel-ai-sandbox.yml](sandbox/docker-compose.parallel-ai-sandbox.yml) for full multi-agent isolation with coordination service, conflict detection, and resource monitoring.
 
 **Cross-Agent Resource Protection**
 
 ```bash
-# .ai/parallel-safety/resource-locks.sh
-#!/bin/bash
-# Prevent parallel agents from modifying shared resources simultaneously
-
 acquire_lock() {
     local resource_path="$1"
     local agent_id="$2"
-    local lock_file="/workspace/locks/$(echo "$resource_path" | sed 's/\//_/g').lock"
-    
-    # Atomic lock acquisition with timeout
+    # Atomic lock using shell's noclobber (set -C)
     if (set -C; echo "$agent_id" > "$lock_file") 2>/dev/null; then
-        echo "Lock acquired for $resource_path by $agent_id"
-        return 0
+        return 0  # Lock acquired
     else
-        echo "Resource $resource_path locked by $(cat "$lock_file" 2>/dev/null || echo 'unknown')"
-        return 1
+        return 1  # Resource locked by another agent
     fi
 }
 
-release_lock() {
-    local resource_path="$1"
-    local agent_id="$2"
-    local lock_file="/workspace/locks/$(echo "$resource_path" | sed 's/\//_/g').lock"
-    
-    if [[ -f "$lock_file" ]] && [[ "$(cat "$lock_file")" == "$agent_id" ]]; then
-        rm "$lock_file"
-        echo "Lock released for $resource_path by $agent_id"
-    fi
-}
-
-# Usage in agent scripts
+# Usage: Prevent concurrent package.json modifications
 if acquire_lock "package.json" "$AGENT_ID"; then
-    # Modify package.json safely
-    modify_package_json
-    release_lock "package.json" "$AGENT_ID"
-else
-    echo "Cannot modify package.json - locked by another agent"
-    exit 1
+    modify_package_json && release_lock "package.json" "$AGENT_ID"
 fi
 ```
+
+**Complete Implementation**: See [examples/parallelized-ai-agents/](examples/parallelized-ai-agents/) for full resource locking system with timeout handling, deadlock detection, and automatic lock cleanup.
 
 **Agent Communication Security**
 
@@ -554,93 +469,24 @@ communication_rules:
 **Parallel Safety Monitoring**
 
 ```python
-# parallel-safety-monitor.py
-import time
-import psutil
-import json
-from pathlib import Path
-
 class ParallelSafetyMonitor:
-    def __init__(self):
-        self.workspace_path = Path("/workspace")
-        self.violations = []
-        
     def monitor_resource_conflicts(self):
         """Detect when multiple agents try to modify same files"""
-        file_access_map = {}
+        # Check file access patterns across agent workspaces
+        # Log violations when concurrent access detected
         
-        for agent_dir in self.workspace_path.glob("agent-*"):
-            agent_id = agent_dir.name
-            
-            # Check file access patterns
-            for file_path in agent_dir.glob("**/*"):
-                if file_path.is_file():
-                    # Detect concurrent file modifications
-                    stat = file_path.stat()
-                    if file_path.suffix in ['.js', '.py', '.json']:
-                        if file_path in file_access_map:
-                            self.violations.append({
-                                "type": "concurrent_access",
-                                "file": str(file_path),
-                                "agents": [file_access_map[file_path], agent_id],
-                                "timestamp": time.time()
-                            })
-                        file_access_map[file_path] = agent_id
-    
     def check_resource_limits(self):
         """Monitor resource usage per agent container"""
-        for container_name in ["ai-agent-backend", "ai-agent-frontend"]:
-            try:
-                # In real implementation, use Docker API
-                stats = self.get_container_stats(container_name)
-                
-                if stats["memory_usage"] > 512 * 1024 * 1024:  # 512MB
-                    self.violations.append({
-                        "type": "memory_limit_exceeded",
-                        "container": container_name,
-                        "usage": stats["memory_usage"],
-                        "limit": 512 * 1024 * 1024
-                    })
-                    
-                if stats["cpu_usage"] > 80:  # 80% CPU
-                    self.violations.append({
-                        "type": "cpu_limit_exceeded", 
-                        "container": container_name,
-                        "usage": stats["cpu_usage"]
-                    })
-            except Exception as e:
-                self.violations.append({
-                    "type": "monitoring_error",
-                    "container": container_name,
-                    "error": str(e)
-                })
-    
+        # Monitor memory (512MB limit) and CPU (80% limit)
+        # Alert on threshold breaches
+        
     def report_violations(self):
-        """Report safety violations for review"""
-        if self.violations:
-            with open("/workspace/safety-violations.json", "w") as f:
-                json.dump({
-                    "timestamp": time.time(),
-                    "violations": self.violations,
-                    "severity": "high" if len(self.violations) > 5 else "medium"
-                }, f, indent=2)
-            
-            # Alert coordination service
-            print(f"SAFETY ALERT: {len(self.violations)} violations detected")
-            return False
-        return True
-
-# Run monitoring
-if __name__ == "__main__":
-    monitor = ParallelSafetyMonitor()
-    while True:
-        monitor.monitor_resource_conflicts()
-        monitor.check_resource_limits()
-        if not monitor.report_violations():
-            # Stop all agents on safety violation
-            exit(1)
-        time.sleep(30)
+        """Report safety violations and trigger emergency shutdown if needed"""
+        # Generate violation report, alert coordination service
+        # Return False to trigger agent shutdown on critical violations
 ```
+
+**Complete Implementation**: See [examples/parallelized-ai-agents/](examples/parallelized-ai-agents/) for full parallel safety monitoring system with Docker API integration, resource tracking, and automated emergency shutdown procedures.
 
 **Emergency Agent Shutdown**
 
@@ -734,56 +580,23 @@ sequenceDiagram
     M->>D: Performance Alerts + Security Events
 ```
 
-**Complete Development Workflow**
+**Core Workflow Implementation**
 
 ```bash
-#!/bin/bash
-# ai_development_workflow.sh - Complete AI-assisted development lifecycle
-
-echo "=== AI Developer Lifecycle: Feature Development ==="
-
 # Stage 1-3: Problem → Plan → Requirements
-ai "Analyze user request and create complete development plan:
-
-REQUEST: Add user authentication with JWT tokens
-
-Generate:
-1. Technical architecture (React frontend, Node.js API, PostgreSQL)
-2. Product requirements with acceptance criteria
-3. Kanban tasks (4-8 hour max, with dependencies)
-4. API specifications in OpenAPI format
-5. Security considerations and compliance requirements
-
-Output structured JSON for automated task creation."
+ai "Analyze request → Generate architecture, tasks, API specs"
 
 # Stage 4-5: Issues → Specifications  
-ai "Generate executable acceptance tests:
-- Gherkin scenarios for login/logout/token refresh
-- API endpoint tests with expected responses
-- Security test cases (invalid tokens, expired sessions)
-- Performance criteria (< 200ms response time)
-
-Make tests runnable before implementation begins."
+ai "Generate executable tests → Gherkin scenarios, API tests, security tests"
 
 # Stage 6: Implementation
-ai "Implement JWT authentication following specifications:
-- Use tests as implementation guide
-- Follow security best practices
-- Add proper error handling
-- Include logging for debugging
-- Ensure code matches acceptance criteria exactly"
+ai "Implement following specifications → Use tests as guide, security best practices"
 
-# Stage 7-9: Testing → Deployment → Monitoring
-ai "Complete quality assurance and deployment:
-- Run all tests and fix failures
-- Security scan for vulnerabilities  
-- Performance benchmark against criteria
-- Generate deployment checklist
-- Create monitoring alerts for auth endpoints
-- Document rollback procedures"
-
-echo "✅ Complete feature development lifecycle with AI assistance"
+# Stage 7-9: Testing → Deployment → Monitoring  
+ai "Complete QA → Run tests, security scan, deploy, monitor"
 ```
+
+**Complete Implementation**: See [examples/ai-development-lifecycle/](examples/ai-development-lifecycle/) for full 9-stage workflow scripts, detailed prompts for each stage, and integration with CI/CD pipelines.
 
 **Anti-pattern: Ad-Hoc AI Development**
 Jumping straight to coding with AI without proper planning, requirements, or testing strategy.
@@ -1028,27 +841,15 @@ Format as JSON for GitHub API import."
 
 **Generated Kanban-Ready Issues**
 ```json
-[
-  {
-    "title": "Backend: Implement password reset token generation",
-    "body": "## Description\nCreate secure token generation for password reset requests\n\n## Acceptance Criteria\n- [ ] Generate cryptographically secure reset tokens\n- [ ] Set token expiration (15 minutes)\n- [ ] Store token-user mapping in Redis\n- [ ] Validate email exists before token creation\n\n## Technical Notes\n- Use crypto.randomBytes(32)\n- TTL of 900 seconds in Redis\n- Rate limit: 3 requests per hour per email\n\n## Cycle Time Target\n8-12 hours (deployable independently)",
-    "labels": ["backend", "security", "kanban-ready"],
-    "milestone": "Password Reset MVP"
-  },
-  {
-    "title": "Backend: Email service integration for reset links", 
-    "body": "## Description\nSend password reset emails with secure links\n\n## Acceptance Criteria\n- [ ] Template-based email generation\n- [ ] Secure reset link with token\n- [ ] Email delivery confirmation\n- [ ] Handle email service failures gracefully\n\n## Dependencies\n- Requires: Password reset token generation\n\n## Cycle Time Target\n6-8 hours (deploy once token generation is complete)",
-    "labels": ["backend", "email", "kanban-ready"],
-    "milestone": "Password Reset MVP"
-  },
-  {
-    "title": "Frontend: Password reset request form",
-    "body": "## Description\nUI for users to request password reset\n\n## Acceptance Criteria\n- [ ] Email input field with validation\n- [ ] Submit button with loading state\n- [ ] Success/error message display\n- [ ] Rate limiting feedback\n\n## Design\n- Use existing form components\n- Match current auth page styling\n\n## Cycle Time Target\n4-6 hours (can work in parallel with backend tasks)",
-    "labels": ["frontend", "ui", "kanban-ready"],
-    "milestone": "Password Reset MVP"
-  }
-]
+{
+  "title": "Backend: Implement password reset token generation",
+  "body": "## Acceptance Criteria\n- [ ] Generate secure reset tokens\n- [ ] Set 15-minute expiration\n## Cycle Time Target\n8-12 hours",
+  "labels": ["backend", "security", "kanban-ready"],
+  "milestone": "Password Reset MVP"
+}
 ```
+
+**Complete Implementation**: See [examples/ai-issue-generation/](examples/ai-issue-generation/) for full Kanban issue templates, GitHub API integration scripts, and JIRA workflow automation.
 
 **Kanban Epic Breakdown**
 ```bash
@@ -1746,52 +1547,19 @@ git worktree remove ../agent-tests
 
 **Shared Memory Architecture**
 ```python
-# shared_memory.py
-import json
-import fcntl
-from pathlib import Path
-from datetime import datetime
-
 class AgentMemory:
-    def __init__(self, memory_path="/shared/agent_memory.json"):
-        self.memory_path = Path(memory_path)
-        self.memory_path.parent.mkdir(parents=True, exist_ok=True)
-        
     def record_learning(self, agent_id, key, value):
-        """Record discovered patterns or solutions"""
-        with open(self.memory_path, 'a+') as f:
-            fcntl.flock(f, fcntl.LOCK_EX)
-            try:
-                f.seek(0)
-                memory = json.load(f) if f.read() else {}
-            except:
-                memory = {}
-            
-            if agent_id not in memory:
-                memory[agent_id] = {}
-            
-            memory[agent_id][key] = {
-                'value': value,
-                'timestamp': datetime.utcnow().isoformat(),
-                'agent': agent_id
-            }
-            
-            f.seek(0)
-            f.truncate()
-            json.dump(memory, f, indent=2)
-            fcntl.flock(f, fcntl.LOCK_UN)
-    
-    def get_shared_knowledge(self):
-        """Retrieve all shared knowledge across agents"""
-        if not self.memory_path.exists():
-            return {}
+        """Record discovered patterns with thread-safe file locking"""
+        # Use fcntl.flock() for atomic file operations
+        # Store timestamped learning entries per agent
         
-        with open(self.memory_path, 'r') as f:
-            fcntl.flock(f, fcntl.LOCK_SH)
-            memory = json.load(f)
-            fcntl.flock(f, fcntl.LOCK_UN)
-        return memory
+    def get_shared_knowledge(self):
+        """Retrieve consolidated knowledge from all agents"""
+        # Return shared memory accessible to all parallel agents
+        # Enable knowledge transfer between agent sessions
 ```
+
+**Complete Implementation**: See [examples/parallelized-ai-agents/](examples/parallelized-ai-agents/) for full shared memory system with file locking, conflict resolution, and agent session persistence.
 
 **Parallel Task Distribution**
 ```yaml
@@ -2139,40 +1907,22 @@ For each task that fails validation:
 **Task Interface Contracts**
 
 ```python
-# Define clear contracts for atomic tasks
 class TaskContract:
-    """Interface contract for atomic tasks to ensure parallel compatibility"""
-    
-    def __init__(self, task_id: str):
-        self.task_id = task_id
-        self.inputs: Dict[str, Type] = {}
-        self.outputs: Dict[str, Type] = {}
-        self.side_effects: List[str] = []
-        self.dependencies: List[str] = []
-    
     def validate_atomic(self) -> bool:
         """Validate task meets atomic criteria"""
-        checks = [
-            len(self.side_effects) == 0,  # No side effects
-            len(self.dependencies) <= 3,   # Minimal dependencies  
-            self.estimated_hours <= 2,     # Rapid completion
-            self.has_clear_io_contract()   # Testable interface
-        ]
-        return all(checks)
+        return all([
+            len(self.side_effects) == 0,    # No side effects
+            self.estimated_hours <= 2,      # Rapid completion
+            self.has_clear_io_contract()    # Testable interface
+        ])
 
-# Example atomic task contracts
-password_validation_task = TaskContract("auth-001")
-password_validation_task.inputs = {
-    "password": str,
-    "rules": PasswordRules
-}
-password_validation_task.outputs = {
-    "is_valid": bool,
-    "validation_errors": List[str]
-}
-password_validation_task.side_effects = []  # Pure function
-password_validation_task.estimated_hours = 1.5
+# Example: Password validation task contract
+task = TaskContract("auth-001")
+task.inputs = {"password": str, "rules": PasswordRules}  
+task.outputs = {"is_valid": bool, "errors": List[str]}
 ```
+
+**Complete Implementation**: See [examples/atomic-task-decomposition/](examples/atomic-task-decomposition/) for full contract validation system, task dependency resolution, and parallel execution coordination.
 
 **When to Use Atomic Task Decomposition**
 
