@@ -19,6 +19,12 @@ For complete pattern documentation, see: [Specification Driven Development](../.
 - **`iam_policy_spec.md`** - Machine-readable specification with authority levels
 - **`.pre-commit-config.yaml`** - Pre-commit hooks for specification validation
 
+### Specification Examples
+- **`user_authentication.feature`** - Gherkin scenarios for authentication workflows
+- **`user_authentication_structured.md`** - Structured specification with authority levels and anchored sections
+- **`api_openapi.yaml`** - OpenAPI specification for authentication API endpoints
+- **`cli_spec.md`** - Command-line interface specification with detailed usage examples
+
 ### Testing Infrastructure
 - **`tests/`** - Complete test suite with specification traceability
 - **`requirements.txt`** - Dependencies for testing and validation
@@ -76,7 +82,23 @@ python iam_policy_generator.py --policy-type s3-read --resource arn:aws:s3:::my-
 }
 ```
 
-### 2. Specification Validation
+### 2. Working with Specification Examples
+
+```bash
+# Validate Gherkin scenarios
+cucumber user_authentication.feature --dry-run
+
+# Validate OpenAPI specification
+swagger-codegen validate -i api_openapi.yaml
+
+# Generate API client from OpenAPI spec
+swagger-codegen generate -i api_openapi.yaml -l python -o ./generated-client/
+
+# Parse structured specification anchors
+python spec_validator.py --validate-anchors user_authentication_structured.md
+```
+
+### 3. Specification Validation
 
 ```bash
 # Check specification coverage
@@ -89,7 +111,7 @@ python spec_validator.py --authority-conflicts
 python spec_validator.py --validate-syntax iam_policy_spec.md
 ```
 
-### 3. Running Tests with Coverage
+### 4. Running Tests with Coverage
 
 ```bash
 # Run all tests with specification coverage
@@ -103,7 +125,7 @@ coverage html
 open htmlcov/index.html
 ```
 
-### 4. Pre-commit Hook Setup
+### 5. Pre-commit Hook Setup
 
 ```bash
 # Install pre-commit hooks
