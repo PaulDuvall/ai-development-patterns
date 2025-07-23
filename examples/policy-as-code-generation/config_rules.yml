@@ -1,0 +1,358 @@
+# AWS Config Rules for AI Development Platform Compliance
+# Generated from compliance requirements using AI assistance
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS Config Rules for AI Development Platform Security and Compliance'
+
+Resources:
+  # S3 Bucket Security Rules
+  S3BucketPublicAccessProhibited:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: s3-bucket-public-access-prohibited
+      Description: 'Checks that Amazon S3 buckets do not allow public access'
+      Source:
+        Owner: AWS
+        SourceIdentifier: S3_BUCKET_PUBLIC_ACCESS_PROHIBITED
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::S3::Bucket
+
+  S3BucketSSLRequestsOnly:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: s3-bucket-ssl-requests-only
+      Description: 'Checks whether S3 buckets have policies that require requests to use SSL'
+      Source:
+        Owner: AWS
+        SourceIdentifier: S3_BUCKET_SSL_REQUESTS_ONLY
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::S3::Bucket
+
+  S3BucketServerSideEncryptionEnabled:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: s3-bucket-server-side-encryption-enabled
+      Description: 'Checks that your S3 bucket either has encryption configured or uses the bucket default encryption'
+      Source:
+        Owner: AWS
+        SourceIdentifier: S3_BUCKET_SERVER_SIDE_ENCRYPTION_ENABLED
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::S3::Bucket
+
+  # RDS Database Security Rules
+  RDSInstancePubliclyAccessible:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: rds-instance-public-read-prohibited
+      Description: 'Checks whether Amazon RDS instances are not publicly accessible'
+      Source:
+        Owner: AWS
+        SourceIdentifier: RDS_INSTANCE_PUBLIC_READ_PROHIBITED
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::RDS::DBInstance
+
+  RDSStorageEncrypted:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: rds-storage-encrypted
+      Description: 'Checks whether storage encryption is enabled for your RDS DB instances'
+      Source:
+        Owner: AWS
+        SourceIdentifier: RDS_STORAGE_ENCRYPTED
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::RDS::DBInstance
+
+  RDSSnapshotPublic:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: rds-snapshot-public-prohibited
+      Description: 'Checks if Amazon RDS snapshots are public'
+      Source:
+        Owner: AWS
+        SourceIdentifier: RDS_SNAPSHOT_PUBLIC_PROHIBITED
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::RDS::DBSnapshot
+          - AWS::RDS::DBClusterSnapshot
+
+  # EC2 Instance Security Rules
+  EC2InstanceNoPublicIP:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: ec2-instance-no-public-ip
+      Description: 'Checks whether Amazon EC2 instances have a public IP association'
+      Source:
+        Owner: AWS
+        SourceIdentifier: EC2_INSTANCE_NO_PUBLIC_IP
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::EC2::Instance
+
+  EC2SecurityGroupSSHRestricted:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: incoming-ssh-disabled
+      Description: 'Checks whether security groups disallow unrestricted incoming SSH traffic'
+      Source:
+        Owner: AWS
+        SourceIdentifier: INCOMING_SSH_DISABLED
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::EC2::SecurityGroup
+
+  EC2InstanceDetailedMonitoringEnabled:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: ec2-instance-detailed-monitoring-enabled
+      Description: 'Checks whether detailed monitoring is enabled for EC2 instances'
+      Source:
+        Owner: AWS
+        SourceIdentifier: EC2_INSTANCE_DETAILED_MONITORING_ENABLED
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::EC2::Instance
+
+  # IAM Security Rules
+  IAMPasswordPolicy:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: iam-password-policy
+      Description: 'Checks whether the account password policy for IAM users meets the specified requirements'
+      Source:
+        Owner: AWS
+        SourceIdentifier: IAM_PASSWORD_POLICY
+      InputParameters: |
+        {
+          "RequireUppercaseCharacters": "true",
+          "RequireLowercaseCharacters": "true", 
+          "RequireSymbols": "true",
+          "RequireNumbers": "true",
+          "MinimumPasswordLength": "12",
+          "PasswordReusePrevention": "5",
+          "MaxPasswordAge": "90"
+        }
+
+  IAMUserMFAEnabled:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: iam-user-mfa-enabled
+      Description: 'Checks whether the AWS Identity and Access Management users have multi-factor authentication (MFA) enabled'
+      Source:
+        Owner: AWS
+        SourceIdentifier: IAM_USER_MFA_ENABLED
+
+  IAMRootAccessKeyCheck:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: iam-root-access-key-check
+      Description: 'Checks whether the root access key is available'
+      Source:
+        Owner: AWS
+        SourceIdentifier: IAM_ROOT_ACCESS_KEY_CHECK
+
+  # VPC Security Rules
+  VPCFlowLogsEnabled:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: vpc-flow-logs-enabled
+      Description: 'Checks whether Amazon Virtual Private Cloud flow logs are found and enabled for VPC'
+      Source:
+        Owner: AWS
+        SourceIdentifier: VPC_FLOW_LOGS_ENABLED
+
+  VPCDefaultSecurityGroupClosed:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: vpc-default-security-group-closed
+      Description: 'Checks that the default security group of any VPC does not allow inbound or outbound traffic'
+      Source:
+        Owner: AWS
+        SourceIdentifier: VPC_DEFAULT_SECURITY_GROUP_CLOSED
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::EC2::SecurityGroup
+
+  # CloudTrail Logging Rules
+  CloudTrailEnabled:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: cloudtrail-enabled
+      Description: 'Checks whether AWS CloudTrail is enabled in your AWS account'
+      Source:
+        Owner: AWS
+        SourceIdentifier: CLOUD_TRAIL_ENABLED
+
+  CloudTrailLogFileValidationEnabled:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: cloudtrail-log-file-validation-enabled
+      Description: 'Checks whether AWS CloudTrail creates a signed digest file with logs'
+      Source:
+        Owner: AWS
+        SourceIdentifier: CLOUD_TRAIL_LOG_FILE_VALIDATION_ENABLED
+
+  # KMS Encryption Rules
+  KMSKeyRotationEnabled:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: cmk-backing-key-rotation-enabled
+      Description: 'Checks whether key rotation is enabled for customer master key (CMK) in AWS Key Management Service'
+      Source:
+        Owner: AWS
+        SourceIdentifier: CMK_BACKING_KEY_ROTATION_ENABLED
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::KMS::Key
+
+  # Lambda Function Security Rules
+  LambdaFunctionPublicAccessProhibited:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: lambda-function-public-access-prohibited
+      Description: 'Checks whether the Lambda function policy prohibits public access'
+      Source:
+        Owner: AWS
+        SourceIdentifier: LAMBDA_FUNCTION_PUBLIC_ACCESS_PROHIBITED
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::Lambda::Function
+
+  LambdaInsideVPC:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: lambda-inside-vpc
+      Description: 'Checks whether an AWS Lambda function is in an Amazon Virtual Private Cloud'
+      Source:
+        Owner: AWS
+        SourceIdentifier: LAMBDA_INSIDE_VPC
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::Lambda::Function
+
+  # Custom Config Rules for AI Development
+  AIContainerImageScanRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: ai-container-image-scan-enabled
+      Description: 'Checks whether ECR repositories have image scanning enabled for AI workloads'
+      Source:
+        Owner: AWS
+        SourceIdentifier: ECR_PRIVATE_IMAGE_SCANNING_ENABLED
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::ECR::Repository
+
+  AIDataEncryptionRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: ai-data-encryption-required
+      Description: 'Custom rule to check AI training data is encrypted at rest and in transit'
+      Source:
+        Owner: AWS_CONFIG_RULE
+        SourceIdentifier: arn:aws:lambda:us-east-1:123456789012:function:ai-data-encryption-check
+      InputParameters: |
+        {
+          "requiredEncryption": "AES256",
+          "transitEncryption": "TLS1.2"
+        }
+
+  # Compliance Aggregation
+  ComplianceAggregatorRule:
+    Type: AWS::Config::ConfigurationAggregator
+    Properties:
+      ConfigurationAggregatorName: ai-development-compliance-aggregator
+      AccountAggregationSources:
+        - AccountIds:
+            - !Ref 'AWS::AccountId'
+          AllAwsRegions: true
+      OrganizationAggregationSource:
+        AllAwsRegions: true
+        RoleArn: !GetAtt ConfigAggregatorRole.Arn
+
+  # IAM Role for Config Aggregator
+  ConfigAggregatorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: config.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/ConfigRole
+      Policies:
+        - PolicyName: ConfigAggregatorPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - config:PutAggregator
+                  - config:GetAggregateComplianceDetailsByConfigRule
+                  - config:GetAggregateConfigRuleComplianceSummary
+                Resource: '*'
+
+  # Remediation Actions
+  S3BucketEncryptionRemediation:
+    Type: AWS::Config::RemediationConfiguration
+    Properties:
+      ConfigRuleName: !Ref S3BucketServerSideEncryptionEnabled
+      TargetType: SSM_DOCUMENT
+      TargetId: AWSConfigRemediation-EnableS3BucketDefaultEncryption
+      TargetVersion: '1'
+      Parameters:
+        AutomationAssumeRole:
+          StaticValue: !GetAtt RemediationRole.Arn
+        BucketName:
+          ResourceValue: RESOURCE_ID
+        SSEAlgorithm:
+          StaticValue: AES256
+
+  # IAM Role for Remediation
+  RemediationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ssm.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole
+      Policies:
+        - PolicyName: S3RemediationPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutEncryptionConfiguration
+                  - s3:GetEncryptionConfiguration
+                Resource: '*'
+
+Outputs:
+  ConfigRuleNames:
+    Description: 'List of deployed Config Rules'
+    Value: !Join
+      - ','
+      - - !Ref S3BucketPublicAccessProhibited
+        - !Ref RDSInstancePubliclyAccessible
+        - !Ref EC2InstanceNoPublicIP
+        - !Ref IAMPasswordPolicy
+        - !Ref VPCFlowLogsEnabled
+        - !Ref CloudTrailEnabled
+
+  ComplianceAggregator:
+    Description: 'Configuration Aggregator for compliance monitoring'
+    Value: !Ref ComplianceAggregatorRule
+    Export:
+      Name: !Sub '${AWS::StackName}-ComplianceAggregator'

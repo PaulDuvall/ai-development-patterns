@@ -1,0 +1,20 @@
+# Basic AI isolation container
+version: '3.8'
+
+services:
+  ai-development:
+    build:
+      context: .
+      dockerfile: Dockerfile.ai-sandbox
+    network_mode: none                    # Complete network isolation
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]                       # Drop all capabilities
+    volumes:
+      - ./src:/workspace/src:ro           # Read-only source code
+      - ./tests:/workspace/tests:rw       # Read/write tests only
+      # DO NOT mount ~/.aws, .env, secrets/, etc.
+    environment:
+      - NODE_ENV=development
+      - AI_SANDBOX=true
+    restart: no

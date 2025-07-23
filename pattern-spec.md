@@ -72,11 +72,11 @@ Patterns are organized into three main categories:
 
 ### Core Implementation
 - Provide ONE concrete, focused example that demonstrates the pattern's key concepts
-- Keep examples concise enough to understand quickly while being specific enough to implement
-- Use real commands, file paths, and tool names
-- Show essential code snippets that illustrate the pattern, not complete implementations
-- For complex patterns, reference detailed implementations in `examples/pattern-name/` directories
-- Focus on the most important use case rather than showing multiple approaches
+- Keep examples extremely concise: 10-30 lines maximum for clarity and scannability
+- Use real commands, file paths, and tool names to show the pattern's essence
+- Show only the most critical code snippets that illustrate the core concept
+- ALWAYS reference detailed implementations in `examples/pattern-name/` directories for complete working code
+- Focus on the single most important use case that captures the pattern's value
 
 ### Anti-patterns
 - Name the anti-pattern with a descriptive title
@@ -101,13 +101,13 @@ Patterns are organized into three main categories:
 
 ### Examples
 - Each pattern should have exactly ONE example in the README to maintain focus and clarity
-- Keep README examples concise: 20-50 lines of code maximum
-- Show the pattern's essence, not exhaustive implementation details
-- For complex patterns requiring extensive code, create `examples/pattern-name/` directories
-- Reference detailed implementations with clear links: "See [examples/pattern-name/](examples/pattern-name/) for complete implementation"
+- Keep README examples extremely concise: 10-30 lines maximum for scannability
+- Show only the pattern's essence and core value proposition, not implementation details
+- For all non-trivial patterns, create `examples/pattern-name/` directories with complete working code
+- ALWAYS reference detailed implementations: "Complete implementation: See [examples/pattern-name/](examples/pattern-name/) for..."
 - Prefer real-world scenarios over abstract examples
 - Use consistent naming conventions (e.g., "myapp" for applications)
-- Include essential file paths and command outputs, not comprehensive listings
+- Focus on the single command or code snippet that best demonstrates the pattern
 
 ### Examples Directory Structure
 For complex patterns requiring extensive implementation details:
@@ -183,13 +183,14 @@ Before adding a new pattern, verify:
 - [ ] Follows exact header structure
 - [ ] Has clear, single-sentence description
 - [ ] Includes appropriate maturity level
-- [ ] Contains exactly ONE working code example
+- [ ] Contains exactly ONE working code example (10-30 lines maximum)
 - [ ] Defines specific anti-pattern
 - [ ] Uses correct markdown formatting
 - [ ] Links to related patterns correctly
 - [ ] Addresses specific, actionable problem
 - [ ] Dependencies are clearly stated
-- [ ] Example is realistic and testable
+- [ ] Example shows only the pattern's essence, not complete implementation
+- [ ] References examples directory for detailed implementation
 - [ ] Writing is clear and concise
 - [ ] Fits logically within existing pattern organization
 - [ ] Added to Complete Pattern Reference table with correct hyperlink

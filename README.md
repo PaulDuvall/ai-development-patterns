@@ -9,7 +9,7 @@ This repository provides a structured approach to AI-assisted development throug
 - **[Foundation Patterns](#foundation-patterns)** - Essential patterns for team readiness and basic AI integration
 - **[Development Patterns](#development-patterns)** - Daily practice patterns for AI-assisted coding workflows  
 - **[Operations Patterns](#operations-patterns)** - CI/CD, security, and production management with AI
-- **[Experimental Patterns](experimental-patterns.md)** - Advanced and experimental patterns under active development and/or consideration.
+- **[Experimental Patterns](experiments/)** - Advanced and experimental patterns under active development and/or consideration.
 
 ## Pattern Dependencies & Implementation Order
 
@@ -171,19 +171,19 @@ graph TD
 1. **[AI Developer Lifecycle](#ai-developer-lifecycle)** - Structured development process
 2. **[Specification Driven Development](#specification-driven-development)** - Quality-focused development
 3. **[AI Issue Generation](#ai-issue-generation)** - Organized work breakdown
-4. **[Comprehensive AI Testing Strategy](experimental-patterns.md#comprehensive-ai-testing-strategy)** - Quality assurance
+4. **[Comprehensive AI Testing Strategy](experiments/#comprehensive-ai-testing-strategy)** - Quality assurance
 
 **For Parallel Implementation**:
 1. **[Atomic Task Decomposition](#atomic-task-decomposition)** - Ultra-small independent tasks
-2. **[AI Workflow Orchestration](experimental-patterns.md#ai-workflow-orchestration)** - Agent coordination
-3. **[AI Review Automation](experimental-patterns.md#ai-review-automation)** - Automated integration
+2. **[AI Workflow Orchestration](experiments/#ai-workflow-orchestration)** - Agent coordination
+3. **[AI Review Automation](experiments/#ai-review-automation)** - Automated integration
 4. **[AI Security Sandbox](#ai-security-sandbox)** - Enhanced with parallel safety
 
 **For Enterprise/Production (Month 2+)**:
 1. **[Policy-as-Code Generation](#policy-as-code-generation)** - Compliance automation
 2. **[Security Scanning Orchestration](#security-scanning-orchestration)** - Integrated security
 3. **[Performance Baseline Management](#performance-baseline-management)** - Production monitoring
-4. **[Technical Debt Forecasting](experimental-patterns.md#technical-debt-forecasting)** - Proactive maintenance
+4. **[Technical Debt Forecasting](experiments/#technical-debt-forecasting)** - Proactive maintenance
 
 ### Project Type Recommendations
 
@@ -338,79 +338,21 @@ Each developer maintains their own prompts and preferences, leading to inconsist
 **Core Security Implementation**
 
 ```yaml
-# Basic AI isolation container
-# docker-compose.ai-sandbox.yml
-version: '3.8'
-
+# Basic AI isolation with complete network isolation
 services:
   ai-development:
-    build:
-      context: .
-      dockerfile: Dockerfile.ai-sandbox
-    network_mode: none                    # Complete network isolation
-    security_opt:
-      - no-new-privileges:true
-    cap_drop: [ALL]                       # Drop all capabilities
+    network_mode: none                    # Zero network access
+    cap_drop: [ALL]                       # No system privileges
     volumes:
       - ./src:/workspace/src:ro           # Read-only source code
-      - ./tests:/workspace/tests:rw       # Read/write tests only
       # DO NOT mount ~/.aws, .env, secrets/, etc.
-    environment:
-      - NODE_ENV=development
-      - AI_SANDBOX=true
-    restart: no
 ```
 
-**What This Accomplishes**
-- **`network_mode: none`** - Zero network access, no DNS, HTTP, or callbacks
-- **`cap_drop: [ALL]`** - No system privileges, prevents privilege escalation
-- **Read-only source** - AI can read code but not modify production files
-- **No secret access** - Secrets, credentials, and config files not mounted
-
-**Multi-Agent Isolation**
-
-```bash
-# Launch isolated agents for parallel work
-docker-compose -f docker-compose.parallel-ai-sandbox.yml up -d
-
-# Each agent gets isolated workspace and resource limits
-services:
-  ai-agent-backend:
-    network_mode: none
-    volumes:
-      - ./workspace/agent-1:/output:rw    # Isolated output only
-    ulimits: {nproc: 256, nofile: 1024}   # Resource constraints
-    environment:
-      - AGENT_ID=backend-specialist
-      - MAX_EXECUTION_TIME=7200           # 2-hour timeout
-
-# Resource locking prevents conflicts
-acquire_lock() {
-    local resource="$1" agent="$2"
-    (set -C; echo "$agent" > "$resource.lock") 2>/dev/null
-}
-
-if acquire_lock "package.json" "$AGENT_ID"; then
-    modify_package_json && release_lock "package.json"
-fi
-```
-
-**Emergency Safety**
-
-```bash
-# Monitor for violations and emergency shutdown
-if [[ $(jq '.violations | length' safety-violations.json) -gt 5 ]]; then
-    docker-compose down --timeout 10     # Emergency stop
-    pkill -f "ai-agent"                   # Kill runaway processes  
-    rm -rf /workspace/agent-*/            # Clear workspaces
-fi
-```
-
-**Complete Implementation**: See [sandbox/](sandbox/) for:
-- Full Docker isolation configurations
-- Multi-agent coordination and conflict resolution
+**Complete Implementation**: See [examples/ai-security-sandbox/](examples/ai-security-sandbox/) for:
+- Complete Docker isolation configurations for single and multi-agent setups
 - Resource locking and emergency shutdown procedures
 - Security monitoring and violation detection
+- Multi-agent coordination with conflict resolution
 
 **Anti-pattern: Unrestricted Access**
 Allowing AI tools full system access risks credential leaks, data breaches, and security compliance violations.
@@ -758,7 +700,7 @@ Specifications use authority levels to resolve conflicts and establish precedenc
 
 When requirements conflict, higher authority levels take precedence, enabling clear decision-making for AI implementation.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Tool Integration](#ai-tool-integration), [Comprehensive AI Testing Strategy](experimental-patterns.md#comprehensive-ai-testing-strategy), [Observable AI Development](#observable-ai-development)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Tool Integration](#ai-tool-integration), [Comprehensive AI Testing Strategy](experiments/#comprehensive-ai-testing-strategy), [Observable AI Development](#observable-ai-development)
 
 **SpecDriven AI Workflow**
 
@@ -909,7 +851,7 @@ Asking AI to "create a complete user management system" results in 5000 lines of
 **Maturity**: Intermediate  
 **Description**: Generate multiple implementation options for exploration and comparison rather than accepting the first AI solution.
 
-**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Context Window Optimization](experimental-patterns.md#context-window-optimization)
+**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Context Window Optimization](experiments/#context-window-optimization)
 
 **Multi-Option Implementation Comparison**
 
@@ -955,7 +897,7 @@ Generating too many choices or spending more time evaluating options than implem
 **Maturity**: Advanced  
 **Description**: Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration.
 
-**Related Patterns**: [AI Workflow Orchestration](experimental-patterns.md#ai-workflow-orchestration), [Atomic Task Decomposition](#atomic-task-decomposition), [AI Security Sandbox](#ai-security-sandbox)
+**Related Patterns**: [AI Workflow Orchestration](experiments/#ai-workflow-orchestration), [Atomic Task Decomposition](#atomic-task-decomposition), [AI Security Sandbox](#ai-security-sandbox)
 
 **Agent Coordination Lifecycle**
 
@@ -1117,54 +1059,29 @@ Running multiple agents without isolation, shared memory, or conflict resolution
 **Core Implementation**
 
 ```bash
-# Simple knowledge structure
-mkdir -p .ai/knowledge/{patterns,failures,gotchas}
+# Initialize organized knowledge structure
+./knowledge-capture.sh --init
 
-# Capture working prompts immediately
-echo "### JWT Auth (95% success)" >> .ai/knowledge/patterns/auth.md
-echo "Prompt: 'JWT with RS256, 15min access, 7day refresh in httpOnly cookie'" >> .ai/knowledge/patterns/auth.md
-echo "Context: Node.js APIs" >> .ai/knowledge/patterns/auth.md
-echo "" >> .ai/knowledge/patterns/auth.md
+# Capture successful patterns with success rates
+./knowledge-capture.sh --success \
+  --domain "auth" \
+  --pattern "JWT Auth" \
+  --prompt "JWT with RS256, 15min access, httpOnly cookie" \
+  --success-rate "95%"
 
 # Document failures to avoid repeating
-echo "### ❌ 'Make auth secure'" >> .ai/knowledge/failures/auth.md  
-echo "Too vague - AI adds OAuth + sessions + JWT complexity" >> .ai/knowledge/failures/auth.md
-echo "Better: Specify exact requirements" >> .ai/knowledge/failures/auth.md
+./knowledge-capture.sh --failure \
+  --domain "auth" \
+  --bad-prompt "Make auth secure" \
+  --problem "Too vague → AI over-engineers" \
+  --solution "Specify exact JWT requirements"
 ```
 
-**High-Impact Knowledge Templates**
-
-```markdown
-# .ai/knowledge/patterns/auth.md
-### JWT Auth (95% success)
-**Prompt**: "JWT with RS256, 15min access, 7day refresh in httpOnly cookie"
-**Context**: Node.js APIs
-**Gotcha**: AI defaults to insecure HS256 - always specify RS256
-
-### Password Hash (90% success)  
-**Prompt**: "bcrypt with salt rounds=12, async/await, bcrypt.compare for validation"
-**Gotcha**: AI uses deprecated hashSync - specify async
-
-# .ai/knowledge/failures/auth.md
-### ❌ "Make auth secure"
-**Problem**: Too vague → AI adds OAuth + sessions + JWT complexity
-**Fix**: Specify exact requirements
-
-# .ai/knowledge/patterns/api.md
-### REST CRUD (85% success)
-**Prompt**: "REST API: GET/POST/PUT/DELETE /users, 200/201/400/404 codes, validate input"
-**Gotcha**: AI over-engineers responses - provide exact JSON format
-```
-
-**Knowledge Maintenance**
-
-```bash
-# Quick review: find stale knowledge (>3 months old)
-find .ai/knowledge -name "*.md" -mtime +90
-
-# Track most-used patterns
-grep -r "### " .ai/knowledge/patterns/ | cut -d: -f2 | sort | uniq -c | sort -nr | head -5
-```
+**Complete Implementation**: See [examples/ai-knowledge-persistence/](examples/ai-knowledge-persistence/) for:
+- Automated knowledge capture and maintenance scripts
+- Structured templates for patterns, failures, and gotchas
+- Success rate tracking and stale knowledge detection
+- Team knowledge sharing and export tools
 
 **Anti-pattern: Knowledge Hoarding**
 
@@ -1205,7 +1122,7 @@ echo "Full JWT specification with 47 configuration options..." >> .ai/knowledge/
 **Maturity**: Beginner  
 **Description**: Give AI specific constraints to prevent over-engineering and ensure focused solutions.
 
-**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Human-AI Handoff Protocol](experimental-patterns.md#human-ai-handoff-protocol), [AI Choice Generation](#ai-choice-generation)
+**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Human-AI Handoff Protocol](experiments/#human-ai-handoff-protocol), [AI Choice Generation](#ai-choice-generation)
 
 **Examples**
 ```
@@ -1226,7 +1143,7 @@ Good: "Reduce p99 latency to <50ms without new dependencies"
 **Maturity**: Intermediate  
 **Description**: Break complex features into atomic, independently implementable tasks (1-2 hours) that can be parallelized across multiple AI agents. Each task should be completable in isolation without dependencies on concurrent work. Use this pattern when implementing with parallel agents; for standard team development, use AI Issue Generation (4-8 hour tasks).
 
-**Related Patterns**: [AI Workflow Orchestration](experimental-patterns.md#ai-workflow-orchestration), [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Issue Generation](#ai-issue-generation)
+**Related Patterns**: [AI Workflow Orchestration](experiments/#ai-workflow-orchestration), [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Issue Generation](#ai-issue-generation)
 
 **Atomic Task Criteria**
 
@@ -1358,15 +1275,11 @@ Breaking tasks so small that coordination overhead exceeds the benefits of paral
 **Maturity**: Intermediate  
 **Description**: Design systems with comprehensive logging, tracing, and debugging capabilities that enable AI to understand system behavior and diagnose issues effectively.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Tool Integration](#ai-tool-integration), [Comprehensive AI Testing Strategy](experimental-patterns.md#comprehensive-ai-testing-strategy), [AI-Driven Traceability](#ai-driven-traceability)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Tool Integration](#ai-tool-integration), [Comprehensive AI Testing Strategy](experiments/#comprehensive-ai-testing-strategy), [AI-Driven Traceability](#ai-driven-traceability)
 
 **Core Implementation**
 
 ```python
-import logging
-import json
-from datetime import datetime
-
 # AI-friendly structured logging
 def log_operation(operation, **context):
     logging.info(json.dumps({
@@ -1375,57 +1288,25 @@ def log_operation(operation, **context):
         "context": context
     }))
 
-# Observable business logic
+# Observable business logic with comprehensive context
 def process_order(order):
     log_operation("order_start", order_id=order.id, total=order.total)
-    
     try:
-        log_operation("validation_start")
         validate_order(order)
         log_operation("validation_success")
-        
-        log_operation("payment_start", method=order.payment_method)
         result = charge_payment(order)
-        log_operation("payment_success", transaction_id=result.transaction_id)
-        
+        log_operation("payment_success", transaction_id=result.id)
         return result
-        
-    except ValidationError as e:
-        log_operation("validation_error", field=e.field, error=str(e))
-        raise
     except PaymentError as e:
         log_operation("payment_error", error=str(e), code=e.code)
         raise
 ```
 
-**Debug Helper for AI Analysis**
-
-```bash
-# Extract relevant logs for AI debugging
-grep -A5 -B5 "ERROR\|payment_error\|validation_error" app.log | tail -20
-```
-
-**Performance Monitoring**
-
-```python
-import time
-
-def monitor_performance(func):
-    def wrapper(*args, **kwargs):
-        start = time.time()
-        try:
-            result = func(*args, **kwargs)
-            log_operation(f"{func.__name__}_success", duration_ms=(time.time()-start)*1000)
-            return result
-        except Exception as e:
-            log_operation(f"{func.__name__}_error", duration_ms=(time.time()-start)*1000, error=str(e))
-            raise
-    return wrapper
-
-@monitor_performance
-def get_user_data(user_id):
-    return database.query("SELECT * FROM users WHERE id = ?", user_id)
-```
+**Complete Implementation**: See [examples/observable-ai-development/](examples/observable-ai-development/) for:
+- Full structured logging framework with correlation IDs
+- Performance monitoring decorators and utilities  
+- AI-friendly debug tools and log analysis scripts
+- Integration examples for e-commerce and authentication systems
 
 **Anti-pattern: Black Box Development**
 
@@ -1463,7 +1344,7 @@ def process_payment(amount):
 **Maturity**: Intermediate  
 **Description**: Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics, following established refactoring rules and maintaining test coverage throughout the process.
 
-**Related Patterns**: [Rules as Code](#rules-as-code), [Comprehensive AI Testing Strategy](experimental-patterns.md#comprehensive-ai-testing-strategy), [Technical Debt Forecasting](experimental-patterns.md#technical-debt-forecasting)
+**Related Patterns**: [Rules as Code](#rules-as-code), [Comprehensive AI Testing Strategy](experiments/#comprehensive-ai-testing-strategy), [Technical Debt Forecasting](experiments/#technical-debt-forecasting)
 
 **Code Smell Detection Framework**
 
@@ -1619,47 +1500,28 @@ ai-assistant design-architecture \
 **Maturity**: Intermediate  
 **Description**: Maintain automated links between requirements, specifications, tests, implementation, and documentation using AI.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Specification Driven Development](#specification-driven-development), [Comprehensive AI Testing Strategy](experimental-patterns.md#comprehensive-ai-testing-strategy)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Specification Driven Development](#specification-driven-development), [Comprehensive AI Testing Strategy](experiments/#comprehensive-ai-testing-strategy)
 
-**Automated Traceability System**
+**Core Implementation**
 
 ```bash
-#!/bin/bash
-# maintain_traceability.sh - Complete AI-driven traceability maintenance
+# Automated traceability maintenance
+./maintain_traceability.sh
 
-echo "=== Scanning for traceability gaps ==="
-
-# 1. Check new code for requirement links
+# Check new code for requirement links and validate existing ones
 git diff --name-only HEAD~1 | while read file; do
-    if [[ $file == *.py ]] && ! grep -q "# Implements:\|# Satisfies:" "$file"; then
-        ai "Analyze $file and suggest requirement links:
-        - What product requirement does this code satisfy?
-        - Which user story does it implement?
-        - Generate proper traceability annotations: # Implements: [^req_id]"
-    fi
+    ai "Analyze $file and suggest requirement traceability links"
 done
 
-# 2. Validate existing links
-ai "Scan codebase for broken traceability links:
-- Check all [^*] footnotes and US-* references
-- Verify linked requirements still exist
-- Report orphaned code and missing tests
-- Calculate coverage: Requirements->Code->Tests->Docs
-
-Output gaps with remediation priority (critical/medium/low)."
-
-# 3. Generate impact analysis for changes
-ai "Analyze recent changes for traceability impact:
-Files changed: $(git diff --name-only HEAD~5)
-
-For each change:
-- Map to affected requirements [^id]
-- Identify dependent user stories (US-*)
-- List tests requiring updates
-- Flag documentation needing revision
-
-Create change impact matrix with effort estimates."
+# Generate impact analysis for recent changes
+ai "Map recent changes to affected requirements and tests"
 ```
+
+**Complete Implementation**: See [examples/ai-driven-traceability/](examples/ai-driven-traceability/) for:
+- Complete traceability maintenance automation system
+- Link validation and gap analysis tools
+- Impact analysis and reporting scripts
+- Integration with project management tools (GitHub, JIRA)
 
 **Anti-pattern: Manual Traceability Management**
 Maintaining requirement links in spreadsheets or manual documentation that becomes stale and inaccurate over time.
@@ -1682,14 +1544,19 @@ Operations patterns focus on CI/CD, security, compliance, and production managem
 **Related Patterns**: [AI Security Sandbox](#ai-security-sandbox), [Rules as Code](#rules-as-code)
 
 ```bash
-# policies/req.md
-"Data at rest must be AES-256 encrypted in transit and at rest per SOC 2."
+# Transform compliance requirements into executable policies
+ai "Convert compliance requirements into Cedar policy code:
+SOC 2: Data at rest must be AES-256 encrypted" > encryption.cedar
 
-# Generate policy
-# See actual policies: policies/iam_permissions.cedar
-ai "Convert policies/req.md into Cedar policy code" > policies/code/encryption.cedar
-opa test policies/code/encryption.cedar
+# Test generated policies
+opa test encryption.cedar
 ```
+
+**Complete Implementation**: See [examples/policy-as-code-generation/](examples/policy-as-code-generation/) for:
+- Complete policy generation pipeline with AI assistance
+- Cedar/OPA policy templates and compliance mapping
+- Policy testing and validation frameworks
+- CI/CD integration examples
 
 **Anti-pattern: Manual Policy Translation**
 Hand-coding policies from written requirements introduces inconsistencies and interpretation errors.
@@ -1704,14 +1571,21 @@ Hand-coding policies from written requirements introduces inconsistencies and in
 **Related Patterns**: [Policy-as-Code Generation](#policy-as-code-generation)
 
 ```bash
-#!/bin/bash
+# Orchestrate multiple security tools
 snyk test --json > snyk.json
 bandit -r src -f json > bandit.json
 trivy fs --format json . > trivy.json
-ai "Summarize snyk.json, bandit.json, trivy.json; list CRITICAL issues" > pr-comment.txt
+
+# AI-powered summarization for actionable insights
+ai "Summarize security findings; focus on CRITICAL issues" > pr-comment.txt
 gh pr comment --body-file pr-comment.txt
-if grep -q '"severity":"CRITICAL"' pr-comment.txt; then exit 1; fi
 ```
+
+**Complete Implementation**: See [examples/security-scanning-orchestration/](examples/security-scanning-orchestration/) for:
+- Complete security scanning pipeline with tool orchestration
+- AI-powered report summarization and prioritization
+- CI/CD integration and automated PR commenting
+- Custom security tool configurations and reporting
 
 **Anti-pattern: Alert Fatigue**
 Posting every low-severity finding buries real issues and frustrates developers.
@@ -1737,10 +1611,17 @@ Posting every low-severity finding buries real issues and frustrates developers.
 **Related Patterns**: [Observable AI Development](#observable-ai-development)
 
 ```bash
+# Collect performance metrics and generate intelligent baselines
 aws cloudwatch get-metric-statistics --period 86400 > perf.csv
-ai "From perf.csv, recommend latency alert thresholds and autoscale policies" > perf-policy.json
+ai "From perf.csv, recommend latency thresholds and autoscale policies" > perf-policy.json
 deploy-tool apply perf-policy.json
 ```
+
+**Complete Implementation**: See [examples/performance-baseline-management/](examples/performance-baseline-management/) for:
+- Complete performance monitoring setup with baseline establishment
+- AI-powered threshold calculation and alert configuration
+- Autoscaling policy generation and deployment automation
+- Integration with multiple monitoring platforms (CloudWatch, Prometheus, etc.)
 
 **Anti-pattern: One-Off Alerts**
 Manual thresholds quickly become stale, causing alert storms or blind spots.

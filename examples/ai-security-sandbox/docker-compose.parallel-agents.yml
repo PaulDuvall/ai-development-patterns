@@ -1,0 +1,57 @@
+# Multi-agent parallel sandbox configuration
+version: '3.8'
+
+services:
+  ai-agent-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.ai-sandbox
+    network_mode: none
+    volumes:
+      - ./workspace/agent-1:/output:rw    # Isolated output only
+    ulimits:
+      nproc: 256
+      nofile: 1024                        # Resource constraints
+    environment:
+      - AGENT_ID=backend-specialist
+      - MAX_EXECUTION_TIME=7200           # 2-hour timeout
+    restart: no
+
+  ai-agent-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.ai-sandbox
+    network_mode: none
+    volumes:
+      - ./workspace/agent-2:/output:rw    # Isolated output only
+    ulimits:
+      nproc: 256
+      nofile: 1024
+    environment:
+      - AGENT_ID=frontend-specialist
+      - MAX_EXECUTION_TIME=7200
+    restart: no
+
+  ai-agent-testing:
+    build:
+      context: .
+      dockerfile: Dockerfile.ai-sandbox
+    network_mode: none
+    volumes:
+      - ./workspace/agent-3:/output:rw    # Isolated output only
+    ulimits:
+      nproc: 256
+      nofile: 1024
+    environment:
+      - AGENT_ID=testing-specialist
+      - MAX_EXECUTION_TIME=7200
+    restart: no
+
+volumes:
+  shared-memory:
+    driver: local
+
+networks:
+  agent-network:
+    driver: bridge
+    internal: true
