@@ -31,6 +31,7 @@ These experimental patterns extend the core AI development patterns with advance
 | **[ChatOps Security Integration](#chatops-security-integration)** | Beginner | Operations | Deploy security scanning capabilities through chat commands for immediate feedback | Security Scanning Orchestration |
 | **[Compliance Evidence Automation](#compliance-evidence-automation)** | Advanced | Operations | Generate audit evidence matrices from logs and configuration changes automatically | Security Scanning Orchestration |
 | **[Context Window Optimization](#context-window-optimization)** | Advanced | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive AI Enhancement |
+| **[Visual Context Scaffolding](#visual-context-scaffolding)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Specification Driven Development, Progressive AI Enhancement, Context Window Optimization |
 
 ---
 
@@ -391,6 +392,79 @@ Running parallel agents without proper isolation, conflict detection, or sync po
 
 **Anti-pattern: One-Size-Fits-All**
 Always using the most powerful (expensive) AI model for simple tasks wastes resources and increases latency for routine operations.
+
+---
+
+### Visual Context Scaffolding
+
+**Maturity**: Intermediate  
+**Description**: Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context.
+
+**Related Patterns**: [Specification Driven Development](../README.md#specification-driven-development), [Progressive AI Enhancement](../README.md#progressive-ai-enhancement), [Context Window Optimization](#context-window-optimization)
+
+#### Core Implementation
+
+```bash
+# 1. Prepare visual specifications
+# Create architecture diagram showing microservices structure
+# Save as: architecture.png with labeled components:
+# - API Gateway (port 8080)
+# - User Service (port 3001)
+# - Order Service (port 3002)  
+# - Payment Service (port 3003)
+# - PostgreSQL databases per service
+# - RabbitMQ message bus connections
+
+# 2. Upload to AI coding tool with minimal context
+# Example prompt for Claude Code:
+cat > build-request.txt << 'EOF'
+Build this microservices architecture from the attached diagram.
+Tech stack: Node.js, Express, PostgreSQL, RabbitMQ
+Start with the User Service following the exact structure shown.
+Include health check endpoints at /health for each service.
+EOF
+
+# 3. Iterate with visual feedback
+# After initial generation, screenshot the running system
+# Annotate screenshot with required changes
+# Example: mark missing authentication flow in red
+# Re-upload annotated screenshot with refinement request
+
+# 4. Structure for complex UIs
+# For dashboard implementation:
+# - dashboard-layout.png (grid measurements, component names)
+# - dashboard-interactions.png (click flows, state changes)
+# - data-model.png (API responses, field mappings)
+
+# Upload sequence with prompt:
+"Implement this dashboard using React and Tailwind.
+Match the layout from dashboard-layout.png exactly.
+Use the interaction flows from dashboard-interactions.png.
+Mock data structure should follow data-model.png."
+```
+
+#### Anti-pattern: Kitchen Sink Upload
+
+**Problem**: Uploading many diagrams at once (e.g., 15+) without structure or context
+
+```bash
+# Wrong approach - overwhelming context
+"Here are all my diagrams. Build the system."
+# Uploads: erd.png, architecture.png, flow1.png, flow2.png, 
+# ui1.png, ui2.png, deployment.png, sequence1.png...
+
+# Why it fails:
+# - AI loses focus trying to parse everything
+# - Contradictions between diagrams cause confusion
+# - Exceeds useful context window
+# - No clear starting point
+
+# Correct approach:
+# Upload progressively with clear hierarchy
+"1. Start with this high-level architecture (architecture.png)
+2. Focus on User Service first
+3. I'll provide UI mockups after core services work"
+```
 
 ---
 
