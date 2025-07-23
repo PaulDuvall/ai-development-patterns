@@ -7,9 +7,16 @@ This directory contains working implementations of experimental AI development p
 | Pattern | Implementation Status | Directory | Description |
 |---------|----------------------|-----------|-------------|
 | **Human-AI Handoff Protocol** | ✅ Complete | `human-ai-handoff/` | Decision framework and automation for task transitions |
+| **Comprehensive AI Testing Strategy** | ✅ Complete | `comprehensive-ai-testing-strategy/` | Unified test-first development and quality assurance |
 | **AI Workflow Orchestration** | ✅ Complete | `ai-workflow-orchestration/` | Multi-agent coordination and parallel execution |
-| **Context Window Optimization** | 🚧 In Progress | `context-window-optimization/` | AI tool selection and cost optimization |
 | **AI Review Automation** | ✅ Complete | `ai-review-automation/` | Automated parallel agent output review |
+| **Technical Debt Forecasting** | ✅ Complete | `technical-debt-forecasting/` | Proactive technical debt analysis and prioritization |
+| **Pipeline Synthesis** | ✅ Complete | `pipeline-synthesis/` | Generate CI/CD pipelines from plain-English specifications |
+| **AI-Guided Blue-Green Deployment** | ✅ Complete | `ai-guided-blue-green-deployment/` | Generate validated blue-green deployment scripts |
+| **Drift Detection & Remediation** | ✅ Complete | `drift-detection-remediation/` | Automated infrastructure drift detection and fixes |
+| **Incident Response Automation** | ✅ Complete | `incident-response-automation/` | Generate incident response playbooks from historical data |
+| **Dependency Upgrade Advisor** | ✅ Complete | `dependency-upgrade-advisor/` | Intelligent dependency upgrade management |
+| **Context Window Optimization** | 🚧 In Progress | `context-window-optimization/` | AI tool selection and cost optimization |
 | **Test Suite Health Management** | 🚧 In Progress | `test-suite-health/` | Flaky test detection and remediation |
 | **On-Call Handoff Automation** | 📋 Planned | `on-call-handoff/` | Automated handoff brief generation |
 
