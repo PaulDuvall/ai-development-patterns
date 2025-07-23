@@ -222,7 +222,6 @@ config.local.*
 .ai/secrets/
 ai-output/
 generated/
-experiments/
 sandbox/
 
 # Version Control
