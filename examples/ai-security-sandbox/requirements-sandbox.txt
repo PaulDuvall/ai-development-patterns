@@ -7,6 +7,6 @@ pytest-cov==4.1.0
 requests==2.31.0
 pydantic==2.5.0
 ipython==8.17.2
-jinja2==3.1.2
+jinja2==3.1.6
 rich==13.7.0
 click==8.1.7
