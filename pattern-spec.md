@@ -92,6 +92,45 @@ Patterns are organized into three main categories:
 - Use realistic file paths and tool names
 - Show both input and expected output where applicable
 
+### Diagrams
+Consider adding diagrams when the pattern would benefit from visual explanation:
+
+**When to use diagrams:**
+- Multi-step workflows or processes (use flowcharts)
+- System interactions or data flow (use sequence diagrams)
+- Component relationships or architecture (use component diagrams)
+- State transitions or decision trees (use state diagrams)
+- Timeline-based processes (use timeline or Gantt charts)
+
+**Diagram guidelines:**
+- Use Mermaid syntax for consistency and maintainability
+- Place diagrams immediately after the pattern description, before Core Implementation
+- Keep diagrams simple and focused on the core concept
+- Label all components clearly with descriptive names
+- Use consistent styling and colors within the same pattern
+- Limit to 1-2 diagrams per pattern to maintain focus
+
+**Mermaid diagram types to consider:**
+```mermaid
+# Flowchart for decision flows and processes
+graph TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Action 1]
+    B -->|No| D[Action 2]
+
+# Sequence diagram for interactions over time
+sequenceDiagram
+    participant User
+    participant AI
+    User->>AI: Request
+    AI->>User: Response
+
+# Component diagram for system architecture
+graph LR
+    A[Component A] --> B[Component B]
+    B --> C[Component C]
+```
+
 ### Hyperlinks
 - ALL pattern references MUST be hyperlinked using format: `[Pattern Name](#pattern-name-anchor)`
 - This applies to: Reference table, Related Patterns sections, pattern mentions in descriptions, implementation examples, and any other pattern references
@@ -190,7 +229,10 @@ Before adding a new pattern, verify:
 - [ ] Addresses specific, actionable problem
 - [ ] Dependencies are clearly stated
 - [ ] Example shows only the pattern's essence, not complete implementation
-- [ ] References examples directory for detailed implementation
+- [ ] References examples directory for detailed implementation (if directory exists)
+- [ ] Considers whether a diagram would enhance understanding of the pattern
+- [ ] If diagram included, uses Mermaid syntax and follows diagram guidelines
+- [ ] Diagram placement is after description, before Core Implementation (if applicable)
 - [ ] Writing is clear and concise
 - [ ] Fits logically within existing pattern organization
 - [ ] Added to Complete Pattern Reference table with correct hyperlink
