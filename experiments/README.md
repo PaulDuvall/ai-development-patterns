@@ -443,12 +443,6 @@ Use the interaction flows from dashboard-interactions.png.
 Mock data structure should follow data-model.png."
 ```
 
-**Complete Implementation**: See [examples/visual-context-scaffolding/](examples/visual-context-scaffolding/) for:
-- Progressive visual upload workflows and templates
-- Screenshot automation tools and annotation systems  
-- Integration scripts for design tools (Figma, Sketch)
-- Multi-format diagram processing pipelines
-
 #### Anti-pattern: Kitchen Sink Upload
 
 **Problem**: Uploading many diagrams at once (e.g., 15+) without structure or context
