@@ -354,7 +354,7 @@ services:
 - Security monitoring and violation detection
 - Multi-agent coordination with conflict resolution
 
-**Production Implementation**: [AWS AgentCore](https://aws.amazon.com/bedrock/agentcore/) provides enterprise-grade implementation of these security controls:
+**Production Implementation**: [Amazon Bedrock AgentCore](https://aws.amazon.com/bedrock/agentcore/) provides enterprise-grade implementation of these security controls:
 - **Isolated runtimes**: microVM session isolation for complete workload separation
 - **Identity layer**: IAM integration for fine-grained access control
 - **Secure tool gateway**: MCP-compatible interface with controlled tool access
