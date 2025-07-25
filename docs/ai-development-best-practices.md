@@ -72,37 +72,39 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 29. **Modular Command Architecture**: Organize AI tools into clear categories with well-defined scopes (project-specific vs. machine-wide) for flexible workflows.
 
-30. **Experimental Design Frameworks**: Treat experimental AI development features as sophisticated specifications that map future advanced workflows.
+30. **Use Specialized Subagents**: Use [subagents](https://docs.anthropic.com/en/docs/claude-code/sub-agents) to offload specialized tasks to isolated AI assistants with custom prompts, tools, and context for consistent, focused execution.
+
+31. **Experimental Design Frameworks**: Treat experimental AI development features as sophisticated specifications that map future advanced workflows.
 
 ## Operations & Automation
 
-31. **Policy as Code Generation**: Transform compliance requirements into executable Cedar/OPA policy files using AI assistance for consistency and automation.
+32. **Policy as Code Generation**: Transform compliance requirements into executable Cedar/OPA policy files using AI assistance for consistency and automation.
 
-32. **Intelligent Security Orchestration**: Aggregate multiple security tools and use AI to summarize findings, reducing alert fatigue while maintaining rigor.
+33. **Intelligent Security Orchestration**: Aggregate multiple security tools and use AI to summarize findings, reducing alert fatigue while maintaining rigor.
 
-33. **AI-Powered Performance Baselines**: Use AI to analyze historical data and establish intelligent monitoring thresholds that minimize false positives.
+34. **AI-Powered Performance Baselines**: Use AI to analyze historical data and establish intelligent monitoring thresholds that minimize false positives.
 
-34. **Automated Incident Response**: Generate actionable playbooks from historical incident data and continuously improve operational procedures.
+35. **Automated Incident Response**: Generate actionable playbooks from historical incident data and continuously improve operational procedures.
 
-35. **Infrastructure as Specifications**: Generate deployment configurations and infrastructure code from plain-English requirements using AI assistance.
+36. **Infrastructure as Specifications**: Generate deployment configurations and infrastructure code from plain-English requirements using AI assistance.
 
 ## Anti-Patterns to Avoid
 
-36. **No Assessment Rush**: Don't implement AI development patterns without first evaluating team readiness and codebase architecture quality.
+37. **No Assessment Rush**: Don't implement AI development patterns without first evaluating team readiness and codebase architecture quality.
 
-37. **Avoid Ad-Hoc Development**: Don't jump directly to AI coding without structured lifecycle processes, proper planning, or testing strategy.
+38. **Avoid Ad-Hoc Development**: Don't jump directly to AI coding without structured lifecycle processes, proper planning, or testing strategy.
 
-38. **No Implementation-First Development**: Don't generate code first then retrofit tests - always establish specifications and tests before implementation.
+39. **No Implementation-First Development**: Don't generate code first then retrofit tests - always establish specifications and tests before implementation.
 
-39. **Prevent Uncoordinated Parallelization**: Don't run multiple AI agents without proper isolation, conflict detection, or resolution mechanisms.
+40. **Prevent Uncoordinated Parallelization**: Don't run multiple AI agents without proper isolation, conflict detection, or resolution mechanisms.
 
-40. **No Black Box Systems**: Don't build systems with minimal observability that prevent AI from understanding behavior and diagnosing issues.
+41. **No Black Box Systems**: Don't build systems with minimal observability that prevent AI from understanding behavior and diagnosing issues.
 
-41. **Avoid One-Size-Fits-All Tools**: Don't use the most powerful (expensive) AI models for simple tasks that could be handled by lighter alternatives.
+42. **Avoid One-Size-Fits-All Tools**: Don't use the most powerful (expensive) AI models for simple tasks that could be handled by lighter alternatives.
 
-42. **No Manual Policy Translation**: Don't manually translate compliance requirements when AI can generate consistent, testable policy code.
+43. **No Manual Policy Translation**: Don't manually translate compliance requirements when AI can generate consistent, testable policy code.
 
-43. **Prevent Manual Evidence Collection**: Don't manually gather compliance evidence when AI can continuously collect and organize audit trails automatically.
+44. **Prevent Manual Evidence Collection**: Don't manually gather compliance evidence when AI can continuously collect and organize audit trails automatically.
 
 ## Implementation Priority Framework
 
@@ -119,11 +121,11 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 - Scale to sophisticated multi-agent and context-aware development
 
 ### Phase 4: Operations & Tooling (Continuous)
-- Practices 26-35: Tool design, automation, operations
+- Practices 26-36: Tool design, automation, operations
 - Mature operational capabilities and custom tooling
 
 ### Continuous: Anti-Pattern Vigilance
-- Practices 36-43: Ongoing awareness and prevention
+- Practices 37-44: Ongoing awareness and prevention
 - Maintain discipline against common failure modes
 
 ## Success Metrics
