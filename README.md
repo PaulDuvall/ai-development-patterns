@@ -348,13 +348,13 @@ services:
       # DO NOT mount ~/.aws, .env, secrets/, etc.
 ```
 
-**Complete Implementation**: See [examples/ai-security-sandbox/](examples/ai-security-sandbox/) for:
+**Complete Example**: See [examples/ai-security-sandbox/](examples/ai-security-sandbox/) for:
 - Complete Docker isolation configurations for single and multi-agent setups
 - Resource locking and emergency shutdown procedures
 - Security monitoring and violation detection
 - Multi-agent coordination with conflict resolution
 
-**Production Implementation**: AWS AgentCore provides enterprise-grade implementation of these security controls:
+**Production Implementation**: [AWS AgentCore](https://aws.amazon.com/bedrock/agentcore/) provides enterprise-grade implementation of these security controls:
 - **Isolated runtimes**: microVM session isolation for complete workload separation
 - **Identity layer**: IAM integration for fine-grained access control
 - **Secure tool gateway**: MCP-compatible interface with controlled tool access
