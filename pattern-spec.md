@@ -34,10 +34,10 @@ Each pattern MUST follow this exact structure:
 
 ### Required Content Sections
 
-1. **Core Implementation** - Single primary example showing pattern in action
+1. **Implementation Section** - Primary examples showing pattern in action (flexible section naming: "Core Implementation", "Assessment Framework", "Workflow Implementation", etc.)
 2. **Anti-pattern** - What NOT to do, with specific example
 
-**Note**: Each pattern should contain exactly ONE core implementation example to maintain clarity and focus. Multiple examples create confusion and dilute the pattern's message.
+**Note**: Each pattern should focus on the most important implementation approaches without overwhelming detail. Complex patterns may include multiple focused examples if they demonstrate different aspects of the same core concept.
 
 ### Pattern Categories
 
@@ -70,13 +70,14 @@ Patterns are organized into three main categories:
 - Include patterns this one depends on or builds upon
 - Avoid circular references
 
-### Core Implementation
-- Provide ONE concrete, focused example that demonstrates the pattern's key concepts
-- Keep examples extremely concise: 10-30 lines maximum for clarity and scannability
+### Implementation Sections
+- Provide concrete, focused examples that demonstrate the pattern's key concepts
+- Keep primary examples concise and scannable (aim for clarity over strict line limits)
 - Use real commands, file paths, and tool names to show the pattern's essence
-- Show only the most critical code snippets that illustrate the core concept
+- Show the most critical code snippets that illustrate the core concept
 - ALWAYS reference detailed implementations in `examples/pattern-name/` directories for complete working code
-- Focus on the single most important use case that captures the pattern's value
+- Focus on the most important use cases that capture the pattern's value
+- Complex patterns may include multiple examples if they address different aspects (e.g., workflow diagrams + code examples + configuration)
 
 ### Anti-patterns
 - Name the anti-pattern with a descriptive title
@@ -104,28 +105,33 @@ Consider adding diagrams when the pattern would benefit from visual explanation:
 
 **Diagram guidelines:**
 - Use Mermaid syntax for consistency and maintainability
-- Place diagrams immediately after the pattern description, before Core Implementation
+- Place diagrams where they best support understanding (typically after description or within implementation sections)
 - Keep diagrams simple and focused on the core concept
 - Label all components clearly with descriptive names
 - Use consistent styling and colors within the same pattern
-- Limit to 1-2 diagrams per pattern to maintain focus
+- Use diagrams judiciously - include them when they clarify complex workflows, relationships, or processes
 
 **Mermaid diagram types to consider:**
+
+**Flowchart for decision flows and processes:**
 ```mermaid
-# Flowchart for decision flows and processes
 graph TD
     A[Start] --> B{Decision}
     B -->|Yes| C[Action 1]
     B -->|No| D[Action 2]
+```
 
-# Sequence diagram for interactions over time
+**Sequence diagram for interactions over time:**
+```mermaid
 sequenceDiagram
     participant User
     participant AI
     User->>AI: Request
     AI->>User: Response
+```
 
-# Component diagram for system architecture
+**Component diagram for system architecture:**
+```mermaid
 graph LR
     A[Component A] --> B[Component B]
     B --> C[Component C]
@@ -139,14 +145,15 @@ graph LR
 - Use consistent anchor naming: convert pattern names to lowercase with hyphens replacing spaces and special characters
 
 ### Examples
-- Each pattern should have exactly ONE example in the README to maintain focus and clarity
-- Keep README examples extremely concise: 10-30 lines maximum for scannability
-- Show only the pattern's essence and core value proposition, not implementation details
-- For all non-trivial patterns, create `examples/pattern-name/` directories with complete working code
-- ALWAYS reference detailed implementations: "Complete implementation: See [examples/pattern-name/](examples/pattern-name/) for..."
+- Each pattern should include focused examples that demonstrate the core concept clearly
+- Keep README examples concise and scannable (prioritize clarity and understanding)
+- Show the pattern's essence and core value proposition with practical detail
+- For complex patterns, create `examples/pattern-name/` directories with complete working code
+- ALWAYS reference detailed implementations: "Complete Example: See [examples/pattern-name/](examples/pattern-name/) for..." or "Complete Implementation: See [examples/pattern-name/](examples/pattern-name/) for..."
 - Prefer real-world scenarios over abstract examples
 - Use consistent naming conventions (e.g., "myapp" for applications)
-- Focus on the single command or code snippet that best demonstrates the pattern
+- Include the most important commands, code snippets, or configurations that demonstrate the pattern
+- Complex patterns may include multiple examples (workflow diagrams, code samples, configuration files) if they illustrate different essential aspects
 
 ### Examples Directory Structure
 For complex patterns requiring extensive implementation details:
@@ -160,6 +167,24 @@ For complex patterns requiring extensive implementation details:
   - Complex configuration setups
   - Complete working applications demonstrating the pattern
   - Advanced usage scenarios and variations
+
+### Experiments Directory Structure
+For experimental or future patterns not yet ready for the main documentation:
+
+- Create `experiments/examples/pattern-name/` directory for experimental implementations
+- Each experimental pattern should have its own subdirectory with descriptive naming
+- Include `README.md` in each experimental directory explaining:
+  - The experimental concept being explored
+  - Current implementation status
+  - Known limitations or areas for development
+  - Potential path to becoming a full pattern
+- Use experiments directory for:
+  - Early-stage pattern exploration and validation
+  - Advanced concepts requiring further research
+  - Patterns dependent on emerging tools or techniques
+  - Complex multi-pattern integrations being tested
+- Experimental patterns should follow the same code quality standards as main patterns
+- Consider adding experimental patterns to main documentation once they're validated and stable
 
 ## Quality Standards
 
@@ -222,23 +247,23 @@ Before adding a new pattern, verify:
 - [ ] Follows exact header structure
 - [ ] Has clear, single-sentence description
 - [ ] Includes appropriate maturity level
-- [ ] Contains exactly ONE working code example (10-30 lines maximum)
-- [ ] Defines specific anti-pattern
+- [ ] Contains focused working examples that demonstrate the core concept
+- [ ] Defines specific anti-pattern with clear explanation
 - [ ] Uses correct markdown formatting
 - [ ] Links to related patterns correctly
 - [ ] Addresses specific, actionable problem
 - [ ] Dependencies are clearly stated
-- [ ] Example shows only the pattern's essence, not complete implementation
+- [ ] Examples show the pattern's essence with practical detail
 - [ ] References examples directory for detailed implementation (if directory exists)
 - [ ] Considers whether a diagram would enhance understanding of the pattern
 - [ ] If diagram included, uses Mermaid syntax and follows diagram guidelines
-- [ ] Diagram placement is after description, before Core Implementation (if applicable)
+- [ ] Diagrams are placed where they best support understanding
 - [ ] Writing is clear and concise
 - [ ] Fits logically within existing pattern organization
 - [ ] Added to Complete Pattern Reference table with correct hyperlink
 - [ ] All pattern references throughout document are hyperlinked
 - [ ] Internal anchor link works correctly from reference table
-- [ ] Does not include multiple examples or implementation approaches
+- [ ] Examples are focused and demonstrate different essential aspects when multiple are included
 
 ## Pattern Evolution
 
