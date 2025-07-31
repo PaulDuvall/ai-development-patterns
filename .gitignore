@@ -205,6 +205,13 @@ htmlcov/
 .tox/
 .pytest_cache/
 .jest/
+tests/test-results/
+test-results/
+*_results.xml
+*_report.xml
+*.junit.xml
+report.html
+comprehensive_report.*
 
 # Documentation
 docs/_build/
