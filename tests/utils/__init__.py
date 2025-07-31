@@ -1,0 +1,1 @@
+# Test utilities for AI Development Patterns validation

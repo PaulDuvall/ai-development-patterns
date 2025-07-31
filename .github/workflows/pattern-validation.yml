@@ -1,0 +1,279 @@
+name: AI Development Patterns Validation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run weekly to catch external link issues
+    - cron: '0 6 * * 1'
+
+jobs:
+  pattern-compliance:
+    runs-on: ubuntu-latest
+    name: Pattern Specification Compliance
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r tests/requirements.txt
+    
+    - name: Run pattern compliance tests
+      run: |
+        cd tests
+        python -m pytest test_pattern_compliance.py -v --tb=short
+    
+    - name: Upload compliance test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: pattern-compliance-results
+        path: tests/test-results/
+
+  readme-accuracy:
+    runs-on: ubuntu-latest
+    name: README Accuracy & Consistency
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r tests/requirements.txt
+    
+    - name: Run README accuracy tests
+      run: |
+        cd tests
+        python -m pytest test_readme_accuracy.py -v --tb=short
+    
+    - name: Upload accuracy test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: readme-accuracy-results
+        path: tests/test-results/
+
+  link-validation:
+    runs-on: ubuntu-latest
+    name: Hyperlink Integrity
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r tests/requirements.txt
+    
+    - name: Run link validation tests (fast)
+      run: |
+        cd tests
+        python -m pytest test_links.py -v --tb=short -m "not slow"
+    
+    - name: Run external link tests (slow)
+      run: |
+        cd tests
+        python -m pytest test_links.py -v --tb=short -m "slow"
+      continue-on-error: true  # External links may be temporarily unavailable
+    
+    - name: Upload link validation results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: link-validation-results
+        path: tests/test-results/
+
+  example-validation:
+    runs-on: ubuntu-latest
+    name: Example Code Validation
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install bash for script validation
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bash
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r tests/requirements.txt
+    
+    - name: Run example validation tests
+      run: |
+        cd tests
+        python -m pytest test_examples.py -v --tb=short
+    
+    - name: Upload example validation results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: example-validation-results
+        path: tests/test-results/
+
+  dependency-validation:
+    runs-on: ubuntu-latest
+    name: Pattern Dependencies
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r tests/requirements.txt
+    
+    - name: Run dependency validation tests
+      run: |
+        cd tests
+        python -m pytest test_dependencies.py -v --tb=short
+    
+    - name: Upload dependency validation results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: dependency-validation-results
+        path: tests/test-results/
+
+  comprehensive-validation:
+    runs-on: ubuntu-latest
+    name: Full Test Suite
+    needs: [pattern-compliance, readme-accuracy, link-validation, example-validation, dependency-validation]
+    if: always()
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install bash for script validation
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bash
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r tests/requirements.txt
+    
+    - name: Run complete test suite
+      run: |
+        cd tests
+        python -m pytest -v --tb=short --html=report.html --self-contained-html --cov=utils --cov-report=html
+    
+    - name: Upload comprehensive test report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: comprehensive-test-report
+        path: |
+          tests/report.html
+          tests/htmlcov/
+          tests/test-results/
+
+  quality-gates:
+    runs-on: ubuntu-latest
+    name: Quality Gate Enforcement
+    needs: [comprehensive-validation]
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r tests/requirements.txt
+    
+    - name: Run critical tests only (quality gates)
+      run: |
+        cd tests
+        # Run only critical tests that should block merges
+        python -m pytest test_pattern_compliance.py::TestPatternSpecCompliance::test_all_expected_patterns_exist -v
+        python -m pytest test_pattern_compliance.py::TestPatternSpecCompliance::test_pattern_header_structure -v
+        python -m pytest test_readme_accuracy.py::TestReadmeAccuracy::test_pattern_reference_table_matches_implementations -v
+        python -m pytest test_links.py::TestHyperlinkIntegrity::test_internal_anchor_links_valid -v
+        python -m pytest test_dependencies.py::TestPatternDependencies::test_no_circular_dependencies -v
+    
+    - name: Check critical test results
+      run: |
+        echo "Quality gates passed - PR can be merged"
+
+# Notification job for failed builds
+  notify-failure:
+    runs-on: ubuntu-latest
+    name: Notify on Failure
+    needs: [pattern-compliance, readme-accuracy, link-validation, example-validation, dependency-validation]
+    if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Create Issue on Failure
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const title = `Pattern Validation Failed - ${new Date().toISOString().split('T')[0]}`;
+          const body = `
+          ## Pattern Validation Failure
+          
+          The automated pattern validation failed on the main branch.
+          
+          **Build**: ${context.runId}
+          **Commit**: ${context.sha}
+          **Workflow**: ${context.workflow}
+          
+          Please review the failed checks and fix any issues with:
+          - Pattern specification compliance
+          - README accuracy and consistency  
+          - Hyperlink integrity
+          - Example code validation
+          - Pattern dependencies
+          
+          [View failed workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId})
+          `;
+          
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: title,
+            body: body,
+            labels: ['bug', 'automation', 'pattern-validation']
+          });
