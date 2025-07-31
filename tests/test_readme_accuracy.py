@@ -4,8 +4,8 @@ Tests for README.md accuracy and consistency validation
 
 import pytest
 import re
-from tests.utils.pattern_parser import PatternParser, ReferenceTableParser
-from tests.conftest import PATTERN_CATEGORIES, EXPECTED_PATTERNS
+from utils.pattern_parser import PatternParser, ReferenceTableParser
+from conftest import PATTERN_CATEGORIES, EXPECTED_PATTERNS
 
 
 class TestReadmeAccuracy:

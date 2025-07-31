@@ -73,9 +73,7 @@ class PatternTestRunner:
             suite_config['module'],
             '-v' if verbose else '-q',
             '--tb=short',
-            f'--junitxml={self.results_dir}/{suite_name}_results.xml',
-            '--json-report',
-            f'--json-report-file={self.results_dir}/{suite_name}_report.json'
+            f'--junitxml={self.results_dir}/{suite_name}_results.xml'
         ]
         
         # Add special flags for specific test suites

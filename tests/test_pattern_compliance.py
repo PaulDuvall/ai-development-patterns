@@ -4,8 +4,8 @@ Tests for pattern specification compliance against pattern-spec.md requirements
 
 import pytest
 import re
-from tests.utils.pattern_parser import PatternParser, ReferenceTableParser
-from tests.conftest import (
+from utils.pattern_parser import PatternParser, ReferenceTableParser
+from conftest import (
     REQUIRED_MATURITY_LEVELS, 
     REQUIRED_PATTERN_SECTIONS,
     EXPECTED_PATTERNS

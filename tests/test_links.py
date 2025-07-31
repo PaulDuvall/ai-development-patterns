@@ -4,9 +4,9 @@ Tests for hyperlink integrity validation - internal and external links
 
 import pytest
 import os
-from tests.utils.link_checker import LinkChecker
-from tests.utils.pattern_parser import PatternParser, ReferenceTableParser
-from tests.conftest import EXPECTED_PATTERNS
+from utils.link_checker import LinkChecker
+from utils.pattern_parser import PatternParser, ReferenceTableParser
+from conftest import EXPECTED_PATTERNS
 
 
 class TestHyperlinkIntegrity:
@@ -254,10 +254,10 @@ class TestLinkQuality:
         import re
         
         non_descriptive_patterns = [
-            r'\\[here\\]\\(',
-            r'\\[click here\\]\\(',
-            r'\\[this\\]\\(',
-            r'\\[link\\]\\('
+            r'\[here\]\(',
+            r'\[click here\]\(',
+            r'\[this\]\(',
+            r'\[link\]\('
         ]
         
         poor_link_text = []

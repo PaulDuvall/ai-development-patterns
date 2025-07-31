@@ -4,12 +4,12 @@ Tests for example code validation - README code blocks and example directories
 
 import pytest
 from pathlib import Path
-from tests.utils.example_validator import (
+from utils.example_validator import (
     ExampleDirectoryValidator, 
     ReadmeCodeBlockValidator,
     CodeValidator
 )
-from tests.utils.pattern_parser import PatternParser
+from utils.pattern_parser import PatternParser
 
 
 class TestCodeExamples:
@@ -340,7 +340,7 @@ class TestExampleCompleteness:
     def test_example_directories_match_patterns(self, readme_content, repo_root):
         """Verify example directories correspond to actual patterns"""
         parser = PatternParser(readme_content)
-        pattern_names = set(patterns.keys() for patterns in parser.extract_patterns())
+        pattern_names = set(parser.extract_patterns().keys())
         
         examples_dir = repo_root / "examples"
         orphaned_examples = []

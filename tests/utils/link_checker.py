@@ -29,7 +29,7 @@ class LinkChecker:
         
         for line_num, line in enumerate(self.lines, 1):
             # Find all markdown links [text](url)
-            markdown_links = re.findall(r'\\[([^\\]]+)\\]\\(([^)]+)\\)', line)
+            markdown_links = re.findall(r'\[([^\]]+)\]\(([^)]+)\)', line)
             
             for link_text, url in markdown_links:
                 url = url.strip()
@@ -51,7 +51,7 @@ class LinkChecker:
         
         for line in self.lines:
             # Find headers (# ## ### etc.)
-            header_match = re.match(r'^(#{1,6})\\s+(.+)', line.strip())
+            header_match = re.match(r'^(#{1,6})\s+(.+)', line.strip())
             if header_match:
                 header_text = header_match.group(2)
                 # Convert to anchor format: lowercase, spaces to hyphens, remove special chars
@@ -134,14 +134,14 @@ class LinkChecker:
     def _text_to_anchor(self, text: str) -> str:
         """Convert header text to anchor format"""
         # Remove markdown formatting
-        text = re.sub(r'\\*\\*(.+?)\\*\\*', r'\\1', text)  # Remove bold
-        text = re.sub(r'\\*(.+?)\\*', r'\\1', text)        # Remove italic
-        text = re.sub(r'`(.+?)`', r'\\1', text)            # Remove code
+        text = re.sub(r'\*\*(.+?)\*\*', r'\1', text)  # Remove bold
+        text = re.sub(r'\*(.+?)\*', r'\1', text)        # Remove italic
+        text = re.sub(r'`(.+?)`', r'\1', text)            # Remove code
         
         # Convert to lowercase and replace spaces with hyphens
         anchor = text.lower()
-        anchor = re.sub(r'[^a-z0-9\\s-]', '', anchor)      # Remove special chars
-        anchor = re.sub(r'\\s+', '-', anchor)              # Spaces to hyphens
+        anchor = re.sub(r'[^a-z0-9\s-]', '', anchor)      # Remove special chars
+        anchor = re.sub(r'\s+', '-', anchor)              # Spaces to hyphens
         anchor = re.sub(r'-+', '-', anchor)                # Multiple hyphens to single
         anchor = anchor.strip('-')                         # Remove leading/trailing hyphens
         

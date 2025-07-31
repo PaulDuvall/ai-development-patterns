@@ -121,12 +121,38 @@ class PatternParser:
         return ""
     
     def _is_pattern_header(self, line: str) -> bool:
-        """Check if line is a pattern header (### Pattern Name)"""
-        return re.match(r'^### [A-Za-z]', line) and not self._is_category_header(line)
+        """Check if line is a pattern header (## or ### Pattern Name)"""
+        if not (re.match(r'^### [A-Za-z]', line) or re.match(r'^## [A-Za-z]', line)):
+            return False
+        
+        if self._is_category_header(line):
+            return False
+            
+        # Exclude organizational sections that aren't actual patterns
+        excluded_sections = [
+            'Pattern Organization', 'Pattern Dependencies & Implementation Order',
+            'Complete Pattern Reference', 'Pattern Maturity Levels', 'Task Sizing Framework',
+            'Pattern Selection Decision Framework', 'Decision Tree', 'Context-Based Pattern Selection',
+            'Project Type Recommendations', 'Team Size Considerations', 'Technology Stack Considerations',
+            'Code Quality Prerequisites', 'Documentation Standards', 'Feature Request',
+            'Contributing', 'Getting Started', 'License', 'Success Metrics',
+            'CLI Requirements', 'Input Validation', 'Long Method Smell', 'Large Class Smell',
+            'Foundation Anti-Patterns', 'Development Anti-Patterns', 'Operations Anti-Patterns',
+            'Common AI Development Anti-Patterns', 'Foundation Metrics', 'Development Metrics', 
+            'Operations Metrics', 'Phase 1:', 'Phase 2:', 'Phase 3:', 'Pattern Contribution Guidelines',
+            'Security & Compliance Patterns', 'Deployment Automation Patterns', 'Monitoring & Maintenance Patterns'
+        ]
+        
+        header_text = line.strip().replace('#', '').strip()
+        for excluded in excluded_sections:
+            if excluded in header_text:
+                return False
+                
+        return True
     
     def _extract_pattern_name(self, line: str) -> Optional[str]:
         """Extract pattern name from header line"""
-        match = re.match(r'^### (.+)', line)
+        match = re.match(r'^### (.+)', line) or re.match(r'^## (.+)', line)
         return match.group(1).strip() if match else None
     
     def _parse_pattern(self, start_line: int, pattern_name: str, category: str) -> Optional[Pattern]:
@@ -157,13 +183,13 @@ class PatternParser:
                 related_patterns_text = self._extract_field_value(stripped, 'Related Patterns')
                 pattern.related_patterns = self._extract_related_patterns(related_patterns_text)
                 current_section = 'related_patterns'
-            elif stripped.startswith('#### ') and 'Anti-pattern' in stripped:
+            elif (stripped.startswith('#### ') and 'Anti-pattern' in stripped) or stripped.startswith('**Anti-pattern'):
                 current_section = 'anti_pattern'
-                section_content = []
+                section_content = [line]  # Include the anti-pattern header
             elif current_section == 'anti_pattern':
                 section_content.append(line)
-            elif current_section is None and stripped:  # Implementation content
-                if not any(stripped.startswith(prefix) for prefix in ['**Maturity**:', '**Description**:', '**Related Patterns**:']):
+            elif stripped and current_section not in ['anti_pattern']:  # Implementation content
+                if not any(stripped.startswith(prefix) for prefix in ['**Maturity**:', '**Description**:', '**Related Patterns**:', '####', '**Anti-pattern']):
                     pattern.implementation_content += line + '\n'
             
             i += 1
@@ -183,7 +209,7 @@ class PatternParser:
     def _extract_related_patterns(self, text: str) -> List[str]:
         """Extract pattern names from related patterns text"""
         # Find all markdown links [Pattern Name](#anchor)
-        pattern_links = re.findall(r'\\[([^\\]]+)\\]\\([^)]+\\)', text)
+        pattern_links = re.findall(r'\[([^\]]+)\]\([^)]+\)', text)
         return pattern_links
     
     def _find_next_pattern_start(self, start_line: int) -> int:
@@ -227,7 +253,7 @@ class ReferenceTableParser:
                 parts = [p.strip() for p in stripped.split('|')[1:-1]]
                 if len(parts) >= 5:
                     # Extract pattern name from markdown link
-                    pattern_match = re.search(r'\\*\\*\\[(.+?)\\]\\((.+?)\\)\\*\\*', parts[0])
+                    pattern_match = re.search(r'\*\*\[(.+?)\]\((.+?)\)\*\*', parts[0])
                     if pattern_match:
                         pattern_name = pattern_match.group(1)
                         anchor_link = pattern_match.group(2)

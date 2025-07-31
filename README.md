@@ -53,23 +53,23 @@ graph TD
 | **[AI Developer Lifecycle](#ai-developer-lifecycle)** | Intermediate | Workflow | Structured 9-stage process from problem definition through deployment with AI assistance | Rules as Code, AI Security Sandbox |
 | **[AI Tool Integration](#ai-tool-integration)** | Intermediate | Foundation | Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions | AI Security Sandbox, AI Developer Lifecycle |
 | **[AI Issue Generation](#ai-issue-generation)** | Intermediate | Foundation | Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies | AI Readiness Assessment |
-| **[Specification Driven Development](#specification-driven-development)** | Intermediate | Development | Use executable specifications to guide AI code generation with clear acceptance criteria before implementation | AI Developer Lifecycle, AI Tool Integration |
-| **[Progressive AI Enhancement](#progressive-ai-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | AI Developer Lifecycle |
+| **[Specification Driven Development](#specification-driven-development)** | Intermediate | Development | Use executable specifications to guide AI code generation with clear acceptance criteria before implementation | AI Developer Lifecycle |
+| **[Progressive AI Enhancement](#progressive-ai-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | None |
 | **[AI Choice Generation](#ai-choice-generation)** | Intermediate | Development | Generate multiple implementation options for exploration and comparison rather than accepting first AI solution | Progressive AI Enhancement |
 | **[Atomic Task Decomposition](#atomic-task-decomposition)** | Intermediate | Development | Break complex features into atomic, independently implementable tasks for parallel AI agent execution | Progressive AI Enhancement |
 | **[Parallelized AI Coding Agents](#parallelized-ai-coding-agents)** | Advanced | Development | Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration | Atomic Task Decomposition |
 | **[AI Knowledge Persistence](#ai-knowledge-persistence)** | Intermediate | Development | Capture successful patterns and failed attempts as versioned knowledge for future sessions | Rules as Code |
-| **[Constraint-Based AI Development](#constraint-based-ai-development)** | Beginner | Development | Give AI specific constraints to prevent over-engineering and ensure focused solutions | Progressive AI Enhancement |
-| **[Observable AI Development](#observable-ai-development)** | Intermediate | Development | Strategic logging and debugging that makes system behavior visible to AI | AI Developer Lifecycle, AI Tool Integration |
+| **[Constraint-Based AI Development](#constraint-based-ai-development)** | Beginner | Development | Give AI specific constraints to prevent over-engineering and ensure focused solutions | None |
+| **[Observable AI Development](#observable-ai-development)** | Intermediate | Development | Strategic logging and debugging that makes system behavior visible to AI | AI Developer Lifecycle |
 | **[AI-Driven Refactoring](#ai-driven-refactoring)** | Intermediate | Development | Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics | Rules as Code |
 | **[AI-Driven Architecture Design](#ai-driven-architecture-design)** | Intermediate | Development | Apply architectural frameworks (DDD, Well-Architected, 12-Factor) using AI to ensure sound system design | AI Developer Lifecycle, Rules as Code |
 | **[AI-Driven Traceability](#ai-driven-traceability)** | Intermediate | Development | Maintain automated links between requirements, specifications, tests, implementation, and documentation using AI | AI Developer Lifecycle |
 | **Security & Compliance** | | Operations | *Category containing security and compliance patterns* | |
 | **[Policy-as-Code Generation](#policy-as-code-generation)** | Advanced | Operations | Transform compliance requirements into executable Cedar/OPA policy files with AI assistance | AI Security Sandbox |
-| **[Security Scanning Orchestration](#security-scanning-orchestration)** | Intermediate | Workflow | Aggregate multiple security tools and use AI to summarize findings for actionable insights | Policy-as-Code Generation |
+| **[Security Scanning Orchestration](#security-scanning-orchestration)** | Intermediate | Workflow | Aggregate multiple security tools and use AI to summarize findings for actionable insights | AI Security Sandbox |
 | **Deployment Automation** | | Operations | *Category containing deployment and pipeline patterns* | |
 | **Monitoring & Maintenance** | | Operations | *Category containing monitoring and maintenance patterns* | |
-| **[Performance Baseline Management](#performance-baseline-management)** | Advanced | Operations | Establish intelligent performance baselines and configure monitoring thresholds automatically | Observable AI Development, AI Tool Integration |
+| **[Performance Baseline Management](#performance-baseline-management)** | Advanced | Operations | Establish intelligent performance baselines and configure monitoring thresholds automatically | AI Tool Integration |
 
 ---
 
@@ -297,7 +297,7 @@ Starting AI adoption without proper assessment leads to inconsistent practices, 
 ## Rules as Code
 
 **Maturity**: Beginner  
-**Description**: Treat AI coding standards like infrastructure - version them, evolve them, and make them explicit. Every AI session starts fresh, so without persistent rules, you're teaching AI your preferences from scratch each time.
+**Description**: Version and maintain AI coding standards as explicit configuration files that persist across sessions and team members.
 
 **Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Knowledge Persistence](#ai-knowledge-persistence)
 
@@ -331,9 +331,9 @@ Each developer maintains their own prompts and preferences, leading to inconsist
 ## AI Security Sandbox
 
 **Maturity**: Beginner  
-**Description**: Run AI tools in isolated environments that can't access secrets, credentials, or sensitive data. Essential for preventing credential leaks and maintaining security compliance. When running multiple parallel agents, isolation becomes critical to prevent cross-contamination and coordinate access to shared resources safely.
+**Description**: Run AI tools in isolated environments without access to secrets or sensitive data to prevent credential leaks and maintain security compliance.
 
-**Related Patterns**: [AI Security & Compliance](#ai-security--compliance), [Rules as Code](#rules-as-code)
+**Related Patterns**: [Security & Compliance Patterns](#security-compliance-patterns), [Rules as Code](#rules-as-code)
 
 **Core Security Implementation**
 
@@ -538,7 +538,7 @@ Attempting to solve complex data analysis, system integration, or real-time prob
 ## AI Issue Generation
 
 **Maturity**: Intermediate  
-**Description**: Generate structured work items optimized for Kanban flow using AI to break down features into small, rapidly completable tasks (4-8 hours max) with clear acceptance criteria and dependencies. Focus on continuous flow rather than batch estimation.
+**Description**: Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies.
 
 **Related Patterns**: [AI Readiness Assessment](#ai-readiness-assessment), [Specification Driven Development](#specification-driven-development)
 
@@ -690,7 +690,7 @@ Development patterns provide tactical approaches for day-to-day AI-assisted codi
 ## Specification Driven Development
 
 **Maturity**: Intermediate  
-**Description**: Use machine-readable specifications with authority levels and rigorous Test-Driven Development (TDD) to guide AI code generation. Write persistent specifications first, then use ephemeral prompts to implement solutions that satisfy those specifications.
+**Description**: Use executable specifications to guide AI code generation with clear acceptance criteria before implementation.
 
 **Core Principle: Precision Enables Productivity**
 
@@ -817,7 +817,7 @@ Saving collections of prompts as if they were specifications. Prompts are implem
 ## Progressive AI Enhancement
 
 **Maturity**: Beginner  
-**Description**: Build complex features through small, deployable iterations with daily deployment cycles. Each AI interaction adds one specific enhancement rather than trying to build everything at once. Focus on rapid market feedback over granular task breakdown.
+**Description**: Build complex features through small, deployable iterations rather than big-bang generation.
 
 **Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Constraint-Based AI Development](#constraint-based-ai-development), [AI Choice Generation](#ai-choice-generation), [AI-Driven Architecture Design](#ai-driven-architecture-design)
 
@@ -1149,7 +1149,7 @@ Good: "Reduce p99 latency to <50ms without new dependencies"
 ## Atomic Task Decomposition
 
 **Maturity**: Intermediate  
-**Description**: Break complex features into atomic, independently implementable tasks (1-2 hours) that can be parallelized across multiple AI agents. Each task should be completable in isolation without dependencies on concurrent work. Use this pattern when implementing with parallel agents; for standard team development, use AI Issue Generation (4-8 hour tasks).
+**Description**: Break complex features into atomic, independently implementable tasks for parallel AI agent execution.
 
 **Related Patterns**: [AI Workflow Orchestration](experiments/#ai-workflow-orchestration), [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Issue Generation](#ai-issue-generation)
 
@@ -1688,9 +1688,9 @@ Manual thresholds quickly become stale, causing alert storms or blind spots.
 4. **[Atomic Task Decomposition](#atomic-task-decomposition)** - Break down complex features
 
 ### Phase 3: Operations (Weeks 5-6)
-1. **[AI Security & Compliance](#ai-security--compliance)** - Implement unified security framework
-2. **[Deployment Automation](#deployment-automation)** - Establish AI-powered CI/CD
-3. **[Monitoring & Maintenance](#monitoring--maintenance)** - Deploy proactive system management
+1. **[Security & Compliance Patterns](#security-compliance-patterns)** - Implement unified security framework
+2. **[Deployment Automation Patterns](#deployment-automation-patterns)** - Establish AI-powered CI/CD
+3. **[Monitoring & Maintenance Patterns](#monitoring-maintenance-patterns)** - Deploy proactive system management
 
 **Note**: For teams practicing continuous delivery, implement security (AI Security Sandbox, AI Security & Compliance) and deployment patterns (Deployment Automation) from week 1 alongside foundation patterns. The phases represent learning dependencies, not deployment sequences.
 
