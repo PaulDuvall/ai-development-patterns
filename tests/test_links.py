@@ -52,9 +52,8 @@ class TestHyperlinkIntegrity:
         
         for pattern_name, pattern in patterns.items():
             for related_pattern in pattern.related_patterns:
-                # Convert pattern name to expected anchor format
-                expected_anchor = '#' + related_pattern.lower().replace(' ', '-').replace('&', '').replace(',', '')
-                expected_anchor = ''.join(c for c in expected_anchor if c.isalnum() or c in '-#')
+                # Convert pattern name to expected anchor format using same logic as LinkChecker
+                expected_anchor = '#' + checker._text_to_anchor(related_pattern)
                 
                 if expected_anchor not in anchors:
                     invalid_related_links.append({

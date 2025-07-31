@@ -114,12 +114,14 @@ class LinkChecker:
         
         for path, line_num in links['relative']:
             # Handle different types of relative paths
-            full_path = os.path.join(repo_root_path, path)
+            # Split path from anchor if present
+            file_path = path.split('#')[0] if '#' in path else path
+            full_path = os.path.join(repo_root_path, file_path)
             
             if not os.path.exists(full_path):
                 # Try removing leading ./
-                if path.startswith('./'):
-                    full_path = os.path.join(repo_root_path, path[2:])
+                if file_path.startswith('./'):
+                    full_path = os.path.join(repo_root_path, file_path[2:])
                 
                 if not os.path.exists(full_path):
                     invalid_links.append({

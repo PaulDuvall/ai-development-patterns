@@ -215,10 +215,12 @@ class PatternParser:
         return match.group(1).strip() if match else ""
     
     def _extract_related_patterns(self, text: str) -> List[str]:
-        """Extract pattern names from related patterns text"""
-        # Find all markdown links [Pattern Name](#anchor)
-        pattern_links = re.findall(r'\[([^\]]+)\]\([^)]+\)', text)
-        return pattern_links
+        """Extract pattern names from related patterns text (only internal references)"""
+        # Find all markdown links [Pattern Name](url)
+        all_links = re.findall(r'\[([^\]]+)\]\(([^)]+)\)', text)
+        # Only return pattern names that link to internal anchors (start with #)
+        internal_patterns = [name for name, url in all_links if url.startswith('#')]
+        return internal_patterns
     
     def _find_next_pattern_start(self, start_line: int) -> int:
         """Find the line number of the next pattern header"""
