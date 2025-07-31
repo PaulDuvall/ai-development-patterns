@@ -1144,6 +1144,12 @@ Bad: "Improve performance"
 Good: "Reduce p99 latency to <50ms without new dependencies"
 ```
 
+**Anti-pattern: Unconstrained Generation**
+Giving AI vague instructions like "make it better" or "add features" leads to over-engineered solutions that are hard to maintain and review.
+
+**Anti-pattern: Constraint Overload**  
+Adding too many constraints ("use exactly 50 lines, 2 methods, no dependencies, 100% test coverage, sub-10ms response time") paralyzes AI decision-making and produces suboptimal solutions.
+
 ---
 
 ## Atomic Task Decomposition

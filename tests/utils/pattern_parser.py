@@ -162,14 +162,19 @@ class PatternParser:
         i = start_line + 1
         current_section = None
         section_content = []
+        in_code_block = False
         
         while i < len(self.lines):
             line = self.lines[i]
             stripped = line.strip()
             
-            # Stop at next pattern or major section
-            if (stripped.startswith('### ') and self._is_pattern_header(stripped)) or \
-               stripped.startswith('## '):
+            # Track code block boundaries
+            if stripped.startswith('```'):
+                in_code_block = not in_code_block
+            
+            # Stop at next pattern or major section (but not if inside code block)
+            if not in_code_block and ((stripped.startswith('### ') and self._is_pattern_header(stripped)) or \
+               stripped.startswith('## ')):
                 break
             
             # Track current section
@@ -184,8 +189,11 @@ class PatternParser:
                 pattern.related_patterns = self._extract_related_patterns(related_patterns_text)
                 current_section = 'related_patterns'
             elif (stripped.startswith('#### ') and 'Anti-pattern' in stripped) or stripped.startswith('**Anti-pattern'):
-                current_section = 'anti_pattern'
-                section_content = [line]  # Include the anti-pattern header
+                if current_section != 'anti_pattern':
+                    current_section = 'anti_pattern'
+                    section_content = [line]  # Include the anti-pattern header
+                else:
+                    section_content.append(line)  # Continue adding to existing anti-pattern content
             elif current_section == 'anti_pattern':
                 section_content.append(line)
             elif stripped and current_section not in ['anti_pattern']:  # Implementation content
