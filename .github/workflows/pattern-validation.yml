@@ -33,7 +33,7 @@ jobs:
         python -m pytest test_pattern_compliance.py -v --tb=short
     
     - name: Upload compliance test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: pattern-compliance-results
@@ -62,7 +62,7 @@ jobs:
         python -m pytest test_readme_accuracy.py -v --tb=short
     
     - name: Upload accuracy test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: readme-accuracy-results
@@ -97,7 +97,7 @@ jobs:
       continue-on-error: true  # External links may be temporarily unavailable
     
     - name: Upload link validation results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: link-validation-results
@@ -131,7 +131,7 @@ jobs:
         python -m pytest test_examples.py -v --tb=short
     
     - name: Upload example validation results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: example-validation-results
@@ -160,7 +160,7 @@ jobs:
         python -m pytest test_dependencies.py -v --tb=short
     
     - name: Upload dependency validation results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: dependency-validation-results
@@ -196,7 +196,7 @@ jobs:
         python -m pytest -v --tb=short --html=report.html --self-contained-html --cov=utils --cov-report=html
     
     - name: Upload comprehensive test report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: comprehensive-test-report
