@@ -841,7 +841,7 @@ Building authentication progressively:
 → Deploy
 ```
 
-**When to Use Progressive AI Enhancement**
+**When to Use [Progressive AI Enhancement](#progressive-ai-enhancement)**
 
 - **MVP Development**: When you need to get to market quickly with minimal features
 - **Uncertain Requirements**: When requirements are likely to change based on user feedback  
