@@ -171,19 +171,19 @@ graph TD
 1. **[AI Developer Lifecycle](#ai-developer-lifecycle)** - Structured development process
 2. **[Specification Driven Development](#specification-driven-development)** - Quality-focused development
 3. **[AI Issue Generation](#ai-issue-generation)** - Organized work breakdown
-4. **[Comprehensive AI Testing Strategy](experiments/#comprehensive-ai-testing-strategy)** - Quality assurance
+4. **[Comprehensive AI Testing Strategy](experiments/README.md#comprehensive-ai-testing-strategy)** - Quality assurance
 
 **For Parallel Implementation**:
 1. **[Atomic Task Decomposition](#atomic-task-decomposition)** - Ultra-small independent tasks
-2. **[AI Workflow Orchestration](experiments/#ai-workflow-orchestration)** - Agent coordination
-3. **[AI Review Automation](experiments/#ai-review-automation)** - Automated integration
+2. **[AI Workflow Orchestration](experiments/README.md#ai-workflow-orchestration)** - Agent coordination
+3. **[AI Review Automation](experiments/README.md#ai-review-automation)** - Automated integration
 4. **[AI Security Sandbox](#ai-security-sandbox)** - Enhanced with parallel safety
 
 **For Enterprise/Production (Month 2+)**:
 1. **[Policy-as-Code Generation](#policy-as-code-generation)** - Compliance automation
 2. **[Security Scanning Orchestration](#security-scanning-orchestration)** - Integrated security
 3. **[Performance Baseline Management](#performance-baseline-management)** - Production monitoring
-4. **[Technical Debt Forecasting](experiments/#technical-debt-forecasting)** - Proactive maintenance
+4. **[Technical Debt Forecasting](experiments/README.md#technical-debt-forecasting)** - Proactive maintenance
 
 ### Project Type Recommendations
 
@@ -708,7 +708,7 @@ Specifications use authority levels to resolve conflicts and establish precedenc
 
 When requirements conflict, higher authority levels take precedence, enabling clear decision-making for AI implementation.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Tool Integration](#ai-tool-integration), [Comprehensive AI Testing Strategy](experiments/#comprehensive-ai-testing-strategy), [Observable AI Development](#observable-ai-development)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Tool Integration](#ai-tool-integration), [Comprehensive AI Testing Strategy](experiments/README.md#comprehensive-ai-testing-strategy), [Observable AI Development](#observable-ai-development)
 
 **SpecDriven AI Workflow**
 
@@ -859,7 +859,7 @@ Asking AI to "create a complete user management system" results in 5000 lines of
 **Maturity**: Intermediate  
 **Description**: Generate multiple implementation options for exploration and comparison rather than accepting the first AI solution.
 
-**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Context Window Optimization](experiments/#context-window-optimization)
+**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Context Window Optimization](experiments/README.md#context-window-optimization)
 
 **Multi-Option Implementation Comparison**
 
@@ -905,7 +905,7 @@ Generating too many choices or spending more time evaluating options than implem
 **Maturity**: Advanced  
 **Description**: Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration.
 
-**Related Patterns**: [AI Workflow Orchestration](experiments/#ai-workflow-orchestration), [Atomic Task Decomposition](#atomic-task-decomposition), [AI Security Sandbox](#ai-security-sandbox)
+**Related Patterns**: [AI Workflow Orchestration](experiments/README.md#ai-workflow-orchestration), [Atomic Task Decomposition](#atomic-task-decomposition), [AI Security Sandbox](#ai-security-sandbox)
 
 **Agent Coordination Lifecycle**
 
@@ -1130,7 +1130,7 @@ echo "Full JWT specification with 47 configuration options..." >> .ai/knowledge/
 **Maturity**: Beginner  
 **Description**: Give AI specific constraints to prevent over-engineering and ensure focused solutions.
 
-**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Human-AI Handoff Protocol](experiments/#human-ai-handoff-protocol), [AI Choice Generation](#ai-choice-generation)
+**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Human-AI Handoff Protocol](experiments/README.md#human-ai-handoff-protocol), [AI Choice Generation](#ai-choice-generation)
 
 **Examples**
 ```
@@ -1157,7 +1157,7 @@ Adding too many constraints ("use exactly 50 lines, 2 methods, no dependencies, 
 **Maturity**: Intermediate  
 **Description**: Break complex features into atomic, independently implementable tasks for parallel AI agent execution.
 
-**Related Patterns**: [AI Workflow Orchestration](experiments/#ai-workflow-orchestration), [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Issue Generation](#ai-issue-generation)
+**Related Patterns**: [AI Workflow Orchestration](experiments/README.md#ai-workflow-orchestration), [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Issue Generation](#ai-issue-generation)
 
 **Atomic Task Criteria**
 
@@ -1289,7 +1289,7 @@ Breaking tasks so small that coordination overhead exceeds the benefits of paral
 **Maturity**: Intermediate  
 **Description**: Design systems with comprehensive logging, tracing, and debugging capabilities that enable AI to understand system behavior and diagnose issues effectively.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Tool Integration](#ai-tool-integration), [Comprehensive AI Testing Strategy](experiments/#comprehensive-ai-testing-strategy), [AI-Driven Traceability](#ai-driven-traceability)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Tool Integration](#ai-tool-integration), [Comprehensive AI Testing Strategy](experiments/README.md#comprehensive-ai-testing-strategy), [AI-Driven Traceability](#ai-driven-traceability)
 
 **Core Implementation**
 
@@ -1358,7 +1358,7 @@ def process_payment(amount):
 **Maturity**: Intermediate  
 **Description**: Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics, following established refactoring rules and maintaining test coverage throughout the process.
 
-**Related Patterns**: [Rules as Code](#rules-as-code), [Comprehensive AI Testing Strategy](experiments/#comprehensive-ai-testing-strategy), [Technical Debt Forecasting](experiments/#technical-debt-forecasting)
+**Related Patterns**: [Rules as Code](#rules-as-code), [Comprehensive AI Testing Strategy](experiments/README.md#comprehensive-ai-testing-strategy), [Technical Debt Forecasting](experiments/README.md#technical-debt-forecasting)
 
 **Code Smell Detection Framework**
 
@@ -1514,7 +1514,7 @@ ai-assistant design-architecture \
 **Maturity**: Intermediate  
 **Description**: Maintain automated links between requirements, specifications, tests, implementation, and documentation using AI.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Specification Driven Development](#specification-driven-development), [Comprehensive AI Testing Strategy](experiments/#comprehensive-ai-testing-strategy)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Specification Driven Development](#specification-driven-development), [Comprehensive AI Testing Strategy](experiments/README.md#comprehensive-ai-testing-strategy)
 
 **Core Implementation**
 

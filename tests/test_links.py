@@ -143,8 +143,17 @@ class TestHyperlinkIntegrity:
         """Verify all markdown links have proper syntax"""
         lines = readme_content.split('\n')
         broken_markdown = []
+        in_code_block = False
         
         for line_num, line in enumerate(lines, 1):
+            # Track code block boundaries
+            if line.strip().startswith('```'):
+                in_code_block = not in_code_block
+                continue
+            
+            # Skip lines inside code blocks
+            if in_code_block:
+                continue
             # Find potential broken markdown links
             
             # Pattern 1: [text] without (url) 

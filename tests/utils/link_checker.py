@@ -173,8 +173,23 @@ class LinkChecker:
     def validate_pattern_references(self, patterns: List[str]) -> List[Dict[str, any]]:
         """Validate that all pattern references are properly linked"""
         invalid_references = []
+        in_code_block = False
+        in_mermaid = False
         
         for line_num, line in enumerate(self.lines, 1):
+            # Track code block and mermaid diagram boundaries
+            if line.strip().startswith('```'):
+                if 'mermaid' in line:
+                    in_mermaid = True
+                elif in_mermaid:
+                    in_mermaid = False
+                else:
+                    in_code_block = not in_code_block
+                continue
+            
+            # Skip lines inside code blocks or mermaid diagrams
+            if in_code_block or in_mermaid:
+                continue
             # Find pattern names mentioned in text
             for pattern in patterns:
                 # Look for pattern name not already in a link
