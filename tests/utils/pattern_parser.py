@@ -95,9 +95,9 @@ class PatternParser:
     def _is_category_header(self, line: str) -> bool:
         """Check if line is a category header (Foundation/Development/Operations Patterns)"""
         category_patterns = [
-            r'^## Foundation Patterns',
-            r'^## Development Patterns', 
-            r'^## Operations Patterns',
+            r'^# Foundation Patterns',
+            r'^# Development Patterns', 
+            r'^# Operations Patterns',
             r'^### Security & Compliance',
             r'^### Deployment Automation',
             r'^### Monitoring & Maintenance'

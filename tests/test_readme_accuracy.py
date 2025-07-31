@@ -81,8 +81,8 @@ class TestReadmeAccuracy:
         section_order = []
         for line in lines:
             stripped = line.strip()
-            if stripped.startswith('## ') and 'Pattern' in stripped:
-                section_name = stripped.replace('## ', '').strip()
+            if stripped.startswith('# ') and 'Pattern' in stripped:
+                section_name = stripped.replace('# ', '').strip()
                 section_order.append(section_name)
         
         # Verify expected section order
