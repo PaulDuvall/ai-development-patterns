@@ -29,85 +29,112 @@
 
 **[SCI-008]** **WHILE** evaluating dependencies, **THE SYSTEM SHALL** maintain a risk score combining CVE severity, dependency depth, and AI-detected behavioral anomalies.
 
-### 1.4 Supply Chain Attestation
-**[SCI-009]** **THE SYSTEM SHALL** generate CycloneDX format SBOMs **FOR** every build artifact **WHERE** each SBOM includes transitive dependencies.
+### 1.4 Change Pattern Analysis
+**[SCI-009]** **THE SYSTEM SHALL** analyze git commit history and diff patterns through Change Pattern Analyzer **TO** determine optimal tool execution strategy **WITHIN** 30 seconds of commit.
 
-**[SCI-010]** **THE SYSTEM SHALL** sign SBOMs using Sigstore **AND** store attestations in a Rekor transparency log **WITHIN** 60 seconds of artifact creation.
+**[SCI-010]** **THE SYSTEM SHALL** classify changes into categories (documentation, configuration, source code, dependencies) **WHERE** each category triggers specific tool subsets based on impact analysis.
 
-### 1.5 License Compliance
-**[SCI-011]** **THE SYSTEM SHALL** scan all dependencies using SPDX license identifiers **BEFORE** build promotion.
+**[SCI-011]** **WHEN** commits contain only documentation changes (*.md, *.txt, docs/), **THE SYSTEM SHALL** skip security scanning, dependency checks, and build processes **WHILE** executing only documentation validation and link checking.
 
-**[SCI-012]** **IF** ambiguous or unclassified licenses are detected, **THEN THE SYSTEM SHALL** invoke the License Compliance Guardian AI agent **TO** classify and assess compatibility.
+**[SCI-012]** **THE SYSTEM SHALL** maintain change pattern rules **WHERE** file extension patterns, directory paths, and commit message keywords determine tool execution scope.
 
-**[SCI-013]** **THE SYSTEM SHALL** maintain an approved license allowlist **WHERE** non-compliant licenses trigger build failure with detailed violation reports.
+### 1.5 Supply Chain Attestation
+**[SCI-013]** **THE SYSTEM SHALL** generate CycloneDX format SBOMs **FOR** every build artifact **WHERE** each SBOM includes transitive dependencies.
+
+**[SCI-014]** **THE SYSTEM SHALL** sign SBOMs using Sigstore **AND** store attestations in a Rekor transparency log **WITHIN** 60 seconds of artifact creation.
+
+### 1.6 License Compliance
+**[SCI-015]** **THE SYSTEM SHALL** scan all dependencies using SPDX license identifiers **BEFORE** build promotion **ONLY WHEN** dependency changes are detected.
+
+**[SCI-016]** **IF** ambiguous or unclassified licenses are detected, **THEN THE SYSTEM SHALL** invoke the License Compliance Guardian AI agent **TO** classify and assess compatibility.
+
+**[SCI-017]** **THE SYSTEM SHALL** maintain an approved license allowlist **WHERE** non-compliant licenses trigger build failure with detailed violation reports.
 
 ---
 
 ## 2. Build Quality & Test Coverage Requirements
 
-### 2.1 Test Generation and Coverage
-**[BQT-001]** **THE SYSTEM SHALL** enforce minimum code coverage thresholds (unit: 80%, integration: 60%) **BEFORE** allowing promotion to staging.
+### 2.1 Intelligent Test Execution
+**[BQT-001]** **THE SYSTEM SHALL** analyze code changes through Code Impact Analyzer **TO** determine affected test suites and execution scope **WITHIN** 2 minutes of commit.
 
-**[BQT-002]** **WHEN** new functional code is introduced, **THE SYSTEM SHALL** invoke the Test Writer agent to propose test cases **WITHIN** 5 minutes of commit.
+**[BQT-002]** **THE SYSTEM SHALL** execute only tests related to changed files and their dependencies **WHERE** test selection is based on static analysis and historical test-to-code mapping.
 
-**[BQT-003]** **THE SYSTEM SHALL** validate that AI-generated tests compile and execute successfully **BEFORE** presenting them for human review.
+**[BQT-003]** **WHEN** changes affect only configuration files (*.yml, *.json, *.env), **THE SYSTEM SHALL** run configuration validation tests **WHILE** skipping unit and integration test suites.
 
-### 2.2 Code Quality Enforcement
-**[BQT-004]** **THE SYSTEM SHALL** execute deterministic linting tools (`pylint`, `eslint`, `black`, `prettier`) **AS SOON AS** code is committed to a feature branch.
+**[BQT-004]** **THE SYSTEM SHALL** maintain test impact mapping **WHERE** each source file maps to relevant test files based on import graphs and execution traces.
 
-**[BQT-005]** **AFTER** deterministic checks pass, **THE SYSTEM SHALL** invoke Style Enforcer for semantic code quality assessment including naming conventions, complexity metrics, and architectural patterns.
+### 2.2 Test Generation and Coverage
+**[BQT-005]** **THE SYSTEM SHALL** enforce minimum code coverage thresholds (unit: 80%, integration: 60%) **BEFORE** allowing promotion to staging **ONLY FOR** commits affecting source code.
 
-**[BQT-006]** **THE SYSTEM SHALL** reject code with cyclomatic complexity > 15 or cognitive complexity > 20 **UNLESS** explicitly approved by senior engineer with justification.
+**[BQT-006]** **WHEN** new functional code is introduced, **THE SYSTEM SHALL** invoke the Test Writer agent to propose test cases **WITHIN** 5 minutes of commit.
 
-### 2.3 Review Process
-**[BQT-007]** **THE SYSTEM SHALL** require approval from at least one human reviewer **AND** the Code Review Assistant **BEFORE** merge to main.
+**[BQT-007]** **THE SYSTEM SHALL** validate that AI-generated tests compile and execute successfully **BEFORE** presenting them for human review.
 
-**[BQT-008]** **THE SYSTEM SHALL** ensure Code Review Assistant evaluates security patterns, performance implications, and best practices **WHERE** findings are presented as actionable suggestions.
+### 2.3 Code Quality Enforcement
+**[BQT-008]** **THE SYSTEM SHALL** execute deterministic linting tools (`pylint`, `eslint`, `black`, `prettier`) **ONLY FOR** files with source code changes **AS SOON AS** code is committed to a feature branch.
 
-**[BQT-009]** **IF** critical issues are identified by Code Review Assistant, **THEN THE SYSTEM SHALL** block merge **UNTIL** issues are resolved or explicitly waived with documented rationale.
+**[BQT-009]** **THE SYSTEM SHALL** use Language Detection Agent **TO** identify programming languages in changed files **AND** apply appropriate linting tools based on file extensions and content analysis.
 
-### 2.4 Requirements Traceability
-**[BQT-010]** **THE SYSTEM SHALL** maintain bidirectional traceability between requirements (FR-*, NFR-*) and test cases **WHERE** Requirements Reviewer validates coverage.
+**[BQT-010]** **AFTER** deterministic checks pass, **THE SYSTEM SHALL** invoke Style Enforcer for semantic code quality assessment **ONLY FOR** files with complexity or style violations.
 
-**[BQT-011]** **THE SYSTEM SHALL** generate coverage reports showing requirement → test → result mappings **AFTER** each test execution.
+**[BQT-011]** **THE SYSTEM SHALL** reject code with cyclomatic complexity > 15 or cognitive complexity > 20 **UNLESS** explicitly approved by senior engineer with justification.
 
-**[BQT-012]** **WHEN** requirements lack test coverage, **THE SYSTEM SHALL** block promotion and notify product owner with gap analysis **WITHIN** 2 hours.
+### 2.4 Review Process
+**[BQT-012]** **THE SYSTEM SHALL** require approval from at least one human reviewer **AND** the Code Review Assistant **BEFORE** merge to main.
+
+**[BQT-013]** **THE SYSTEM SHALL** ensure Code Review Assistant evaluates security patterns, performance implications, and best practices **WHERE** findings are presented as actionable suggestions **ONLY FOR** files containing source code changes.
+
+**[BQT-014]** **IF** critical issues are identified by Code Review Assistant, **THEN THE SYSTEM SHALL** block merge **UNTIL** issues are resolved or explicitly waived with documented rationale.
+
+### 2.5 Requirements Traceability
+**[BQT-015]** **THE SYSTEM SHALL** maintain bidirectional traceability between requirements (FR-*, NFR-*) and test cases **WHERE** Requirements Reviewer validates coverage.
+
+**[BQT-016]** **THE SYSTEM SHALL** generate coverage reports showing requirement → test → result mappings **AFTER** each test execution **ONLY WHEN** source code changes affect traced requirements.
+
+**[BQT-017]** **WHEN** requirements lack test coverage, **THE SYSTEM SHALL** block promotion and notify product owner with gap analysis **WITHIN** 2 hours.
 
 ---
 
 ## 3. Deployment & Release Control Requirements
 
-### 3.1 Deployment Strategy
-**[DRC-001]** **THE SYSTEM SHALL** implement progressive deployment strategies (canary, blue-green, feature flags) **WHERE** Deployment Strategist selects strategy based on risk assessment.
+### 3.1 Risk-Based Deployment Strategy
+**[DRC-001]** **THE SYSTEM SHALL** analyze deployment risk through Deployment Risk Analyzer **USING** change scope, affected services, and historical failure patterns **TO** select optimal deployment strategy.
 
-**[DRC-002]** **THE SYSTEM SHALL** use AWS Step Functions to orchestrate multi-stage deployments **WITH** automated progression gates based on health metrics.
+**[DRC-002]** **WHEN** changes affect only static assets, documentation, or configuration, **THE SYSTEM SHALL** execute direct deployment **WHILE** skipping canary and blue-green processes.
 
-**[DRC-003]** **WHILE** canary deployment is active, **THE SYSTEM SHALL** monitor error rates, latency, and business KPIs **WHERE** degradation > 5% triggers automatic rollback.
+**[DRC-003]** **THE SYSTEM SHALL** implement progressive deployment strategies (canary, blue-green, feature flags) **WHERE** Deployment Strategist selects strategy based on automated risk assessment.
+
+**[DRC-004]** **THE SYSTEM SHALL** use AWS Step Functions to orchestrate multi-stage deployments **WITH** automated progression gates based on health metrics **ONLY FOR** high-risk deployments.
+
+**[DRC-005]** **WHILE** canary deployment is active, **THE SYSTEM SHALL** monitor error rates, latency, and business KPIs **WHERE** degradation > 5% triggers automatic rollback.
 
 ### 3.2 Release Orchestration
-**[DRC-004]** **THE SYSTEM SHALL** enforce release approval through Continuous Release Orchestrator **ONLY WHEN** all quality gates return success status.
+**[DRC-006]** **THE SYSTEM SHALL** enforce release approval through Continuous Release Orchestrator **ONLY WHEN** all quality gates return success status.
 
-**[DRC-005]** **THE SYSTEM SHALL** evaluate release readiness using composite predicates:
-- Integrity Score ≥ 95%
-- Quality Score ≥ 90%
-- Security Score ≥ 95%
-- Performance Score ≥ 85%
+**[DRC-007]** **THE SYSTEM SHALL** evaluate release readiness using composite predicates based on change impact:
+- **High-risk changes**: Integrity Score ≥ 95%, Quality Score ≥ 90%, Security Score ≥ 95%, Performance Score ≥ 85%
+- **Medium-risk changes**: Integrity Score ≥ 90%, Quality Score ≥ 80%, Security Score ≥ 90%
+- **Low-risk changes**: Integrity Score ≥ 80%, Quality Score ≥ 70%
 
-**[DRC-006]** **IF** any predicate fails, **THEN THE SYSTEM SHALL** generate detailed remediation report **AND** notify release manager **WITHIN** 15 minutes.
+**[DRC-008]** **IF** any predicate fails, **THEN THE SYSTEM SHALL** generate detailed remediation report **AND** notify release manager **WITHIN** 15 minutes.
 
 ### 3.3 Rollback Capabilities
-**[DRC-007]** **THE SYSTEM SHALL** maintain rollback-ready artifacts for previous 5 versions **WHERE** each artifact includes configuration and database migration scripts.
+**[DRC-009]** **THE SYSTEM SHALL** maintain rollback-ready artifacts for previous 5 versions **WHERE** each artifact includes configuration and database migration scripts.
 
-**[DRC-008]** **WHEN** production incidents occur, **THE SYSTEM SHALL** enable Rollback First Responder to initiate automated rollback **WITHIN** 2 minutes of detection.
+**[DRC-010]** **WHEN** production incidents occur, **THE SYSTEM SHALL** enable Rollback First Responder to initiate automated rollback **WITHIN** 2 minutes of detection.
 
-**[DRC-009]** **THE SYSTEM SHALL** execute rollback validation tests **AFTER** rollback completion **TO** ensure system stability and data integrity.
+**[DRC-011]** **THE SYSTEM SHALL** execute rollback validation tests **AFTER** rollback completion **TO** ensure system stability and data integrity.
 
-### 3.4 Workflow Coordination
-**[DRC-010]** **THE SYSTEM SHALL** optimize GitHub Actions workflow execution through Workflow Coordinator **WHERE** parallel jobs are maximized while respecting dependencies.
+### 3.4 Intelligent Workflow Coordination
+**[DRC-012]** **THE SYSTEM SHALL** analyze workflow dependencies through Workflow Optimizer **TO** generate dynamic execution graphs based on change scope and tool requirements.
 
-**[DRC-011]** **IF** workflow execution time exceeds SLA (30 minutes for standard builds), **THEN THE SYSTEM SHALL** analyze bottlenecks and propose optimizations.
+**[DRC-013]** **THE SYSTEM SHALL** optimize GitHub Actions workflow execution through Workflow Coordinator **WHERE** parallel jobs are maximized while respecting dependencies **AND** unnecessary jobs are skipped based on change analysis.
 
-**[DRC-012]** **THE SYSTEM SHALL** enforce workflow ordering rules **WHERE** security scans must complete before performance tests, and all tests before deployment.
+**[DRC-014]** **WHEN** only documentation changes are detected, **THE SYSTEM SHALL** execute minimal workflow containing documentation validation, link checking, and spell checking **WHILE** skipping build, test, and deployment phases.
+
+**[DRC-015]** **IF** workflow execution time exceeds SLA (30 minutes for standard builds), **THEN THE SYSTEM SHALL** analyze bottlenecks and propose optimizations.
+
+**[DRC-016]** **THE SYSTEM SHALL** enforce workflow ordering rules **WHERE** security scans must complete before performance tests, and all tests before deployment **ONLY FOR** workflows that include those phases.
 
 ---
 
@@ -206,33 +233,39 @@
 
 ## 7. Hybrid AI + Deterministic Tooling Requirements
 
-### 7.1 Tool Prioritization
-**[HAI-001]** **THE SYSTEM SHALL** execute deterministic tools first **BEFORE** invoking AI agents **WHERE** deterministic results inform AI context.
+### 7.1 Context-Aware Tool Selection
+**[HAI-001]** **THE SYSTEM SHALL** analyze change context through Context Intelligence Engine **TO** determine optimal tool execution sequence based on file types, change patterns, and historical effectiveness.
 
-**[HAI-002]** **THE SYSTEM SHALL** route to AI agents **ONLY WHEN** deterministic tools report ambiguous results **OR** require semantic interpretation.
+**[HAI-002]** **THE SYSTEM SHALL** execute deterministic tools first **BEFORE** invoking AI agents **WHERE** deterministic results inform AI context **ONLY FOR** changes that require those specific tools.
 
-**[HAI-003]** **THE SYSTEM SHALL** measure and report tool execution time **WHERE** SLAs are: deterministic < 5 min, AI < 10 min per invocation.
+**[HAI-003]** **THE SYSTEM SHALL** route to AI agents **ONLY WHEN** deterministic tools report ambiguous results **OR** require semantic interpretation **OR** when change complexity exceeds predefined thresholds.
+
+**[HAI-004]** **THE SYSTEM SHALL** maintain tool effectiveness metrics per change type **WHERE** success rates and execution times inform future tool selection decisions.
+
+**[HAI-005]** **THE SYSTEM SHALL** measure and report tool execution time **WHERE** SLAs are: deterministic < 5 min, AI < 10 min per invocation.
 
 ### 7.2 Evidence Chain
-**[HAI-004]** **THE SYSTEM SHALL** link every AI decision to supporting evidence **WHERE** evidence includes tool outputs, logs, and confidence scores.
+**[HAI-006]** **THE SYSTEM SHALL** link every AI decision to supporting evidence **WHERE** evidence includes tool outputs, logs, and confidence scores.
 
-**[HAI-005]** **THE SYSTEM SHALL** sign all AI agent outputs using Sigstore **WHERE** signatures enable tamper detection and non-repudiation.
+**[HAI-007]** **THE SYSTEM SHALL** sign all AI agent outputs using Sigstore **WHERE** signatures enable tamper detection and non-repudiation.
 
-**[HAI-006]** **THE SYSTEM SHALL** maintain provenance graph **WHERE** each node represents tool/agent invocation **AND** edges represent data flow.
+**[HAI-008]** **THE SYSTEM SHALL** maintain provenance graph **WHERE** each node represents tool/agent invocation **AND** edges represent data flow.
 
-### 7.3 Feedback Loop
-**[HAI-007]** **THE SYSTEM SHALL** collect accuracy metrics for AI predictions **WHERE** human overrides are tracked as training signals.
+### 7.3 Adaptive Learning & Feedback
+**[HAI-009]** **THE SYSTEM SHALL** collect accuracy metrics for AI predictions **WHERE** human overrides are tracked as training signals.
 
-**[HAI-008]** **THE SYSTEM SHALL** retrain AI models quarterly **OR** when accuracy drops below 85% **USING** accumulated feedback data.
+**[HAI-010]** **THE SYSTEM SHALL** learn from tool selection patterns **WHERE** successful change-type to tool mappings are reinforced and ineffective combinations are deprioritized.
 
-**[HAI-009]** **WHEN** AI confidence is below 70%, **THE SYSTEM SHALL** escalate to human review **WITH** AI reasoning and alternative recommendations.
+**[HAI-011]** **THE SYSTEM SHALL** retrain AI models quarterly **OR** when accuracy drops below 85% **USING** accumulated feedback data from tool effectiveness and change pattern analysis.
+
+**[HAI-012]** **WHEN** AI confidence is below 70%, **THE SYSTEM SHALL** escalate to human review **WITH** AI reasoning and alternative recommendations.
 
 ### 7.4 Cost Optimization
-**[HAI-010]** **THE SYSTEM SHALL** track API costs for AI invocations **WHERE** monthly budgets trigger throttling when exceeded.
+**[HAI-013]** **THE SYSTEM SHALL** track API costs for AI invocations **WHERE** monthly budgets trigger throttling when exceeded.
 
-**[HAI-011]** **THE SYSTEM SHALL** cache AI responses for 24 hours **WHERE** identical inputs return cached results to reduce costs.
+**[HAI-014]** **THE SYSTEM SHALL** cache AI responses for 24 hours **WHERE** identical inputs return cached results to reduce costs **AND** similar change patterns reuse previous analysis results.
 
-**[HAI-012]** **THE SYSTEM SHALL** implement circuit breakers **WHERE** repeated AI failures trigger fallback to deterministic-only mode.
+**[HAI-015]** **THE SYSTEM SHALL** implement circuit breakers **WHERE** repeated AI failures trigger fallback to deterministic-only mode **AND** excessive costs trigger selective AI agent disabling based on change risk assessment.
 
 ---
 
