@@ -600,7 +600,7 @@ Format as JSON for GitHub API import."
 }
 ```
 
-**Complete Implementation**: See [examples/ai-issue-generation/](examples/ai-issue-generation/) for full Kanban issue templates, GitHub API integration scripts, and JIRA workflow automation.
+**Complete Implementation**: See [examples/ai-issue-generation/ai-prompts-for-epic-management.md](examples/ai-issue-generation/ai-prompts-for-epic-management.md) for practical AI prompts that directly interface with issue tracking systems to create epics, manage subissue relationships, and automate progress tracking.
 
 **Kanban Epic Breakdown**
 ```bash
@@ -625,23 +625,161 @@ Break down into:
 Goal: Continuous flow with rapid feedback cycles."
 ```
 
+**Epic-Subissue Relationship Management**
+
+AI-assisted establishment and maintenance of bidirectional links between epics and their constituent work items for comprehensive progress tracking and dependency management.
+
+```mermaid
+graph TD
+    A[Epic Creation] --> B[AI Decomposition]
+    B --> C[Subissue Generation]
+    C --> D[Cross-Linking]
+    D --> E[Progress Tracking]
+    E --> F[Epic Status Updates]
+    F --> G[Dependency Resolution]
+    G --> H[Completion Validation]
+```
+
+**AI-Driven Cross-Linking Strategy**
+```bash
+ai "Generate epic-subissue relationships for:
+Epic: User Authentication System
+
+Requirements:
+- Create parent-child references in both directions
+- Establish dependency chains between subissues
+- Include progress tracking mechanisms
+- Generate status rollup criteria
+- Add completion validation rules
+
+Output format that works across platforms:
+- Reference IDs for linking
+- Status propagation rules
+- Dependency validation
+- Progress calculation logic"
+```
+
+**Generated Relationship Structure**
+```json
+{
+  "epic": {
+    "id": "AUTH-001",
+    "title": "Epic: User Authentication System",
+    "subissues": ["AUTH-002", "AUTH-003", "AUTH-004", "AUTH-005"],
+    "completion_criteria": "all_subissues_closed",
+    "status_calculation": "percentage_complete"
+  },
+  "subissues": [
+    {
+      "id": "AUTH-002",
+      "title": "Password validation service",
+      "parent_epic": "AUTH-001",
+      "blocks": [],
+      "blocked_by": [],
+      "completion_updates_epic": true
+    }
+  ],
+  "relationships": {
+    "AUTH-002": {"depends_on": [], "enables": ["AUTH-005"]},
+    "AUTH-003": {"depends_on": [], "enables": ["AUTH-005"]},
+    "AUTH-004": {"depends_on": [], "enables": ["AUTH-005"]},
+    "AUTH-005": {"depends_on": ["AUTH-002", "AUTH-003", "AUTH-004"], "enables": []}
+  }
+}
+```
+
+**Automated Progress Tracking**
+```bash
+# AI-generated progress monitoring
+ai "Create progress tracking for epic AUTH-001:
+
+Monitor subissue completion and update epic status:
+- Calculate completion percentage
+- Identify blocking dependencies
+- Update epic description with progress
+- Generate status reports
+- Alert on timeline risks
+
+Track these metrics:
+- Subissues completed vs total
+- Cycle time per subissue
+- Dependency chain health
+- Epic velocity trends"
+```
+
+**Cross-Platform Linking Implementation**
+```bash
+# Universal relationship management
+ai "Generate platform-agnostic linking:
+
+Platform capabilities to leverage:
+- Reference linking (GitHub: #issue, JIRA: KEY-123)
+- Custom fields for parent/child relationships
+- Labels for epic grouping
+- Milestones for epic tracking
+- Comments for progress updates
+
+Create linking strategy that:
+1. Works with API limitations
+2. Maintains bidirectional references
+3. Survives platform migrations
+4. Enables automated reporting"
+```
+
+**Dynamic Epic Status Management**
+```bash
+ai "Update epic AUTH-001 status based on subissue changes:
+
+Current state:
+- AUTH-002: Completed
+- AUTH-003: In Progress (60% done)
+- AUTH-004: Not Started
+- AUTH-005: Blocked (waiting for AUTH-002, AUTH-003, AUTH-004)
+
+Generate:
+- Epic progress summary
+- Updated epic description
+- Risk assessment
+- Next action recommendations
+- Stakeholder communication"
+```
+
+**Dependency Chain Validation**
+```bash
+ai "Validate dependency relationships for epic AUTH-001:
+
+Check for:
+- Circular dependencies
+- Missing prerequisite work
+- Parallel work opportunities
+- Critical path identification
+- Resource contention
+
+Output:
+- Dependency graph validation
+- Suggested scheduling optimizations
+- Risk mitigation recommendations
+- Parallel execution opportunities"
+```
+
 **Integration with Project Management**
 ```bash
-# GitHub Issues
-gh issue create --title "$(echo "$issue" | jq -r '.title')" \
-                --body "$(echo "$issue" | jq -r '.body')" \
-                --label "$(echo "$issue" | jq -r '.labels[]')"
+# Epic-aware issue creation
+ai "Create linked issues maintaining epic relationships"
 
-# JIRA Integration
-curl -X POST "$JIRA_API/issue" \
-  -H "Content-Type: application/json" \
-  -d "$jira_issue_json"
+# Platform-specific implementations
+epic_id="EPIC-123"
+parent_reference="Relates to: ${epic_id}"
 
-# Azure DevOps
-az boards work-item create --title "$title" \
-                          --type "User Story" \
-                          --description "$description"
+# Universal linking approach
+issue_body="$original_body\n\n## Epic Relationship\nParent Epic: $epic_id\nDependencies: [see epic for full context]\nProgress contributes to: Epic completion"
 ```
+
+**Anti-pattern: Orphaned Work Items**
+Creating subissues without establishing clear parent-child relationships, leading to epic progress that cannot be tracked and completed work that doesn't contribute to measurable outcomes.
+
+**Anti-pattern: Manual Relationship Maintenance**
+Relying on humans to manually update epic progress and maintain cross-references as subissues change, resulting in stale information and broken dependency chains when teams are under pressure.
 
 **Kanban Work Item Splitting**
 ```bash
