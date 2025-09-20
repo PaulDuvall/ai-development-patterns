@@ -42,25 +42,41 @@ jobs:
   readme-accuracy:
     runs-on: ubuntu-latest
     name: README Accuracy & Consistency
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python 3.11
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r tests/requirements.txt
-    
+
+    - name: Update pattern count badge
+      run: |
+        python scripts/update-pattern-count.py
+
+    - name: Check for pattern count changes
+      run: |
+        if git diff --quiet README.md; then
+          echo "✓ Pattern count badge is up to date"
+        else
+          echo "⚠️ Pattern count badge was updated"
+          git diff README.md
+          # Fail the job if pattern count is wrong to remind developers to commit the change
+          echo "::error::Pattern count badge was out of date. Please run 'python scripts/update-pattern-count.py' and commit the changes."
+          exit 1
+        fi
+
     - name: Run README accuracy tests
       run: |
         cd tests
         python -m pytest test_readme_accuracy.py -v --tb=short
-    
+
     - name: Upload accuracy test results
       uses: actions/upload-artifact@v4
       if: always()
