@@ -16,7 +16,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 5. **Specification-Driven Development**: Write machine-readable specifications with explicit authority levels (system/platform/feature) and unique identifiers before AI implementation to ensure consistent, testable outcomes.
 
-6. **Test-First AI Development**: Create automated tests from specifications before AI code generation, ensuring every requirement has corresponding test coverage with measurable success criteria.
+6. **Test-First AI Development**: Create automated tests from specifications before AI code generation, ensuring every specification has corresponding test coverage with measurable success criteria.
 
 7. **Progressive Enhancement Over Big-Bang**: Apply Lean and Kanban principles by building features through small, deployable iterations with daily feedback cycles rather than large-scale AI generation attempts.
 
@@ -30,7 +30,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 11. **Comprehensive AI Testing Strategy**: Generate complete test suites (unit, integration, performance, security) automatically from specifications using AI assistance.
 
-12. **Maintain Test-to-Specification Traceability**: Link every specification requirement to automated tests with anchored references and coverage tracking.
+12. **Maintain Test-to-Specification Traceability**: Link every specification element to automated tests with anchored references and coverage tracking.
 
 13. **Structured Observability**: Implement comprehensive logging with operation context, correlation IDs, and specific error details in standardized formats (JSON/structured) for AI analysis and debugging.
 
@@ -56,7 +56,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 22. **Context Window Optimization**: Match AI tool selection to task complexity using defined criteria: simple models for queries <500 tokens, complex models for architecture decisions >2000 tokens.
 
-23. **Visual Context Scaffolding**: Use diagrams, mockups, and flows as primary specifications for complex requirements, supplemented with structured text for precise details.
+23. **Visual Context Scaffolding**: Use diagrams, mockups, and flows as primary specifications for complex needs, supplemented with structured text for precise details.
 
 24. **Version Knowledge Assets**: Treat AI development knowledge as code with semantic versioning, peer review processes, and automated quality checks.
 
@@ -78,7 +78,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 ## Operations & Automation
 
-32. **Policy as Code Generation**: Transform compliance requirements into executable Cedar/OPA policy files using AI assistance for consistency and automation.
+32. **Policy as Code Generation**: Transform compliance specifications into executable Cedar/OPA policy files using AI assistance for consistency and automation.
 
 33. **Intelligent Security Orchestration**: Aggregate multiple security tools and use AI to summarize findings, reducing alert fatigue while maintaining rigor.
 
@@ -86,7 +86,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 35. **Automated Incident Response**: Generate actionable playbooks from historical incident data and continuously improve operational procedures.
 
-36. **Infrastructure as Specifications**: Generate deployment configurations and infrastructure code from plain-English requirements using AI assistance.
+36. **Infrastructure as Specifications**: Generate deployment configurations and infrastructure code from plain-English specifications using AI assistance.
 
 37. **Operational Readiness Reviews (ORRs)**: Conduct systematic pre-deployment reviews using data-driven checklists derived from past incidents to prevent known operational risks across workloads.
 
@@ -98,7 +98,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 40. **Model Performance Monitoring**: Establish automated monitoring for AI model accuracy, latency, and drift with defined thresholds for performance degradation alerts.
 
-41. **Ethical AI Boundaries**: Define explicit constraints for AI tool usage including prohibited use cases, data privacy requirements, and human oversight requirements for critical decisions.
+41. **Ethical AI Boundaries**: Define explicit constraints for AI tool usage including prohibited use cases, data privacy specifications, and human oversight specifications for critical decisions.
 
 42. **AI Output Validation**: Implement multi-layered validation including automated testing, peer review, and domain expert verification for AI-generated code and configurations.
 
@@ -134,7 +134,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 56. **Avoid One-Size-Fits-All Tools**: Don't use the most powerful (expensive) AI models for simple tasks that could be handled by lighter alternatives.
 
-57. **No Manual Policy Translation**: Don't manually translate compliance requirements when AI can generate consistent, testable policy code.
+57. **No Manual Policy Translation**: Don't manually translate compliance specifications when AI can generate consistent, testable policy code.
 
 58. **Prevent Manual Evidence Collection**: Don't manually gather compliance evidence when AI can continuously collect and organize audit trails automatically.
 
