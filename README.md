@@ -34,17 +34,19 @@ graph TD
     
     subgraph "Phase 2: Development (Weeks 3-4)"
         D --> G[Specification Driven Development]
-        G --> H[Progressive AI Enhancement]
-        H --> I[AI Choice Generation]
-        G --> J[Atomic Task Decomposition]
-        J --> K[Parallelized AI Coding Agents]
+        D --> H[AI Plan-First Development]
+        G --> I[Progressive AI Enhancement]
+        H --> I
+        I --> J[AI Choice Generation]
+        G --> K[Atomic Task Decomposition]
+        K --> L[Parallelized AI Coding Agents]
     end
     
     subgraph "Phase 3: Operations (Weeks 5-6)"
-        C --> L[Policy-as-Code Generation]
-        L --> M[Security Scanning Orchestration]
-        K --> N[Performance Baseline Management]
-        D --> O[AI-Driven Traceability]
+        C --> M[Policy-as-Code Generation]
+        M --> N[Security Scanning Orchestration]
+        L --> O[Performance Baseline Management]
+        D --> P[AI-Driven Traceability]
     end
 ```
 
@@ -61,6 +63,7 @@ graph TD
 | **[AI Tool Integration](#ai-tool-integration)** | Intermediate | Foundation | Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions | AI Security Sandbox, AI Developer Lifecycle |
 | **[AI Issue Generation](#ai-issue-generation)** | Intermediate | Foundation | Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies | AI Readiness Assessment |
 | **[Specification Driven Development](#specification-driven-development)** | Intermediate | Development | Use executable specifications to guide AI code generation with clear acceptance criteria before implementation | AI Developer Lifecycle |
+| **[AI Plan-First Development](#ai-plan-first-development)** | Beginner | Development | Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration | None |
 | **[Progressive AI Enhancement](#progressive-ai-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | None |
 | **[AI Choice Generation](#ai-choice-generation)** | Intermediate | Development | Generate multiple implementation options for exploration and comparison rather than accepting first AI solution | Progressive AI Enhancement |
 | **[Atomic Task Decomposition](#atomic-task-decomposition)** | Intermediate | Development | Break complex features into atomic, independently implementable tasks for parallel AI agent execution | Progressive AI Enhancement |
@@ -152,18 +155,19 @@ graph TD
     G --> H[AI Security Sandbox]
     H --> I{Need Structured Development?}
     I -->|Yes| J[AI Developer Lifecycle]
-    I -->|No| K[Progressive AI Enhancement]
+    I -->|No| K[AI Plan-First Development]
+    K --> L[Progressive AI Enhancement]
     
-    D --> L{Multiple Developers/Agents?}
-    L -->|Yes| M[Parallelized AI Coding Agents]
-    L -->|No| N[Specification Driven Development]
-    M --> O[Atomic Task Decomposition]
-    N --> P[AI-Driven Traceability]
+    D --> M{Multiple Developers/Agents?}
+    M -->|Yes| N[Parallelized AI Coding Agents]
+    M -->|No| O[Specification Driven Development]
+    N --> P[Atomic Task Decomposition]
+    O --> Q[AI-Driven Traceability]
     
-    E --> Q{Enterprise Requirements?}
-    Q -->|Compliance| R[Policy-as-Code Generation]
-    Q -->|Scale| S[Performance Baseline Management]
-    Q -->|Quality| T[Technical Debt Forecasting]
+    E --> R{Enterprise Requirements?}
+    R -->|Compliance| S[Policy-as-Code Generation]
+    R -->|Scale| T[Performance Baseline Management]
+    R -->|Quality| U[Technical Debt Forecasting]
 ```
 
 ### Context-Based Pattern Selection
@@ -172,7 +176,8 @@ graph TD
 1. **[AI Readiness Assessment](#ai-readiness-assessment)** - Evaluate current state
 2. **[Rules as Code](#rules-as-code)** - Establish consistent standards
 3. **[AI Security Sandbox](#ai-security-sandbox)** - Ensure safe experimentation
-4. **[Progressive AI Enhancement](#progressive-ai-enhancement)** - Start with simple iterations
+4. **[AI Plan-First Development](#ai-plan-first-development)** - Learn structured planning approaches
+5. **[Progressive AI Enhancement](#progressive-ai-enhancement)** - Start with simple iterations
 
 **For Development Teams (Weeks 3-8)**:
 1. **[AI Developer Lifecycle](#ai-developer-lifecycle)** - Structured development process
@@ -957,13 +962,147 @@ Saving collections of prompts as if they were specifications. Prompts are implem
 
 ---
 
+## AI Plan-First Development
+
+**Maturity**: Beginner
+**Description**: Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration.
+
+**Related Patterns**: [Specification Driven Development](#specification-driven-development), [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Choice Generation](#ai-choice-generation)
+
+**Core Principle: Think Before You Code**
+
+Modern AI coding tools provide planning capabilities that allow developers to iterate on implementation approaches before writing any code. This pattern leverages these planning features to:
+- **Reduce implementation iterations** by validating approach upfront
+- **Improve code quality** through structured thinking
+- **Enable better collaboration** via shareable plans
+- **Minimize context switching** between planning and execution
+
+**Planning Workflow**
+
+```mermaid
+graph TD
+    A[Problem Statement] --> B[Generate Initial Plan]
+    B --> C[Review & Refine Plan]
+    C --> D{Plan Approved?}
+    D -->|No| E[Iterate on Plan]
+    E --> C
+    D -->|Yes| F[Execute Implementation]
+    F --> G[Validate Against Plan]
+    G --> H{Meets Plan?}
+    H -->|No| I[Adjust Implementation]
+    I --> F
+    H -->|Yes| J[Complete]
+
+    style A fill:#e1f5e1
+    style C fill:#e1f5e1
+    style F fill:#ffe6e6
+    style J fill:#e1f5e1
+```
+
+**Core Implementation**
+
+**1. Plan Generation Phase**
+```bash
+# Example planning prompt structure
+CONTEXT: "Building user authentication for SaaS application"
+REQUIREMENTS: "JWT tokens, password reset, rate limiting"
+CONSTRAINTS: "Must integrate with existing user table, 2-hour time limit"
+
+REQUEST: "Generate step-by-step implementation plan with:
+- Database changes needed
+- API endpoints to create/modify
+- Security considerations
+- Testing approach
+- Rollback strategy"
+```
+
+**2. Plan Review and Iteration**
+```markdown
+# Generated Plan Review Checklist
+
+## Technical Approach
+- [ ] Database schema changes are backwards compatible
+- [ ] API design follows existing conventions
+- [ ] Security measures address OWASP top 10
+- [ ] Performance impact is minimal
+
+## Implementation Strategy
+- [ ] Tasks are broken into deployable increments
+- [ ] Dependencies are clearly identified
+- [ ] Rollback plan is feasible
+- [ ] Testing strategy covers edge cases
+
+## Resource Requirements
+- [ ] Time estimate is realistic
+- [ ] Required permissions are available
+- [ ] External dependencies are identified
+```
+
+**3. Execution with Plan Validation**
+```bash
+# During implementation, validate against plan
+echo "✓ Step 1: Created user_sessions table (matches plan)"
+echo "✓ Step 2: Added JWT service (matches plan)"
+echo "⚠ Step 3: Rate limiting - using Redis instead of in-memory (plan deviation documented)"
+```
+
+**Tool-Agnostic Planning Approach**
+
+**Planning Session Structure**
+```markdown
+## 1. Problem Definition (2-3 sentences)
+Clear statement of what needs to be built and why
+
+## 2. Constraints & Requirements
+- Technical constraints (existing systems, performance, security)
+- Business requirements (timeline, user experience, compliance)
+- Resource constraints (team size, expertise, budget)
+
+## 3. Implementation Options
+- Option A: [Brief description, pros/cons, time estimate]
+- Option B: [Brief description, pros/cons, time estimate]
+- Recommended: [Choice with justification]
+
+## 4. Detailed Plan
+- [ ] Step 1: [Concrete action with acceptance criteria]
+- [ ] Step 2: [Concrete action with acceptance criteria]
+- [ ] Step 3: [Concrete action with acceptance criteria]
+
+## 5. Validation Strategy
+How to verify each step works and overall solution meets requirements
+```
+
+**When to Use Plan-First Development**
+
+- **Complex Features**: Multi-step implementations requiring coordination
+- **Unknown Domains**: Working in unfamiliar technologies or business areas
+- **Team Collaboration**: When multiple developers need to understand the approach
+- **High-Stakes Changes**: Security, performance, or business-critical modifications
+- **Learning Contexts**: When using AI to explore new implementation approaches
+
+**Complete Implementation**
+
+See [examples/ai-plan-first-development/](examples/ai-plan-first-development/) for:
+- Tool-specific planning examples (Claude Code, Cursor, Windsurf)
+- Planning templates and checklists
+- Integration with existing development workflows
+- Plan validation and iteration strategies
+
+**Anti-pattern: Blind Code Generation**
+Immediately jumping to code generation without understanding the problem scope, constraints, or implementation options, leading to over-engineered or incorrect solutions.
+
+**Anti-pattern: Analysis Paralysis**
+Spending excessive time refining plans without moving to implementation, missing opportunities for rapid feedback and iterative improvement.
+
+---
+
 
 ## Progressive AI Enhancement
 
 **Maturity**: Beginner  
 **Description**: Build complex features through small, deployable iterations rather than big-bang generation.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Constraint-Based AI Development](#constraint-based-ai-development), [AI Choice Generation](#ai-choice-generation), [AI-Driven Architecture Design](#ai-driven-architecture-design)
+**Related Patterns**: [AI Plan-First Development](#ai-plan-first-development), [AI Developer Lifecycle](#ai-developer-lifecycle), [Constraint-Based AI Development](#constraint-based-ai-development), [AI Choice Generation](#ai-choice-generation), [AI-Driven Architecture Design](#ai-driven-architecture-design)
 
 **Examples**
 Building authentication progressively:
@@ -1003,7 +1142,7 @@ Asking AI to "create a complete user management system" results in 5000 lines of
 **Maturity**: Intermediate  
 **Description**: Generate multiple implementation options for exploration and comparison rather than accepting the first AI solution.
 
-**Related Patterns**: [Progressive AI Enhancement](#progressive-ai-enhancement), [Context Window Optimization](experiments/README.md#context-window-optimization)
+**Related Patterns**: [AI Plan-First Development](#ai-plan-first-development), [Progressive AI Enhancement](#progressive-ai-enhancement), [Context Window Optimization](experiments/README.md#context-window-optimization)
 
 **Multi-Option Implementation Comparison**
 

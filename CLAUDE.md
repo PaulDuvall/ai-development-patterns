@@ -55,9 +55,9 @@ This is the AI Development Patterns repository - a comprehensive collection of p
 5. **Link related patterns**: Use proper markdown hyperlinks to related patterns
 
 ### Pattern Dependencies
-- **Foundation patterns** (lines 270-1400): Establish team readiness, security, and basic AI integration
-- **Development patterns** (lines 1400-2500): Daily workflows for AI-assisted coding
-- **Operations patterns** (lines 2500+): CI/CD, security, compliance, and production management
+- **Foundation patterns** (lines 270-960): Establish team readiness, security, and basic AI integration
+- **Development patterns** (lines 960-1830): Daily workflows for AI-assisted coding
+- **Operations patterns** (lines 1830+): CI/CD, security, compliance, and production management
 
 ### Content Guidelines
 - **Kanban workflow assumed**: No sprint-based or fixed iteration references

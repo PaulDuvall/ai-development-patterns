@@ -53,10 +53,10 @@ REQUIRED_PATTERN_SECTIONS = {
 PATTERN_CATEGORIES = {
     "Foundation": ["AI Readiness Assessment", "Rules as Code", "AI Security Sandbox", 
                    "AI Developer Lifecycle", "AI Tool Integration", "AI Issue Generation"],
-    "Development": ["Specification Driven Development", "Progressive AI Enhancement", 
+    "Development": ["Specification Driven Development", "AI Plan-First Development", "Progressive AI Enhancement",
                     "AI Choice Generation", "Parallelized AI Coding Agents", "AI Knowledge Persistence",
-                    "Constraint-Based AI Development", "Atomic Task Decomposition", 
-                    "Observable AI Development", "AI-Driven Refactoring", 
+                    "Constraint-Based AI Development", "Atomic Task Decomposition",
+                    "Observable AI Development", "AI-Driven Refactoring",
                     "AI-Driven Architecture Design", "AI-Driven Traceability"],
     "Operations": ["Policy-as-Code Generation", "Security Scanning Orchestration", 
                    "Performance Baseline Management"]
@@ -71,6 +71,7 @@ EXPECTED_PATTERNS = [
     "AI Tool Integration",
     "AI Issue Generation",
     "Specification Driven Development",
+    "AI Plan-First Development",
     "Progressive AI Enhancement",
     "AI Choice Generation",
     "Atomic Task Decomposition",
