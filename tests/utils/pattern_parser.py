@@ -138,9 +138,10 @@ class PatternParser:
             'Contributing', 'Getting Started', 'License', 'Success Metrics',
             'CLI Requirements', 'Input Validation', 'Long Method Smell', 'Large Class Smell',
             'Foundation Anti-Patterns', 'Development Anti-Patterns', 'Operations Anti-Patterns',
-            'Common AI Development Anti-Patterns', 'Foundation Metrics', 'Development Metrics', 
+            'Common AI Development Anti-Patterns', 'Foundation Metrics', 'Development Metrics',
             'Operations Metrics', 'Phase 1:', 'Phase 2:', 'Phase 3:', 'Pattern Contribution Guidelines',
-            'Security & Compliance Patterns', 'Deployment Automation Patterns', 'Monitoring & Maintenance Patterns'
+            'Security & Compliance Patterns', 'Deployment Automation Patterns', 'Monitoring & Maintenance Patterns',
+            'Technical Approach', 'Implementation Strategy', 'Resource Requirements'
         ]
         
         header_text = line.strip().replace('#', '').strip()

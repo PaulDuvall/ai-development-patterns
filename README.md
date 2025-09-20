@@ -1020,19 +1020,19 @@ REQUEST: "Generate step-by-step implementation plan with:
 ```markdown
 # Generated Plan Review Checklist
 
-## Technical Approach
+### Technical Approach
 - [ ] Database schema changes are backwards compatible
 - [ ] API design follows existing conventions
 - [ ] Security measures address OWASP top 10
 - [ ] Performance impact is minimal
 
-## Implementation Strategy
+### Implementation Strategy
 - [ ] Tasks are broken into deployable increments
 - [ ] Dependencies are clearly identified
 - [ ] Rollback plan is feasible
 - [ ] Testing strategy covers edge cases
 
-## Resource Requirements
+### Resource Requirements
 - [ ] Time estimate is realistic
 - [ ] Required permissions are available
 - [ ] External dependencies are identified
