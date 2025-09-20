@@ -22,6 +22,7 @@ AI Plan-First Development leverages the planning capabilities built into modern 
 | File | Purpose | Use Case |
 |------|---------|-----------|
 | [`planning-template.md`](planning-template.md) | Universal planning template | Any AI tool, any project type |
+| [`markdown-iteration-techniques.md`](markdown-iteration-techniques.md) | Detailed iteration techniques | Plan refinement, stakeholder review cycles |
 
 ## Quick Start Guide
 

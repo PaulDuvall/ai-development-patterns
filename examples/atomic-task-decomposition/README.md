@@ -6,20 +6,21 @@ This directory contains a complete implementation of the Atomic Task Decompositi
 
 ```
 atomic-task-decomposition/
-├── README.md                    # This file
-├── task-decomposer.py          # AI-powered task decomposition tool
-├── contract-validator.py       # Task contract validation system
-├── dependency-resolver.py      # Task dependency analysis and scheduling
-├── parallel-coordinator.py     # Agent assignment and execution coordination
-├── templates/                  # Task contract templates
+├── README.md                           # This file
+├── function-level-decomposition.md     # Function-level decomposition techniques when AI struggles
+├── task-decomposer.py                  # AI-powered task decomposition tool
+├── contract-validator.py              # Task contract validation system
+├── dependency-resolver.py             # Task dependency analysis and scheduling
+├── parallel-coordinator.py            # Agent assignment and execution coordination
+├── templates/                          # Task contract templates
 │   ├── task-contract.json
 │   ├── validation-rules.yaml
 │   └── agent-profiles.yaml
-├── examples/                   # Example decompositions
+├── examples/                           # Example decompositions
 │   ├── authentication-system/
 │   ├── payment-processing/
 │   └── user-dashboard/
-└── monitoring/                 # Execution monitoring and metrics
+└── monitoring/                         # Execution monitoring and metrics
     ├── task-monitor.py
     └── metrics-dashboard.html
 ```
@@ -27,6 +28,7 @@ atomic-task-decomposition/
 ## Key Features
 
 - **Atomic Task Criteria**: 1-2 hour tasks with no shared state
+- **Function-Level Decomposition**: Systematic breakdown when AI struggles with implementation
 - **Contract Validation**: Automated checking of atomic task requirements
 - **Dependency Resolution**: Smart scheduling of interdependent tasks
 - **Agent Assignment**: Optimal distribution across parallel AI agents

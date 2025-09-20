@@ -387,7 +387,7 @@ Allowing multiple parallel agents to write to the same directories creates race 
 **Maturity**: Intermediate  
 **Description**: Structured 9-stage process from problem definition through deployment with AI assistance.
 
-**Related Patterns**: [Rules as Code](#rules-as-code), [Specification Driven Development](#specification-driven-development), [Observable AI Development](#observable-ai-development)
+**Related Patterns**: [Rules as Code](#rules-as-code), [Specification Driven Development](#specification-driven-development), [AI Plan-First Development](#ai-plan-first-development), [Atomic Task Decomposition](#atomic-task-decomposition), [Observable AI Development](#observable-ai-development)
 
 **Workflow Interaction Sequence**
 
@@ -448,10 +448,10 @@ ai "Implement following specifications → Use tests as guide, security best pra
 ai "Complete QA → Run tests, security scan, deploy, monitor"
 ```
 
-**Complete Implementation**: See [examples/ai-development-lifecycle/](examples/ai-development-lifecycle/) for full 9-stage workflow scripts, detailed prompts for each stage, and integration with CI/CD pipelines.
+**Complete Implementation**: See [examples/ai-development-lifecycle/](examples/ai-development-lifecycle/) for full 9-stage workflow scripts, detailed prompts for each stage, enhanced implementation techniques ([Five-Try Rule](https://www.linkedin.com/posts/jessicakerr_the-implementation-is-a-test-of-the-design-activity-7367649800193761281-LzCu/), markdown iteration, function decomposition), and integration with CI/CD pipelines.
 
 **Anti-pattern: Ad-Hoc AI Development**
-Jumping straight to coding with AI without proper planning, requirements, or testing strategy.
+Jumping straight to coding with AI without proper planning, requirements, or testing strategy. Also avoid continuing with the same AI approach after 3-4 failures without decomposing the problem or changing strategy.
 
 ---
 
@@ -967,7 +967,7 @@ Saving collections of prompts as if they were specifications. Prompts are implem
 **Maturity**: Beginner
 **Description**: Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration.
 
-**Related Patterns**: [Specification Driven Development](#specification-driven-development), [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Choice Generation](#ai-choice-generation)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [Specification Driven Development](#specification-driven-development), [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Choice Generation](#ai-choice-generation)
 
 **Core Principle: Think Before You Code**
 
@@ -1072,6 +1072,7 @@ Clear statement of what needs to be built and why
 How to verify each step works and overall solution meets requirements
 ```
 
+
 **When to Use Plan-First Development**
 
 - **Complex Features**: Multi-step implementations requiring coordination
@@ -1085,6 +1086,7 @@ How to verify each step works and overall solution meets requirements
 See [examples/ai-plan-first-development/](examples/ai-plan-first-development/) for:
 - Tool-specific planning examples (Claude Code, Cursor)
 - Planning templates and checklists
+- Markdown iteration techniques and stakeholder review cycles
 - Integration with existing development workflows
 - Plan validation and iteration strategies
 
@@ -1440,7 +1442,7 @@ Adding too many constraints ("use exactly 50 lines, 2 methods, no dependencies, 
 **Maturity**: Intermediate  
 **Description**: Break complex features into atomic, independently implementable tasks for parallel AI agent execution.
 
-**Related Patterns**: [AI Workflow Orchestration](experiments/README.md#ai-workflow-orchestration), [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Issue Generation](#ai-issue-generation)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Workflow Orchestration](experiments/README.md#ai-workflow-orchestration), [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Issue Generation](#ai-issue-generation)
 
 **Atomic Task Criteria**
 
@@ -1500,6 +1502,7 @@ ai_task_validator "Check each task for:
 5. No circular dependencies"
 ```
 
+
 **Agent Assignment & Coordination**
 
 ```yaml
@@ -1549,6 +1552,7 @@ assert task.validate_atomic()  # ✓ Passes atomic criteria
 
 **Complete Implementation**: See [examples/atomic-task-decomposition/](examples/atomic-task-decomposition/) for:
 - Contract validation system with automated checking
+- Function-level decomposition techniques and trigger indicators
 - Task dependency resolution and scheduling
 - Parallel execution coordination and monitoring
 - Agent assignment and resource management
