@@ -1083,7 +1083,7 @@ How to verify each step works and overall solution meets requirements
 **Complete Implementation**
 
 See [examples/ai-plan-first-development/](examples/ai-plan-first-development/) for:
-- Tool-specific planning examples (Claude Code, Cursor, Windsurf)
+- Tool-specific planning examples (Claude Code, Cursor)
 - Planning templates and checklists
 - Integration with existing development workflows
 - Plan validation and iteration strategies
