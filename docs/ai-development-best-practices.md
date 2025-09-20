@@ -14,11 +14,11 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 ## Workflow & Development Process
 
-5. **Specification-Driven Development**: Write machine-readable specifications with clear authority levels before using AI for implementation to ensure consistent, testable outcomes.
+5. **Specification-Driven Development**: Write machine-readable specifications with clear authority levels before using AI for implementation to ensure consistent, testable outcomes that align with Design by Contract principles.
 
-6. **Test-First AI Development**: Create specifications and tests before implementation, then use AI to generate code that satisfies behavioral requirements.
+6. **Test-First AI Development**: Apply TDD and BDD principles by creating specifications and tests before implementation, then use AI to generate code that satisfies behavioral requirements.
 
-7. **Progressive Enhancement Over Big-Bang**: Build features through small, deployable iterations with daily feedback cycles rather than large-scale AI generation attempts.
+7. **Progressive Enhancement Over Big-Bang**: Apply Lean and Kanban principles by building features through small, deployable iterations with daily feedback cycles rather than large-scale AI generation attempts.
 
 8. **Structured Development Lifecycle**: Follow a systematic 9-stage process from problem definition through deployment and monitoring for consistent AI-assisted development.
 
@@ -90,45 +90,70 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 37. **Operational Readiness Reviews (ORRs)**: Conduct systematic pre-deployment reviews using data-driven checklists derived from past incidents to prevent known operational risks across workloads.
 
+## AI-Enhanced Traditional Practices
+
+38. **SOLID Principles for AI Code**: Apply Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion specifically to AI-generated code to ensure maintainable, extensible systems.
+
+39. **Clean Architecture with AI Layers**: Structure AI applications using Clean Architecture principles with dedicated layers for AI model interfaces, business rules, and external AI service dependencies.
+
+40. **Domain-Driven Design for AI Systems**: Use DDD bounded contexts to separate AI model domains, ensuring clear boundaries between different AI capabilities and business contexts.
+
+41. **Well-Architected AI Systems**: Apply AWS Well-Architected Framework pillars (Operational Excellence, Security, Reliability, Performance, Cost Optimization, Sustainability) specifically to AI workloads and model deployments.
+
+42. **Contract-First AI Integration**: Define clear contracts and interfaces for AI components using Design by Contract principles, ensuring predictable behavior and error handling.
+
+43. **Lean AI Development**: Apply Lean principles to eliminate waste in AI model training, reduce unnecessary experimentation, and focus on value-delivering AI features.
+
+44. **Continuous Integration for AI**: Implement CI pipelines that include AI model validation, performance regression testing, and automated deployment of AI components alongside traditional code.
+
+45. **Chaos Engineering for AI Systems**: Apply chaos engineering principles to AI systems by introducing controlled failures in AI model responses, degraded model performance, and service dependencies.
+
 ## Anti-Patterns to Avoid
 
-38. **No Assessment Rush**: Don't implement AI development patterns without first evaluating team readiness and codebase architecture quality.
+46. **No Assessment Rush**: Don't implement AI development patterns without first evaluating team readiness and codebase architecture quality.
 
-39. **Avoid Ad-Hoc Development**: Don't jump directly to AI coding without structured lifecycle processes, proper planning, or testing strategy.
+47. **Avoid Ad-Hoc Development**: Don't jump directly to AI coding without structured lifecycle processes, proper planning, or testing strategy.
 
-40. **No Implementation-First Development**: Don't generate code first then retrofit tests - always establish specifications and tests before implementation.
+48. **No Implementation-First Development**: Don't generate code first then retrofit tests - always establish specifications and tests before implementation.
 
-41. **Prevent Uncoordinated Parallelization**: Don't run multiple AI agents without proper isolation, conflict detection, or resolution mechanisms.
+49. **Prevent Uncoordinated Parallelization**: Don't run multiple AI agents without proper isolation, conflict detection, or resolution mechanisms.
 
-42. **No Black Box Systems**: Don't build systems with minimal observability that prevent AI from understanding behavior and diagnosing issues.
+50. **No Black Box Systems**: Don't build systems with minimal observability that prevent AI from understanding behavior and diagnosing issues.
 
-43. **Avoid One-Size-Fits-All Tools**: Don't use the most powerful (expensive) AI models for simple tasks that could be handled by lighter alternatives.
+51. **Avoid One-Size-Fits-All Tools**: Don't use the most powerful (expensive) AI models for simple tasks that could be handled by lighter alternatives.
 
-44. **No Manual Policy Translation**: Don't manually translate compliance requirements when AI can generate consistent, testable policy code.
+52. **No Manual Policy Translation**: Don't manually translate compliance requirements when AI can generate consistent, testable policy code.
 
-45. **Prevent Manual Evidence Collection**: Don't manually gather compliance evidence when AI can continuously collect and organize audit trails automatically.
+53. **Prevent Manual Evidence Collection**: Don't manually gather compliance evidence when AI can continuously collect and organize audit trails automatically.
+
+54. **Avoid Monolithic AI Architecture**: Don't build large, coupled AI systems that violate Single Responsibility Principle and are difficult to test and maintain.
+
+55. **No AI Without Contracts**: Don't integrate AI components without clear interface contracts, error handling specifications, and fallback mechanisms.
 
 ## Implementation Priority Framework
 
 ### Phase 1: Foundation (Weeks 1-2)
 - Practices 1-4: Assessment, rules, security, progressive start
-- Focus on team readiness and safe AI tool integration
+- Practices 38-42: Apply SOLID, Clean Architecture, DDD, Well-Architected principles to AI systems
+- Focus on team readiness, safe AI tool integration, and solid architectural foundations
 
-### Phase 2: Development (Weeks 3-4)  
+### Phase 2: Development (Weeks 3-4)
 - Practices 5-15: Workflows, testing, quality assurance
-- Establish systematic development and quality practices
+- Practices 43-44: Lean AI development and continuous integration for AI
+- Establish systematic development and quality practices with traditional engineering rigor
 
 ### Phase 3: Advanced Capabilities (Weeks 5-8)
 - Practices 16-25: Parallel development, knowledge management
-- Scale to sophisticated multi-agent and context-aware development
+- Practice 45: Chaos engineering for AI systems
+- Scale to sophisticated multi-agent and context-aware development with resilience testing
 
 ### Phase 4: Operations & Tooling (Continuous)
 - Practices 26-37: Tool design, automation, operations
-- Mature operational capabilities and custom tooling
+- Mature operational capabilities and custom tooling with full lifecycle support
 
 ### Continuous: Anti-Pattern Vigilance
-- Practices 38-45: Ongoing awareness and prevention
-- Maintain discipline against common failure modes
+- Practices 46-55: Ongoing awareness and prevention
+- Maintain discipline against common failure modes in both AI and traditional development
 
 ## Success Metrics
 
