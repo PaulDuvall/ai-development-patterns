@@ -147,6 +147,17 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 - Reduced deployment failures through AI-generated automation
 - Proactive technical debt management and resolution
 
+# Software Development Matrix
+
+| **Category**              | **Approaches / Principles**                                                                 |
+|----------------------------|---------------------------------------------------------------------------------------------|
+| **Principles**             | SOLID • KISS • DRY • YAGNI • Separation of Concerns • Convention over Configuration • Fail Fast • Design by Contract |
+| **Code Quality & Design**  | Clean Code • Refactoring • TDD • BDD • DDD • Design Patterns • Anti-Patterns Awareness      |
+| **Architectures**          | Layered / n-tier • Clean Architecture / Onion • Hexagonal (Ports & Adapters) • Microservices • Event-Driven • CQRS • Event Sourcing • Serverless |
+| **Methodologies & Practices** | Extreme Programming (XP) • Kanban • Lean • Trunk-Based Development • Steel Thread • Pair Programming • Mob Programming |
+| **Operations & Delivery**  | 12-Factor App • Continuous Integration • Continuous Delivery • Continuous Deployment • Feature Toggles • Infrastructure as Code (IaC) • DevOps • DevSecOps • Site Reliability Engineering (SRE) |
+| **Techniques**             | Code Reviews • Prototyping / Spikes • Progressive Delivery (Canary, Blue/Green) • Chaos Engineering • Metrics & Observability |
+
 ---
 
 *This canonical list represents distilled wisdom from extensive AI development experience, emphasizing security, quality, and systematic approaches over ad-hoc AI usage. These practices provide a comprehensive framework for teams to adopt AI-assisted development safely and effectively while maintaining high standards for code quality and system reliability.*
