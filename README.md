@@ -579,7 +579,7 @@ ai "Break down this feature into small Kanban tasks:
 
 Feature: Password reset via email
 
-Create GitHub issues following Kanban principles:
+Create work items following Kanban principles:
 - Ensure each task can be completed in less than a day
 - Clear titles and descriptions
 - Specific acceptance criteria
@@ -587,14 +587,14 @@ Create GitHub issues following Kanban principles:
 - Dependencies between tasks
 - If any task takes >2 days, split it further
 
-Format as JSON for GitHub API import."
+Output structured work items ready for your issue tracker."
 ```
 
-**Generated Kanban-Ready Issues**
+**Generated Kanban-Ready Work Items**
 ```json
 {
   "title": "Backend: Implement password reset token generation",
-  "body": "## Acceptance Criteria\n- [ ] Generate secure reset tokens\n- [ ] Set 15-minute expiration\n## Cycle Time Target\n8-12 hours",
+  "description": "## Acceptance Criteria\n- [ ] Generate secure reset tokens\n- [ ] Set 15-minute expiration\n## Cycle Time Target\n8-12 hours",
   "labels": ["backend", "security", "kanban-ready"],
   "milestone": "Password Reset MVP"
 }
@@ -652,7 +652,7 @@ Requirements:
 - Generate status rollup criteria
 - Add completion validation rules
 
-Output format that works across platforms:
+Output universal relationship structure:
 - Reference IDs for linking
 - Status propagation rules
 - Dependency validation
@@ -707,22 +707,21 @@ Track these metrics:
 - Epic velocity trends"
 ```
 
-**Cross-Platform Linking Implementation**
+**Universal Linking Implementation**
 ```bash
-# Universal relationship management
-ai "Generate platform-agnostic linking:
+ai "Generate relationship linking strategy:
 
-Platform capabilities to leverage:
-- Reference linking (GitHub: #issue, JIRA: KEY-123)
+Common platform capabilities to leverage:
+- Reference linking between work items
 - Custom fields for parent/child relationships
 - Labels for epic grouping
 - Milestones for epic tracking
 - Comments for progress updates
 
 Create linking strategy that:
-1. Works with API limitations
+1. Works with platform limitations
 2. Maintains bidirectional references
-3. Survives platform migrations
+3. Survives tool migrations
 4. Enables automated reporting"
 ```
 
@@ -762,17 +761,17 @@ Output:
 - Parallel execution opportunities"
 ```
 
-**Integration with Project Management**
+**Work Item Integration**
 ```bash
-# Epic-aware issue creation
-ai "Create linked issues maintaining epic relationships"
+# Epic-aware work item creation
+ai "Create linked work items maintaining epic relationships"
 
-# Platform-specific implementations
+# Universal linking approach
 epic_id="EPIC-123"
 parent_reference="Relates to: ${epic_id}"
 
-# Universal linking approach
-issue_body="$original_body\n\n## Epic Relationship\nParent Epic: $epic_id\nDependencies: [see epic for full context]\nProgress contributes to: Epic completion"
+# Standard relationship format
+item_description="$original_description\n\n## Epic Relationship\nParent Epic: $epic_id\nDependencies: [see epic for full context]\nProgress contributes to: Epic completion"
 ```
 
 **Anti-pattern: Orphaned Work Items**

@@ -21,32 +21,31 @@ EPIC STRUCTURE:
 - Each subissue references parent epic
 - Progress tracking mechanism
 
-OUTPUT FORMAT for GitHub:
-- Epic issue with subissue checklist
-- Individual subissue issues with 'epic-123' labels
+OUTPUT FORMAT:
+- Epic work item with subissue checklist
+- Individual subissue work items with 'epic-123' labels
 - Dependency comments in each subissue
 - RED/GREEN/REFACTOR acceptance criteria"
 ```
 
-## Cross-Platform Epic Linking
+## Universal Epic Linking
 
 ```bash
-ai "Generate epic-subissue structure that works across GitHub, JIRA, and Azure DevOps:
+ai "Generate epic-subissue structure with universal compatibility:
 
 UNIVERSAL REQUIREMENTS:
-1. Parent-child references that survive platform migrations
+1. Parent-child references that survive tool migrations
 2. Progress calculation: completed subissues / total subissues
 3. Dependency chain validation (no circular dependencies)
 4. Auto-update epic status when subissues change
 5. CI/CD integration points for each subissue
 
 LINKING STRATEGY:
-- Use issue references (#123, KEY-456) for cross-linking
+- Use work item references for cross-linking
 - Include epic ID in subissue titles or descriptions
 - Use labels/tags for epic grouping (epic-auth-system)
 - Status propagation rules (epic done when all subissues done)
 
-For platform: [GitHub/JIRA/Azure DevOps]
 Create: Epic + 5 subissues with proper cross-references"
 ```
 
@@ -117,14 +116,13 @@ PIPELINE REQUIREMENTS per subissue:
 4. Rollback capability for each deployment
 5. Epic progress notification on completion
 
-For GitHub Actions, create:
+Create CI/CD workflows that include:
 - Workflow trigger: subissue completion
 - Epic progress update job
 - Dependency unblocking automation
 - Stakeholder notification on epic completion
 
-For CI/CD tools: [GitHub Actions/GitLab CI/Jenkins]
-Output: Workflow YAML that handles epic lifecycle automation"
+Output: Workflow configuration that handles epic lifecycle automation"
 ```
 
 ## Dependency Management Prompts
@@ -168,12 +166,11 @@ AUTOMATION RULES:
 4. When subissue blocked >2 days → escalate
 
 IMPLEMENTATION:
-- Use issue webhooks/automation rules
+- Use webhooks/automation rules
 - Simple percentage calculation
 - Comment-based progress updates
 - Label-based status tracking
 
-For [your issue tracker]:
 Generate automation rules that maintain epic-subissue relationships with minimal manual intervention"
 ```
 
