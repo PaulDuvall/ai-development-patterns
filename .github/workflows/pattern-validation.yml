@@ -24,13 +24,13 @@ jobs:
     
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r tests/requirements.txt
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r tests/requirements.txt
     
     - name: Run pattern compliance tests
       run: |
         cd tests
-        python -m pytest test_pattern_compliance.py -v --tb=short
+        python3 -m pytest test_pattern_compliance.py -v --tb=short
     
     - name: Upload compliance test results
       uses: actions/upload-artifact@v4
@@ -53,12 +53,12 @@ jobs:
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r tests/requirements.txt
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r tests/requirements.txt
 
     - name: Update pattern count badge
       run: |
-        python scripts/update-pattern-count.py
+        python3 scripts/update-pattern-count.py
 
     - name: Check for pattern count changes
       run: |
@@ -68,14 +68,14 @@ jobs:
           echo "⚠️ Pattern count badge was updated"
           git diff README.md
           # Fail the job if pattern count is wrong to remind developers to commit the change
-          echo "::error::Pattern count badge was out of date. Please run 'python scripts/update-pattern-count.py' and commit the changes."
+          echo "::error::Pattern count badge was out of date. Please run 'python3 scripts/update-pattern-count.py' and commit the changes."
           exit 1
         fi
 
     - name: Run README accuracy tests
       run: |
         cd tests
-        python -m pytest test_readme_accuracy.py -v --tb=short
+        python3 -m pytest test_readme_accuracy.py -v --tb=short
 
     - name: Upload accuracy test results
       uses: actions/upload-artifact@v4
@@ -98,18 +98,18 @@ jobs:
     
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r tests/requirements.txt
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r tests/requirements.txt
     
     - name: Run link validation tests (fast)
       run: |
         cd tests
-        python -m pytest test_links.py -v --tb=short -m "not slow"
+        python3 -m pytest test_links.py -v --tb=short -m "not slow"
     
     - name: Run external link tests (slow)
       run: |
         cd tests
-        python -m pytest test_links.py -v --tb=short -m "slow"
+        python3 -m pytest test_links.py -v --tb=short -m "slow"
       continue-on-error: true  # External links may be temporarily unavailable
     
     - name: Upload link validation results
@@ -138,13 +138,13 @@ jobs:
     
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r tests/requirements.txt
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r tests/requirements.txt
     
     - name: Run example validation tests
       run: |
         cd tests
-        python -m pytest test_examples.py -v --tb=short
+        python3 -m pytest test_examples.py -v --tb=short
     
     - name: Upload example validation results
       uses: actions/upload-artifact@v4
@@ -167,13 +167,13 @@ jobs:
     
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r tests/requirements.txt
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r tests/requirements.txt
     
     - name: Run dependency validation tests
       run: |
         cd tests
-        python -m pytest test_dependencies.py -v --tb=short
+        python3 -m pytest test_dependencies.py -v --tb=short
     
     - name: Upload dependency validation results
       uses: actions/upload-artifact@v4
@@ -203,13 +203,13 @@ jobs:
     
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r tests/requirements.txt
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r tests/requirements.txt
     
     - name: Run complete test suite
       run: |
         cd tests
-        python -m pytest -v --tb=short --html=report.html --self-contained-html --cov=utils --cov-report=html
+        python3 -m pytest -v --tb=short --html=report.html --self-contained-html --cov=utils --cov-report=html
     
     - name: Upload comprehensive test report
       uses: actions/upload-artifact@v4
@@ -237,8 +237,8 @@ jobs:
     
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r tests/requirements.txt
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r tests/requirements.txt
     
     - name: Run critical tests only (quality gates)
       run: |
