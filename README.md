@@ -570,311 +570,60 @@ graph TD
     I --> J[Kanban Card Creation]
 ```
 
-**Examples**
+**Core Implementation**
 
-**Input: High-level requirement**
-```markdown
-## Feature Request
-"Users need to be able to reset their passwords via email"
-```
-
-**AI Prompt for Kanban-Ready Task Generation**
 ```bash
-ai "Break down this feature into small Kanban tasks:
+ai "Break down this feature into Kanban-ready tasks:
 
-Feature: Password reset via email
+Feature: [Your Feature Description]
 
-Create work items following Kanban principles:
-- Ensure each task can be completed in less than a day
-- Clear titles and descriptions
-- Specific acceptance criteria
-- Labels (frontend, backend, testing)
-- Dependencies between tasks
-- If any task takes >1 day, split it further
+Requirements:
+- Each task <8 hours (1 day max)
+- Clear acceptance criteria
+- Specific file changes and CI requirements
+- Dependency mapping
 
-Output structured work items ready for your issue tracker."
+Output: Structured work items with traceability"
 ```
 
-**Generated Kanban-Ready Work Items**
+**Basic Work Item Structure**
 ```json
 {
   "title": "Backend: Implement password reset token generation",
-  "description": "## Acceptance Criteria\n- [ ] Generate secure reset tokens\n- [ ] Set 15-minute expiration\n## Cycle Time Target\n8-12 hours",
-  "labels": ["backend", "security", "kanban-ready"],
-  "milestone": "Password Reset MVP"
-}
-```
-
-**Complete Implementation**: See [examples/ai-issue-generation/ai-prompts-for-epic-management.md](examples/ai-issue-generation/ai-prompts-for-epic-management.md) for practical AI prompts that directly interface with issue tracking systems to create epics, manage subissue relationships, and automate progress tracking.
-
-**Kanban Epic Breakdown**
-```bash
-ai "Break down this epic for optimal Kanban flow:
-
-Epic: User Dashboard with Analytics
-
-Kanban task requirements:
-- Maximum 4-8 hours per task (1 day)
-- If a task would take longer, split it
-- Each task independently deployable
-- Focus on flow over estimates
-
-Break down into:
-- Database migrations (each table/index separately)
-- Individual API endpoints (one endpoint per task)
-- UI components (one component per task)
-- Test suites (by feature area)
-- Security checks (per component)
-- Performance optimizations (targeted improvements)
-
-Goal: Continuous flow with rapid feedback cycles."
-```
-
-**Epic-Subissue Relationship Management**
-
-AI-assisted establishment and maintenance of bidirectional links between epics and their constituent work items for comprehensive progress tracking and dependency management.
-
-```mermaid
-graph TD
-    A[Epic Creation] --> B[AI Decomposition]
-    B --> C[Subissue Generation]
-    C --> D[Cross-Linking]
-    D --> E[Progress Tracking]
-    E --> F[Epic Status Updates]
-    F --> G[Dependency Resolution]
-    G --> H[Completion Validation]
-```
-
-**AI-Driven Cross-Linking Strategy**
-```bash
-ai "Generate epic-subissue relationships for:
-Epic: User Authentication System
-
-Requirements:
-- Create parent-child references in both directions
-- Establish dependency chains between subissues
-- Include progress tracking mechanisms
-- Generate status rollup criteria
-- Add completion validation rules
-
-Output universal relationship structure:
-- Reference IDs for linking
-- Status propagation rules
-- Dependency validation
-- Progress calculation logic"
-```
-
-**Generated Relationship Structure**
-```json
-{
-  "epic": {
-    "id": "AUTH-001",
-    "title": "Epic: User Authentication System",
-    "subissues": ["AUTH-002", "AUTH-003", "AUTH-004", "AUTH-005"],
-    "completion_criteria": "all_subissues_closed",
-    "status_calculation": "percentage_complete"
-  },
-  "subissues": [
-    {
-      "id": "AUTH-002",
-      "title": "Password validation service",
-      "parent_epic": "AUTH-001",
-      "blocks": [],
-      "blocked_by": [],
-      "completion_updates_epic": true
-    }
-  ],
-  "relationships": {
-    "AUTH-002": {"depends_on": [], "enables": ["AUTH-005"]},
-    "AUTH-003": {"depends_on": [], "enables": ["AUTH-005"]},
-    "AUTH-004": {"depends_on": [], "enables": ["AUTH-005"]},
-    "AUTH-005": {"depends_on": ["AUTH-002", "AUTH-003", "AUTH-004"], "enables": []}
-  }
-}
-```
-
-**Automated Progress Tracking**
-```bash
-# AI-generated progress monitoring
-ai "Create progress tracking for epic AUTH-001:
-
-Monitor subissue completion and update epic status:
-- Calculate completion percentage
-- Identify blocking dependencies
-- Update epic description with progress
-- Generate status reports
-- Alert on timeline risks
-
-Track these metrics:
-- Subissues completed vs total
-- Cycle time per subissue
-- Dependency chain health
-- Epic velocity trends"
-```
-
-**Universal Linking Implementation**
-```bash
-ai "Generate relationship linking strategy:
-
-Common platform capabilities to leverage:
-- Reference linking between work items
-- Custom fields for parent/child relationships
-- Labels for epic grouping
-- Milestones for epic tracking
-- Comments for progress updates
-
-Create linking strategy that:
-1. Works with platform limitations
-2. Maintains bidirectional references
-3. Survives tool migrations
-4. Enables automated reporting"
-```
-
-**Dynamic Epic Status Management**
-```bash
-ai "Update epic AUTH-001 status based on subissue changes:
-
-Current state:
-- AUTH-002: Completed
-- AUTH-003: In Progress (60% done)
-- AUTH-004: Not Started
-- AUTH-005: Blocked (waiting for AUTH-002, AUTH-003, AUTH-004)
-
-Generate:
-- Epic progress summary
-- Updated epic description
-- Risk assessment
-- Next action recommendations
-- Stakeholder communication"
-```
-
-**Dependency Chain Validation**
-```bash
-ai "Validate dependency relationships for epic AUTH-001:
-
-Check for:
-- Circular dependencies
-- Missing prerequisite work
-- Parallel work opportunities
-- Critical path identification
-- Resource contention
-
-Output:
-- Dependency graph validation
-- Suggested scheduling optimizations
-- Risk mitigation recommendations
-- Parallel execution opportunities"
-```
-
-**Work Item Integration**
-```bash
-# Epic-aware work item creation
-ai "Create linked work items maintaining epic relationships"
-
-# Universal linking approach
-epic_id="EPIC-123"
-parent_reference="Relates to: ${epic_id}"
-
-# Standard relationship format
-item_description="$original_description\n\n## Epic Relationship\nParent Epic: $epic_id\nDependencies: [see epic for full context]\nProgress contributes to: Epic completion"
-```
-
-**Anti-pattern: Orphaned Work Items**
-Creating subissues without establishing clear parent-child relationships, leading to epic progress that cannot be tracked and completed work that doesn't contribute to measurable outcomes.
-
-**Anti-pattern: Manual Relationship Maintenance**
-Relying on humans to manually update epic progress and maintain cross-references as subissues change, resulting in stale information and broken dependency chains when teams are under pressure.
-
-**Kanban Work Item Splitting**
-```bash
-ai "Apply Kanban principles to split these work items:
-
-Kanban splitting rules:
-- Maximum cycle time: 4-8 hours (1 day)
-- If >8 hours, must split into smaller items
-- Each item independently deployable
-- Measure actual cycle time, not estimates
-
-Historical cycle times for reference:
-- Authentication token generation: 8 hours
-- Email template setup: 4 hours
-- Password reset form: 4 hours  
-- API endpoint creation: 6 hours
-- Database migration: 3 hours per table
-
-For each task:
-1. Can it be completed in <8 hours?
-2. If no, how to split it?
-3. What's the smallest valuable increment?
-
-Remember: Flow over estimates, rapid feedback over perfect planning."
-```
-
-**CI Workflow Integration Requirements**
-
-Generated issues must include implementation and test requirements that integrate with continuous integration workflows:
-
-```bash
-ai "For each generated work item, include CI integration requirements:
-
-Issue Requirements:
-- Define files to be added, updated, or removed
-- Specify test coverage requirements (unit, integration, e2e)
-- Include CI pipeline validation steps
-- Link implementation to verification criteria
-
-CI Report Integration:
-- Include issue references in commit messages
-- Generate CI reports that link back to originating issues
-- Track file changes against issue scope
-- Validate test coverage meets issue requirements
-
-File Tracking Format:
-Files Added: [list new files with purpose]
-Files Updated: [list modified files with changes]
-Files Removed: [list deleted files with reason]
-Test Coverage: [minimum coverage % and test types]
-CI Validation: [pipeline steps that must pass]"
-```
-
-**Issue-to-Implementation Traceability**
-```json
-{
-  "issue_id": "AUTH-002",
-  "title": "Password validation service",
+  "cycle_time_target": "6 hours",
+  "acceptance_criteria": ["Generate secure tokens", "15-minute expiration"],
   "files": {
-    "added": ["src/auth/validators.py", "tests/test_validators.py"],
-    "updated": ["src/auth/__init__.py", "requirements.txt"],
-    "removed": []
+    "added": ["src/auth/tokens.py", "tests/test_tokens.py"],
+    "updated": ["requirements.txt"]
   },
   "ci_requirements": {
     "test_coverage": "95%",
-    "pipeline_steps": ["lint", "unit-tests", "integration-tests"],
-    "quality_gates": ["sonarqube", "security-scan"]
-  },
-  "verification": {
-    "commit_pattern": "AUTH-002: implement password validation",
-    "ci_report_links": ["build-{build_id}", "coverage-{build_id}"],
-    "acceptance_validation": "all tests pass, coverage >95%"
+    "pipeline_steps": ["lint", "test", "security-scan"]
   }
 }
 ```
 
-**CI Report Linking Strategy**
+**Complete Examples**: See [examples/ai-issue-generation/detailed-kanban-workflow.md](examples/ai-issue-generation/detailed-kanban-workflow.md) for comprehensive epic breakdown, relationship management, and progress tracking examples.
+
+**CI Integration**: See [examples/ai-issue-generation/ci-integration-examples.md](examples/ai-issue-generation/ci-integration-examples.md) for file tracking, traceability, and automated reporting implementations.
+
+**CI Integration Requirements**
+
+Issues must specify file changes, test coverage, and pipeline validation:
+- Files: added/updated/removed with purpose
+- Tests: minimum coverage % and types (unit/integration/e2e)
+- CI: pipeline steps that must pass for acceptance
+- Traceability: commit messages reference issues, CI reports link back
+
 ```bash
-# Commit message format for CI integration
-git commit -m "AUTH-002: add password validation service
+# Example commit format
+git commit -m "AUTH-002: implement password validation
 
-- Add password complexity validation
-- Implement rate limiting for failed attempts
-- Update authentication middleware
+Files: Added validators.py, tests/test_validators.py
+Coverage: 97% (target: 95%)
+CI: All pipeline steps passed
 
-Files changed per issue AUTH-002:
-- Added: src/auth/validators.py, tests/test_validators.py
-- Updated: src/auth/__init__.py, requirements.txt
-
-Closes: AUTH-002
-CI-Report: Available at {ci_dashboard_url}/AUTH-002"
+Closes: AUTH-002"
 ```
 
 > "If a task takes more than one day, split it."
