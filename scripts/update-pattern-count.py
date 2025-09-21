@@ -44,17 +44,42 @@ def update_readme_badge(pattern_count):
     with open(readme_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    # Pattern to match the badge line
-    badge_pattern = r'(\[!\[Patterns\]\(https://img\.shields\.io/badge/patterns-)(\d+)(-blue\.svg\)\]\(#complete-pattern-reference\))'
+    print(f"✓ README.md found, length: {len(content)} characters")
 
-    # Replace the pattern count in the badge
-    def replace_count(match):
-        return f"{match.group(1)}{pattern_count}{match.group(3)}"
+    # Multiple patterns to try, from most specific to most general
+    badge_patterns = [
+        # Exact pattern with complete-pattern-reference link
+        r'(\[!\[Patterns\]\(https://img\.shields\.io/badge/patterns-)(\d+)(-blue\.svg\)\]\(#complete-pattern-reference\))',
+        # Pattern with any anchor link
+        r'(\[!\[Patterns\]\(https://img\.shields\.io/badge/patterns-)(\d+)(-blue\.svg\)\]\([^)]+\))',
+        # Pattern without link
+        r'(\[!\[Patterns\]\(https://img\.shields\.io/badge/patterns-)(\d+)(-blue\.svg\))',
+    ]
 
-    updated_content = re.sub(badge_pattern, replace_count, content)
+    updated_content = content
+    pattern_found = False
 
-    if updated_content == content:
+    for i, pattern in enumerate(badge_patterns):
+        def replace_count(match):
+            nonlocal pattern_found
+            pattern_found = True
+            return f"{match.group(1)}{pattern_count}{match.group(3)}"
+
+        test_content = re.sub(pattern, replace_count, content)
+        if test_content != content:
+            updated_content = test_content
+            print(f"✓ Used pattern {i+1} to update badge")
+            break
+
+    if not pattern_found:
         print("Warning: No badge pattern found to update")
+        print("Searching for any Patterns badge in content...")
+
+        # Debug: show what patterns we can find
+        lines = content.split('\n')
+        for line_num, line in enumerate(lines, 1):
+            if 'Patterns' in line and 'shields.io' in line:
+                print(f"Found badge-like line {line_num}: {repr(line)}")
         return False
 
     with open(readme_path, 'w', encoding='utf-8') as f:
