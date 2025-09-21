@@ -570,61 +570,32 @@ graph TD
     I --> J[Kanban Card Creation]
 ```
 
-**Core Implementation**
+**Core Principles**
 
-```bash
-ai "Break down this feature into Kanban-ready tasks:
+- **Kanban Optimization**: Each work item sized for <8 hours to ensure continuous flow
+- **AI-Assisted Decomposition**: Use AI to break down requirements into implementable tasks
+- **Traceability Integration**: Connect issues to implementation files and CI workflows
+- **Dependency Mapping**: Establish clear relationships between work items and epics
+- **Acceptance-Driven**: Each task includes specific, testable acceptance criteria
 
-Feature: [Your Feature Description]
+**Work Item Attributes**
 
-Requirements:
-- Each task <8 hours (1 day max)
-- Clear acceptance criteria
-- Specific file changes and CI requirements
-- Dependency mapping
+Generated issues must include:
+- **Title**: Specific, actionable description of the work
+- **Cycle Time Target**: Estimated completion time (4-8 hours)
+- **Acceptance Criteria**: Testable conditions for completion
+- **File Scope**: Which files will be added, updated, or removed
+- **CI Requirements**: Test coverage, pipeline steps, quality gates
+- **Dependencies**: Blocking and enabling relationships with other issues
 
-Output: Structured work items with traceability"
-```
+**Epic Relationship Management**
 
-**Basic Work Item Structure**
-```json
-{
-  "title": "Backend: Implement password reset token generation",
-  "cycle_time_target": "6 hours",
-  "acceptance_criteria": ["Generate secure tokens", "15-minute expiration"],
-  "files": {
-    "added": ["src/auth/tokens.py", "tests/test_tokens.py"],
-    "updated": ["requirements.txt"]
-  },
-  "ci_requirements": {
-    "test_coverage": "95%",
-    "pipeline_steps": ["lint", "test", "security-scan"]
-  }
-}
-```
+- **Bidirectional Linking**: Parent-child references maintained automatically
+- **Progress Tracking**: Epic completion calculated from subissue status
+- **Dependency Validation**: Automated checking for circular dependencies
+- **Status Propagation**: Subissue changes update epic progress
 
-**Complete Examples**: See [examples/ai-issue-generation/detailed-kanban-workflow.md](examples/ai-issue-generation/detailed-kanban-workflow.md) for comprehensive epic breakdown, relationship management, and progress tracking examples.
-
-**CI Integration**: See [examples/ai-issue-generation/ci-integration-examples.md](examples/ai-issue-generation/ci-integration-examples.md) for file tracking, traceability, and automated reporting implementations.
-
-**CI Integration Requirements**
-
-Issues must specify file changes, test coverage, and pipeline validation:
-- Files: added/updated/removed with purpose
-- Tests: minimum coverage % and types (unit/integration/e2e)
-- CI: pipeline steps that must pass for acceptance
-- Traceability: commit messages reference issues, CI reports link back
-
-```bash
-# Example commit format
-git commit -m "AUTH-002: implement password validation
-
-Files: Added validators.py, tests/test_validators.py
-Coverage: 97% (target: 95%)
-CI: All pipeline steps passed
-
-Closes: AUTH-002"
-```
+**Implementation Examples**: See [examples/ai-issue-generation/](examples/ai-issue-generation/) for detailed AI prompts, epic breakdown workflows, CI integration patterns, and traceability implementations.
 
 > "If a task takes more than one day, split it."
 > – Kanban Guide, Lean Kanban University
