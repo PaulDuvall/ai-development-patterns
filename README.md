@@ -590,7 +590,7 @@ Create work items following Kanban principles:
 - Specific acceptance criteria
 - Labels (frontend, backend, testing)
 - Dependencies between tasks
-- If any task takes >2 days, split it further
+- If any task takes >1 day, split it further
 
 Output structured work items ready for your issue tracker."
 ```
