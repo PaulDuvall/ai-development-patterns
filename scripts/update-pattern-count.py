@@ -45,11 +45,13 @@ def update_readme_badge(pattern_count):
         content = f.read()
 
     # Pattern to match the badge line
-    badge_pattern = r'(\[!\[Patterns\]\(https://img\.shields\.io/badge/patterns-)[^-]+(-.+?\))'
+    badge_pattern = r'(\[!\[Patterns\]\(https://img\.shields\.io/badge/patterns-)(\d+)(-blue\.svg\)\]\(#complete-pattern-reference\))'
 
     # Replace the pattern count in the badge
-    new_badge = f"\\g<1>{pattern_count}\\g<2>"
-    updated_content = re.sub(badge_pattern, new_badge, content)
+    def replace_count(match):
+        return f"{match.group(1)}{pattern_count}{match.group(3)}"
+
+    updated_content = re.sub(badge_pattern, replace_count, content)
 
     if updated_content == content:
         print("Warning: No badge pattern found to update")
