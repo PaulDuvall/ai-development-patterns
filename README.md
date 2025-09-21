@@ -810,24 +810,99 @@ For each task:
 Remember: Flow over estimates, rapid feedback over perfect planning."
 ```
 
-> "If a task takes more than one day, split it."  
+**CI Workflow Integration Requirements**
+
+Generated issues must include implementation and test requirements that integrate with continuous integration workflows:
+
+```bash
+ai "For each generated work item, include CI integration requirements:
+
+Issue Requirements:
+- Define files to be added, updated, or removed
+- Specify test coverage requirements (unit, integration, e2e)
+- Include CI pipeline validation steps
+- Link implementation to verification criteria
+
+CI Report Integration:
+- Include issue references in commit messages
+- Generate CI reports that link back to originating issues
+- Track file changes against issue scope
+- Validate test coverage meets issue requirements
+
+File Tracking Format:
+Files Added: [list new files with purpose]
+Files Updated: [list modified files with changes]
+Files Removed: [list deleted files with reason]
+Test Coverage: [minimum coverage % and test types]
+CI Validation: [pipeline steps that must pass]"
+```
+
+**Issue-to-Implementation Traceability**
+```json
+{
+  "issue_id": "AUTH-002",
+  "title": "Password validation service",
+  "files": {
+    "added": ["src/auth/validators.py", "tests/test_validators.py"],
+    "updated": ["src/auth/__init__.py", "requirements.txt"],
+    "removed": []
+  },
+  "ci_requirements": {
+    "test_coverage": "95%",
+    "pipeline_steps": ["lint", "unit-tests", "integration-tests"],
+    "quality_gates": ["sonarqube", "security-scan"]
+  },
+  "verification": {
+    "commit_pattern": "AUTH-002: implement password validation",
+    "ci_report_links": ["build-{build_id}", "coverage-{build_id}"],
+    "acceptance_validation": "all tests pass, coverage >95%"
+  }
+}
+```
+
+**CI Report Linking Strategy**
+```bash
+# Commit message format for CI integration
+git commit -m "AUTH-002: add password validation service
+
+- Add password complexity validation
+- Implement rate limiting for failed attempts
+- Update authentication middleware
+
+Files changed per issue AUTH-002:
+- Added: src/auth/validators.py, tests/test_validators.py
+- Updated: src/auth/__init__.py, requirements.txt
+
+Closes: AUTH-002
+CI-Report: Available at {ci_dashboard_url}/AUTH-002"
+```
+
+> "If a task takes more than one day, split it."
 > – Kanban Guide, Lean Kanban University
 
-> "Small, frequent deliveries expose issues early and keep teams aligned."  
+> "Small, frequent deliveries expose issues early and keep teams aligned."
 > – Agile Alliance, Kanban Glossary
 
 **Anti-pattern: Vague Issue Generation**
 Creating generic tasks without specific acceptance criteria, proper sizing, or clear dependencies leads to scope creep and estimation errors.
 
+**Anti-pattern: Missing CI Integration**
+Creating issues without CI workflow integration, file tracking, or traceability requirements leads to disconnected development cycles and poor visibility into implementation progress.
+
 **Anti-pattern Examples:**
 ```markdown
 ❌ "Fix the login page"
-❌ "Make the dashboard better" 
+❌ "Make the dashboard better"
 ❌ "Add some tests"
+❌ "AUTH-002: Implement password validation" (no file tracking or CI requirements)
 
 ✅ "Add OAuth 2.0 token validation endpoint (8 hours)"
 ✅ "Implement dashboard metric WebSocket connection (6 hours)"
 ✅ "Write unit tests for user service login method (4 hours)"
+✅ "AUTH-002: Password validation service with CI integration"
+   - Files: src/auth/validators.py, tests/test_validators.py
+   - Coverage: 95%, unit + integration tests
+   - CI: lint, test, security-scan must pass
 ```
 
 ---
