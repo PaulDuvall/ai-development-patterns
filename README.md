@@ -1155,7 +1155,7 @@ AI context is a finite resource with diminishing returns. Effective context engi
 
 Persist information outside the context window using standardized memory formats:
 
-```bash
+```markdown
 # TODO.md - Task tracking across sessions
 - [ ] Implement JWT middleware (blocked: key rotation design)
 - [x] Add bcrypt password hashing (2024-01-15)
