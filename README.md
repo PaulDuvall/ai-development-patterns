@@ -1168,11 +1168,11 @@ Alternatives: HS256 (simpler but less flexible)
 Impact: auth-service, api-gateway
 
 # NOTES.md - Session continuity and discoveries
-## Session 2024-01-15
-Context: Implementing authentication system
-Discoveries: bcrypt has performance issues >100 req/s
-Blockers: Need to decide on refresh token storage
-Next: Benchmark argon2 as bcrypt alternative
+Session 2024-01-15:
+  Context: Implementing authentication system
+  Discoveries: bcrypt has performance issues >100 req/s
+  Blockers: Need to decide on refresh token storage
+  Next: Benchmark argon2 as bcrypt alternative
 
 # scratchpad.md - Working memory (cleared after task)
 Exploring JWT refresh token flow...
