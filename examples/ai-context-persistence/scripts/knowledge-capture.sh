@@ -1,5 +1,8 @@
 #!/bin/bash
-# AI Knowledge Persistence - Capture and Management System
+# AI Context Persistence - Prompt Pattern Capture and Management
+#
+# Part of the AI Context Persistence pattern
+# Captures successful prompts and failures with success rates for reuse
 
 set -euo pipefail
 

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "description": "Machine-readable architectural decision record for AI context engineering",
+  "decisions": [
+    {
+      "id": "DEC-001",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "decision": "Use RS256 for JWT signing instead of HS256",
+      "rationale": "Asymmetric keys enable better key rotation without redistributing secrets to all services. Public key can be freely shared for verification.",
+      "alternatives": [
+        {
+          "option": "HS256 symmetric signing",
+          "rejected_reason": "Requires secret sharing across all services, complicates key rotation"
+        },
+        {
+          "option": "Full OAuth2 implementation",
+          "rejected_reason": "Over-engineered for current requirements, adds unnecessary complexity"
+        }
+      ],
+      "impact": {
+        "components": ["auth-service", "api-gateway", "all-resource-servers"],
+        "scope": "high",
+        "breaking_change": false
+      },
+      "consequences": {
+        "positive": [
+          "Better security posture",
+          "Easier key rotation process",
+          "Simpler service onboarding (only need public key)"
+        ],
+        "negative": [
+          "More complex key management infrastructure",
+          "Marginally slower verification (negligible at current scale)"
+        ]
+      },
+      "status": "accepted",
+      "authors": ["team-consensus"],
+      "related_documents": [
+        "NOTES.md#session-2024-01-15",
+        "specs/jwt-auth-spec.md"
+      ],
+      "tags": ["security", "authentication", "architecture"]
+    },
+    {
+      "id": "DEC-002",
+      "timestamp": "2024-01-16T14:20:00Z",
+      "decision": "[Example template for next decision]",
+      "rationale": "[Why this choice was made]",
+      "alternatives": [
+        {
+          "option": "[Alternative 1]",
+          "rejected_reason": "[Why it was rejected]"
+        }
+      ],
+      "impact": {
+        "components": ["component-1", "component-2"],
+        "scope": "medium",
+        "breaking_change": false
+      },
+      "consequences": {
+        "positive": ["[Benefit 1]", "[Benefit 2]"],
+        "negative": ["[Trade-off 1]"]
+      },
+      "status": "accepted",
+      "authors": ["developer-name"],
+      "related_documents": [],
+      "tags": ["category", "topic"]
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "last_updated": "2024-01-16T14:20:00Z",
+    "total_decisions": 2,
+    "active_decisions": 2,
+    "deprecated_decisions": 0
+  }
+}

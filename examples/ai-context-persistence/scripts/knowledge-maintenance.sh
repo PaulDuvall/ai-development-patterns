@@ -1,5 +1,8 @@
 #!/bin/bash
-# AI Knowledge Maintenance - Analysis and cleanup tools
+# AI Context Persistence - Pattern Library Maintenance
+#
+# Part of the AI Context Persistence pattern
+# Analyzes and maintains prompt pattern library
 
 set -euo pipefail
 

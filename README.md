@@ -68,7 +68,7 @@ graph TD
 | **[AI Choice Generation](#ai-choice-generation)** | Intermediate | Development | Generate multiple implementation options for exploration and comparison rather than accepting first AI solution | Progressive AI Enhancement |
 | **[Atomic Task Decomposition](#atomic-task-decomposition)** | Intermediate | Development | Break complex features into atomic, independently implementable tasks for parallel AI agent execution | Progressive AI Enhancement |
 | **[Parallelized AI Coding Agents](#parallelized-ai-coding-agents)** | Advanced | Development | Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration | Atomic Task Decomposition |
-| **[AI Knowledge Persistence](#ai-knowledge-persistence)** | Intermediate | Development | Capture successful patterns and failed attempts as versioned knowledge for future sessions | Rules as Code |
+| **[AI Context Persistence](#ai-context-persistence)** | Intermediate | Development | Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols | Rules as Code |
 | **[Constraint-Based AI Development](#constraint-based-ai-development)** | Beginner | Development | Give AI specific constraints to prevent over-engineering and ensure focused solutions | None |
 | **[Observable AI Development](#observable-ai-development)** | Intermediate | Development | Strategic logging and debugging that makes system behavior visible to AI | AI Developer Lifecycle |
 | **[AI-Driven Refactoring](#ai-driven-refactoring)** | Intermediate | Development | Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics | Rules as Code |
@@ -211,7 +211,7 @@ graph TD
 
 **Research/Experimental Projects**:
 - **Primary**: [AI Choice Generation](#ai-choice-generation), [Observable AI Development](#observable-ai-development)
-- **Secondary**: [AI Knowledge Persistence](#ai-knowledge-persistence), [Context Window Optimization](experiments/README.md#context-window-optimization)
+- **Secondary**: [AI Context Persistence](#ai-context-persistence), [Context Window Optimization](experiments/README.md#context-window-optimization)
 - **Focus**: Learning and exploration over production readiness
 
 **High-Scale Production**:
@@ -248,7 +248,7 @@ graph TD
 
 **On-Premise Systems**:
 - Focus on **[AI Security Sandbox](#ai-security-sandbox)** with network isolation
-- Implement **[AI Knowledge Persistence](#ai-knowledge-persistence)** for institutional knowledge
+- Implement **[AI Context Persistence](#ai-context-persistence)** for institutional knowledge
 - Use **Technical Debt Forecasting** for maintenance planning
 
 **Microservices Architecture**:
@@ -311,7 +311,7 @@ Starting AI adoption without proper assessment leads to inconsistent practices, 
 **Maturity**: Beginner  
 **Description**: Version and maintain AI coding standards as explicit configuration files that persist across sessions and team members.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Knowledge Persistence](#ai-knowledge-persistence)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Context Persistence](#ai-context-persistence)
 
 **Standardized Project Structure**
 ```bash
@@ -1137,27 +1137,65 @@ Running multiple agents without isolation, shared memory, or conflict resolution
 ---
 
 
-## AI Knowledge Persistence
+## AI Context Persistence
 
-**Maturity**: Intermediate  
-**Description**: Capture successful patterns and failed attempts as versioned knowledge for future AI sessions to accelerate development and avoid repeating mistakes.
+**Maturity**: Intermediate
+**Description**: Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols for efficient multi-session development.
 
-**Related Patterns**: [Rules as Code](#rules-as-code), [AI-Driven Traceability](#ai-driven-traceability)
+**Related Patterns**: [Rules as Code](#rules-as-code), [AI-Driven Traceability](#ai-driven-traceability), [Parallelized AI Coding Agents](#parallelized-ai-coding-agents)
 
-**Core Implementation**
+**Core Principles**
+
+AI context is a finite resource with diminishing returns. Effective context engineering requires:
+- **Minimal High-Signal Tokens**: Find the smallest set of information that maximizes outcomes
+- **Just-in-Time Retrieval**: Load context dynamically rather than pre-loading everything
+- **Progressive Disclosure**: Explore and discover information as needed, not upfront
+
+**Structured Memory Schemas**
+
+Persist information outside the context window using standardized memory formats:
 
 ```bash
-# Initialize organized knowledge structure
+# TODO.md - Task tracking across sessions
+- [ ] Implement JWT middleware (blocked: key rotation design)
+- [x] Add bcrypt password hashing (2024-01-15)
+- [ ] Rate limiting (next: research token bucket vs sliding window)
+
+# DECISIONS.log - Architectural decisions with timestamp
+2024-01-15 10:30: Use RS256 for JWT (not HS256)
+Rationale: Asymmetric keys enable better key rotation
+Alternatives: HS256 (simpler but less flexible)
+Impact: auth-service, api-gateway
+
+# NOTES.md - Session continuity and discoveries
+## Session 2024-01-15
+Context: Implementing authentication system
+Discoveries: bcrypt has performance issues >100 req/s
+Blockers: Need to decide on refresh token storage
+Next: Benchmark argon2 as bcrypt alternative
+
+# scratchpad.md - Working memory (cleared after task)
+Exploring JWT refresh token flow...
+- httpOnly cookies prevent XSS
+- Need CSRF protection for cookie-based auth
+```
+
+**Prompt Pattern Library**
+
+Capture successful prompts and failures with success rates for reuse:
+
+```bash
+# Initialize knowledge structure
 ./knowledge-capture.sh --init
 
-# Capture successful patterns with success rates
+# Capture successful pattern
 ./knowledge-capture.sh --success \
   --domain "auth" \
   --pattern "JWT Auth" \
   --prompt "JWT with RS256, 15min access, httpOnly cookie" \
   --success-rate "95%"
 
-# Document failures to avoid repeating
+# Document failure to avoid repeating
 ./knowledge-capture.sh --failure \
   --domain "auth" \
   --bad-prompt "Make auth secure" \
@@ -1165,11 +1203,33 @@ Running multiple agents without isolation, shared memory, or conflict resolution
   --solution "Specify exact JWT requirements"
 ```
 
-**Complete Implementation**: See [examples/ai-knowledge-persistence/](examples/ai-knowledge-persistence/) for:
-- Automated knowledge capture and maintenance scripts
-- Structured templates for patterns, failures, and gotchas
-- Success rate tracking and stale knowledge detection
-- Team knowledge sharing and export tools
+**Context Window Management**
+
+**Compaction Strategy** - When context approaches limits:
+1. Distill critical decisions to `DECISIONS.log`
+2. Summarize key discoveries in `NOTES.md`
+3. Update `TODO.md` with current state and blockers
+4. Create "Previously on..." recap for session continuity
+
+**Session Continuity Protocol** - Resume work across sessions:
+1. Read `NOTES.md` for previous session context
+2. Review `TODO.md` for current tasks and blockers
+3. Check `DECISIONS.log` for recent architectural choices
+4. Scan `scratchpad.md` for active explorations
+
+```bash
+# Compact context when nearing limits
+./context-compact.sh --summarize
+
+# Resume from previous session
+./session-resume.sh  # Displays TODO + recent decisions + notes recap
+```
+
+**Complete Implementation**: See [examples/ai-context-persistence/](examples/ai-context-persistence/) for:
+- Memory schema templates (TODO.md, DECISIONS.log, NOTES.md, scratchpad.md)
+- Context compaction and session resume automation scripts
+- Prompt pattern capture and maintenance tools
+- Working examples of memory schemas in use
 
 **Anti-pattern: Knowledge Hoarding**
 
@@ -1181,27 +1241,27 @@ Creating extensive knowledge bases that become maintenance burdens instead of ac
 - Overly detailed entries are ignored in favor of quick experimentation
 - Knowledge becomes siloed and not easily discoverable
 
-**Signs of Knowledge Hoarding:**
-- Knowledge files haven't been accessed in months
-- Entries are extremely detailed but rarely referenced
-- Multiple overlapping knowledge bases with conflicting information
-- Knowledge capture takes longer than the original development work
-
 **Instead, focus on:**
 - Capture only high-impact patterns (>80% success rate)
 - Document failures that wasted significant time (>30 minutes)
 - Keep entries concise and immediately actionable
 - Review and prune knowledge quarterly
 
-```bash
-# Good: Focused, actionable knowledge
-echo "### JWT Auth Success" >> .ai/knowledge/auth.md
-echo "Prompt: 'JWT with RS256, 15min expiry' - 95% success" >> .ai/knowledge/auth.md
+**Anti-pattern: Context Bloat**
 
-# Bad: Exhaustive documentation  
-echo "### Complete JWT Implementation Guide" >> .ai/knowledge/auth.md
-echo "Full JWT specification with 47 configuration options..." >> .ai/knowledge/auth.md
-```
+Loading entire codebases, documentation, or conversation history into context rather than using structured memory and just-in-time retrieval.
+
+**Why it's problematic:**
+- Wastes tokens on low-signal information
+- Degrades AI performance due to information overload
+- Slows interaction latency and increases costs
+- Misses the forest for the trees
+
+**Instead:**
+- Use lightweight identifiers (file paths, links) rather than full content
+- Load context progressively as needed
+- Externalize detailed information to memory schemas
+- Prefer 3-5 high-quality examples over exhaustive documentation
 
 ---
 

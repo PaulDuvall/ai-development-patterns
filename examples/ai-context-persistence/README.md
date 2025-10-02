@@ -1,78 +1,101 @@
-# AI Knowledge Persistence Implementation
+# AI Context Persistence Implementation
 
-This directory contains a complete implementation of the AI Knowledge Persistence pattern, capturing successful patterns and failed attempts as versioned knowledge for future AI sessions to accelerate development and avoid repeating mistakes.
+This directory contains a complete implementation of the AI Context Persistence pattern, managing AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols.
 
 ## Overview
 
-AI Knowledge Persistence enables teams to:
-- Capture working prompts and patterns with success rates
-- Document failures and gotchas to avoid repeating mistakes
-- Maintain actionable, focused knowledge that accelerates AI development
-- Version and evolve knowledge as patterns change over time
+AI Context Persistence enables teams to:
+- **Structure memory** using standardized schemas (TODO, DECISIONS, NOTES, scratchpad)
+- **Manage context** as a finite resource with just-in-time retrieval and compaction
+- **Resume sessions** seamlessly with continuity protocols across AI interactions
+- **Capture patterns** - working prompts and failures with success rates
+
+## Core Concept
+
+Treat AI context like working memory with diminishing returns. Effective context persistence requires:
+- **Minimal high-signal tokens**: Find smallest set of information that maximizes outcomes
+- **Progressive disclosure**: Load context dynamically rather than pre-loading everything
+- **Structured persistence**: Externalize information to memory schemas outside context window
 
 ## Files in this Implementation
 
-- `knowledge-capture.sh` - Scripts for capturing patterns and failures
-- `knowledge-maintenance.sh` - Automated maintenance and cleanup utilities
-- `templates/` - Knowledge entry templates for consistency
-- `.ai/knowledge/` - Organized knowledge structure
-  - `patterns/` - Successful AI interaction patterns
-  - `failures/` - Failed attempts and lessons learned
-  - `gotchas/` - Common AI behavior quirks and workarounds
-- `examples/` - Sample knowledge entries for different domains
+### Memory Schema Templates (`templates/`)
+- `TODO.md` - Task tracking across AI sessions
+- `DECISIONS.log` - Architectural decisions with timestamp and rationale
+- `decisions.json` - Machine-readable decision format
+- `NOTES.md` - Session continuity and discoveries
+- `scratchpad.md` - Working memory for active exploration
+
+### Context Management Scripts (`scripts/`)
+- `context-compact.sh` - Context compaction and summarization
+- `session-resume.sh` - Quick session context loading
+- `knowledge-capture.sh` - Capture prompt patterns and failures
+- `knowledge-maintenance.sh` - Knowledge cleanup and analysis
+
+### Working Examples (`examples/`)
+- `.ai/memory/` - Realistic memory files in use (TODO, DECISIONS, NOTES, scratchpad)
+- `.ai/knowledge/` - Prompt pattern library (patterns/, failures/)
 
 ## Quick Start
 
-### Initialize Knowledge Structure
+### 1. Session Resume - Load Context
 
 ```bash
-# Create organized knowledge directory structure
-./knowledge-capture.sh --init
+# Resume previous work session
+./scripts/session-resume.sh
 
-# This creates:
-# .ai/knowledge/patterns/    - Working patterns with success rates
-# .ai/knowledge/failures/    - Failed attempts to avoid
-# .ai/knowledge/gotchas/     - AI behavior quirks and fixes
+# Shows: Current TODOs, recent decisions, session notes, active explorations
+# Use at start of every AI session for continuity
 ```
 
-### Capture Successful Patterns
+### 2. Memory Schemas - Structure Information
 
 ```bash
-# Capture working authentication pattern
-./knowledge-capture.sh --success \
+# Copy templates to your project
+cp -r templates/.ai .
+
+# Use memory schemas to persist context:
+# - TODO.md: Track tasks and blockers across sessions
+# - DECISIONS.log: Record architectural choices with rationale
+# - NOTES.md: Session discoveries and "Previously on..." recaps
+# - scratchpad.md: Working memory for active debugging/exploration
+```
+
+### 3. Context Management - Compact When Full
+
+```bash
+# Check context size
+./scripts/context-compact.sh --status
+
+# Create "Previously on..." recap when context is full
+./scripts/context-compact.sh --summarize
+
+# Archive old session notes (>30 days)
+./scripts/context-compact.sh --archive-notes
+```
+
+### 4. Prompt Patterns - Capture Knowledge
+
+```bash
+# Initialize prompt pattern library
+./scripts/knowledge-capture.sh --init
+
+# Capture successful pattern
+./scripts/knowledge-capture.sh --success \
   --domain "auth" \
   --pattern "JWT with RS256" \
-  --prompt "JWT with RS256, 15min access, 7day refresh in httpOnly cookie" \
-  --context "Node.js APIs" \
+  --prompt "JWT with RS256, 15min access, httpOnly cookie" \
   --success-rate "95%"
 
-# Capture API development pattern
-./knowledge-capture.sh --success \
-  --domain "api" \
-  --pattern "REST CRUD" \
-  --prompt "REST API: GET/POST/PUT/DELETE /users, 200/201/400/404 codes, validate input" \
-  --gotcha "AI over-engineers responses - provide exact JSON format"
-```
-
-### Document Failures
-
-```bash
-# Document vague prompt failure
-./knowledge-capture.sh --failure \
+# Document failure to avoid repeating
+./scripts/knowledge-capture.sh --failure \
   --domain "auth" \
   --bad-prompt "Make auth secure" \
-  --problem "Too vague → AI adds OAuth + sessions + JWT complexity" \
-  --solution "Specify exact requirements and constraints"
-```
+  --problem "Too vague → AI over-engineers" \
+  --solution "Specify exact JWT requirements"
 
-### Query Knowledge
-
-```bash
-# Find patterns for specific domain
-./knowledge-maintenance.sh --search "auth"
-
-# Get most successful patterns
-./knowledge-maintenance.sh --top-patterns
+# Search patterns
+./scripts/knowledge-maintenance.sh --search "auth"
 
 # Find stale knowledge for review
 ./knowledge-maintenance.sh --stale-review
