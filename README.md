@@ -1297,7 +1297,7 @@ Adding too many constraints ("use exactly 50 lines, 2 methods, no dependencies, 
 **Maturity**: Intermediate  
 **Description**: Break complex features into atomic, independently implementable tasks for parallel AI agent execution.
 
-**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Workflow Orchestration](experiments/README.md#ai-workflow-orchestration), [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Issue Generation](#ai-issue-generation)
+**Related Patterns**: [AI Developer Lifecycle](#ai-developer-lifecycle), [AI Workflow Orchestration](experiments/README.md#ai-workflow-orchestration), [Progressive AI Enhancement](#progressive-ai-enhancement), [AI Issue Generation](#ai-issue-generation), [Parallelized AI Coding Agents](#parallelized-ai-coding-agents)
 
 **Atomic Task Criteria**
 
