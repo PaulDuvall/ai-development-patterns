@@ -1,337 +1,295 @@
 # AI Context Persistence Implementation
 
-This directory contains a complete implementation of the AI Context Persistence pattern, managing AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols.
-
-## Overview
-
-AI Context Persistence enables teams to:
-- **Structure memory** using standardized schemas (TODO, DECISIONS, NOTES, scratchpad)
-- **Manage context** as a finite resource with just-in-time retrieval and compaction
-- **Resume sessions** seamlessly with continuity protocols across AI interactions
-- **Capture patterns** - working prompts and failures with success rates
-
-## Core Concept
-
-Treat AI context like working memory with diminishing returns. Effective context persistence requires:
-- **Minimal high-signal tokens**: Find smallest set of information that maximizes outcomes
-- **Progressive disclosure**: Load context dynamically rather than pre-loading everything
-- **Structured persistence**: Externalize information to memory schemas outside context window
-
-## Files in this Implementation
-
-### Memory Schema Templates (`templates/`)
-- `TODO.md` - Task tracking across AI sessions
-- `DECISIONS.log` - Architectural decisions with timestamp and rationale
-- `decisions.json` - Machine-readable decision format
-- `NOTES.md` - Session continuity and discoveries
-- `scratchpad.md` - Working memory for active exploration
-
-### Context Management Scripts (`scripts/`)
-- `context-compact.sh` - Context compaction and summarization
-- `session-resume.sh` - Quick session context loading
-- `knowledge-capture.sh` - Capture prompt patterns and failures
-- `knowledge-maintenance.sh` - Knowledge cleanup and analysis
-
-### Working Examples (`examples/`)
-- `.ai/memory/` - Realistic memory files in use (TODO, DECISIONS, NOTES, scratchpad)
-- `.ai/knowledge/` - Prompt pattern library (patterns/, failures/)
+Manage AI context as a finite resource through structured memory schemas and session continuity.
 
 ## Quick Start
 
-### 1. Session Resume - Load Context
+### Automated Setup (Recommended)
+
+Use Claude Code hooks for automatic context loading:
 
 ```bash
-# Resume previous work session
+./hooks/setup-hooks.sh
+# Then: claude → /hooks → approve → restart
+```
+
+This configures automatic context loading on every Claude Code session.
+
+### Manual Setup
+
+Copy templates to your project:
+
+```bash
+cp -r templates/.ai .
+```
+
+This creates 4 memory files:
+- **TODO.md** - Track tasks across sessions
+- **DECISIONS.log** - Record architectural choices
+- **NOTES.md** - Session discoveries and continuity
+- **scratchpad.md** - Working memory (cleared after tasks)
+
+### Resume Previous Session
+
+**With Hooks (Automatic):**
+Context loads automatically when starting Claude Code.
+
+**Manual:**
+```bash
 ./scripts/session-resume.sh
 
-# Shows: Current TODOs, recent decisions, session notes, active explorations
-# Use at start of every AI session for continuity
+# Shows: Current TODOs, recent decisions, session notes
 ```
 
-### 2. Memory Schemas - Structure Information
-
-```bash
-# Copy templates to your project
-cp -r templates/.ai .
-
-# Use memory schemas to persist context:
-# - TODO.md: Track tasks and blockers across sessions
-# - DECISIONS.log: Record architectural choices with rationale
-# - NOTES.md: Session discoveries and "Previously on..." recaps
-# - scratchpad.md: Working memory for active debugging/exploration
-```
-
-### 3. Context Management - Compact When Full
+### 3. Manage Context Size
 
 ```bash
 # Check context size
 ./scripts/context-compact.sh --status
 
-# Create "Previously on..." recap when context is full
+# Create recap when context is full
 ./scripts/context-compact.sh --summarize
-
-# Archive old session notes (>30 days)
-./scripts/context-compact.sh --archive-notes
 ```
 
-### 4. Prompt Patterns - Capture Knowledge
+### 4. Capture Knowledge
 
 ```bash
-# Initialize prompt pattern library
-./scripts/knowledge-capture.sh --init
+# Initialize knowledge library
+./scripts/knowledge.sh --init
 
 # Capture successful pattern
-./scripts/knowledge-capture.sh --success \
+./scripts/knowledge.sh --success \
   --domain "auth" \
-  --pattern "JWT with RS256" \
+  --pattern "JWT Auth" \
   --prompt "JWT with RS256, 15min access, httpOnly cookie" \
   --success-rate "95%"
 
 # Document failure to avoid repeating
-./scripts/knowledge-capture.sh --failure \
+./scripts/knowledge.sh --failure \
   --domain "auth" \
   --bad-prompt "Make auth secure" \
-  --problem "Too vague → AI over-engineers" \
-  --solution "Specify exact JWT requirements"
+  --problem "Too vague" \
+  --solution "Specify exact requirements"
 
 # Search patterns
-./scripts/knowledge-maintenance.sh --search "auth"
-
-# Find stale knowledge for review
-./knowledge-maintenance.sh --stale-review
+./scripts/knowledge.sh --search "auth"
 ```
 
-## Knowledge Organization
+## Memory Schemas
 
-### Patterns Structure
+### TODO.md - Task Tracking
 ```markdown
-# .ai/knowledge/patterns/auth.md
+- [ ] Implement JWT middleware
+  - **Status**: blocked
+  - **Blocked By**: Key rotation design needed
+  - **Dependencies**: none
 
+- [x] Add bcrypt password hashing (2024-01-15)
+  - **Outcome**: Implemented with salt rounds=12
+```
+
+### DECISIONS.log - Architectural Decisions
+```
+[2024-01-15 10:30] Use RS256 for JWT (not HS256)
+Rationale: Asymmetric keys enable better key rotation
+Alternatives: HS256 (simpler but less flexible)
+Impact: auth-service, api-gateway
+```
+
+### NOTES.md - Session Continuity
+```markdown
+## Session 2024-01-15
+
+**Context**: Implementing authentication system
+
+**Discoveries**:
+- bcrypt has performance issues >100 req/s
+- RS256 only 2ms slower than HS256 at p99
+
+**Blockers**:
+- Need to decide on refresh token storage
+
+**Next Actions**:
+- Benchmark argon2 as bcrypt alternative
+
+## Previously On...
+As of 2024-01-15, implementing JWT auth with RS256.
+Decided on RS256 for key rotation flexibility.
+Current focus: password hashing performance.
+Blocker: refresh token strategy needed.
+Next: complete auth middleware with <50ms p99.
+```
+
+### scratchpad.md - Working Memory
+```markdown
+## Current Exploration
+Investigating JWT verification failures (5% of requests)
+
+### Hypothesis
+Clock skew between auth server and gateway
+
+### Evidence
+- Failures only on api-gateway-2
+- Clock is 47 seconds behind
+- 60s tolerance → failures dropped to 0.1%
+
+### Next Steps
+- Enable NTP sync
+- Add clock drift monitoring
+
+[Clear after moving insights to NOTES.md]
+```
+
+## Available Scripts
+
+### session-resume.sh
+Resume work across sessions:
+```bash
+./scripts/session-resume.sh          # Quick summary
+./scripts/session-resume.sh --full   # All memory files
+./scripts/session-resume.sh --todos  # Just TODOs
+```
+
+### context-compact.sh
+Manage context size:
+```bash
+./scripts/context-compact.sh --status     # Check size
+./scripts/context-compact.sh --summarize  # Create recap
+```
+
+### knowledge.sh
+Capture and search patterns:
+```bash
+./scripts/knowledge.sh --init                    # Setup
+./scripts/knowledge.sh --success [OPTIONS]       # Capture success
+./scripts/knowledge.sh --failure [OPTIONS]       # Document failure
+./scripts/knowledge.sh --search "keyword"        # Find patterns
+```
+
+## Knowledge Patterns
+
+Successful patterns stored in `.ai/knowledge/patterns/`:
+
+```markdown
 ### JWT Auth (95% success)
-**Prompt**: "JWT with RS256, 15min access, 7day refresh in httpOnly cookie"
+**Prompt**: "JWT with RS256, 15min access, httpOnly cookie"
 **Context**: Node.js APIs
 **Gotcha**: AI defaults to insecure HS256 - always specify RS256
 **Last Used**: 2024-01-15
 **Success Rate**: 95% (19/20 attempts)
-
-### Password Hash (90% success)
-**Prompt**: "bcrypt with salt rounds=12, async/await, bcrypt.compare for validation"
-**Context**: Any Node.js backend
-**Gotcha**: AI uses deprecated hashSync - specify async
-**Last Used**: 2024-01-12
-**Success Rate**: 90% (18/20 attempts)
 ```
 
-### Failures Structure
-```markdown
-# .ai/knowledge/failures/auth.md
+Failed attempts in `.ai/knowledge/failures/`:
 
+```markdown
 ### ❌ "Make auth secure"
-**Problem**: Too vague → AI adds OAuth + sessions + JWT complexity
-**Time Wasted**: 2 hours debugging over-engineered solution
-**Better Approach**: "Implement JWT auth with RS256, 15min expiry, secure httpOnly cookies"
+**Problem**: Too vague → AI over-engineers
+**Time Wasted**: 2 hours
+**Better Approach**: "JWT with RS256, 15min expiry, httpOnly cookies"
 **Date**: 2024-01-10
-
-### ❌ "Add authentication"
-**Problem**: No constraints → 500 lines of unnecessary middleware
-**Time Wasted**: 45 minutes simplifying generated code
-**Better Approach**: "Simple JWT middleware: verify token, attach user to req, 401 on invalid"
-**Date**: 2024-01-08
 ```
 
-### Gotchas Structure
-```markdown
-# .ai/knowledge/gotchas/general.md
+## Workflow
 
-### AI Over-Engineering Tendency
-**Behavior**: AI adds complexity when constraints are missing
-**Fix**: Always specify exact requirements and limitations
-**Examples**: "Simple X, not enterprise-grade" or "Maximum 50 lines"
+### Starting a Session
+1. Run `./scripts/session-resume.sh` to load context
+2. Check TODO.md for current tasks
+3. Review NOTES.md "Previously on..." section
+4. Use scratchpad.md for active exploration
 
-### Default to Insecure Patterns
-**Behavior**: AI chooses convenient over secure (HS256 vs RS256)
-**Fix**: Explicitly specify security requirements
-**Examples**: "Use RS256", "async/await not sync", "parameterized queries"
+### During Development
+1. Track tasks in TODO.md
+2. Record decisions in DECISIONS.log
+3. Note discoveries in scratchpad.md
+4. Capture successful prompts with `knowledge.sh --success`
+
+### Ending a Session
+1. Move scratchpad insights to NOTES.md
+2. Update TODO.md with progress
+3. Check context size with `context-compact.sh --status`
+4. If context is large, create recap with `--summarize`
+
+### When Context is Full
+1. Create "Previously on..." recap in NOTES.md
+2. Archive old session notes (>30 days)
+3. Consolidate TODO.md completed items
+4. Clear scratchpad.md after extracting insights
+
+## Best Practices
+
+### DO
+- ✅ Write session notes immediately after work
+- ✅ Capture high-success patterns (>80%)
+- ✅ Document failures that wasted >30 minutes
+- ✅ Update TODO.md status in real-time
+- ✅ Create recaps when context exceeds 8000 tokens
+
+### DON'T
+- ❌ Don't duplicate info across memory files
+- ❌ Don't let scratchpad accumulate indefinitely
+- ❌ Don't capture obvious or one-off patterns
+- ❌ Don't let NOTES.md grow beyond 500 lines
+
+## Claude Code Hooks
+
+Automate context management with hooks. See [hooks/README.md](hooks/README.md) for details.
+
+**Available Hooks:**
+- **SessionStart** - Auto-load context when starting Claude Code
+- **SessionEnd** - Auto-save session state when ending
+- **PostToolUse** - Remind to capture successful patterns
+- **PreCompact** - Suggest recap before context compaction
+
+**Setup:**
+```bash
+./hooks/setup-hooks.sh
+# Then approve hooks with /hooks in Claude Code
 ```
 
 ## Advanced Features
 
-### Success Rate Tracking
-```bash
-# Update success rate after using a pattern
-./knowledge-capture.sh --update-success \
-  --domain "auth" \
-  --pattern "JWT Auth" \
-  --result "success"  # or "failure"
+For enterprise features, see [ADVANCED.md](ADVANCED.md):
+- Success rate tracking and trends
+- Knowledge versioning and team sharing
+- CI/CD integration
+- IDE integration
+- Anti-pattern detection
+- Multi-project context sync
 
-# View success rate trends
-./knowledge-maintenance.sh --success-trends
+## Files in this Implementation
+
+```
+examples/ai-context-persistence/
+├── README.md              # This file
+├── ADVANCED.md           # Advanced features
+├── templates/            # Memory schema templates
+│   ├── TODO.md
+│   ├── DECISIONS.log
+│   ├── decisions.json
+│   ├── NOTES.md
+│   └── scratchpad.md
+├── scripts/              # Context management scripts
+│   ├── session-resume.sh
+│   ├── context-compact.sh
+│   └── knowledge.sh
+├── hooks/                # Claude Code hooks (NEW)
+│   ├── README.md
+│   ├── setup-hooks.sh
+│   ├── session-resume.sh
+│   ├── session-end.sh
+│   ├── post-edit-reminder.sh
+│   ├── pre-compact.sh
+│   └── settings.json
+└── examples/             # Working examples
+    └── .ai/
+        ├── memory/       # Example memory files
+        └── knowledge/    # Example pattern library
 ```
 
-### Knowledge Versioning
-```bash
-# Create versioned knowledge backup
-./knowledge-maintenance.sh --backup --version "v1.2"
+## Security
 
-# Compare knowledge versions
-./knowledge-maintenance.sh --diff "v1.1" "v1.2"
-```
-
-### Team Knowledge Sharing
-```bash
-# Export knowledge for team sharing
-./knowledge-maintenance.sh --export --format json > team-knowledge.json
-
-# Import knowledge from team member
-./knowledge-maintenance.sh --import team-knowledge.json
-```
-
-## Templates and Examples
-
-### Pattern Template
-```markdown
-### [Pattern Name] ([Success Rate]% success)
-**Prompt**: "[Exact prompt that works]"
-**Context**: [When to use this pattern]
-**Gotcha**: [Common AI behavior to watch out for]
-**Last Used**: [Date]
-**Success Rate**: [Percentage] ([successful attempts]/[total attempts])
-**Notes**: [Additional context or variations]
-```
-
-### Failure Template
-```markdown
-### ❌ "[Failed prompt or approach]"
-**Problem**: [What went wrong and why]
-**Time Wasted**: [How much time was lost]
-**Better Approach**: "[Improved prompt or strategy]"
-**Date**: [When this failure occurred]
-**Root Cause**: [Why this approach failed]
-```
-
-## Integration Examples
-
-### Pre-commit Hook
-```bash
-# .git/hooks/pre-commit
-#!/bin/bash
-# Remind to capture knowledge for significant changes
-
-if [[ $(git diff --cached --name-only | wc -l) -gt 5 ]]; then
-    echo "Large changeset detected. Consider capturing knowledge:"
-    echo "  ./knowledge-capture.sh --success --domain [domain] --pattern [pattern]"
-fi
-```
-
-### IDE Integration
-```bash
-# VS Code snippet for quick knowledge capture
-# Add to .vscode/snippets/knowledge.json
-{
-  "capture-success": {
-    "prefix": "kc-success",
-    "body": [
-      "./knowledge-capture.sh --success \\",
-      "  --domain \"$1\" \\",
-      "  --pattern \"$2\" \\", 
-      "  --prompt \"$3\" \\",
-      "  --success-rate \"$4%\""
-    ]
-  }
-}
-```
-
-### CI/CD Knowledge Updates
-```yaml
-# .github/workflows/knowledge-maintenance.yml
-name: Knowledge Maintenance
-on:
-  schedule:
-    - cron: '0 0 * * 0'  # Weekly
-jobs:
-  maintain:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Review Stale Knowledge
-        run: ./knowledge-maintenance.sh --stale-review --auto-cleanup
-      - name: Generate Knowledge Report
-        run: ./knowledge-maintenance.sh --report > knowledge-report.md
-```
-
-## Maintenance and Best Practices
-
-### Regular Maintenance Tasks
-```bash
-# Weekly maintenance routine
-./knowledge-maintenance.sh --weekly-maintenance
-
-# This performs:
-# - Identify stale knowledge (>90 days unused)
-# - Update success rates based on recent usage
-# - Consolidate similar patterns
-# - Generate usage statistics
-```
-
-### Knowledge Quality Guidelines
-
-#### High-Impact Knowledge (Capture These)
-- Patterns with >80% success rate
-- Failures that wasted >30 minutes
-- Gotchas that were non-obvious
-- Domain-specific prompt formulations
-
-#### Low-Impact Knowledge (Avoid These)
-- Obvious or well-documented patterns
-- Single-use, context-specific solutions
-- Exhaustive documentation that won't be referenced
-- Patterns with <50% success rate (unless educational)
-
-### Anti-Pattern Prevention
-```bash
-# Detect knowledge hoarding patterns
-./knowledge-maintenance.sh --anti-pattern-check
-
-# Reports:
-# - Unused knowledge files (>3 months)
-# - Overly detailed entries (>200 words)
-# - Low-success patterns (<60%)
-# - Duplicate or overlapping entries
-```
-
-## Troubleshooting
-
-### Common Issues
-- **Knowledge Not Used**: Check if entries are too detailed or too generic
-- **Outdated Patterns**: Run regular maintenance to identify stale knowledge
-- **Low Success Rates**: Review and improve prompt formulations
-- **Knowledge Silos**: Ensure team sharing and regular export/import
-
-### Debug Commands
-```bash
-# Find unused knowledge
-find .ai/knowledge -name "*.md" -mtime +90
-
-# Check knowledge access patterns
-./knowledge-maintenance.sh --usage-stats
-
-# Validate knowledge format
-./knowledge-maintenance.sh --validate-format
-```
-
-## Contributing
-
-When adding knowledge patterns:
-1. Use consistent templates and formatting
-2. Include realistic success rates and usage context
-3. Focus on actionable, reusable patterns
-4. Document failures that wasted significant time
-5. Regular review and pruning of knowledge base
-
-## Security Considerations
-
-⚠️ **Important Security Notes**
+⚠️ **Important**:
 - Never capture sensitive data in knowledge files
-- Review knowledge entries before committing to version control
-- Use generic examples rather than real credentials or secrets
-- Regular audit of knowledge content for data leaks
+- Review entries before committing to version control
+- Use generic examples rather than real credentials
+- Regularly audit knowledge content for data leaks
