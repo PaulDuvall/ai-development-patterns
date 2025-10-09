@@ -335,6 +335,12 @@ project/
     └── rules.md
 ```
 
+**Complete Example**: See [examples/rules-as-code/](examples/rules-as-code/) for:
+- Comprehensive development workflow rules and standards
+- Pipeline automation and CI/CD rules
+- Code quality standards and enforcement guidelines
+- Claude Code configuration for rules-as-code implementation
+
 **Anti-pattern: Context Drift**
 Each developer maintains their own prompts and preferences, leading to inconsistent code across the team.
 
