@@ -32,6 +32,7 @@ These experimental patterns extend the core AI development patterns with advance
 | **[Compliance Evidence Automation](#compliance-evidence-automation)** | Advanced | Operations | Generate audit evidence matrices from logs and configuration changes automatically | Security Scanning Orchestration |
 | **[Context Window Optimization](#context-window-optimization)** | Advanced | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive AI Enhancement |
 | **[Visual Context Scaffolding](#visual-context-scaffolding)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Specification Driven Development, Progressive AI Enhancement, Context Window Optimization |
+| **[AI Event Automation](#ai-event-automation)** | Intermediate | Development | Execute custom commands automatically at specific lifecycle events in AI coding assistants to enforce policies and automate workflows | Rules as Code, AI Security Sandbox |
 
 ---
 
@@ -465,6 +466,112 @@ Mock data structure should follow data-model.png."
 2. Focus on User Service first
 3. I'll provide UI mockups after core services work"
 ```
+
+---
+
+### AI Event Automation
+
+**Maturity**: Intermediate
+**Description**: Execute custom commands automatically at specific lifecycle events (before/after file operations, session start, prompt submission) to enforce security policies and automate workflows.
+
+**Related Patterns**: [Rules as Code](../README.md#rules-as-code), [AI Security Sandbox](../README.md#ai-security-sandbox)
+
+**Core Concept**
+
+Attach shell commands to AI assistant lifecycle events. Commands receive context via environment variables (file paths, tool names, user prompts) and return exit codes: `0` (allow), `2` (block), or other (warn).
+
+**Event Flow**
+
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant AI as AI Assistant
+    participant Pre as PreToolUse Hook
+    participant Post as PostToolUse Hook
+
+    Dev->>AI: Edit .env file
+    AI->>Pre: Run security-hook.sh
+    Pre->>Pre: Check if file is sensitive
+    Pre-->>AI: Exit 2 (BLOCK)
+    AI->>Dev: ❌ Blocked: Cannot edit sensitive file
+
+    Dev->>AI: Edit src/api.js
+    AI->>Pre: Run security-hook.sh
+    Pre->>Pre: Check if file is sensitive
+    Pre-->>AI: Exit 0 (Allow)
+    AI->>AI: Execute file edit
+    AI->>Post: Run security-hook.sh
+    Post->>Post: Scan for secrets with gitleaks
+    alt Secret Found
+        Post-->>AI: Exit 1 (Warning)
+        AI->>Dev: ⚠️ Secret detected! Review before committing
+    else No Secret
+        Post-->>AI: Exit 0 (Success)
+        AI->>Dev: ✅ Edit complete
+    end
+```
+
+**Simple Security Example**
+
+Prevent editing sensitive files and scan for secrets:
+
+```bash
+#!/bin/bash
+# security-hook.sh
+
+FILE="$TOOL_INPUT_FILE_PATH"
+
+# Block .env and credentials files
+if echo "$FILE" | grep -E "(\.env|secrets\.json|credentials)" > /dev/null; then
+  echo "❌ Blocked: Cannot edit sensitive file"
+  exit 2
+fi
+
+# Scan for hardcoded secrets (requires gitleaks)
+if command -v gitleaks > /dev/null; then
+  if gitleaks detect --no-git --source="$FILE" 2>&1 | grep -q "leaks found"; then
+    echo "⚠️ Secret detected! Review before committing."
+    exit 1
+  fi
+fi
+
+exit 0
+```
+
+**Configuration Example (Claude Code)**
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Edit",
+      "hooks": [{"type": "command", "command": "./security-hook.sh"}]
+    }],
+    "PostToolUse": [{
+      "matcher": "Edit",
+      "hooks": [{"type": "command", "command": "./security-hook.sh"}]
+    }]
+  }
+}
+```
+
+**Common Use Cases**
+- Auto-format code after edits (`prettier`, `black`, `gofmt`)
+- Block sensitive file modifications
+- Log AI interactions for compliance
+- Run linters before commits
+
+**Security Warning**
+
+Event commands run with full system access. Always review scripts before enabling. Test in isolated environments first.
+
+**Complete Example**
+
+See [examples/ai-event-automation/](examples/ai-event-automation/) for working implementation with security scanning and slash command integration.
+
+**Anti-pattern: Unchecked Event Commands**
+
+Running automation from untrusted sources without review exposes your system to malicious code execution and credential theft. Always audit event scripts before installation.
 
 ---
 
