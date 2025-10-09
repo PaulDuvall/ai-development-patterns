@@ -472,7 +472,7 @@ Mock data structure should follow data-model.png."
 ### AI Event Automation
 
 **Maturity**: Intermediate
-**Description**: Execute custom commands automatically at specific lifecycle events (before/after file operations, session start, prompt submission) to enforce security policies and automate workflows.
+**Description**: Execute custom commands automatically at specific lifecycle events (before/after file operations, session start, prompt submission) for workflow automation, validation, and policy enforcement.
 
 **Related Patterns**: [Rules as Code](../README.md#rules-as-code), [AI Security Sandbox](../README.md#ai-security-sandbox)
 
@@ -480,7 +480,7 @@ Mock data structure should follow data-model.png."
 
 Attach shell commands to AI assistant lifecycle events. Commands receive context via environment variables (file paths, tool names, user prompts) and return exit codes: `0` (allow), `2` (block), or other (warn).
 
-**Event Flow**
+**Event Flow Example**
 
 ```mermaid
 sequenceDiagram
