@@ -927,6 +927,8 @@ Building authentication progressively:
 → Deploy
 ```
 
+**Developer Review Required**: Each iteration requires developer review and testing of AI-generated code before deployment.
+
 **When to Use [Progressive AI Enhancement](#progressive-ai-enhancement)**
 
 - **MVP Development**: When you need to get to market quickly with minimal features
