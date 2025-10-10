@@ -5,8 +5,14 @@ Multi-layer security analysis beyond simple scanning.
 ## Command Definition
 
 ```markdown
-# .claude/commands/security-review.md
-Comprehensive security analysis of recent changes.
+---
+description: Comprehensive security analysis with multi-layer vulnerability detection
+argument-hint: Optional flags (--full, --secrets, --deps, --config)
+---
+
+# Security Review
+
+You are helping a developer identify security vulnerabilities in code changes. Perform multi-layer security analysis covering secrets, dependencies, authentication, input validation, and configuration security.
 
 ## Implementation
 

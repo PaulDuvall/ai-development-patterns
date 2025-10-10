@@ -5,8 +5,14 @@ Combine built-in commands with custom logic for safe refactoring.
 ## Command Definition
 
 ```markdown
-# .claude/commands/safe-refactor.md
-Safe refactoring with automated review.
+---
+description: Safe refactoring with automated review, testing, and rollback capabilities
+argument-hint: Optional flags (--auto for automated mode)
+---
+
+# Safe Refactor
+
+You are helping a developer perform safe refactoring with comprehensive safety checks. Combine built-in review commands with custom safety workflows.
 
 ## Process
 1. Run /review to analyze current code state

@@ -5,8 +5,14 @@ Link implementation directly to specifications with traceability.
 ## Command Definition
 
 ```markdown
-# .claude/commands/implement-spec.md
-Implement specification with full traceability.
+---
+description: Implement specification with full traceability and test-driven development
+argument-hint: Specification ID (e.g., AUTH-001)
+---
+
+# Implement Specification
+
+You are helping a developer implement a specification using test-driven development with full traceability from requirements to code.
 
 ## Usage
 /implement-spec AUTH-001

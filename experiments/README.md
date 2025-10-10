@@ -613,8 +613,14 @@ Cmd+K /edit /chat
 Encode Martin Fowler's refactoring catalog for systematic code improvement:
 
 ```markdown
-# .claude/commands/refactor.md
-Interactive refactoring assistant based on Martin Fowler's refactoring catalog.
+---
+description: Interactive refactoring assistant based on Martin Fowler's refactoring catalog
+argument-hint: Optional flags (--smell, --duplicates, --suggest)
+---
+
+# Refactoring Assistant
+
+You are helping a developer improve code maintainability by identifying code smells and recommending specific refactoring techniques from Martin Fowler's catalog.
 
 ## Usage
 /refactor              # Full analysis

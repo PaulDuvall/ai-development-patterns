@@ -1,6 +1,11 @@
+---
+description: Comprehensive security analysis with multi-layer vulnerability detection
+argument-hint: Optional flags (--full, --secrets, --deps, --config)
+---
+
 # Security Review
 
-Comprehensive security analysis of recent changes with multi-layer vulnerability detection.
+You are helping a developer identify security vulnerabilities in code changes. Perform multi-layer security analysis covering secrets, dependencies, authentication, input validation, and configuration security. Provide actionable remediation with specific code examples.
 
 ## Usage
 
@@ -8,6 +13,8 @@ Comprehensive security analysis of recent changes with multi-layer vulnerability
 /security-review              # Review recent changes
 /security-review --full       # Full codebase scan
 /security-review --secrets    # Focus on secret detection
+/security-review --deps       # Focus on dependencies
+/security-review --config     # Focus on configuration
 ```
 
 ## Implementation
@@ -140,10 +147,21 @@ Leverage these tools when available:
 - `bandit` (Python) / `gosec` (Go) - Static security analysis
 - `eslint-plugin-security` - JavaScript security patterns
 
-## Argument Support
+## Argument Handling
+
+Parse $ARGUMENTS to determine scan scope:
 
 - `--full`: Scan entire codebase (not just recent changes)
 - `--secrets`: Focus only on secret detection
 - `--deps`: Focus only on dependency vulnerabilities
 - `--config`: Focus only on configuration security
-- No arguments: Comprehensive review of recent changes
+- No arguments: Comprehensive review of recent changes (git diff)
+
+## Core Principles
+
+- Prioritize CRITICAL and HIGH severity issues
+- Provide specific, actionable remediation with code examples
+- Reference OWASP Top 10 and CWE categories
+- Include attack scenarios to demonstrate real-world impact
+- Leverage external tools (gitleaks, npm audit) when available
+- Balance thoroughness with actionability

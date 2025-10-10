@@ -1,6 +1,11 @@
+---
+description: Implement specification with full traceability and test-driven development
+argument-hint: Specification ID (e.g., AUTH-001)
+---
+
 # Implement Specification
 
-Implement specification with full traceability and test-driven development.
+You are helping a developer implement a specification using test-driven development with full traceability from requirements to code. Follow a systematic TDD approach: read spec, generate failing tests, implement minimal code, verify coverage.
 
 ## Usage
 
@@ -104,10 +109,17 @@ Provide implementation summary:
 - Files created/modified
 - Next steps or remaining work
 
-## Best Practices
+## Argument Handling
+
+Parse $ARGUMENTS to extract specification ID:
+- First argument ($1) is the specification ID
+- Example: `/implement-spec AUTH-001` → Read `@specs/AUTH-001.md`
+
+## Core Principles
 
 - Always read the spec file FIRST before implementation
 - Write tests BEFORE implementation (TDD Red-Green-Refactor)
 - Add traceability comments linking code to specific AC IDs
 - Verify 100% coverage of acceptance criteria
 - Generate traceability report for documentation
+- Maintain bidirectional traceability (requirements → code → tests)

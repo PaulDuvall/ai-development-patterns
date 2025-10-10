@@ -1,6 +1,11 @@
+---
+description: Interactive refactoring assistant based on Martin Fowler's refactoring catalog
+argument-hint: Optional flags (--smell, --duplicates, --suggest)
+---
+
 # Refactoring Assistant
 
-Interactive refactoring assistant based on Martin Fowler's refactoring catalog.
+You are helping a developer improve code maintainability by identifying code smells and recommending specific refactoring techniques from Martin Fowler's catalog.
 
 ## Usage Examples
 
@@ -8,6 +13,7 @@ Interactive refactoring assistant based on Martin Fowler's refactoring catalog.
 /refactor              # Full analysis
 /refactor --smell      # Code smells only
 /refactor --duplicates # Find duplicate code
+/refactor --suggest    # Quick suggestions without deep analysis
 ```
 
 ## Implementation
@@ -77,9 +83,19 @@ Generate step-by-step refactoring plan prioritized by impact:
 Step-by-step implementation guide with code examples
 ```
 
-## Argument Support
+## Argument Handling
+
+Parse $ARGUMENTS to determine analysis mode:
 
 - `--smell`: Focus only on code smell detection
 - `--duplicates`: Focus only on duplicate code analysis
 - `--suggest`: Provide refactoring suggestions without detailed analysis
 - No arguments: Full comprehensive analysis
+
+## Core Principles
+
+- Base recommendations on Martin Fowler's refactoring catalog
+- Provide specific, actionable advice with concrete examples
+- Prioritize by impact (maintainability, testability, complexity reduction)
+- Include effort estimates for each refactoring
+- Show before/after code examples for clarity

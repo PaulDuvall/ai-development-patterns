@@ -1,6 +1,11 @@
+---
+description: Smart test runner with filtering, coverage, and health monitoring
+argument-hint: Test target and optional flags (backend, frontend, --coverage, --watch)
+---
+
 # Test Suite Runner
 
-Run test suite with parameters, smart filtering, and comprehensive reporting.
+You are helping a developer run tests with smart filtering, comprehensive reporting, and test suite health monitoring. Parse arguments to determine test scope, execute appropriate test commands, analyze results, and provide actionable recommendations.
 
 ## Usage
 
@@ -200,7 +205,15 @@ rspec spec/$ARGUMENTS
 rspec spec/$ARGUMENTS --format documentation
 ```
 
-## Best Practices
+## Argument Handling
+
+Parse $ARGUMENTS to extract test target and flags:
+
+- First positional argument: Test target (backend, frontend, integration, etc.)
+- Remaining arguments: Flags (--watch, --coverage, --verbose, --bail)
+- If no arguments: Use smart test selection based on recent git changes
+
+## Core Principles
 
 - Always provide test summary with pass/fail counts
 - Show failed test details with file locations
@@ -209,3 +222,4 @@ rspec spec/$ARGUMENTS --format documentation
 - Recommend coverage improvements for low-coverage files
 - Detect and report flaky tests
 - Provide clear next steps based on results
+- Use smart test selection when no target specified

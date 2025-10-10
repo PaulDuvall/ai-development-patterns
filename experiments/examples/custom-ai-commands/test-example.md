@@ -5,8 +5,14 @@ Parameterized test runner with smart filtering and comprehensive reporting.
 ## Command Definition
 
 ```markdown
-# .claude/commands/test.md
-Run test suite with parameters.
+---
+description: Smart test runner with filtering, coverage, and health monitoring
+argument-hint: Test target and optional flags (backend, frontend, --coverage, --watch)
+---
+
+# Test Suite Runner
+
+You are helping a developer run tests with smart filtering, comprehensive reporting, and test suite health monitoring.
 
 ## Usage
 /test backend        # Run backend tests

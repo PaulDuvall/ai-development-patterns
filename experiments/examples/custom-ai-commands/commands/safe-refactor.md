@@ -1,11 +1,16 @@
+---
+description: Safe refactoring with automated review, testing, and rollback capabilities
+argument-hint: Optional flags (--auto for automated mode)
+---
+
 # Safe Refactor
 
-Safe refactoring with automated review, testing, and rollback capabilities.
+You are helping a developer perform safe refactoring with comprehensive safety checks. Combine built-in review commands with custom safety workflows: baseline analysis, isolated branching, full test execution, performance comparison, and automated quality gates.
 
 ## Usage
 
 ```bash
-/safe-refactor                    # Interactive refactoring
+/safe-refactor                    # Interactive refactoring with safety checks
 /safe-refactor --auto             # Automatic refactoring with approval gates
 ```
 
@@ -170,7 +175,14 @@ Automatic approval if ALL conditions met:
 
 Manual review required if ANY condition fails.
 
-## Best Practices
+## Argument Handling
+
+Parse $ARGUMENTS to determine refactoring mode:
+
+- `--auto`: Automatic mode with approval gates (proceed if all safety gates pass)
+- No arguments: Interactive mode (ask for user approval at each step)
+
+## Core Principles
 
 - Always create a safety branch
 - Never modify existing test behavior without justification
@@ -179,3 +191,4 @@ Manual review required if ANY condition fails.
 - Document all refactoring patterns applied
 - Keep refactoring PRs focused (single responsibility)
 - Have clear rollback plan before starting
+- Use built-in `/review` command for baseline analysis
