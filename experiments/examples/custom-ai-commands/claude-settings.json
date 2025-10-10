@@ -1,0 +1,6 @@
+{
+  "commandDirectories": [
+    ".claude/commands",
+    ".ai/commands"
+  ]
+}

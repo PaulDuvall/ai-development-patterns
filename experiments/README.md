@@ -33,6 +33,7 @@ These experimental patterns extend the core AI development patterns with advance
 | **[Context Window Optimization](#context-window-optimization)** | Advanced | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive AI Enhancement |
 | **[Visual Context Scaffolding](#visual-context-scaffolding)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Specification Driven Development, Progressive AI Enhancement, Context Window Optimization |
 | **[AI Event Automation](#ai-event-automation)** | Intermediate | Development | Execute custom commands automatically at specific lifecycle events in AI coding assistants to enforce policies and automate workflows | Rules as Code, AI Security Sandbox |
+| **[Custom AI Commands](#custom-ai-commands)** | Intermediate | Development | Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and project-specific workflows | AI Event Automation, Specification Driven Development |
 
 ---
 
@@ -572,6 +573,262 @@ See [examples/ai-event-automation/](examples/ai-event-automation/) for working i
 **Anti-pattern: Unchecked Event Commands**
 
 Running automation from untrusted sources without review exposes your system to malicious code execution and credential theft. Always audit event scripts before installation.
+
+---
+
+### Custom AI Commands
+
+**Maturity**: Intermediate
+**Description**: Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise, project standards, and sophisticated workflows.
+
+**Related Patterns**: [AI Event Automation](#ai-event-automation), [Specification Driven Development](../README.md#specification-driven-development), [Rules as Code](../README.md#rules-as-code)
+
+**Core Concept**
+
+AI coding tools provide built-in commands for common operations and support custom commands (markdown files containing AI instructions) for project-specific workflows. Custom commands encode domain expertise and team conventions beyond simple shell wrappers.
+
+**Distinction from AI Event Automation**: Commands are manual/on-demand (invoked explicitly like `/refactor`), while events fire automatically (e.g., PostToolUse hook after file edits).
+
+**Command Discovery**
+
+Start by discovering built-in commands before creating custom ones:
+
+**Claude Code**
+```bash
+/help              # Show all available commands
+/model             # Switch AI model
+/clear             # Clear conversation
+/review            # Review code changes
+```
+
+**Cursor IDE**
+```bash
+Cmd+K              # Show command palette
+/edit              # Edit selected code
+/chat              # Start chat mode
+```
+
+**Gemini CLI**
+```bash
+/stats             # Show session statistics
+/memory show       # Display conversation memory
+/compress          # Compress conversation history
+/clear             # Clear conversation
+/tools             # Manage available tools
+/chat save         # Save conversation
+/chat resume       # Resume saved conversation
+```
+
+**When to Use Built-in vs Custom**
+
+| Use Built-in Commands | Create Custom Commands |
+|-----------------------|------------------------|
+| Generic operations (clear, help, model switch) | Domain expertise (refactoring patterns, security analysis) |
+| Tool features (review code, edit) | Project workflows (deploy, release, implement-spec) |
+| Universal commands | Team standards and conventions |
+
+**Example: Refactoring Assistant**
+
+Encode Martin Fowler's refactoring catalog for systematic code improvement:
+
+```markdown
+# .claude/commands/refactor.md
+Interactive refactoring assistant based on Martin Fowler's refactoring catalog.
+
+## Usage Examples
+/refactor              # Full analysis
+/refactor --smell      # Code smells only
+/refactor --duplicates # Find duplicate code
+
+## Implementation
+
+### 1. Code Smell Detection
+Analyze codebase for maintainability issues:
+- Long methods (>20 lines)
+- Duplicate code blocks
+- Complex conditionals (cyclomatic complexity >10)
+- Large classes (>250 lines)
+
+For each smell found:
+- Identify exact location (file:line)
+- Assess severity (CRITICAL/HIGH/MEDIUM/LOW)
+- Suggest specific refactoring from Fowler's catalog
+- Estimate effort and risk
+
+### 2. Bloater Detection
+Find oversized code structures:
+- Methods with excessive parameters (>4)
+- Data clumps (same variables passed together)
+- Primitive obsession (overuse of primitives vs objects)
+
+### 3. Refactoring Strategy
+For each issue:
+1. Name the code smell
+2. Recommend specific refactoring technique
+3. Show before/after example
+4. Estimate maintainability improvement
+
+Generate step-by-step refactoring plan prioritized by impact.
+```
+
+**Example: Implement-Spec**
+
+Link implementation directly to specifications with traceability:
+
+```markdown
+# .claude/commands/implement-spec.md
+Implement specification with full traceability.
+
+## Usage
+/implement-spec AUTH-001
+
+## Process
+1. Read specification file: @specs/$1.md
+2. Extract acceptance criteria from spec
+3. Generate failing tests for each criterion
+4. Implement minimal code to pass tests
+5. Add traceability comments: // Implements: specs/$1.md#AC-001
+6. Run tests to verify 100% spec coverage
+7. Generate traceability report linking code to requirements
+```
+
+**Example: Security Review**
+
+Multi-layer security analysis beyond simple scanning:
+
+```markdown
+# .claude/commands/security-review.md
+Comprehensive security analysis of recent changes.
+
+## Implementation
+
+### Secret Detection
+- Scan for hardcoded API keys, passwords, tokens
+- Check environment variable usage patterns
+- Identify credential files (.env, secrets.json)
+
+### Vulnerability Analysis
+- Check dependencies against CVE databases
+- Analyze authentication/authorization logic
+- Review input validation and sanitization
+
+### Configuration Security
+- Verify HTTPS enforcement
+- Check CORS policies and headers
+- Review security headers (CSP, HSTS)
+
+For each issue found:
+- Severity: CRITICAL/HIGH/MEDIUM/LOW
+- Location: file:line
+- Risk explanation with examples
+- Specific remediation with code example
+```
+
+**Example: Safe-Refactor**
+
+Combine built-in commands with custom logic:
+
+```markdown
+# .claude/commands/safe-refactor.md
+Safe refactoring with automated review.
+
+## Process
+1. Run /review to analyze current code state
+2. Create git branch: refactor-$TIMESTAMP
+3. Perform refactoring changes
+4. Run existing test suite
+5. Generate new tests for refactored code
+6. Compare performance before/after
+7. Create PR with refactoring summary
+```
+
+**Parameterized Commands**
+
+Commands support argument substitution:
+
+```markdown
+# .claude/commands/test.md
+Run test suite with parameters.
+
+## Usage
+/test backend        # Run backend tests
+/test frontend --watch  # Watch mode
+
+## Implementation
+Run tests: $ARGUMENTS
+If no arguments: run full test suite
+Parse flags: --watch, --coverage, --verbose
+```
+
+**Common Use Cases**
+- **Domain expertise**: Encode architectural patterns, refactoring catalogs, design principles
+- **Project workflows**: Deployment procedures, release checklists, incident response
+- **Team standards**: Code review guidelines, commit message formats, documentation templates
+- **Sophisticated analysis**: Security reviews, performance profiling, dependency audits
+
+**Tool-Agnostic Command Structure**
+
+Generic location for cross-tool compatibility:
+
+```bash
+.ai/commands/          # Generic location
+├── README.md          # Command catalog
+├── refactor.md
+├── implement-spec.md
+├── security-review.md
+└── test.md
+```
+
+**Tool Support**:
+- **Claude Code**: `.claude/commands/*.md` - Full custom command support
+- **Cursor IDE**: Custom prompts in `.cursorrules`
+- **Gemini CLI**: Custom commands in IDE mode, CLI enhancement planned (`.gemini/commands/`)
+
+**Complete Implementation**
+
+See [examples/custom-ai-commands/](examples/custom-ai-commands/) for:
+- Ready-to-use command examples (refactor, implement-spec, security-review)
+- Configuration files (claude-settings.json)
+- Setup guide and command catalog
+
+**Anti-pattern: Ignoring Built-in Commands**
+
+Creating custom commands that duplicate built-in functionality (e.g., creating `/clear` when the tool already provides it). Always discover and use built-in commands first.
+
+**Anti-pattern: Shallow Commands**
+
+Wrapping simple shell commands without adding AI value:
+
+```markdown
+# Bad: Just wraps a shell command
+# .claude/commands/deploy-staging.md
+Run: npm run deploy:staging
+```
+
+Instead, encode expertise:
+
+```markdown
+# Good: Adds safety checks and expertise
+# .claude/commands/deploy-staging.md
+1. Verify staging environment health
+2. Check for active incidents
+3. Review recent commits for risk
+4. Run deployment with rollback plan
+5. Monitor key metrics for 5 minutes
+6. Generate deployment report
+```
+
+**Anti-pattern: Hardcoded Context**
+
+Embedding environment-specific values instead of using parameters:
+
+```markdown
+# Bad: Hardcoded database
+Deploy to prod-db-instance-1.us-east-1.rds.amazonaws.com
+
+# Good: Parameterized
+Deploy to database: $1 (default: $STAGING_DB)
+```
 
 ---
 
