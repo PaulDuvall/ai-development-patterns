@@ -164,6 +164,30 @@ Per DELIVERY_RULES.md requirements:
 
 ---
 
+## Progress Tracking
+
+Maintain PROGRESS.md file throughout development:
+
+**After each task completion:**
+1. Update task status from "Current" to "Completed"
+2. Record commit hash and actual time spent
+3. Update code metrics (SLOC, coverage, complexity)
+4. Set next task as "Current Task"
+5. Update progress percentages
+6. Commit PROGRESS.md with the task code
+
+**File location:** `/PROGRESS.md` (project root)
+
+**Update frequency:** After every completed task, before git commit
+
+**Purpose:**
+- Enables context reconstruction in new sessions
+- Provides stakeholder visibility
+- Tracks estimates vs actuals
+- Documents quality metrics over time
+
+---
+
 ## File Structure Requirements
 
 ```
