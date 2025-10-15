@@ -1,642 +1,1312 @@
-# DEVELOPMENT_RULES - Test-First Specification-Driven Development
+# DEVELOPMENT_RULES - Automated Test-Driven Development
 
-**IMPORTANT: Review these rules before EVERY code change. These are non-negotiable requirements.**
+## 30-SECOND VERSION
 
-## CORE MANDATE
-
-1. **NEVER write implementation code before tests**
-2. **ALWAYS run tests locally before committing**  
-3. **ONLY push code when all tests pass locally**
-4. **CI must validate all tests before merge**
-5. **Every specification needs corresponding tests**
-6. **Tasks must be atomic and independently testable**
+1. **Spec → Test → Code → Automate** (in that order, always)
+2. **No manual commands twice** - Script it, then GitHub Action it
+3. **Tests pass locally before push** - Pre-commit hook enforces
+4. **Everything traces:** Spec ID → Test → Code → Automation
+5. **Tasks ≤ 3 hours** - Break larger work into atomic pieces
 
 ---
 
-## WORKFLOW REQUIREMENTS
+## 5-MINUTE CORE WORKFLOW
 
-### For Every New Feature or Change:
+### New Feature?
+```bash
+# 1. Spec (2 min)
+echo "FEAT-001: Login returns 200 for valid creds" > specs/FEAT-001-auth.md
 
-#### 1. CHECK SPECIFICATION EXISTS
+# 2. Test (5 min)
+cat > tests/test_auth.py << 'EOF'
+def test_valid_login():
+    """Implements: specs/FEAT-001-auth.md#AC-001"""
+    assert login("user", "pass").status == 200
+EOF
+pytest tests/test_auth.py  # Should FAIL
+
+# 3. Code (10 min)
+cat > src/auth.py << 'EOF'
+def login(user, pw):
+    """Implements: FEAT-001#AC-001"""
+    return Response(200) if valid(user, pw) else Response(401)
+EOF
+pytest tests/test_auth.py  # Should PASS
+
+# 4. Automate (already done - see .github/workflows/test-and-deploy.yml)
+git commit -m "feat(FEAT-001): add login" && git push
 ```
-IF no specification exists for this change:
-   STOP - Create specification first in specs/ directory
-   Include acceptance criteria and test scenarios
-   Add unique identifiers for traceability
-ELSE:
-   PROCEED to step 2
+
+### Repeating Command?
+```bash
+# 1. Script it
+echo '#!/bin/bash\npsql -c "DELETE FROM logs WHERE age > 90"' > scripts/cleanup-logs.sh
+chmod +x scripts/cleanup-logs.sh
+
+# 2. Automate it
+cat > .github/workflows/cleanup-logs.yml << 'EOF'
+on:
+  schedule: [cron: '0 2 * * 0']
+jobs:
+  cleanup: {runs-on: ubuntu-latest, steps: [{run: ./scripts/cleanup-logs.sh}]}
+EOF
 ```
 
-**SPECIFICATION REQUIREMENTS:**
+---
+
+## COMPREHENSIVE DECISION TREE
+
+```
+USER REQUEST
+│
+├─ NEW FEATURE/CHANGE
+│  │
+│  ├─ Has spec? NO → Create specs/FEAT-XXX.md ━━━━━━━━┓
+│  │                  - Unique ID, acceptance criteria │
+│  │                  - Test scenarios, task breakdown │ STOP
+│  │                  - Size tasks: 1-3h each          │
+│  │                                                    ┛
+│  ├─ Has tests? NO → Write failing tests first ━━━━━━┓
+│  │                   - Reference spec in docstring   │
+│  │                   - Verify test fails initially   │ STOP
+│  │                   - Commit: "test: FEAT-XXX"      │
+│  │                                                    ┛
+│  ├─ Tests pass locally? NO → Implement minimal code ┓
+│  │                            - Just enough to pass  │
+│  │                            - Add spec references  │ STOP
+│  │                            - Re-run tests         │
+│  │                                                    ┛
+│  └─ Tests pass? YES → Proceed to automation check
+│
+├─ COMMAND/SCRIPT
+│  │
+│  ├─ First time? → Create script in scripts/ ━━━━━━━━┓
+│  │                - Make executable                  │
+│  │                - Add --help flag                  │ STOP
+│  │                - Add error handling               │
+│  │                                                    ┛
+│  ├─ Scheduled? → Create GitHub Action FIRST ━━━━━━━━┓
+│  │               - Use cron trigger                  │
+│  │               - Add workflow_dispatch             │ THEN RUN
+│  │               - Test with workflow_dispatch       │
+│  │                                                    ┛
+│  ├─ Triggered by code? → Add to existing workflow ━━┓
+│  │                        - On push/PR trigger       │
+│  │                        - Runs automatically       │ STOP
+│  │                                                    ┛
+│  └─ Truly one-off? → Document in RUNBOOK.md ━━━━━━━━┓
+│                      - Why it was one-off            │
+│                      - Context for future            │ OK
+│                                                       ┛
+├─ BUG FIX
+│  │
+│  ├─ Has repro test? NO → Write failing test first ━━┓
+│  │                       - Reproduces the bug        │
+│  │                       - Links to issue/spec       │ STOP
+│  │                                                    ┛
+│  └─ Has test? YES → Fix & verify test passes ━━━━━━━┓
+│                      - Minimal fix                   │
+│                      - Check no regressions          │ CONTINUE
+│                                                       ┛
+├─ REFACTOR
+│  │
+│  ├─ Tests exist? NO → Write characterization tests ━┓
+│  │                    - Document current behavior    │
+│  │                    - 100% coverage of refactor    │ STOP
+│  │                                                    ┛
+│  └─ Tests exist? YES → Refactor & keep tests green ━┓
+│                        - Tests define correctness    │
+│                        - No behavior changes         │ CONTINUE
+│                                                       ┛
+├─ INFRASTRUCTURE/CONFIG
+│  │
+│  ├─ Manual change? → Script it as code ━━━━━━━━━━━━━┓
+│  │                   - Terraform/CloudFormation      │
+│  │                   - Docker/K8s manifests          │ STOP
+│  │                   - Version control it            │
+│  │                                                    ┛
+│  └─ Environment-specific? → Parameterize ━━━━━━━━━━━┓
+│                             - Use env vars           │
+│                             - Separate configs       │ CONTINUE
+│                                                       ┛
+├─ DEPENDENCY UPDATE
+│  │
+│  ├─ Breaking change? → Spec + test + code workflow ━┓
+│  │                     - Document breaking changes   │
+│  │                     - Update tests first          │ STOP
+│  │                                                    ┛
+│  └─ Non-breaking? → Update & test ━━━━━━━━━━━━━━━━━━┓
+│                     - Run full test suite            │
+│                     - Check for deprecations         │ CONTINUE
+│                                                       ┛
+├─ HOTFIX (Production Down)
+│  │
+│  ├─ P0 Outage? → FIX FIRST, follow up after ━━━━━━━━┓
+│  │               - Fix immediately                   │
+│  │               - Document what was done            │ HOTFIX OK
+│  │               - Create issue for proper fix       │ THEN
+│  │               - Follow normal workflow for issue  │ STOP
+│  │                                                    ┛
+│  └─ Not P0? → Follow normal workflow ━━━━━━━━━━━━━━━┛
+│
+├─ DOCUMENTATION
+│  │
+│  └─ Code change? NO → Update docs directly ━━━━━━━━━┓
+│     Code change? YES → Update in same commit ━━━━━━━┫ CONTINUE
+│                                                       ┛
+└─ QUESTION/EXPLANATION
+   │
+   └─ Answer directly (no automation needed)
+```
+
+---
+
+## WORKFLOW DETAILS
+
+### 1. SPECIFICATION TEMPLATE
+
 ```markdown
-# specs/feature-name.md
-## Feature ID: FEAT-001
-## Status: Draft|Ready|Implemented|Tested
+# specs/FEAT-001-user-authentication.md
+**Feature ID:** FEAT-001
+**Status:** Draft → Ready → In Progress → Done
+**Owner:** @username
+**Created:** 2025-01-15
 
-### User Story
+## User Story
+As a **registered user**
+I want to **log in with email and password**
+So that **I can access my account securely**
+
+## Acceptance Criteria
+- **AC-001:** Returns 200 + JWT for valid credentials
+- **AC-002:** Returns 401 for invalid credentials
+- **AC-003:** Returns 429 after 5 failed attempts in 1 minute
+- **AC-004:** Logs security events (success/failure)
+
+## Test Scenarios
+| Scenario | Test Location | Status |
+|----------|---------------|--------|
+| Valid login | `tests/test_auth.py::test_valid_login` | ✅ Pass |
+| Invalid password | `tests/test_auth.py::test_invalid_password` | ✅ Pass |
+| Rate limiting | `tests/test_auth.py::test_rate_limit` | 🚧 In Progress |
+| Security logging | `tests/test_auth.py::test_security_logs` | ❌ Not Started |
+
+## Task Breakdown (Atomic: 1-3 hours each)
+- [ ] **TASK-001** (2h): Write all test cases
+- [ ] **TASK-002** (2h): Implement basic auth endpoint
+- [ ] **TASK-003** (2h): Add rate limiting
+- [ ] **TASK-004** (1h): Add security logging
+- [ ] **TASK-005** (1h): Update API documentation
+
+## Dependencies
+- Database: Users table with hashed passwords
+- External: Redis for rate limiting
+- Config: JWT secret in environment
+
+## Risks
+- Rate limiting requires Redis (not in local dev by default)
+- JWT secret rotation strategy needed
+
+## Rollback Plan
+- Feature flag: `FEATURE_NEW_AUTH=false`
+- Old auth endpoint remains at `/auth/legacy`
+- Remove after 2 weeks of monitoring
+```
+
+### 2. TEST-FIRST IMPLEMENTATION
+
+```python
+# tests/test_auth.py
+"""Authentication tests
+Implements: specs/FEAT-001-user-authentication.md
+"""
+import pytest
+from src.auth import login, AuthService
+from src.models import User
+
+class TestAuthentication:
+    """Test suite for FEAT-001"""
+
+    @pytest.fixture
+    def auth_service(self):
+        """Implements: FEAT-001 test setup"""
+        return AuthService()
+
+    @pytest.fixture
+    def valid_user(self, db):
+        """Implements: FEAT-001 test data"""
+        return User.create(
+            email="test@example.com",
+            password_hash=hash_password("ValidPass123!")
+        )
+
+    def test_valid_login(self, auth_service, valid_user):
+        """Implements: specs/FEAT-001-user-authentication.md#AC-001
+
+        Given a registered user with valid credentials
+        When they attempt to login
+        Then they receive a 200 response with a JWT token
+        """
+        response = auth_service.login(
+            email="test@example.com",
+            password="ValidPass123!"
+        )
+
+        assert response.status_code == 200
+        assert "token" in response.json()
+        assert jwt.decode(response.json()["token"]).get("user_id") == valid_user.id
+
+    def test_invalid_password(self, auth_service, valid_user):
+        """Implements: specs/FEAT-001-user-authentication.md#AC-002
+
+        Given a registered user
+        When they attempt to login with wrong password
+        Then they receive a 401 response
+        """
+        response = auth_service.login(
+            email="test@example.com",
+            password="WrongPassword"
+        )
+
+        assert response.status_code == 401
+        assert response.json()["error"] == "Invalid credentials"
+
+    def test_rate_limiting(self, auth_service, valid_user):
+        """Implements: specs/FEAT-001-user-authentication.md#AC-003
+
+        Given a user has failed 5 login attempts in under 1 minute
+        When they attempt to login again
+        Then they receive a 429 response
+        """
+        # Make 5 failed attempts
+        for _ in range(5):
+            auth_service.login("test@example.com", "wrong")
+
+        # 6th attempt should be rate limited
+        response = auth_service.login("test@example.com", "wrong")
+
+        assert response.status_code == 429
+        assert "retry_after" in response.json()
+
+    def test_security_logging(self, auth_service, valid_user, mock_logger):
+        """Implements: specs/FEAT-001-user-authentication.md#AC-004
+
+        Given any login attempt
+        When the attempt is made
+        Then a security event is logged
+        """
+        auth_service.login("test@example.com", "ValidPass123!")
+
+        mock_logger.assert_called_with(
+            event="login_success",
+            user_id=valid_user.id,
+            ip_address=ANY,
+            timestamp=ANY
+        )
+
+    def test_nonexistent_user(self, auth_service):
+        """Edge case: User doesn't exist
+
+        Given an email not in the system
+        When login attempted
+        Then 401 returned (same as invalid password to prevent enumeration)
+        """
+        response = auth_service.login("nonexistent@example.com", "password")
+
+        assert response.status_code == 401
+        assert response.json()["error"] == "Invalid credentials"
+
+# Run and verify FAILS
+# $ pytest tests/test_auth.py -v
+# FAILED tests/test_auth.py::TestAuthentication::test_valid_login
+# FAILED tests/test_auth.py::TestAuthentication::test_invalid_password
+# ...all should fail initially
+```
+
+### 3. MINIMAL IMPLEMENTATION
+
+```python
+# src/auth.py
+"""Authentication service
+Implements: specs/FEAT-001-user-authentication.md
+"""
+from datetime import datetime, timedelta
+from typing import Optional
+import jwt
+import redis
+from .models import User
+from .logging import security_logger
+
+class AuthService:
+    """Implements: FEAT-001 - User Authentication
+
+    Tests: tests/test_auth.py::TestAuthentication
+    """
+
+    def __init__(self, redis_client: redis.Redis = None):
+        self.redis = redis_client or redis.from_url(settings.REDIS_URL)
+        self.jwt_secret = settings.JWT_SECRET
+
+    def login(self, email: str, password: str) -> Response:
+        """Authenticate user and return JWT
+
+        Implements:
+            - FEAT-001#AC-001: Valid credentials → 200 + JWT
+            - FEAT-001#AC-002: Invalid credentials → 401
+            - FEAT-001#AC-003: Rate limiting
+            - FEAT-001#AC-004: Security logging
+
+        Tests:
+            - tests/test_auth.py::test_valid_login
+            - tests/test_auth.py::test_invalid_password
+            - tests/test_auth.py::test_rate_limiting
+            - tests/test_auth.py::test_security_logging
+        """
+        # AC-003: Check rate limit first
+        if self._is_rate_limited(email):
+            self._log_security_event("login_rate_limited", email)
+            return Response(429, {"error": "Too many attempts", "retry_after": 60})
+
+        # AC-001, AC-002: Validate credentials
+        user = self._authenticate(email, password)
+
+        if user is None:
+            self._increment_failed_attempts(email)
+            self._log_security_event("login_failed", email)  # AC-004
+            return Response(401, {"error": "Invalid credentials"})
+
+        # AC-001: Generate JWT
+        token = self._generate_jwt(user)
+        self._reset_failed_attempts(email)
+        self._log_security_event("login_success", email, user.id)  # AC-004
+
+        return Response(200, {"token": token, "user_id": user.id})
+
+    def _authenticate(self, email: str, password: str) -> Optional[User]:
+        """Verify credentials against database"""
+        user = User.find_by_email(email)
+        if user and user.verify_password(password):
+            return user
+        return None
+
+    def _is_rate_limited(self, email: str) -> bool:
+        """Implements: FEAT-001#AC-003"""
+        key = f"login_attempts:{email}"
+        attempts = self.redis.get(key)
+        return attempts and int(attempts) >= 5
+
+    def _increment_failed_attempts(self, email: str):
+        """Implements: FEAT-001#AC-003"""
+        key = f"login_attempts:{email}"
+        self.redis.incr(key)
+        self.redis.expire(key, 60)  # 1 minute window
+
+    def _reset_failed_attempts(self, email: str):
+        """Implements: FEAT-001#AC-003"""
+        self.redis.delete(f"login_attempts:{email}")
+
+    def _generate_jwt(self, user: User) -> str:
+        """Implements: FEAT-001#AC-001"""
+        payload = {
+            "user_id": user.id,
+            "email": user.email,
+            "exp": datetime.utcnow() + timedelta(hours=24)
+        }
+        return jwt.encode(payload, self.jwt_secret, algorithm="HS256")
+
+    def _log_security_event(self, event: str, email: str, user_id: int = None):
+        """Implements: FEAT-001#AC-004"""
+        security_logger.info({
+            "event": event,
+            "email": email,
+            "user_id": user_id,
+            "timestamp": datetime.utcnow().isoformat(),
+            "ip_address": get_request_ip()
+        })
+```
+
+### 4. AUTOMATION (GitHub Actions)
+
+```yaml
+# .github/workflows/test-and-deploy.yml
+name: Test, Build, Deploy
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:  # Manual trigger
+
+env:
+  PYTHON_VERSION: '3.11'
+  MIN_COVERAGE: 80
+
+jobs:
+  validate:
+    name: Validate Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Lint code
+        run: |
+          ruff check src/ tests/
+          black --check src/ tests/
+          mypy src/
+
+      - name: Check traceability
+        run: ./scripts/check_traceability.sh
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: validate
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Run unit tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost/test
+          REDIS_URL: redis://localhost:6379
+        run: |
+          pytest tests/unit/ \
+            --cov=src \
+            --cov-report=xml \
+            --cov-report=term \
+            --cov-fail-under=${{ env.MIN_COVERAGE }} \
+            -v
+
+      - name: Run integration tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost/test
+          REDIS_URL: redis://localhost:6379
+        run: |
+          pytest tests/integration/ -v
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: true
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Check for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    if: github.ref == 'refs/heads/develop'
+    environment:
+      name: staging
+      url: https://staging.example.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to staging
+        run: ./scripts/deploy.sh staging
+        env:
+          DEPLOY_KEY: ${{ secrets.STAGING_DEPLOY_KEY }}
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+
+      - name: Run smoke tests
+        run: ./scripts/smoke-test.sh https://staging.example.com
+
+      - name: Notify deployment
+        if: always()
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "Staging deployment ${{ job.status }}",
+              "commit": "${{ github.sha }}",
+              "author": "${{ github.actor }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://example.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create deployment
+        id: deployment
+        uses: chrnorm/deployment-action@v2
+        with:
+          token: ${{ github.token }}
+          environment: production
+
+      - name: Deploy to production
+        run: ./scripts/deploy.sh production
+        env:
+          DEPLOY_KEY: ${{ secrets.PROD_DEPLOY_KEY }}
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+
+      - name: Run smoke tests
+        run: ./scripts/smoke-test.sh https://example.com
+
+      - name: Update deployment status (success)
+        if: success()
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: ${{ github.token }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+          state: 'success'
+
+      - name: Update deployment status (failure)
+        if: failure()
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: ${{ github.token }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+          state: 'failure'
+
+      - name: Rollback on failure
+        if: failure()
+        run: ./scripts/rollback.sh production
+
+      - name: Notify deployment
+        if: always()
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "Production deployment ${{ job.status }}",
+              "commit": "${{ github.sha }}",
+              "author": "${{ github.actor }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+```
+
+---
+
+## FILE STRUCTURE (Complete)
+
+```
+project/
+│
+├── specs/                              # ← Start here (Step 1)
+│   ├── FEAT-001-authentication.md     # Specs with IDs, ACs, test refs
+│   ├── FEAT-002-user-profile.md
+│   ├── ARCH-001-api-design.md         # Architecture decisions
+│   ├── traceability.md                # Spec↔Test↔Code matrix
+│   └── README.md                      # Spec index and status
+│
+├── tests/                              # ← Write second (Step 2)
+│   ├── unit/                          # Fast, isolated tests
+│   │   ├── test_auth.py              # """Implements: specs/FEAT-001#AC-001"""
+│   │   ├── test_models.py
+│   │   └── test_services.py
+│   ├── integration/                   # Tests with DB/external services
+│   │   ├── test_api_endpoints.py
+│   │   └── test_database.py
+│   ├── e2e/                           # End-to-end tests
+│   │   └── test_user_flows.py
+│   ├── fixtures/                      # Test data
+│   │   ├── users.json
+│   │   └── factories.py
+│   ├── conftest.py                    # Pytest configuration
+│   └── README.md                      # How to run tests
+│
+├── src/                                # ← Implement third (Step 3)
+│   ├── auth.py                        # # Implements: FEAT-001
+│   ├── models/
+│   ├── services/
+│   ├── api/
+│   └── utils/
+│
+├── scripts/                            # ← Automate fourth (Step 4)
+│   ├── deploy.sh                      # Deployment script
+│   ├── rollback.sh                    # Rollback script
+│   ├── smoke-test.sh                  # Post-deploy validation
+│   ├── cleanup-old-data.sh            # Maintenance tasks
+│   ├── check_traceability.sh          # Validate spec-test-code links
+│   ├── setup-dev-env.sh               # Developer onboarding
+│   └── README.md                      # Script documentation
+│
+├── .github/
+│   ├── workflows/                     # ← Final automation
+│   │   ├── test-and-deploy.yml       # Main CI/CD pipeline
+│   │   ├── nightly-cleanup.yml       # Scheduled maintenance
+│   │   ├── security-scan.yml         # Daily security scans
+│   │   ├── dependency-update.yml     # Automated dependency PRs
+│   │   └── README.md                 # Workflow documentation
+│   └── PULL_REQUEST_TEMPLATE.md      # PR checklist
+│
+├── infrastructure/                     # Infrastructure as code
+│   ├── terraform/                     # Terraform configs
+│   ├── docker/                        # Dockerfiles
+│   └── k8s/                           # Kubernetes manifests
+│
+├── docs/                               # Documentation
+│   ├── api/                           # API documentation
+│   ├── architecture/                  # Architecture docs
+│   ├── runbooks/                      # Operational procedures
+│   └── onboarding/                    # New developer guides
+│
+├── migrations/                         # Database migrations
+│   ├── 001_create_users.sql
+│   └── 002_add_auth_indexes.sql
+│
+├── .git/
+│   └── hooks/                         # Git hooks (auto-installed)
+│       ├── pre-commit                 # Run tests before commit
+│       ├── pre-push                   # Full validation before push
+│       └── commit-msg                 # Validate commit message format
+│
+├── RUNBOOK.md                         # Manual procedures (last resort)
+├── CHANGELOG.md                       # Auto-generated from commits
+├── run_tests.sh                       # Local test runner (= CI)
+├── check_traceability.sh              # Spec-test-code validation
+├── requirements.txt                   # Production dependencies
+├── requirements-dev.txt               # Development dependencies
+├── .env.example                       # Environment variable template
+└── README.md                          # Project overview
+```
+
+---
+
+## TRACEABILITY SYSTEM
+
+### Bidirectional Linking
+
+```
+SPEC (specs/FEAT-001.md)
+  │
+  ├─→ "Test: tests/test_auth.py::test_valid_login"
+  │
+  ↓
+TEST (tests/test_auth.py::test_valid_login)
+  │
+  ├─→ """Implements: specs/FEAT-001.md#AC-001"""
+  │
+  ↓
+CODE (src/auth.py::login)
+  │
+  ├─→ """Implements: FEAT-001#AC-001"""
+  ├─→ """Tests: tests/test_auth.py::test_valid_login"""
+  │
+  ↓
+WORKFLOW (.github/workflows/test-and-deploy.yml)
+  │
+  └─→ Runs tests automatically on every push
+```
+
+### Automated Validation
+
+```bash
+#!/bin/bash
+# scripts/check_traceability.sh
+# Validates all spec-test-code links
+
+set -e
+
+echo "🔍 Checking traceability..."
+
+# 1. Check specs have tests
+for spec in specs/FEAT-*.md; do
+    spec_id=$(basename "$spec" .md)
+
+    # Extract test references from spec
+    test_refs=$(grep -o 'tests/[^)]*' "$spec" || true)
+
+    if [ -z "$test_refs" ]; then
+        echo "❌ $spec_id: No test references found"
+        exit 1
+    fi
+
+    # Verify each test exists
+    for test_ref in $test_refs; do
+        if ! grep -r "Implements.*$spec_id" tests/ > /dev/null; then
+            echo "❌ $spec_id: Test $test_ref doesn't reference spec"
+            exit 1
+        fi
+    done
+done
+
+# 2. Check tests have specs
+for test_file in tests/test_*.py; do
+    if ! grep -q "Implements: specs/" "$test_file"; then
+        echo "⚠️  $test_file: No spec reference found"
+    fi
+done
+
+# 3. Check code has specs
+for code_file in src/**/*.py; do
+    if ! grep -q "Implements: FEAT-" "$code_file"; then
+        echo "⚠️  $code_file: No spec reference found"
+    fi
+done
+
+# 4. Generate traceability matrix
+python scripts/generate_traceability_matrix.py > specs/traceability.md
+
+echo "✅ Traceability check passed"
+```
+
+```python
+# scripts/generate_traceability_matrix.py
+"""Generate traceability matrix: Spec ↔ Test ↔ Code"""
+
+import re
+from pathlib import Path
+from typing import Dict, List
+
+def extract_spec_refs(file_path: Path) -> List[str]:
+    """Extract spec references from file"""
+    content = file_path.read_text()
+    return re.findall(r'FEAT-\d+', content)
+
+def extract_test_refs(file_path: Path) -> List[str]:
+    """Extract test references from spec"""
+    content = file_path.read_text()
+    return re.findall(r'tests/[^\)]+', content)
+
+def build_traceability_matrix():
+    specs = {}
+
+    # Scan specs
+    for spec_file in Path('specs').glob('FEAT-*.md'):
+        spec_id = spec_file.stem
+        test_refs = extract_test_refs(spec_file)
+        specs[spec_id] = {
+            'tests': test_refs,
+            'code': [],
+            'status': '❓'
+        }
+
+    # Scan tests
+    for test_file in Path('tests').rglob('test_*.py'):
+        content = test_file.read_text()
+        for spec_id in specs:
+            if spec_id in content:
+                # Find implementing code
+                functions = re.findall(r'def (test_\w+)', content)
+                for func in functions:
+                    if spec_id in content[content.find(func):content.find(func) + 500]:
+                        specs[spec_id]['tests'].append(f"{test_file}::{func}")
+
+    # Scan code
+    for code_file in Path('src').rglob('*.py'):
+        content = code_file.read_text()
+        for spec_id in specs:
+            if spec_id in content:
+                specs[spec_id]['code'].append(str(code_file))
+                # Check if tests pass
+                if specs[spec_id]['tests']:
+                    specs[spec_id]['status'] = '✅'
+
+    # Generate markdown table
+    print("# Traceability Matrix\n")
+    print("| Spec ID | Tests | Implementation | Status |")
+    print("|---------|-------|----------------|--------|")
+
+    for spec_id, data in sorted(specs.items()):
+        tests = '<br>'.join(data['tests'][:3]) + ('...' if len(data['tests']) > 3 else '')
+        code = '<br>'.join(data['code'][:3]) + ('...' if len(data['code']) > 3 else '')
+        status = data['status']
+        print(f"| {spec_id} | {tests} | {code} | {status} |")
+
+if __name__ == '__main__':
+    build_traceability_matrix()
+```
+
+---
+
+## EDGE CASES & EMERGENCIES
+
+### Hotfix Procedure (Production Down)
+
+```markdown
+# P0 HOTFIX PROTOCOL
+
+## Immediate Actions (Do First)
+1. **Fix production immediately** - Don't wait for tests
+2. **Deploy hotfix** - Use emergency deploy script
+3. **Notify team** - Page on-call, post in #incidents
+4. **Monitor** - Watch metrics/logs for 30 minutes
+
+## Follow-Up Actions (Within 24 hours)
+1. **Write test** - Reproduce the bug with failing test
+2. **Proper fix** - Follow normal workflow (spec → test → code)
+3. **Post-mortem** - Document in `docs/incidents/YYYY-MM-DD-incident.md`
+4. **Update runbook** - Add detection/mitigation steps
+
+## Emergency Deploy Script
+```bash
+# scripts/emergency-deploy.sh
+#!/bin/bash
+# ONLY USE FOR P0 INCIDENTS
+
+read -p "Incident ticket #: " ticket
+read -p "Confirm production deploy (yes): " confirm
+
+if [ "$confirm" != "yes" ]; then
+    echo "Cancelled"
+    exit 1
+fi
+
+echo "🚨 EMERGENCY DEPLOY - Incident #$ticket"
+git tag -a "hotfix-$ticket" -m "Emergency hotfix for #$ticket"
+./scripts/deploy.sh production --skip-tests --force
+echo "📝 Create follow-up ticket to add tests"
+```
+```
+
+### Legacy Code Migration
+
+```markdown
+# ADOPTING THESE RULES ON EXISTING CODEBASE
+
+## Phase 1: Bootstrap (Week 1)
+- [ ] Create `specs/` directory
+- [ ] Set up GitHub Actions skeleton
+- [ ] Install pre-commit hooks
+- [ ] Add `run_tests.sh` script
+- [ ] Create `check_traceability.sh` (lenient mode)
+
+## Phase 2: New Code Only (Weeks 2-4)
+- [ ] All NEW features follow full workflow
+- [ ] Legacy code exempted (for now)
+- [ ] Document legacy areas in `TECHNICAL_DEBT.md`
+
+## Phase 3: Gradual Retrofit (Month 2+)
+- [ ] When touching legacy code, add tests first
+- [ ] Create spec for modified areas
+- [ ] Add traceability references
+- [ ] Track progress: `scripts/coverage-report.sh`
+
+## Don't Boil the Ocean
+- ✅ DO: Add tests when fixing bugs in legacy code
+- ✅ DO: Spec new features completely
+- ❌ DON'T: Rewrite everything at once
+- ❌ DON'T: Block work on "perfect" setup
+```
+
+### Non-Code Changes
+
+```markdown
+# HANDLING NON-CODE CHANGES
+
+## Documentation Changes
+- Treat like code: PR → review → merge
+- No tests needed, but CI spell-checks
+
+## Configuration Changes
+- Spec: Document what's changing and why
+- Test: Validate config with smoke test
+- Code: Use infrastructure-as-code (Terraform/Ansible)
+- Automate: Apply via GitHub Actions
+
+## Database Migrations
+- Spec: Migration plan with rollback procedure
+- Test: Run migration on test DB, verify rollback
+- Code: Write both up and down migrations
+- Automate: Apply in deploy script with safety checks
+
+## Infrastructure Changes
+- Spec: Architecture decision record (ADR)
+- Test: Terraform plan, cost estimate
+- Code: Terraform/CloudFormation
+- Automate: Apply via GitHub Actions with approval gate
+```
+
+### When Tests Are Impossible
+
+```markdown
+# EXEMPTIONS (Use Sparingly)
+
+## Legitimate Cases for No Automated Tests
+1. **UI pixel-perfect alignment** - Manual QA acceptable
+2. **Third-party API changes** - Contract tests + monitoring
+3. **Performance tuning** - Benchmark tests instead
+4. **Security patches** - Apply immediately, test after
+
+## Required Documentation
+```yaml
+# specs/EXEMPT-001-ui-polish.md
+exempt: true
+reason: "Pixel-perfect alignment requires human judgment"
+alternative_validation: "Manual QA checklist"
+qa_checklist:
+  - [ ] Mobile responsive
+  - [ ] Dark mode works
+  - [ ] Accessibility verified
+manual_tester: "@designer"
+```
+```
+
+---
+
+## BOOTSTRAP SCRIPTS
+
+### Initial Setup
+
+```bash
+#!/bin/bash
+# scripts/bootstrap-project.sh
+# Sets up test-first automation-first workflow from scratch
+
+set -e
+
+echo "🚀 Bootstrapping test-first automation-first project..."
+
+# 1. Create directory structure
+mkdir -p specs tests/{unit,integration,e2e,fixtures} src scripts .github/workflows docs infrastructure
+
+# 2. Create spec template
+cat > specs/TEMPLATE.md << 'EOF'
+# Feature: [Feature Name]
+**ID:** FEAT-XXX
+**Status:** Draft
+**Owner:** @username
+
+## User Story
 As a [user type]
 I want [feature]
 So that [benefit]
 
-### Acceptance Criteria
-- [ ] AC-001: Specific, testable requirement
-- [ ] AC-002: Another testable requirement
-
-### Test Scenarios
-- TEST-001: Links to test_feature.py::test_scenario_one
-- TEST-002: Links to test_feature.py::test_scenario_two
-
-### Task Breakdown
-- [ ] TASK-001: Atomic task (1-3 hours)
-- [ ] TASK-002: Another atomic task (1-3 hours)
-```
-
-#### 2. WRITE TESTS FIRST
-```
-For each acceptance criterion in specification:
-   1. Create test file with traceable name
-   2. Write failing test that defines success
-   3. Include specification reference in test
-   4. Run test locally to confirm it fails
-   5. Commit test with message: "test: add failing test for [feature-id]"
-```
-
-**TEST TRACEABILITY:**
-```python
-def test_user_authentication():
-    """
-    Implements: specs/auth.md#AC-001
-    Feature: FEAT-001
-    Task: TASK-001
-    
-    Test that user can authenticate with valid credentials.
-    """
-    # Test implementation
-    assert login("user@example.com", "password").status_code == 200
-```
-
-#### 3. GENERATE STRUCTURED WORK ITEMS
-```yaml
-work_item_requirements:
-  task_id: "FEAT-001-TASK-001"
-  title: "Implement user authentication endpoint"
-  size: "1-3 hours (max 4-8 hours for complex items)"
-  
-  acceptance_criteria:
-    - "Returns 200 for valid credentials"
-    - "Returns 401 for invalid credentials"
-    - "Handles rate limiting"
-  
-  test_files:
-    - "tests/test_auth.py::test_valid_login"
-    - "tests/test_auth.py::test_invalid_login"
-    - "tests/test_auth.py::test_rate_limiting"
-  
-  dependencies: []  # Must be empty for atomic tasks
-  
-  definition_of_done:
-    - "All tests passing locally"
-    - "Code reviewed"
-    - "Documentation updated"
-    - "CI pipeline green"
-```
-
-#### 4. IMPLEMENT TO PASS TESTS
-```
-While tests are failing:
-   1. Write MINIMAL code to pass current failing test
-   2. Run tests locally: pytest tests/ or npm test
-   3. Do NOT add features beyond what tests require
-   4. Do NOT refactor until tests pass
-   5. Include traceability comments in implementation
-```
-
-**IMPLEMENTATION TRACEABILITY:**
-```python
-class AuthenticationService:
-    """Service for user authentication.
-    
-    Implements specifications from:
-    - specs/auth.md#authentication-service
-    - Features: FEAT-001, FEAT-002
-    """
-    
-    def authenticate(self, email: str, password: str):
-        """Authenticate user with credentials.
-        
-        Implements: specs/auth.md#AC-001
-        Tests: tests/test_auth.py::test_valid_login
-        """
-        # Implementation code
-```
-
-#### 5. VALIDATE LOCALLY
-```bash
-# Before EVERY commit:
-pytest tests/           # Run all tests
-pytest tests/ --cov     # Check coverage >= 80%
-behave tests/features   # Run behavior tests if present
-./check_traceability.sh # Verify spec-test-code links
-
-IF any test fails:
-   DO NOT COMMIT - Fix the issue first
-   
-IF traceability broken:
-   DO NOT COMMIT - Update references
-```
-
-#### 6. PUSH ONLY WHEN GREEN
-```bash
-git add .
-git commit -m "feat(FEAT-001): [description] - all tests passing locally"
-git push
-
-MONITOR CI pipeline - if CI fails but local passed:
-   INVESTIGATE environment differences immediately
-   Document in specs/environment-issues.md
-```
-
----
-
-## TASK DECOMPOSITION STANDARDS
-
-### Atomic Task Requirements
-```yaml
-task_sizing:
-  ideal: "1-3 hours"
-  maximum: "4-8 hours"
-  parallel_ai: "1-2 hours"  # For AI agent execution
-  
-task_attributes:
-  atomic: true  # Completable independently
-  testable: true  # Has clear success criteria
-  traceable: true  # Links to spec and tests
-  
-reject_if:
-  - duration > 8 hours
-  - has_dependencies_on_other_tasks
-  - no_clear_completion_criteria
-  - no_test_scenarios
-```
-
-**GOOD TASK EXAMPLE:**
-```yaml
-task:
-  id: "USER-001-TASK-003"
-  title: "Add email validation to user model"
-  estimated_hours: 2
-  
-  acceptance_criteria:
-    - "Rejects invalid email formats"
-    - "Accepts valid email formats"
-    - "Handles edge cases (unicode, long domains)"
-  
-  test_first:
-    - "tests/models/test_user.py::test_email_validation_invalid"
-    - "tests/models/test_user.py::test_email_validation_valid"
-    - "tests/models/test_user.py::test_email_edge_cases"
-  
-  no_dependencies: true
-  can_be_done_in_isolation: true
-```
-
-**BAD TASK EXAMPLE:**
-```yaml
-task:  # ❌ TOO BIG, DEPENDENT
-  title: "Implement complete user system"
-  estimated_hours: 40  # ❌ Way too large
-  dependencies: ["database", "email_service"]  # ❌ Not atomic
-  criteria: "User system works"  # ❌ Too vague
-```
-
----
-
-## SPECIFICATION-TEST TRACEABILITY
-
-### Every Specification Element MUST Have Tests
-```python
-# check_traceability.py
-def validate_traceability():
-    specifications = load_specifications("specs/")
-    test_files = load_tests("tests/")
-    
-    for spec in specifications:
-        for criterion in spec.acceptance_criteria:
-            if not has_corresponding_test(criterion, test_files):
-                ERROR: f"No test for {spec.id}#{criterion.id}"
-                
-        for test_ref in spec.test_references:
-            if not test_exists(test_ref):
-                ERROR: f"Missing test: {test_ref}"
-    
-    for test in test_files:
-        if not has_specification_reference(test):
-            WARNING: f"Test without spec: {test.name}"
-```
-
-### Traceability Matrix Requirements
-```markdown
-# docs/traceability.md
-| Spec ID | Acceptance Criteria | Test File | Implementation | Status |
-|---------|-------------------|-----------|----------------|--------|
-| AUTH-001 | AC-001: Valid login | test_auth.py::test_valid | auth.py:15-45 | ✓ |
-| AUTH-001 | AC-002: Invalid login | test_auth.py::test_invalid | auth.py:47-65 | ✓ |
-| AUTH-001 | AC-003: Rate limiting | test_auth.py::test_rate | auth.py:67-95 | 🚧 |
-```
-
----
-
-## AI AGENT INSTRUCTIONS
-
-When asked to implement a feature:
-
-### STEP 1: Request Specification
-```
-"Show me the specification for this feature"
-"What are the acceptance criteria?"
-"What test scenarios define success?"
-"What is the unique feature ID?"
-```
-
-### STEP 2: Request Tests
-```
-"Show me the failing tests for this feature"
-"Which test files correspond to the specification?"
-"What is the expected behavior from the tests?"
-```
-
-### STEP 3: Implement Against Tests
-```python
-# ALWAYS structure responses like this:
-
-## Specification Reference
-Feature: FEAT-001
-Acceptance Criteria: AC-001, AC-002
-
-## Current Failing Test
-[Show the specific test that's failing]
-
-## Implementation to Pass Test
-[Minimal code to make test pass]
-[Include traceability comments]
-
-## Verification
-Run: pytest tests/test_feature.py -v
-Expected: All tests pass
-Coverage: Must maintain or improve
-```
-
-### STEP 4: Validate Before Delivering
-```
-Before marking any task complete:
-1. ✓ All specified tests pass locally
-2. ✓ No existing tests broken
-3. ✓ Coverage maintained or improved
-4. ✓ Implementation matches specification
-5. ✓ Traceability references included
-6. ✓ Task completed within time estimate
-```
-
----
-
-## PROGRESSIVE ENHANCEMENT PATTERN
-
-### Build Features Incrementally
-```markdown
-## Day 1: Minimal Implementation [TEST→CODE→DEPLOY]
-TASK-001: Basic functionality (1-3 hours)
-- [ ] Write failing test
-- [ ] Implement minimal code
-- [ ] Local tests pass
-- [ ] Deploy to staging
-
-## Day 2: Add Validation [TEST→CODE→DEPLOY]
-TASK-002: Input validation (1-3 hours)
-- [ ] Write validation tests
-- [ ] Add validation logic
-- [ ] Local tests pass
-- [ ] Deploy to staging
-
-## Day 3: Add Error Handling [TEST→CODE→DEPLOY]
-TASK-003: Comprehensive errors (1-3 hours)
-- [ ] Write error case tests
-- [ ] Implement error handling
-- [ ] Local tests pass
-- [ ] Deploy to staging
-
-## Day 4: Performance Optimization [TEST→CODE→DEPLOY]
-TASK-004: Optimize queries (1-3 hours)
-- [ ] Write performance tests
-- [ ] Optimize implementation
-- [ ] Local tests pass
-- [ ] Deploy to production
-```
-
----
-
-## ANTI-PATTERNS TO REJECT
-
-### ❌ REJECT: Code Without Tests
-```python
-# If code is submitted without tests:
-"ERROR: No tests found. Write tests first, then implementation."
-```
-
-### ❌ REJECT: Tests After Code
-```python
-# If implementation exists before tests:
-"ERROR: Implementation found before tests. Delete code, write tests first."
-```
-
-### ❌ REJECT: Untested Commits
-```bash
-# If attempting to commit without running tests:
-"ERROR: Run tests locally first: pytest tests/"
-```
-
-### ❌ REJECT: Missing Specifications
-```python
-# If no specification exists:
-"ERROR: Create specification in specs/ before implementation"
-```
-
-### ❌ REJECT: Broken Traceability
-```python
-# If tests don't reference specs:
-"ERROR: Test missing specification reference"
-
-# If specs don't reference tests:
-"ERROR: Specification missing test references"
-```
-
-### ❌ REJECT: Oversized Tasks
-```python
-# If task > 8 hours:
-"ERROR: Break into smaller tasks (ideally 1-3 hours, max 4-8)"
-
-# If task has dependencies:
-"ERROR: Make task atomic and independent"
-```
-
-### ❌ REJECT: Vague Acceptance Criteria
-```python
-# If criteria like "it should work":
-"ERROR: Acceptance criteria must be specific and testable"
-```
-
----
-
-## FILE STRUCTURE ENFORCEMENT
-
-### Required Structure:
-```
-project/
-├── specs/                      # Specifications (source of truth)
-│   ├── feature-001.md         # With unique IDs and criteria
-│   └── traceability.md        # Spec-test-code mapping
-├── tests/                     # Tests (written first)
-│   ├── unit/                 # Unit tests with spec refs
-│   ├── integration/          # Integration tests
-│   └── features/            # Behavior tests
-├── src/                      # Implementation (written last)
-│   └── feature.py           # With traceability comments
-├── docs/
-│   └── task-breakdown.md    # Atomic task definitions
-└── run_tests.sh             # Local test runner (identical to CI)
-```
-
-### File Creation Order:
-1. `specs/feature-001.md` - Specification with IDs and criteria
-2. `docs/task-breakdown.md` - Atomic tasks (1-3 hours each)
-3. `tests/test_feature.py` - Failing tests with spec references
-4. `src/feature.py` - Implementation to pass tests
-
----
-
-## QUICK REFERENCE COMMANDS
-
-### Before Starting Work:
-```bash
-# Pull latest and run tests
-git pull
-pytest tests/  # Must pass before starting
-./check_traceability.sh  # Verify all links valid
-```
-
-### Creating New Feature:
-```bash
-# 1. Write specification
-vim specs/feature-001.md
-
-# 2. Generate task breakdown
-python generate_tasks.py specs/feature-001.md
-
-# 3. Write first test
-vim tests/test_feature.py
-# Add: """Implements: specs/feature-001.md#AC-001"""
-
-# 4. Verify test fails
-pytest tests/test_feature.py  # Should fail
-
-# 5. Implement feature
-vim src/feature.py
-# Add: # Implements: FEAT-001-TASK-001
-
-# 6. Verify test passes
-pytest tests/test_feature.py  # Should pass
-
-# 7. Check coverage and traceability
-pytest tests/ --cov=src --cov-fail-under=80
-./check_traceability.sh
-```
-
-### Before Committing:
-```bash
-# Full validation
-pytest tests/ --cov=src --cov-fail-under=80
-behave tests/features  # If behavior tests exist
-./check_traceability.sh  # Verify all references
-```
-
-### Before Pushing:
-```bash
-# Final check (same as CI)
-./run_tests.sh
-git push
-```
-
----
-
-## METRICS TO TRACK
-
-Monitor these on every change:
-
-```python
-metrics = {
-    "tests_written_first": True,  # MUST be True
-    "local_tests_passed": True,   # MUST be True before push
-    "coverage": ">=80%",          # MUST maintain or improve
-    "ci_pipeline": "green",       # MUST pass before merge
-    "spec_coverage": "100%",      # Every spec has tests
-    "task_size_hours": "<=8",     # Ideally 1-3, max 4-8
-    "traceability_complete": True,  # All references valid
-}
-```
-
----
-
-## CONSTITUTION (NON-NEGOTIABLE)
-
-1. **Tests define correctness** - If tests pass, implementation is correct
-2. **Specifications are contracts** - Implementation must match spec exactly
-3. **Local = CI** - Tests must behave identically locally and in CI
-4. **No test, no merge** - Untested code is broken code
-5. **Tests first, always** - Implementation follows tests, never leads
-6. **Tasks are atomic** - Every task completable independently
-7. **Everything is traceable** - Spec→Test→Code links maintained
-
----
-
-## ENFORCEMENT HOOKS
-
-### Pre-commit Hook:
-```bash
+## Acceptance Criteria
+- AC-001: [Specific, testable requirement]
+
+## Test Scenarios
+- TEST-001: tests/test_feature.py::test_scenario
+
+## Tasks
+- [ ] TASK-001: (1-3h) [Atomic task]
+EOF
+
+# 3. Create test template
+cat > tests/TEMPLATE.py << 'EOF'
+"""[Feature name] tests
+Implements: specs/FEAT-XXX.md
+"""
+import pytest
+
+def test_example():
+    """Implements: specs/FEAT-XXX.md#AC-001"""
+    assert True  # Replace with actual test
+EOF
+
+# 4. Install pre-commit hooks
+cat > .git/hooks/pre-commit << 'EOF'
 #!/bin/bash
-# .git/hooks/pre-commit
-
-echo "Running pre-commit checks..."
-
-# Check for tests
-for file in $(git diff --cached --name-only | grep "^src/"); do
-    test_file="tests/test_$(basename $file)"
-    if [ ! -f "$test_file" ]; then
-        echo "❌ Missing test for $file"
-        exit 1
-    fi
-done
-
-# Run tests
+set -e
 pytest tests/ --quiet --exitfirst || {
     echo "❌ Tests failed - commit blocked"
-    echo "Run: pytest tests/ to see failures"
     exit 1
 }
+EOF
+chmod +x .git/hooks/pre-commit
 
-# Check traceability
-./check_traceability.sh || {
-    echo "❌ Traceability broken - fix references"
-    exit 1
-}
+# 5. Create run_tests.sh (same as CI)
+cat > run_tests.sh << 'EOF'
+#!/bin/bash
+set -e
+pytest tests/ --cov=src --cov-fail-under=80 -v
+./check_traceability.sh
+EOF
+chmod +x run_tests.sh
 
-echo "✓ All checks passed"
+# 6. Create traceability checker
+cat > check_traceability.sh << 'EOF'
+#!/bin/bash
+# Validates spec-test-code links
+echo "🔍 Checking traceability..."
+# Add validation logic here
+echo "✅ Traceability check passed"
+EOF
+chmod +x check_traceability.sh
+
+# 7. Create basic GitHub Action
+cat > .github/workflows/test-and-deploy.yml << 'EOF'
+name: Test & Deploy
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./run_tests.sh
+EOF
+
+# 8. Create README
+cat > README.md << 'EOF'
+# Project Name
+
+## Development Workflow
+1. Write spec in `specs/FEAT-XXX.md`
+2. Write failing tests in `tests/`
+3. Implement in `src/`
+4. Push - CI auto-deploys on green
+
+## Quick Start
+```bash
+./scripts/setup-dev-env.sh
+./run_tests.sh
+```
+EOF
+
+echo "✅ Bootstrap complete!"
+echo "Next steps:"
+echo "  1. Create your first spec: cp specs/TEMPLATE.md specs/FEAT-001-myfeature.md"
+echo "  2. Write failing tests: cp tests/TEMPLATE.py tests/test_myfeature.py"
+echo "  3. Run tests: ./run_tests.sh"
 ```
 
-### Pre-push Hook:
+### Developer Onboarding
+
 ```bash
 #!/bin/bash
-# .git/hooks/pre-push
+# scripts/setup-dev-env.sh
+# One-command developer environment setup
 
-./run_tests.sh || {
-    echo "❌ Full test suite failed - push blocked"
-    exit 1
-}
+set -e
 
-# Verify task size
-for task in $(git diff origin/main --name-only | grep "tasks/"); do
-    hours=$(grep "estimated_hours:" $task | awk '{print $2}')
-    if [ $hours -gt 8 ]; then
-        echo "❌ Task exceeds 8 hours: $task"
-        exit 1
-    fi
-done
+echo "👋 Setting up development environment..."
+
+# 1. Check prerequisites
+command -v python3 >/dev/null 2>&1 || { echo "❌ Python 3 required"; exit 1; }
+command -v git >/dev/null 2>&1 || { echo "❌ Git required"; exit 1; }
+
+# 2. Create virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+
+# 4. Install git hooks
+cp .git/hooks/pre-commit.sample .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+
+# 5. Set up local database
+docker-compose up -d postgres redis
+
+# 6. Run migrations
+python scripts/migrate.py
+
+# 7. Create .env from template
+if [ ! -f .env ]; then
+    cp .env.example .env
+    echo "⚠️  Update .env with your local settings"
+fi
+
+# 8. Run tests to verify setup
+./run_tests.sh
+
+echo "✅ Development environment ready!"
+echo "To activate: source .venv/bin/activate"
+echo "To run tests: ./run_tests.sh"
+echo "To start coding: Read CLAUDE.md for workflow"
 ```
 
 ---
 
-## FOR CLAUDE CODE / AI ASSISTANTS
+## METRICS & MONITORING
 
-When reviewing changes or implementing features:
+### Track These Metrics
 
-### 1. FIRST: Check Specification
-```python
-if not specification_exists(feature):
-    REJECT("Create specification first in specs/")
-    
-if not has_unique_id(specification):
-    REJECT("Add unique feature ID to specification")
+```yaml
+# .github/workflows/metrics.yml
+name: Track Metrics
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly
+
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Calculate metrics
+        run: |
+          echo "## Development Metrics" > metrics.md
+          echo "Generated: $(date)" >> metrics.md
+          echo "" >> metrics.md
+
+          # Test coverage
+          coverage=$(pytest --cov=src --cov-report=term | grep TOTAL | awk '{print $4}')
+          echo "- **Test Coverage:** $coverage" >> metrics.md
+
+          # Traceability
+          specs=$(find specs -name 'FEAT-*.md' | wc -l)
+          tests=$(grep -r "Implements: specs" tests | wc -l)
+          echo "- **Specs:** $specs" >> metrics.md
+          echo "- **Traced Tests:** $tests" >> metrics.md
+          echo "- **Traceability:** $((tests * 100 / specs))%" >> metrics.md
+
+          # Automation
+          manual=$(grep -c "# TODO: Automate" scripts/*.sh || echo 0)
+          automated=$(find .github/workflows -name '*.yml' | wc -l)
+          echo "- **Automated Workflows:** $automated" >> metrics.md
+          echo "- **Manual TODOs:** $manual" >> metrics.md
+
+          # Task sizing
+          large_tasks=$(grep -r "estimated_hours: [9-9][0-9]\|[0-9][0-9][0-9]" specs || true | wc -l)
+          echo "- **Oversized Tasks:** $large_tasks" >> metrics.md
+
+          cat metrics.md
+
+      - name: Post to dashboard
+        run: |
+          # Send metrics to monitoring system
+          curl -X POST ${{ secrets.METRICS_WEBHOOK }} \
+            -H "Content-Type: application/json" \
+            -d @metrics.md
 ```
-
-### 2. SECOND: Verify Tests Exist
-```python
-if not tests_written_first(feature):
-    REJECT("Write tests before implementation")
-    
-if not test_references_spec(test):
-    REJECT("Add specification reference to test")
-```
-
-### 3. THIRD: Validate Task Size
-```python
-if task_hours > 8:
-    REJECT("Break into smaller tasks (ideally 1-3 hours)")
-    
-if task_has_dependencies:
-    REJECT("Make task atomic - no dependencies")
-```
-
-### 4. FOURTH: Check Traceability
-```python
-if not spec_has_test_references:
-    REJECT("Add test references to specification")
-    
-if not code_has_spec_references:
-    REJECT("Add specification references to code")
-```
-
-### 5. FIFTH: Ensure Tests Pass
-```python
-if not all_tests_passing_locally:
-    REJECT("Fix failing tests before commit")
-    
-if coverage_decreased:
-    REJECT("Maintain or improve test coverage")
-```
-
-If ANY of these checks fail, STOP and report the issue.
 
 ---
 
-## REVIEW CHECKLIST
+## QUICK REFERENCE
 
-Before approving any change:
+### Common Commands
 
-### Specifications
-- [ ] Specification exists with unique ID
-- [ ] Acceptance criteria are specific and testable
-- [ ] Test scenarios documented
-- [ ] Task breakdown complete
+```bash
+# Daily workflow
+git pull                           # Get latest
+./run_tests.sh                     # Run all tests (= CI)
+git commit -m "feat: description"  # Commit (runs pre-commit hook)
+git push                           # Push (triggers CI → deploy)
 
-### Tests
-- [ ] Tests written before implementation
-- [ ] Tests reference specifications
-- [ ] Tests pass locally
-- [ ] Coverage >= 80%
+# Creating new feature
+cp specs/TEMPLATE.md specs/FEAT-042-new-thing.md
+# Edit spec with acceptance criteria
+cp tests/TEMPLATE.py tests/test_new_thing.py
+# Write failing tests
+./run_tests.sh                     # Verify tests fail
+# Implement feature
+./run_tests.sh                     # Verify tests pass
 
-### Tasks
-- [ ] Tasks sized 1-3 hours (max 4-8)
-- [ ] Tasks are atomic (no dependencies)
-- [ ] Clear completion criteria
+# Automation
+./scripts/automate-command.sh "command to automate"
+# Creates script + GitHub Action
 
-### Traceability
-- [ ] Spec → Test references valid
-- [ ] Test → Spec references valid
-- [ ] Code → Spec references valid
-- [ ] Traceability matrix updated
+# Validation
+./check_traceability.sh            # Verify all links valid
+pytest tests/ --cov=src            # Check coverage
+```
 
-### Quality
-- [ ] All tests passing in CI
-- [ ] No decrease in coverage
-- [ ] Documentation updated
-- [ ] Progressive enhancement followed
+### Commit Message Format
 
-**Remember: The test IS the specification. The specification IS the test. Write tests first, implement second, deploy third.**
+```
+<type>(<scope>): <description>
+
+Types: feat, fix, docs, refactor, test, chore
+Scope: FEAT-XXX or component name
+
+Examples:
+  feat(FEAT-001): add user authentication
+  fix(FEAT-001): handle empty password
+  test(FEAT-001): add rate limiting tests
+  docs: update API documentation
+  chore: upgrade dependencies
+```
+
+---
+
+## SUMMARY: The Rules
+
+1. **Spec → Test → Code → Automate** (always this order)
+2. **Tests pass locally before push** (enforced by pre-commit hook)
+3. **Everything is traced** (Spec ↔ Test ↔ Code ↔ Automation)
+4. **Tasks ≤ 3 hours** (atomic, independent, testable)
+5. **No manual commands twice** (script it, then automate it)
+6. **CI = Local** (same tests, same results)
+7. **Green before merge** (CI must pass)
+8. **Auto-deploy on green** (staging immediately, production on tag)
+9. **Hotfixes allowed** (but follow up within 24h)
+10. **Gradual adoption OK** (new code first, legacy incrementally)
+
+**Emergency Override:** Production down? Fix first, follow up after.
+**Legacy Code:** Exempt until touched, then add tests.
+**When Stuck:** Document in RUNBOOK.md, create issue to automate.
+
+---
+
+**Remember: If you do it twice, script it. If you script it, automate it. If you code it, test it first.**
