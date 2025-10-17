@@ -49,14 +49,12 @@ Provide:
 3. How to test locally before pushing"
 ```
 
-## Example: Real CI Failure
+## Example: CI Failure
 
 See [ci-failure-example.md](ci-failure-example.md) for a complete example of diagnosing and fixing:
 - Terraform formatting issues
 - Shellcheck warnings
 - Validation failures
-
-This example shows the actual error from workflow run 18578261366.
 
 ## Integration Script
 
