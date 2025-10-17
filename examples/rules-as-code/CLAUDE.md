@@ -174,7 +174,8 @@ Maintain PROGRESS.md file throughout development:
 3. Update code metrics (SLOC, coverage, complexity)
 4. Set next task as "Current Task"
 5. Update progress percentages
-6. Commit PROGRESS.md with the task code
+6. Log all human prompts from current session (avoid duplicates)
+7. Commit PROGRESS.md with the task code
 
 **File location:** `/PROGRESS.md` (project root)
 
@@ -185,6 +186,14 @@ Maintain PROGRESS.md file throughout development:
 - Provides stakeholder visibility
 - Tracks estimates vs actuals
 - Documents quality metrics over time
+- Records complete interaction history for continuity
+
+**Session Logging:**
+- Log every human prompt/request from the current session
+- Include task context and decisions made
+- Ensure no duplicate entries (check before adding)
+- Maintain chronological order
+- Helps AI reconstruct conversation context in future sessions
 
 ---
 
