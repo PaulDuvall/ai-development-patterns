@@ -51,9 +51,147 @@ Patterns are organized into three main categories:
 ## Content Requirements
 
 ### Pattern Name
-- Use descriptive, action-oriented names
-- Avoid generic terms like "AI Pattern" or "Best Practice"
-- Examples: "Policy-as-Code Generation", "Specification Driven Development"
+
+All pattern names MUST follow these strict naming conventions:
+
+#### Pattern Naming Rules
+
+1. **Exactly two words, Title Case**
+   - No more, no less (e.g., "Context Persistence", "Guided Refactoring")
+   - Hyphenated compounds count as one word (e.g., "Spec-First" = 1 word)
+
+2. **Format: Noun + Noun OR Adjective + Noun**
+   - Noun + Noun: "Pipeline Synthesis", "Context Persistence", "Error Resolution"
+   - Adjective + Noun: "Parallel Agents", "Guided Architecture", "Atomic Decomposition"
+   - Avoid verbs unless absolutely essential to meaning
+
+3. **Must clearly imply what the pattern solves or how it works**
+   - Pattern name should pass the "so what" test
+   - Users should understand the pattern's purpose from the name alone
+   - Example: "Workflow Orchestration" clearly implies coordinating multiple workflows
+
+4. **Use concrete, domain-specific AI-native engineering terms**
+   - Prefer: Prompting, Agents, Orchestration, Generation, Synthesis, Automation
+   - Prefer: DevSecOps, Observability, Traceability, Remediation, Forecasting
+   - Avoid: Generic software terms (Adapter, Manager, Handler, Service)
+   - Avoid: Vague terms (Helper, Utility, Common, General)
+
+5. **Each word must be short, clear, and recognizable to engineers**
+   - Avoid jargon requiring specialized knowledge
+   - Prefer common technical vocabulary
+   - Each word should be 2-4 syllables maximum
+
+6. **Unique within catalog**
+   - No duplicate pattern names
+   - Reuse root words ONLY for related sub-patterns
+   - Example: "Context Persistence" and "Context Optimization" share "Context" because they're related
+
+7. **Parallel structure across related pattern sets**
+   - Synthesis family: "Pipeline Synthesis", "Deployment Synthesis", "Release Synthesis"
+   - Automation family: "Event Automation", "Review Automation", "Evidence Automation"
+   - Consistent naming helps users understand pattern relationships
+
+8. **Test: "Use the X Y pattern to..." must sound natural**
+   - "Use the Pipeline Synthesis pattern to..." ✅
+   - "Use the AI-Guided Blue-Green Deployment pattern to..." ❌ (too long)
+   - The pattern name describes a principle, not a tool
+
+#### Antipattern Naming Rules
+
+All antipattern names MUST follow these strict conventions:
+
+1. **Prefix with negative or cautionary modifier**
+   - Use: "Broken", "Blind", "Over", "Under", "False"
+   - Use: "Un-" prefix (Unplanned, Unchecked, Undocumented)
+   - Use: Negative adjectives (Premature, Reckless, Static, Manual, Scattered)
+   - Example: "Broken Context", "Blind Generation", "Over-Alerting"
+
+2. **Two words, Title Case**
+   - Same format as pattern names
+   - Negative prefix counts as part of the first word
+   - Example: "Uncoordinated Agents" (not "Un Coordinated Agents")
+
+3. **Must imply a failure mode or misuse of a valid pattern**
+   - Should describe what went wrong, not just criticize
+   - Example: "Scattered Testing" implies lack of strategy (failure mode)
+   - Example: "Lazy Testing" is judgmental (avoid)
+
+4. **Symmetrical with positive patterns where logical**
+   - Pattern: "Spec-First" → Antipattern: "Spec-Ignored"
+   - Pattern: "Pipeline Synthesis" → Antipattern: "Manual Pipelines"
+   - Pattern: "Workflow Orchestration" → Antipattern: "Chaotic Orchestration"
+   - Symmetry helps learners understand the contrast
+
+5. **Technical focus, not judgmental or humorous**
+   - Focus on the technical cause of failure
+   - Avoid: "Silly Prompting", "Lazy Context", "Dumb Automation"
+   - Prefer: "Blind Prompting", "Bloated Context", "Unplanned Automation"
+
+#### Examples of Good Pattern Names
+
+| Pattern Name | Format | Why It Works |
+|--------------|--------|--------------|
+| Pipeline Synthesis | Noun + Noun | Clear meaning, domain-specific, 2 words |
+| Parallel Agents | Adj + Noun | Describes multiple agents working together |
+| Context Persistence | Noun + Noun | Technical term + clear benefit |
+| Guided Refactoring | Adj + Noun | Implies AI assistance in refactoring |
+| Error Resolution | Noun + Noun | Simple, clear problem-solving pattern |
+| Deployment Synthesis | Noun + Noun | Parallels "Pipeline Synthesis", clear meaning |
+
+#### Examples of Pattern Names Violating Rules
+
+| Bad Pattern Name | Violation | Fixed Version |
+|------------------|-----------|---------------|
+| AI Readiness Assessment | 3 words, "AI" redundant | Readiness Assessment |
+| Comprehensive AI Testing Strategy | 4 words, vague | Testing Orchestration |
+| AI-Guided Blue-Green Deployment | 4 words, too specific | Deployment Synthesis |
+| Rules as Code | 3 words, preposition | Codified Rules |
+| Constraint-Based AI Development | 4 words, "AI" redundant | Constrained Generation |
+
+#### Examples of Good Antipattern Names
+
+| Antipattern Name | Format | Why It Works |
+|------------------|--------|--------------|
+| Broken Context | Negative + Noun | "Broken" prefix, describes failure mode |
+| Blind Generation | Negative + Noun | "Blind" prefix, technical focus |
+| Over-Alerting | Negative + Noun | "Over-" prefix, clear excess problem |
+| Uncoordinated Agents | Negative + Noun | "Un-" prefix, symmetrical with "Parallel Agents" |
+| Spec-Ignored | Negative + Noun | Symmetrical with "Spec-First" pattern |
+
+#### Examples of Antipattern Names Violating Rules
+
+| Bad Antipattern Name | Violation | Fixed Version |
+|----------------------|-----------|---------------|
+| Rushing Into AI | 3 words, no clear prefix | Premature Adoption |
+| Test Generation Without Strategy | 4 words, no negative prefix | Scattered Testing |
+| Kitchen Sink Upload | 3 words, informal/humorous | Overwhelming Visuals |
+| Analysis Paralysis | No negative prefix (common phrase) | Over-Analysis |
+| Blue-Green-Canary Confusion | 3+ words, too specific | Confused Deployment |
+
+#### Validation Checklist for Pattern Names
+
+Before finalizing a pattern name, verify:
+
+- [ ] Exactly 2 words
+- [ ] Title Case formatting
+- [ ] Noun+Noun or Adj+Noun format
+- [ ] No "AI" prefix (redundant in AI development context)
+- [ ] Domain-specific, technical vocabulary
+- [ ] Passes "Use the X Y pattern to..." test
+- [ ] Unique within the catalog
+- [ ] Clear, concise, recognizable words
+- [ ] Describes principle or approach, not a tool
+
+#### Validation Checklist for Antipattern Names
+
+Before finalizing an antipattern name, verify:
+
+- [ ] Exactly 2 words
+- [ ] Has negative/cautionary prefix or adjective
+- [ ] Describes technical failure mode
+- [ ] Not judgmental or humorous
+- [ ] Symmetrical with related pattern (if applicable)
+- [ ] Passes the professional naming test
 
 ### Maturity Levels
 - **Beginner**: No prerequisites, immediate implementation, low complexity
@@ -244,6 +382,11 @@ For experimental or future patterns not yet ready for the main documentation:
 
 Before adding a new pattern, verify:
 
+- [ ] **Pattern name follows strict two-word naming convention**
+- [ ] **Pattern name uses Noun+Noun or Adj+Noun format**
+- [ ] **Pattern name passes "Use the X Y pattern to..." test**
+- [ ] **Pattern name is unique within catalog**
+- [ ] **Antipattern name has negative prefix and follows naming rules**
 - [ ] Follows exact header structure
 - [ ] Has clear, single-sentence description
 - [ ] Includes appropriate maturity level
