@@ -12,7 +12,7 @@ This is the AI Development Patterns repository - a comprehensive collection of p
 ├── README.md                    # Main pattern documentation (3000+ lines)
 ├── pattern-spec.md             # Pattern creation specification and formatting rules
 ├── examples/                   # Working implementations of patterns
-│   └── parallelized-ai-agents/ # Complete Docker-based parallel agent example
+│   └── parallel-agents/ # Complete Docker-based parallel agent example
 ├── docs/                       # Additional documentation and specs
 │   ├── specs.md               # Specification-driven development patterns
 │   └── examples/              # Pattern implementation examples (au1a.md, pm7a.md, etc.)
@@ -85,12 +85,12 @@ This is the AI Development Patterns repository - a comprehensive collection of p
 ## Special Considerations
 
 ### Security Patterns
-- **Isolation-first**: AI Security Sandbox pattern emphasizes network isolation and secret management
+- **Isolation-first**: Security Sandbox pattern emphasizes network isolation and secret management
 - **Default-deny**: Container configurations use `network_mode: none` by default
 - **Parallel safety**: Multiple agent patterns include conflict resolution and coordination
 
 ### Advanced Patterns
-- **Multi-agent coordination**: Parallelized AI Coding Agents pattern includes shared memory and merge automation
+- **Multi-agent coordination**: Parallel Agents pattern includes shared memory and merge automation
 - **Enterprise focus**: Operations patterns target compliance, security, and production concerns
 - **Scalability considerations**: Patterns support both small teams and enterprise deployments
 
