@@ -324,8 +324,8 @@ class PatternValidator:
         files_to_check = [
             repo_root / 'README.md',
             repo_root / 'experiments' / 'README.md',
-            repo_root / 'CLAUDE.md',
-            repo_root / 'pattern-spec.md'
+            repo_root / 'CLAUDE.md'
+            # pattern-spec.md excluded - contains intentional examples of old names
         ]
 
         for file_path in files_to_check:
