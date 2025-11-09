@@ -113,7 +113,7 @@ This change aligns with established pattern naming conventions:
 | ChatOps Security Integration | ChatOps Security | Simplified | "Integration" is implicit |
 | Compliance Evidence Automation | Evidence Automation | Simplified | "Compliance" is implicit in evidence context |
 | Context Window Optimization | Context Optimization | Simplified | "Window" is implicit for context |
-| Visual Context Scaffolding | Visual Scaffolding | Simplified | "Context" is implicit |
+| Visual Context Scaffolding | Image Spec | Simplified | More concise, "Image" specifies visual type |
 | AI Event Automation | Event Automation | Removed "AI" prefix | Automation implies AI |
 | Custom AI Commands | Custom Commands | Removed "AI" prefix | Commands are AI commands in context |
 | Error Resolution | Error Resolution | No change | Already compliant |
@@ -281,7 +281,7 @@ All GitHub markdown anchor links have changed. Update your hyperlinks:
 | `#chatops-security-integration` | `#chatops-security` |
 | `#compliance-evidence-automation` | `#evidence-automation` |
 | `#context-window-optimization` | `#context-optimization` |
-| `#visual-context-scaffolding` | `#visual-scaffolding` |
+| `#visual-context-scaffolding` | `#image-spec` |
 | `#ai-event-automation` | `#event-automation` |
 | `#custom-ai-commands` | `#custom-commands` |
 

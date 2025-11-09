@@ -182,7 +182,7 @@ This implementation plan includes **mandatory human approval checkpoints** befor
 | ChatOps Security Integration | ChatOps Security |
 | Compliance Evidence Automation | Evidence Automation |
 | Context Window Optimization | Context Optimization |
-| Visual Context Scaffolding | Visual Scaffolding |
+| Visual Context Scaffolding | Image Spec |
 | AI Event Automation | Event Automation |
 | Custom AI Commands | Custom Commands |
 | Error Resolution | (no change) |
@@ -922,7 +922,7 @@ Before starting implementation, confirm:
 | ChatOps Security Integration | ChatOps Security | Rename |
 | Compliance Evidence Automation | Evidence Automation | Rename |
 | Context Window Optimization | Context Optimization | Rename |
-| Visual Context Scaffolding | Visual Scaffolding | Rename |
+| Visual Context Scaffolding | Image Spec | Rename |
 | AI Event Automation | Event Automation | Rename |
 | Custom AI Commands | Custom Commands | Rename |
 | Error Resolution | Error Resolution | No Change ✅ |

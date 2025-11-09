@@ -31,7 +31,7 @@ These experimental patterns extend the core AI development patterns with advance
 | **[ChatOps Security](#chatops-security)** | Beginner | Operations | Deploy security scanning capabilities through chat commands for immediate feedback | Security Orchestration |
 | **[Evidence Automation](#evidence-automation)** | Advanced | Operations | Generate audit evidence matrices from logs and configuration changes automatically | Security Orchestration |
 | **[Context Optimization](#context-optimization)** | Advanced | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive Enhancement |
-| **[Visual Scaffolding](#visual-scaffolding)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Spec-First, Progressive Enhancement, Context Optimization |
+| **[Image Spec](#image-spec)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Spec-First, Progressive Enhancement, Context Optimization |
 | **[Event Automation](#event-automation)** | Intermediate | Development | Execute custom commands automatically at specific lifecycle events in AI coding assistants to enforce policies and automate workflows | Codified Rules, Security Sandbox |
 | **[Custom Commands](#custom-commands)** | Intermediate | Development | Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and project-specific workflows | Event Automation, Spec-First |
 
@@ -397,9 +397,9 @@ Always using the most powerful (expensive) AI model for simple tasks wastes reso
 
 ---
 
-### Visual Scaffolding
+### Image Spec
 
-**Maturity**: Intermediate  
+**Maturity**: Intermediate
 **Description**: Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context.
 
 **Related Patterns**: [Spec-First](../README.md#spec-first), [Progressive Enhancement](../README.md#progressive-enhancement), [Context Optimization](#context-optimization)
@@ -445,7 +445,7 @@ Use the interaction flows from dashboard-interactions.png.
 Mock data structure should follow data-model.png."
 ```
 
-#### Anti-pattern: Kitchen Sink Upload
+#### Anti-pattern: Overwhelming Visuals
 
 **Problem**: Uploading many diagrams at once (e.g., 15+) without structure or context
 

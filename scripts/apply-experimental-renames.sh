@@ -75,9 +75,9 @@ sed -i 's/## Context Window Optimization/## Context Optimization/g' "$file"
 sed -i 's/\[Context Window Optimization\](#context-window-optimization)/[Context Optimization](#context-optimization)/g' "$file"
 sed -i 's/#context-window-optimization/#context-optimization/g' "$file"
 
-sed -i 's/## Visual Context Scaffolding/## Visual Scaffolding/g' "$file"
-sed -i 's/\[Visual Context Scaffolding\](#visual-context-scaffolding)/[Visual Scaffolding](#visual-scaffolding)/g' "$file"
-sed -i 's/#visual-context-scaffolding/#visual-scaffolding/g' "$file"
+sed -i 's/## Visual Context Scaffolding/## Image Spec/g' "$file"
+sed -i 's/\[Visual Context Scaffolding\](#visual-context-scaffolding)/[Image Spec](#image-spec)/g' "$file"
+sed -i 's/#visual-context-scaffolding/#image-spec/g' "$file"
 
 sed -i 's/## AI Event Automation/## Event Automation/g' "$file"
 sed -i 's/\[AI Event Automation\](#ai-event-automation)/[Event Automation](#event-automation)/g' "$file"
