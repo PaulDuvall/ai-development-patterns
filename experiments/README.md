@@ -14,37 +14,37 @@ These experimental patterns extend the core AI development patterns with advance
 
 | Pattern | Maturity | Type | Description | Dependencies |
 |---------|----------|------|-------------|--------------|
-| **[Human-AI Handoff Protocol](#human-ai-handoff-protocol)** | Intermediate | Foundation | Clear boundaries and procedures for transitioning work between human developers and AI | AI Developer Lifecycle |
-| **[Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)** | Intermediate | Workflow | Unified approach to test-first development, automated generation, and quality assurance | Specification Driven Development |
-| **[AI Workflow Orchestration](#ai-workflow-orchestration)** | Advanced | Workflow | Coordinate sequential pipelines, parallel workflows, and hybrid human-AI processes | Comprehensive AI Testing Strategy, AI Tool Integration |
-| **[AI Review Automation](#ai-review-automation)** | Intermediate | Operations | Automate review process for parallel agent outputs using AI to detect conflicts and coordinate integration | AI Workflow Orchestration, Atomic Task Decomposition |
-| **[Technical Debt Forecasting](#technical-debt-forecasting)** | Intermediate | Operations | Proactively identify and prioritize technical debt using AI-powered code analysis | AI-Driven Refactoring, AI-Driven Architecture Design, AI Tool Integration |
-| **[Pipeline Synthesis](#pipeline-synthesis)** | Intermediate | Workflow | Convert plain-English build specifications into CI/CD pipeline configurations | AI Workflow Orchestration, AI Tool Integration |
-| **[AI-Guided Blue-Green Deployment](#ai-guided-blue-green-deployment)** | Advanced | Operations | Generate blue-green deployment scripts with validation to prevent AI misconceptions | Pipeline Synthesis |
-| **[Drift Detection & Remediation](#drift-detection--remediation)** | Advanced | Operations | Detect infrastructure configuration drift and generate corrective patches automatically | Pipeline Synthesis |
-| **[Release Note Synthesis](#release-note-synthesis)** | Beginner | Operations | Automatically generate structured release notes by analyzing git commit history | Pipeline Synthesis |
-| **[Incident Response Automation](#incident-response-automation)** | Advanced | Operations | Generate actionable incident response playbooks from historical incident data | Performance Baseline Management |
-| **[Test Suite Health Management](#test-suite-health-management)** | Intermediate | Operations | Analyze build history to identify and remediate flaky tests automatically | Comprehensive AI Testing Strategy |
-| **[Dependency Upgrade Advisor](#dependency-upgrade-advisor)** | Intermediate | Operations | Intelligently manage dependency upgrades with compatibility analysis and risk assessment | Technical Debt Forecasting |
-| **[On-Call Handoff Automation](#on-call-handoff-automation)** | Intermediate | Operations | Generate comprehensive handoff briefs that summarize system state and active issues | Incident Response Automation |
-| **[Chaos Engineering Scenarios](#chaos-engineering-scenarios)** | Advanced | Operations | Generate targeted chaos experiments based on system architecture and dependencies | Performance Baseline Management |
-| **[ChatOps Security Integration](#chatops-security-integration)** | Beginner | Operations | Deploy security scanning capabilities through chat commands for immediate feedback | Security Scanning Orchestration |
-| **[Compliance Evidence Automation](#compliance-evidence-automation)** | Advanced | Operations | Generate audit evidence matrices from logs and configuration changes automatically | Security Scanning Orchestration |
-| **[Context Window Optimization](#context-window-optimization)** | Advanced | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive AI Enhancement |
-| **[Visual Context Scaffolding](#visual-context-scaffolding)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Specification Driven Development, Progressive AI Enhancement, Context Window Optimization |
-| **[AI Event Automation](#ai-event-automation)** | Intermediate | Development | Execute custom commands automatically at specific lifecycle events in AI coding assistants to enforce policies and automate workflows | Rules as Code, AI Security Sandbox |
-| **[Custom AI Commands](#custom-ai-commands)** | Intermediate | Development | Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and project-specific workflows | AI Event Automation, Specification Driven Development |
+| **[Handoff Protocols](#handoff-protocols)** | Intermediate | Foundation | Clear boundaries and procedures for transitioning work between human developers and AI | Developer Lifecycle |
+| **[Testing Orchestration](#testing-orchestration)** | Intermediate | Workflow | Unified approach to test-first development, automated generation, and quality assurance | Spec-First |
+| **[Workflow Orchestration](#workflow-orchestration)** | Advanced | Workflow | Coordinate sequential pipelines, parallel workflows, and hybrid human-AI processes | Testing Orchestration, Tool Integration |
+| **[Review Automation](#review-automation)** | Intermediate | Operations | Automate review process for parallel agent outputs using AI to detect conflicts and coordinate integration | Workflow Orchestration, Atomic Decomposition |
+| **[Debt Forecasting](#debt-forecasting)** | Intermediate | Operations | Proactively identify and prioritize technical debt using AI-powered code analysis | Guided Refactoring, Guided Architecture, Tool Integration |
+| **[Pipeline Synthesis](#pipeline-synthesis)** | Intermediate | Workflow | Convert plain-English build specifications into CI/CD pipeline configurations | Workflow Orchestration, Tool Integration |
+| **[Deployment Synthesis](#deployment-synthesis)** | Advanced | Operations | Generate blue-green deployment scripts with validation to prevent AI misconceptions | Pipeline Synthesis |
+| **[Drift Remediation](#drift-remediation)** | Advanced | Operations | Detect infrastructure configuration drift and generate corrective patches automatically | Pipeline Synthesis |
+| **[Release Synthesis](#release-synthesis)** | Beginner | Operations | Automatically generate structured release notes by analyzing git commit history | Pipeline Synthesis |
+| **[Incident Automation](#incident-automation)** | Advanced | Operations | Generate actionable incident response playbooks from historical incident data | Baseline Management |
+| **[Suite Health](#suite-health)** | Intermediate | Operations | Analyze build history to identify and remediate flaky tests automatically | Testing Orchestration |
+| **[Upgrade Advisor](#upgrade-advisor)** | Intermediate | Operations | Intelligently manage dependency upgrades with compatibility analysis and risk assessment | Debt Forecasting |
+| **[Handoff Automation](#handoff-automation)** | Intermediate | Operations | Generate comprehensive handoff briefs that summarize system state and active issues | Incident Automation |
+| **[Chaos Engineering](#chaos-engineering)** | Advanced | Operations | Generate targeted chaos experiments based on system architecture and dependencies | Baseline Management |
+| **[ChatOps Security](#chatops-security)** | Beginner | Operations | Deploy security scanning capabilities through chat commands for immediate feedback | Security Orchestration |
+| **[Evidence Automation](#evidence-automation)** | Advanced | Operations | Generate audit evidence matrices from logs and configuration changes automatically | Security Orchestration |
+| **[Context Optimization](#context-optimization)** | Advanced | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive Enhancement |
+| **[Visual Scaffolding](#visual-scaffolding)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Spec-First, Progressive Enhancement, Context Optimization |
+| **[Event Automation](#event-automation)** | Intermediate | Development | Execute custom commands automatically at specific lifecycle events in AI coding assistants to enforce policies and automate workflows | Codified Rules, Security Sandbox |
+| **[Custom Commands](#custom-commands)** | Intermediate | Development | Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and project-specific workflows | Event Automation, Spec-First |
 
 ---
 
 ## Advanced Workflows
 
-### Human-AI Handoff Protocol
+### Handoff Protocols
 
 **Maturity**: Intermediate  
 **Description**: Clear boundaries and procedures for transitioning work between human developers and AI tools based on complexity, security requirements, and creative problem-solving needs.
 
-**Related Patterns**: [AI Developer Lifecycle](../README.md#ai-developer-lifecycle), [Observable AI Development](../README.md#observable-ai-development), [AI Workflow Orchestration](#ai-workflow-orchestration)
+**Related Patterns**: [Developer Lifecycle](../README.md#developer-lifecycle), [Observable Development](../README.md#observable-development), [Workflow Orchestration](#workflow-orchestration)
 
 **Handoff Decision Framework**
 
@@ -131,23 +131,23 @@ sequenceDiagram
     AS->>AS: Refine Handoff Criteria
 ```
 
-**Anti-pattern: Unclear Boundaries**
+**Anti-pattern: Broken Boundaries**
 Allowing AI and humans to work on the same task simultaneously without clear handoff points leads to conflicts, duplicated effort, and inconsistent quality.
 
 ---
 
-### Comprehensive AI Testing Strategy
+### Testing Orchestration
 
 **Maturity**: Intermediate  
 **Description**: Unified approach combining test-first development, automated test generation, and quality assurance patterns to ensure AI-generated code meets quality and behavioral specifications.
 
 **Pattern Boundary Clarification**:
 - **This pattern** focuses on overall testing strategy and test generation
-- **Specification Driven Development** focuses on writing specs before implementation
-- **Observable AI Development** focuses on logging and debugging for AI understanding
-- **AI-Driven Traceability** focuses on linking requirements to tests and implementation
+- **Spec-First** focuses on writing specs before implementation
+- **Observable Development** focuses on logging and debugging for AI understanding
+- **Automated Traceability** focuses on linking requirements to tests and implementation
 
-**Related Patterns**: [Specification Driven Development](../README.md#specification-driven-development), [Observable AI Development](../README.md#observable-ai-development)
+**Related Patterns**: [Spec-First](../README.md#spec-first), [Observable Development](../README.md#observable-development)
 
 **Integrated Testing Framework**
 
@@ -230,17 +230,17 @@ sequenceDiagram
     AI->>AI: Learn from Test Success/Failure Patterns
 ```
 
-**Anti-pattern: Test Generation Without Strategy**
+**Anti-pattern: Scattered Testing**
 Generating tests with AI without a coherent strategy leads to poor coverage, flaky tests, and false confidence in code quality.
 
 ---
 
-### AI Workflow Orchestration
+### Workflow Orchestration
 
 **Maturity**: Advanced  
 **Description**: Coordinate sequential pipelines, parallel agent workflows, and hybrid human-AI processes for complex development tasks. Transform synchronous single-agent workflows into asynchronous, event-driven multi-agent architectures while maintaining safety and consistency.
 
-**Related Patterns**: [Human-AI Handoff Protocol](#human-ai-handoff-protocol), [AI Tool Integration](../README.md#ai-tool-integration), [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy), [Atomic Task Decomposition](../README.md#atomic-task-decomposition)
+**Related Patterns**: [Handoff Protocols](#handoff-protocols), [Tool Integration](../README.md#tool-integration), [Testing Orchestration](#testing-orchestration), [Atomic Decomposition](../README.md#atomic-decomposition)
 
 **Workflow Types & Selection**
 
@@ -368,20 +368,20 @@ parallel_safety:
     - before_deployment
 ```
 
-**Anti-pattern: Uncoordinated Multi-Tool Usage**
+**Anti-pattern: Chaotic Orchestration**
 Using multiple AI tools without proper orchestration leads to inconsistent code, integration conflicts, and wasted effort from competing implementations.
 
-**Anti-pattern: Unsafe Parallel Execution**
+**Anti-pattern: Unsafe Parallelism**
 Running parallel agents without proper isolation, conflict detection, or sync points risks data corruption, merge conflicts, and system instability.
 
 ---
 
-### Context Window Optimization
+### Context Optimization
 
 **Maturity**: Advanced  
 **Description**: Match AI tool selection to task complexity and optimize cost/performance trade-offs by understanding different AI models' context window capabilities and computational costs.
 
-**Related Patterns**: [Progressive AI Enhancement](../README.md#progressive-ai-enhancement), [AI Choice Generation](../README.md#ai-choice-generation)
+**Related Patterns**: [Progressive Enhancement](../README.md#progressive-enhancement), [Choice Generation](../README.md#ai-choice-generation)
 
 **Tool Selection Decision Matrix**
 
@@ -392,17 +392,17 @@ Running parallel agents without proper isolation, conflict detection, or sync po
 | Complex systems | 8K-32K tokens | GPT-4 Turbo, Claude Opus | High | Architecture, large refactors |
 | Massive codebases | 32K+ tokens | Claude-100K, GPT-4-128K | Premium | Full system analysis |
 
-**Anti-pattern: One-Size-Fits-All**
+**Anti-pattern: Wasteful Context**
 Always using the most powerful (expensive) AI model for simple tasks wastes resources and increases latency for routine operations.
 
 ---
 
-### Visual Context Scaffolding
+### Visual Scaffolding
 
 **Maturity**: Intermediate  
 **Description**: Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context.
 
-**Related Patterns**: [Specification Driven Development](../README.md#specification-driven-development), [Progressive AI Enhancement](../README.md#progressive-ai-enhancement), [Context Window Optimization](#context-window-optimization)
+**Related Patterns**: [Spec-First](../README.md#spec-first), [Progressive Enhancement](../README.md#progressive-enhancement), [Context Optimization](#context-optimization)
 
 #### Core Implementation
 
@@ -470,12 +470,12 @@ Mock data structure should follow data-model.png."
 
 ---
 
-### AI Event Automation
+### Event Automation
 
 **Maturity**: Intermediate
 **Description**: Execute custom commands automatically at specific lifecycle events (before/after file operations, session start, prompt submission) for workflow automation, validation, and policy enforcement.
 
-**Related Patterns**: [Rules as Code](../README.md#rules-as-code), [AI Security Sandbox](../README.md#ai-security-sandbox)
+**Related Patterns**: [Codified Rules](../README.md#codified-rules), [Security Sandbox](../README.md#security-sandbox)
 
 **Core Concept**
 
@@ -570,22 +570,22 @@ Event commands run with full system access. Always review scripts before enablin
 
 See [examples/ai-event-automation/](examples/ai-event-automation/) for working implementation with security scanning and slash command integration.
 
-**Anti-pattern: Unchecked Event Commands**
+**Anti-pattern: Unchecked Events**
 
 Running automation from untrusted sources without review exposes your system to malicious code execution and credential theft. Always audit event scripts before installation.
 
 ---
 
-### Custom AI Commands
+### Custom Commands
 
 **Maturity**: Intermediate
 **Description**: Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and sophisticated workflows.
 
-**Related Patterns**: [AI Event Automation](#ai-event-automation), [Specification Driven Development](../README.md#specification-driven-development), [Rules as Code](../README.md#rules-as-code)
+**Related Patterns**: [Event Automation](#event-automation), [Spec-First](../README.md#spec-first), [Codified Rules](../README.md#codified-rules)
 
 **Core Concept**
 
-AI coding tools provide built-in commands for common operations and support custom commands (markdown files with AI instructions) for project-specific workflows. Commands are manual/on-demand (invoked like `/refactor`), while events fire automatically (see [AI Event Automation](#ai-event-automation)).
+AI coding tools provide built-in commands for common operations and support custom commands (markdown files with AI instructions) for project-specific workflows. Commands are manual/on-demand (invoked like `/refactor`), while events fire automatically (see [Event Automation](#event-automation)).
 
 **Command Discovery**
 
@@ -671,7 +671,7 @@ mkdir -p .ai/commands
 
 See [examples/custom-ai-commands/](examples/custom-ai-commands/) for ready-to-use commands, configuration files, and setup guide.
 
-**Anti-pattern: Ignoring Built-in Commands**
+**Anti-pattern: Redundant Commands**
 
 Creating `/clear` when the tool already provides it. Always discover built-in commands first.
 
@@ -702,12 +702,12 @@ Deploy to database: $1 (default: $STAGING_DB)
 
 ## Operations Automation
 
-### AI Review Automation
+### Review Automation
 
 **Maturity**: Intermediate  
 **Description**: Automate review process for parallel agent outputs using AI to detect conflicts and coordinate integration.
 
-**Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration), [Atomic Task Decomposition](../README.md#atomic-task-decomposition), [Parallelized AI Coding Agents](../README.md#parallelized-ai-coding-agents)
+**Related Patterns**: [Workflow Orchestration](#workflow-orchestration), [Atomic Decomposition](../README.md#atomic-decomposition), [Parallel Agents](../README.md#parallelized-ai-coding-agents)
 
 **Automated Review and Merge System**
 
@@ -715,7 +715,7 @@ Deploy to database: $1 (default: $STAGING_DB)
 #!/bin/bash
 # automated-review.sh - Complete parallel agent review and integration
 
-echo "=== AI Review Automation for Parallel Agents ==="
+echo "=== Review Automation for Parallel Agents ==="
 
 # 1. Detect conflicts between agent outputs
 echo "Scanning for conflicts across agent workspaces..."
@@ -790,17 +790,17 @@ else
 fi
 ```
 
-**Anti-pattern: Manual-Only Review**
+**Anti-pattern: Manual Reviews**
 Relying entirely on human reviewers for parallel agent outputs creates bottlenecks and misses systematic integration issues that automated tools can catch.
 
 ---
 
-### Technical Debt Forecasting
+### Debt Forecasting
 
 **Maturity**: Intermediate  
 **Description**: Proactively identify and prioritize technical debt using AI-powered code analysis.
 
-**Related Patterns**: [AI-Driven Refactoring](../README.md#ai-driven-refactoring), [AI-Driven Architecture Design](../README.md#ai-driven-architecture-design), [AI Tool Integration](../README.md#ai-tool-integration)
+**Related Patterns**: [Guided Refactoring](../README.md#guided-refactoring), [Guided Architecture](../README.md#guided-architecture), [Tool Integration](../README.md#tool-integration)
 
 ```bash
 ai "Analyze codebase for technical debt indicators and forecast maintenance burden:
@@ -812,7 +812,7 @@ ai "Analyze codebase for technical debt indicators and forecast maintenance burd
 Prioritize by maintenance cost and business impact."
 ```
 
-**Anti-pattern: Reactive Debt Management**
+**Anti-pattern: Reactive Debt**
 Waiting until technical debt becomes a crisis instead of continuously monitoring and addressing it through predictive analysis.
 
 ---
@@ -822,7 +822,7 @@ Waiting until technical debt becomes a crisis instead of continuously monitoring
 **Maturity**: Intermediate  
 **Description**: Convert plain-English build specifications into CI/CD pipeline configurations.
 
-**Related Patterns**: [AI Workflow Orchestration](#ai-workflow-orchestration), [AI Tool Integration](../README.md#ai-tool-integration)
+**Related Patterns**: [Workflow Orchestration](#workflow-orchestration), [Tool Integration](../README.md#tool-integration)
 
 ```bash
 ai "Generate GitHub Actions workflow from specification:
@@ -835,12 +835,12 @@ Build Requirements:
 Output complete .github/workflows/ci.yml with security best practices."
 ```
 
-**Anti-pattern: Manual Pipeline Maintenance**
+**Anti-pattern: Manual Pipelines**
 Hand-crafting and updating CI/CD configurations instead of generating them from requirements specifications leads to inconsistency and maintenance burden.
 
 ---
 
-### AI-Guided Blue-Green Deployment
+### Deployment Synthesis
 
 **Maturity**: Advanced  
 **Description**: Generate blue-green deployment scripts with validation to prevent AI misconceptions about deployment strategies.
@@ -868,12 +868,12 @@ validation:
   approval_required: true
 ```
 
-**Anti-pattern: Blue-Green-Canary Confusion**
+**Anti-pattern: Confused Deployment**
 AI-generated deployment scripts that mix blue-green and canary strategies, resulting in complex traffic splitting instead of simple environment switching.
 
 ---
 
-### Drift Detection & Remediation
+### Drift Remediation
 
 **Maturity**: Advanced  
 **Description**: Detect infrastructure configuration drift and generate corrective patches automatically.
@@ -888,12 +888,12 @@ ai "Compare current AWS infrastructure against Terraform state:
 4. Create automated remediation script with approval gates"
 ```
 
-**Anti-pattern: Manual Drift Checking**
+**Anti-pattern: Manual Drift**
 Relying on periodic manual infrastructure audits instead of continuous automated drift detection and remediation.
 
 ---
 
-### Release Note Synthesis
+### Release Synthesis
 
 **Maturity**: Beginner  
 **Description**: Automatically generate structured release notes by analyzing git commit history.
@@ -911,19 +911,19 @@ Format:
 Group by conventional commit prefixes and business impact."
 ```
 
-**Anti-pattern: Manual Release Notes**
+**Anti-pattern: Manual Releases**
 Writing release notes manually from memory instead of systematically analyzing commit history and pull request descriptions.
 
 ---
 
 ## Monitoring & Intelligence
 
-### Incident Response Automation
+### Incident Automation
 
 **Maturity**: Advanced  
 **Description**: Generate actionable incident response playbooks from historical incident data.
 
-**Related Patterns**: [Performance Baseline Management](../README.md#performance-baseline-management)
+**Related Patterns**: [Baseline Management](../README.md#baseline-management)
 
 ```bash
 ai "Analyze last 50 incidents in PagerDuty/AWS CloudWatch to:
@@ -938,12 +938,12 @@ Maintaining outdated incident response procedures instead of continuously improv
 
 ---
 
-### Test Suite Health Management
+### Suite Health
 
 **Maturity**: Intermediate  
 **Description**: Analyze build history to identify and remediate flaky tests automatically.
 
-**Related Patterns**: [Comprehensive AI Testing Strategy](#comprehensive-ai-testing-strategy)
+**Related Patterns**: [Testing Orchestration](#testing-orchestration)
 
 ```bash
 ai "Analyze Jenkins/GitHub Actions history for flaky tests:
@@ -953,17 +953,17 @@ ai "Analyze Jenkins/GitHub Actions history for flaky tests:
 4. Recommend test suite restructuring"
 ```
 
-**Anti-pattern: Ignoring Flaky Tests**
+**Anti-pattern: Ignored Flakiness**
 Accepting unreliable tests as normal instead of systematically identifying and fixing test suite stability issues.
 
 ---
 
-### Dependency Upgrade Advisor
+### Upgrade Advisor
 
 **Maturity**: Intermediate  
 **Description**: Intelligently manage dependency upgrades with compatibility analysis and risk assessment.
 
-**Related Patterns**: [Technical Debt Forecasting](#technical-debt-forecasting)
+**Related Patterns**: [Debt Forecasting](#debt-forecasting)
 
 ```bash
 ai "Analyze package.json/requirements.txt for upgrade opportunities:
@@ -973,17 +973,17 @@ ai "Analyze package.json/requirements.txt for upgrade opportunities:
 4. Create rollback procedures"
 ```
 
-**Anti-pattern: Batch Upgrades**
+**Anti-pattern: Reckless Upgrades**
 Upgrading all dependencies simultaneously without risk assessment or staged rollout plans.
 
 ---
 
-### On-Call Handoff Automation
+### Handoff Automation
 
 **Maturity**: Intermediate  
 **Description**: Generate comprehensive handoff briefs that summarize system state and active issues.
 
-**Related Patterns**: [Incident Response Automation](#incident-response-automation)
+**Related Patterns**: [Incident Automation](#incident-automation)
 
 ```bash
 ai "Generate on-call handoff brief from last 24h:
@@ -994,17 +994,17 @@ ai "Generate on-call handoff brief from last 24h:
 Include trending metrics and anomaly detection."
 ```
 
-**Anti-pattern: Verbal-Only Handoffs**
+**Anti-pattern: Undocumented Handoffs**
 Relying on informal verbal communication for critical system state transfer instead of structured, documented handoff procedures.
 
 ---
 
-### Chaos Engineering Scenarios
+### Chaos Engineering
 
 **Maturity**: Advanced  
 **Description**: Generate targeted chaos experiments based on system architecture and dependencies.
 
-**Related Patterns**: [Performance Baseline Management](../README.md#performance-baseline-management)
+**Related Patterns**: [Baseline Management](../README.md#baseline-management)
 
 ```bash
 ai "Design chaos experiments for microservices architecture:
@@ -1020,12 +1020,12 @@ Running unfocused chaos experiments without clear hypotheses or measurement crit
 
 ---
 
-### ChatOps Security Integration
+### ChatOps Security
 
 **Maturity**: Beginner  
 **Description**: Deploy security scanning capabilities through chat commands for immediate feedback.
 
-**Related Patterns**: [Security Scanning Orchestration](../README.md#security-scanning-orchestration)
+**Related Patterns**: [Security Orchestration](../README.md#security-orchestration)
 
 ```bash
 # Slack bot integration for security scanning
@@ -1036,17 +1036,17 @@ ai "Create Slack command handlers for:
 Include results formatting and alert escalation."
 ```
 
-**Anti-pattern: Delayed Security Feedback**
+**Anti-pattern: Delayed Security**
 Waiting for scheduled security scans instead of enabling on-demand security validation through developer workflows.
 
 ---
 
-### Compliance Evidence Automation
+### Evidence Automation
 
 **Maturity**: Advanced  
 **Description**: Generate audit evidence matrices from logs and configuration changes automatically.
 
-**Related Patterns**: [Security Scanning Orchestration](../README.md#security-scanning-orchestration)
+**Related Patterns**: [Security Orchestration](../README.md#security-orchestration)
 
 ```bash
 ai "Generate SOC 2 compliance evidence from AWS CloudTrail:
@@ -1057,5 +1057,5 @@ ai "Generate SOC 2 compliance evidence from AWS CloudTrail:
 Format as audit-ready evidence matrix with timestamps and responsible parties."
 ```
 
-**Anti-pattern: Manual Evidence Collection**
+**Anti-pattern: Manual Evidence**
 Manually gathering compliance evidence during audits instead of continuously collecting and organizing audit trail data.

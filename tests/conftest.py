@@ -51,38 +51,38 @@ REQUIRED_PATTERN_SECTIONS = {
 }
 
 PATTERN_CATEGORIES = {
-    "Foundation": ["AI Readiness Assessment", "Rules as Code", "AI Security Sandbox", 
-                   "AI Developer Lifecycle", "AI Tool Integration", "AI Issue Generation"],
-    "Development": ["Specification Driven Development", "AI Plan-First Development", "Progressive AI Enhancement",
-                    "AI Choice Generation", "Parallelized AI Coding Agents", "AI Context Persistence",
-                    "Constraint-Based AI Development", "Atomic Task Decomposition",
-                    "Observable AI Development", "AI-Driven Refactoring",
-                    "AI-Driven Architecture Design", "AI-Driven Traceability"],
-    "Operations": ["Policy-as-Code Generation", "Security Scanning Orchestration", 
-                   "Performance Baseline Management"]
+    "Foundation": ["Readiness Assessment", "Codified Rules", "Security Sandbox",
+                   "Developer Lifecycle", "Tool Integration", "Issue Generation"],
+    "Development": ["Spec-First", "Planned Implementation", "Progressive Enhancement",
+                    "Choice Generation", "Parallel Agents", "Context Persistence",
+                    "Constrained Generation", "Atomic Decomposition",
+                    "Observable Development", "Guided Refactoring",
+                    "Guided Architecture", "Automated Traceability"],
+    "Operations": ["Policy Generation", "Security Orchestration",
+                   "Baseline Management"]
 }
 
 # Expected patterns from the reference table
 EXPECTED_PATTERNS = [
-    "AI Readiness Assessment",
-    "Rules as Code", 
-    "AI Security Sandbox",
-    "AI Developer Lifecycle",
-    "AI Tool Integration",
-    "AI Issue Generation",
-    "Specification Driven Development",
-    "AI Plan-First Development",
-    "Progressive AI Enhancement",
-    "AI Choice Generation",
-    "Atomic Task Decomposition",
-    "Parallelized AI Coding Agents",
-    "AI Context Persistence",
-    "Constraint-Based AI Development",
-    "Observable AI Development",
-    "AI-Driven Refactoring",
-    "AI-Driven Architecture Design",
-    "AI-Driven Traceability",
-    "Policy-as-Code Generation",
-    "Security Scanning Orchestration",
-    "Performance Baseline Management"
+    "Readiness Assessment",
+    "Codified Rules",
+    "Security Sandbox",
+    "Developer Lifecycle",
+    "Tool Integration",
+    "Issue Generation",
+    "Spec-First",
+    "Planned Implementation",
+    "Progressive Enhancement",
+    "Choice Generation",
+    "Atomic Decomposition",
+    "Parallel Agents",
+    "Context Persistence",
+    "Constrained Generation",
+    "Observable Development",
+    "Guided Refactoring",
+    "Guided Architecture",
+    "Automated Traceability",
+    "Policy Generation",
+    "Security Orchestration",
+    "Baseline Management"
 ]
