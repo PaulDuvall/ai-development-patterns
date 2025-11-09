@@ -130,7 +130,7 @@ graph TD
 **When to Use Each Approach**:
 - Use **[Issue Generation](#issue-generation)** for standard team development with human developers
 - Use **[Atomic Decomposition](#atomic-decomposition)** when implementing with parallel AI agents
-- Use **Progressive Enhancement** when prioritizing rapid market feedback over task granularity
+- Use **[Progressive Enhancement](#progressive-enhancement)** when prioritizing rapid market feedback over task granularity
 
 **Pattern Differentiation**:
 - **[Issue Generation](#issue-generation)**: Creates Kanban work items (4-8 hours) for human team workflows
@@ -335,7 +335,7 @@ project/
     └── rules.md
 ```
 
-**Complete Example**: See [examples/rules-as-code/](examples/rules-as-code/) for:
+**Complete Example**: See [examples/codified-rules/](examples/codified-rules/) for:
 - Comprehensive development workflow rules and standards
 - Pipeline automation and CI/CD rules
 - Code quality standards and enforcement guidelines
@@ -366,7 +366,7 @@ services:
       # DO NOT mount ~/.aws, .env, secrets/, etc.
 ```
 
-**Complete Example**: See [examples/ai-security-sandbox/](examples/ai-security-sandbox/) for:
+**Complete Example**: See [examples/security-sandbox/](examples/security-sandbox/) for:
 - Complete Docker isolation configurations for single and multi-agent setups
 - Resource locking and emergency shutdown procedures
 - Security monitoring and violation detection
@@ -454,7 +454,7 @@ ai "Implement following specifications → Use tests as guide, security best pra
 ai "Complete QA → Run tests, security scan, deploy, monitor"
 ```
 
-**Complete Implementation**: See [examples/ai-development-lifecycle/](examples/ai-development-lifecycle/) for full 9-stage workflow scripts, detailed prompts for each stage, enhanced implementation techniques ([Five-Try Rule](https://www.linkedin.com/posts/jessicakerr_the-implementation-is-a-test-of-the-design-activity-7367649800193761281-LzCu/), markdown iteration, function decomposition), and integration with CI/CD pipelines.
+**Complete Implementation**: See [examples/developer-lifecycle/](examples/developer-lifecycle/) for full 9-stage workflow scripts, detailed prompts for each stage, enhanced implementation techniques ([Five-Try Rule](https://www.linkedin.com/posts/jessicakerr_the-implementation-is-a-test-of-the-design-activity-7367649800193761281-LzCu/), markdown iteration, function decomposition), and integration with CI/CD pipelines.
 
 **Anti-pattern: Unplanned Development**
 Jumping straight to coding with AI without proper planning, requirements, or testing strategy. Also avoid continuing with the same AI approach after 3-4 failures without decomposing the problem or changing strategy.
@@ -531,7 +531,7 @@ This pattern can be implemented using [Anthropic's Model Context Protocol (MCP)]
 }
 ```
 
-**What Tool Integration Enables**
+**What [Tool Integration](#tool-integration) Enables**
 
 - **Real-time data access**: AI queries current database state, not training data
 - **File system interaction**: Read logs, write generated code, manage project files
@@ -541,7 +541,7 @@ This pattern can be implemented using [Anthropic's Model Context Protocol (MCP)]
 
 **Complete Implementation**
 
-See [examples/ai-tool-integration/](examples/ai-tool-integration/) for:
+See [examples/tool-integration/](examples/tool-integration/) for:
 - Full Python implementation with security controls
 - Configuration examples and MCP integration
 - Usage patterns and deployment guidelines
@@ -560,7 +560,7 @@ Attempting to solve complex data analysis, system integration, or real-time prob
 
 **Related Patterns**: [Readiness Assessment](#readiness-assessment), [Spec-First](#spec-first)
 
-**Issue Generation Framework**
+**[Issue Generation](#issue-generation) Framework**
 
 ```mermaid
 graph TD
@@ -601,7 +601,7 @@ Generated issues must include:
 - **Dependency Validation**: Automated checking for circular dependencies
 - **Status Propagation**: Subissue changes update epic progress
 
-**Implementation Examples**: See [examples/ai-issue-generation/](examples/ai-issue-generation/) for detailed AI prompts, epic breakdown workflows, CI integration patterns, and traceability implementations.
+**Implementation Examples**: See [examples/issue-generation/](examples/issue-generation/) for detailed AI prompts, epic breakdown workflows, CI integration patterns, and traceability implementations.
 
 > "If a task takes more than one day, split it."
 > – Kanban Guide, Lean Kanban University
@@ -748,7 +748,7 @@ Coverage: 94% (31/33 spec requirements covered)"
 
 **Complete Implementation**
 
-See [examples/specification-driven-development/](examples/specification-driven-development/) for:
+See [examples/spec-first/](examples/spec-first/) for:
 - Complete IAM Policy Generator implementation
 - spec_validator.py tool for automated compliance checking
 - Pre-commit hooks and Git workflow integration
@@ -884,7 +884,7 @@ How to verify each step works and overall solution meets requirements
 
 **Complete Implementation**
 
-See [examples/ai-plan-first-development/](examples/ai-plan-first-development/) for:
+See [examples/planned-implementation/](examples/planned-implementation/) for:
 - Tool-specific planning examples (Claude Code, Cursor)
 - Planning templates and checklists
 - Markdown iteration techniques and stakeholder review cycles
@@ -1124,14 +1124,14 @@ tasks = {
 }
 ```
 
-**Complete Implementation**: See [examples/parallelized-ai-agents/](examples/parallelized-ai-agents/) for:
+**Complete Implementation**: See [examples/parallel-agents/](examples/parallel-agents/) for:
 - Full Docker isolation and coordination setup
 - Git worktree management and conflict resolution
 - Shared memory system with file locking
 - Emergency shutdown and safety monitoring
 - Task distribution and dependency management
 
-**When to Use Parallel Agents**
+**When to Use [Parallel Agents](#parallel-agents)**
 - **Complex features** requiring multiple specialized implementations
 - **Time-critical projects** where speed trumps coordination overhead
 - **Exploration phases** testing multiple approaches simultaneously
@@ -1233,7 +1233,7 @@ Capture successful prompts and failures with success rates for reuse:
 ./session-resume.sh  # Displays TODO + recent decisions + notes recap
 ```
 
-**Complete Implementation**: See [examples/ai-context-persistence/](examples/ai-context-persistence/) for:
+**Complete Implementation**: See [examples/context-persistence/](examples/context-persistence/) for:
 - Memory schema templates (TODO.md, DECISIONS.log, NOTES.md, scratchpad.md)
 - Context compaction and session resume automation scripts
 - Prompt pattern capture and maintenance tools
@@ -1413,14 +1413,14 @@ task.outputs = {"is_valid": bool, "errors": List[str]}
 assert task.validate_atomic()  # ✓ Passes atomic criteria
 ```
 
-**Complete Implementation**: See [examples/atomic-task-decomposition/](examples/atomic-task-decomposition/) for:
+**Complete Implementation**: See [examples/atomic-decomposition/](examples/atomic-decomposition/) for:
 - Contract validation system with automated checking
 - Function-level decomposition techniques and trigger indicators
 - Task dependency resolution and scheduling
 - Parallel execution coordination and monitoring
 - Agent assignment and resource management
 
-**When to Use Atomic Decomposition**
+**When to Use [Atomic Decomposition](#atomic-decomposition)**
 - **Parallel Agent Implementation**: Multiple AI agents working simultaneously
 - **Complex Feature Development**: Large features benefiting from parallel work
 - **Time-Critical Projects**: Speed through parallelization essential
@@ -1466,7 +1466,7 @@ def process_order(order):
         raise
 ```
 
-**Complete Implementation**: See [examples/observable-ai-development/](examples/observable-ai-development/) for:
+**Complete Implementation**: See [examples/observable-development/](examples/observable-development/) for:
 - Full structured logging framework with correlation IDs
 - Performance monitoring decorators and utilities  
 - AI-friendly debug tools and log analysis scripts
@@ -1575,7 +1575,7 @@ Document lessons learned in .ai/knowledge/refactoring.md"
 - **Replace Primitive**: Convert strings/dicts to value objects
 - **Consolidate Duplicates**: Merge similar code patterns
 
-**Complete Implementation**: See [examples/ai-driven-refactoring/](examples/ai-driven-refactoring/) for:
+**Complete Implementation**: See [examples/guided-refactoring/](examples/guided-refactoring/) for:
 - Automated refactoring pipeline with CI integration
 - Quality metrics tracking and reporting
 - Risk assessment guidelines and rollback procedures
@@ -1681,7 +1681,7 @@ done
 ai "Map recent changes to affected requirements and tests"
 ```
 
-**Complete Implementation**: See [examples/ai-driven-traceability/](examples/ai-driven-traceability/) for:
+**Complete Implementation**: See [examples/automated-traceability/](examples/automated-traceability/) for:
 - Complete traceability maintenance automation system
 - Link validation and gap analysis tools
 - Impact analysis and reporting scripts
@@ -1716,7 +1716,7 @@ SOC 2: Data at rest must be AES-256 encrypted" > encryption.cedar
 opa test encryption.cedar
 ```
 
-**Complete Implementation**: See [examples/policy-as-code-generation/](examples/policy-as-code-generation/) for:
+**Complete Implementation**: See [examples/policy-generation/](examples/policy-generation/) for:
 - Complete policy generation pipeline with AI assistance
 - Cedar/OPA policy templates and compliance mapping
 - Policy testing and validation frameworks
@@ -1745,7 +1745,7 @@ ai "Summarize security findings; focus on CRITICAL issues" > pr-comment.txt
 gh pr comment --body-file pr-comment.txt
 ```
 
-**Complete Implementation**: See [examples/security-scanning-orchestration/](examples/security-scanning-orchestration/) for:
+**Complete Implementation**: See [examples/security-orchestration/](examples/security-orchestration/) for:
 - Complete security scanning pipeline with tool orchestration
 - AI-powered report summarization and prioritization
 - CI/CD integration and automated PR commenting
@@ -1781,7 +1781,7 @@ ai "From perf.csv, recommend latency thresholds and autoscale policies" > perf-p
 deploy-tool apply perf-policy.json
 ```
 
-**Complete Implementation**: See [examples/performance-baseline-management/](examples/performance-baseline-management/) for:
+**Complete Implementation**: See [examples/baseline-management/](examples/baseline-management/) for:
 - Complete performance monitoring setup with baseline establishment
 - AI-powered threshold calculation and alert configuration
 - Autoscaling policy generation and deployment automation
