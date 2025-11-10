@@ -3,7 +3,7 @@
 [![Tests](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml/badge.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/docs-comprehensive-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns#ai-development-patterns)
-[![Patterns](https://img.shields.io/badge/patterns-22-blue.svg)](#complete-pattern-reference)
+[![Patterns](https://img.shields.io/badge/patterns-21-blue.svg)](#complete-pattern-reference)
 [![Quality Gate](https://img.shields.io/badge/quality%20gate-passing-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/tree/main/tests)
 [![Hyperlinks](https://img.shields.io/badge/hyperlinks-validated-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
 
@@ -1733,19 +1733,19 @@ graph TD
 cat > .error-context.md << 'EOF'
 # Error Analysis
 
-## Error Output
+**Error Output:**
 [Complete error message, stack trace, and exit codes]
 
-## Recent Changes
+**Recent Changes:**
 $(git log --oneline -5)
 
-## Affected Files
+**Affected Files:**
 $(git diff --name-only HEAD~1)
 
-## File Contents (for affected files)
+**File Contents:**
 $(cat path/to/affected/file.ext)
 
-## Environment
+**Environment:**
 - OS: $(uname -s)
 - Shell: $SHELL
 - Working Directory: $(pwd)
@@ -1803,18 +1803,18 @@ ERROR_LOG="path/to/error.log"
 
 # 2. Enrich with context
 cat > error-analysis.md << EOF
-## Error
+**Error:**
 $(cat $ERROR_LOG)
 
-## Recent Commits
+**Recent Commits:**
 $(git log --oneline -3)
 
-## Changed Files
+**Changed Files:**
 $(git diff --name-only HEAD~1)
 
-## File Contents
+**File Contents:**
 $(for file in $(git diff --name-only HEAD~1); do
-    echo "### $file"
+    echo "**$file:**"
     cat $file
 done)
 EOF
