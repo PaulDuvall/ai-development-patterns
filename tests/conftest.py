@@ -57,7 +57,7 @@ PATTERN_CATEGORIES = {
                     "Choice Generation", "Parallel Agents", "Context Persistence",
                     "Constrained Generation", "Atomic Decomposition",
                     "Observable Development", "Guided Refactoring",
-                    "Guided Architecture", "Automated Traceability"],
+                    "Guided Architecture", "Automated Traceability", "Error Resolution"],
     "Operations": ["Policy Generation", "Security Orchestration",
                    "Baseline Management"]
 }
@@ -82,6 +82,7 @@ EXPECTED_PATTERNS = [
     "Guided Refactoring",
     "Guided Architecture",
     "Automated Traceability",
+    "Error Resolution",
     "Policy Generation",
     "Security Orchestration",
     "Baseline Management"
