@@ -3,7 +3,7 @@
 [![Tests](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml/badge.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/docs-comprehensive-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns#ai-development-patterns)
-[![Patterns](https://img.shields.io/badge/patterns-21-blue.svg)](#complete-pattern-reference)
+[![Patterns](https://img.shields.io/badge/patterns-22-blue.svg)](#complete-pattern-reference)
 [![Quality Gate](https://img.shields.io/badge/quality%20gate-passing-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/tree/main/tests)
 [![Hyperlinks](https://img.shields.io/badge/hyperlinks-validated-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
 
@@ -74,6 +74,7 @@ graph TD
 | **[Guided Refactoring](#guided-refactoring)** | Intermediate | Development | Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics | Codified Rules |
 | **[Guided Architecture](#guided-architecture)** | Intermediate | Development | Apply architectural frameworks (DDD, Well-Architected, 12-Factor) using AI to ensure sound system design | Developer Lifecycle, Codified Rules |
 | **[Automated Traceability](#automated-traceability)** | Intermediate | Development | Maintain automated links between requirements, specifications, tests, implementation, and documentation using AI | Developer Lifecycle |
+| **[Error Resolution](#error-resolution)** | Intermediate | Development | Automatically collect error context from logs, system state, and git history, then use AI to diagnose root causes and generate validated fixes | Developer Lifecycle, Observable Development, Tool Integration |
 | **Security & Compliance** | | Operations | *Category containing security and compliance patterns* | |
 | **[Policy Generation](#policy-generation)** | Advanced | Operations | Transform compliance requirements into executable Cedar/OPA policy files with AI assistance | Security Sandbox |
 | **[Security Orchestration](#security-orchestration)** | Intermediate | Workflow | Aggregate multiple security tools and use AI to summarize findings for actionable insights | Security Sandbox |
@@ -1689,6 +1690,246 @@ ai "Map recent changes to affected requirements and tests"
 
 **Anti-pattern: Broken Traceability**
 Maintaining requirement links in spreadsheets or manual documentation that becomes stale and inaccurate over time.
+
+---
+
+## Error Resolution
+
+**Maturity**: Intermediate
+**Description**: Automatically collect comprehensive error context from logs, system state, and git history, then use AI to diagnose root causes and generate validated fixes.
+
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Observable Development](#observable-development), [Tool Integration](#tool-integration), [Testing Orchestration](experiments/README.md#testing-orchestration)
+
+**Error Resolution Workflow**
+
+```mermaid
+graph TD
+    A[Error Occurs] --> B[Collect Error Context]
+    B --> C[Enrich with Git History]
+    C --> D[AI Diagnosis]
+    D --> E[Generate Fix Proposals]
+    E --> F{Human Review}
+    F -->|Approved| G[Apply Fix]
+    F -->|Rejected| H[Refine Context]
+    G --> I[Run Tests]
+    I --> J{Tests Pass?}
+    J -->|Yes| K[Commit Fix]
+    J -->|No| L[Rollback]
+    H --> D
+    L --> D
+
+    style B fill:#e1f5e1
+    style D fill:#ffe6e6
+    style G fill:#ffe6e6
+    style K fill:#e1f5e1
+```
+
+**Core Implementation**
+
+**Step 1: Collect Error Context**
+
+```bash
+# Create comprehensive error context file
+cat > .error-context.md << 'EOF'
+# Error Analysis
+
+## Error Output
+[Complete error message, stack trace, and exit codes]
+
+## Recent Changes
+$(git log --oneline -5)
+
+## Affected Files
+$(git diff --name-only HEAD~1)
+
+## File Contents (for affected files)
+$(cat path/to/affected/file.ext)
+
+## Environment
+- OS: $(uname -s)
+- Shell: $SHELL
+- Working Directory: $(pwd)
+EOF
+```
+
+**Step 2: AI-Powered Diagnosis**
+
+```bash
+# Send structured context to AI for analysis
+ai "Analyze this error and provide actionable fixes:
+
+CONTEXT:
+$(cat .error-context.md)
+
+REQUIRED OUTPUT:
+1. Root cause analysis
+2. Specific fix commands (copy-pasteable)
+3. Prevention strategy (pre-commit hooks, tests, etc.)
+
+Format fixes as executable bash commands."
+```
+
+**Step 3: Validate and Apply Fixes**
+
+```bash
+# Create checkpoint before applying fixes
+git stash push -m "Pre-fix checkpoint"
+
+# Review AI suggestions
+cat ai-suggestions.md
+
+# Apply fixes with validation
+bash fix-commands.sh
+
+# Verify with tests
+./run-tests.sh
+
+# Commit if successful, rollback if not
+if [ $? -eq 0 ]; then
+    git add .
+    git commit -m "fix: [description based on AI analysis]"
+    git stash drop
+else
+    git stash pop
+    echo "Fix failed validation, rolled back"
+fi
+```
+
+**Practical Workflow Example**
+
+```bash
+# 1. Capture error from any source (CI, terminal, logs)
+ERROR_LOG="path/to/error.log"
+
+# 2. Enrich with context
+cat > error-analysis.md << EOF
+## Error
+$(cat $ERROR_LOG)
+
+## Recent Commits
+$(git log --oneline -3)
+
+## Changed Files
+$(git diff --name-only HEAD~1)
+
+## File Contents
+$(for file in $(git diff --name-only HEAD~1); do
+    echo "### $file"
+    cat $file
+done)
+EOF
+
+# 3. AI diagnosis
+ai "Diagnose and fix:
+$(cat error-analysis.md)
+
+Provide:
+1. Root cause
+2. Exact fix commands
+3. How to prevent recurrence"
+
+# 4. Apply and validate
+# [Review AI output]
+# [Execute suggested fixes]
+# [Run tests]
+# [Commit]
+```
+
+**When to Use Error Resolution**
+
+- **CI/CD Failures**: Diagnose build, test, or deployment failures
+- **Local Development Errors**: Debug unexpected errors during development
+- **Configuration Issues**: Resolve environment or configuration problems
+- **Dependency Conflicts**: Analyze and resolve version conflicts
+- **Integration Failures**: Debug issues with external services or APIs
+
+**Complete Implementation**: See [examples/error-resolution/](examples/error-resolution/) for:
+- Reusable templates for error context collection and AI prompts
+- Common error scenarios (test failures, dependency conflicts, configuration errors)
+- GitHub Actions integration for CI/CD error diagnosis
+- Automated context extraction and diagnosis workflows
+
+**Anti-pattern: Blind Diagnosis**
+
+Sending only the error message to AI without surrounding context.
+
+```bash
+# ❌ Bad: No context
+ai "Fix error: Process completed with exit code 1"
+```
+
+**Why it's problematic**: AI cannot diagnose the issue without seeing:
+- What command failed
+- Recent changes that might have caused it
+- File contents or configuration
+- System environment
+
+**Instead, provide full context:**
+
+```bash
+# ✅ Good: Comprehensive context
+ai "Fix this error:
+
+Error: Process completed with exit code 1
+
+Command that failed: terraform fmt -check -recursive
+Files affected: main.tf, outputs.tf
+
+Recent change:
+$(git log -1 --oneline)
+
+File content:
+$(cat terraform/main.tf)
+
+Environment: Terraform v1.6.0"
+```
+
+**Anti-pattern: Brittle Fixes**
+
+Applying AI-suggested fixes without validation or rollback strategy.
+
+```bash
+# ❌ Bad: Apply without review or rollback
+ai "Fix this error" | bash
+```
+
+**Why it's problematic**:
+- AI suggestions may introduce new bugs
+- May break existing functionality
+- Could make security or data loss mistakes
+- No rollback strategy if fix fails
+
+**Instead, validate fixes before applying:**
+
+```bash
+# ✅ Good: Validate before applying with rollback
+git stash push -m "Pre-fix checkpoint"
+
+# Generate fix
+ai "Fix this error" > proposed-fix.sh
+
+# Review the proposed changes
+cat proposed-fix.sh
+
+# Apply fix
+bash proposed-fix.sh
+
+# Verify changes
+git diff
+
+# Run tests to validate
+./run-tests.sh
+
+# Commit or rollback
+if [ $? -eq 0 ]; then
+    git add .
+    git commit -m "fix: [description]"
+    git stash drop
+else
+    git stash pop
+    echo "Fix failed validation, rolled back"
+fi
+```
 
 ---
 
