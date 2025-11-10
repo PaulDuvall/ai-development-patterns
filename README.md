@@ -3,7 +3,7 @@
 [![Tests](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml/badge.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/docs-comprehensive-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns#ai-development-patterns)
-[![Patterns](https://img.shields.io/badge/patterns-21-blue.svg)](#complete-pattern-reference)
+[![Patterns](https://img.shields.io/badge/patterns-22-blue.svg)](#complete-pattern-reference)
 [![Quality Gate](https://img.shields.io/badge/quality%20gate-passing-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/tree/main/tests)
 [![Hyperlinks](https://img.shields.io/badge/hyperlinks-validated-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
 
@@ -1700,7 +1700,7 @@ Maintaining requirement links in spreadsheets or manual documentation that becom
 
 **Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Observable Development](#observable-development), [Tool Integration](#tool-integration), [Testing Orchestration](experiments/README.md#testing-orchestration)
 
-**Error Resolution Workflow**
+**[Error Resolution](#error-resolution) Workflow**
 
 ```mermaid
 graph TD
@@ -1835,7 +1835,7 @@ Provide:
 # [Commit]
 ```
 
-**When to Use Error Resolution**
+**When to Use [Error Resolution](#error-resolution)**
 
 - **CI/CD Failures**: Diagnose build, test, or deployment failures
 - **Local Development Errors**: Debug unexpected errors during development
