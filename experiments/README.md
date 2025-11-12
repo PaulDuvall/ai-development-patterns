@@ -34,6 +34,7 @@ These experimental patterns extend the core AI development patterns with advance
 | **[Image Spec](#image-spec)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Spec-First, Progressive Enhancement, Context Optimization |
 | **[Event Automation](#event-automation)** | Intermediate | Development | Execute custom commands automatically at specific lifecycle events in AI coding assistants to enforce policies and automate workflows | Codified Rules, Security Sandbox |
 | **[Custom Commands](#custom-commands)** | Intermediate | Development | Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and project-specific workflows | Event Automation, Spec-First |
+| **[Asynchronous Research](#asynchronous-research)** | Intermediate | Development | Use fire-and-forget coding agents in dedicated repositories to conduct autonomous code investigations that prove technical feasibility through executable experiments | Parallel Agents, Context Persistence, Choice Generation |
 
 ---
 
@@ -697,6 +698,307 @@ Deploy to prod-db-instance-1.us-east-1.rds.amazonaws.com
 # Good: Parameterized
 Deploy to database: $1 (default: $STAGING_DB)
 ```
+
+---
+
+### Asynchronous Research
+
+**Maturity**: Intermediate
+**Description**: Use fire-and-forget coding agents in dedicated repositories to conduct autonomous code investigations that prove technical feasibility through executable experiments.
+
+**Related Patterns**: [Parallel Agents](../README.md#parallel-agents), [Context Persistence](../README.md#context-persistence), [Choice Generation](../README.md#choice-generation)
+
+**Source**: Simon Willison, "[Code research projects with async coding agents](https://simonwillison.net/2025/Nov/6/async-code-research/)", November 6, 2025
+
+#### Core Concept
+
+**"Code research"** - answering technical questions definitively by writing and executing code. Simon's key insight: *"The great thing about questions about code is that they can often be definitively answered by writing and executing code."*
+
+Use asynchronous coding agents (Claude Code for web, Codex Cloud, Gemini Jules, GitHub Copilot) to conduct autonomous investigations in dedicated research repositories. Fire-and-forget execution allows 2-3 research tasks per day with minimal human oversight.
+
+**Why it works**: *"LLMs hallucinate and make mistakes. This is far less important for code research tasks because the code itself doesn't lie: if they write code and execute it and it does the right things then they've demonstrated to both themselves and to you that something really does work."*
+
+#### Implementation Pattern
+
+**1. Dedicated Research Repository**
+
+Create separate repository from production code to enable unrestricted experimentation:
+
+```bash
+# Create dedicated research repo (public or private)
+gh repo create my-research --private
+
+# Configure for unrestricted network access
+# Claude Code: Settings → Enable network access
+# Codex Cloud: Enable full sandbox permissions
+# Jules: Default unrestricted access
+```
+
+**Key benefits:**
+- Safe to grant full network access (no production secrets)
+- One folder per research task
+- Archive of explorations for future reference
+- "Slop containment" - keeps AI-generated content separate
+
+**2. Research Question Formulation**
+
+Convert technical curiosity into testable hypothesis with clear deliverables:
+
+**Good research questions (from Simon's examples):**
+- "Could Redis Streams handle 10k concurrent notification subscribers?"
+- "How do 7 Python Markdown libraries compare on performance?"
+- "Can cmarkgfm C extension compile for Pyodide WebAssembly?"
+
+**Example prompt (Simon's markdown comparison):**
+```
+Create a performance benchmark and feature comparison report on PyPI cmarkgfm
+compared to other popular Python markdown libraries—check all of them out from
+github and read the source to get an idea for features, then design and run a
+benchmark including generating some charts, then create a report in a new
+python-markdown-comparison folder. Make sure the performance chart images are
+directly displayed in the README.md in the folder.
+```
+
+**3. Asynchronous Execution Workflow**
+
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Agent as Async Agent
+    participant Repo as Research Repo
+
+    Note over Dev,Repo: Fire and Forget Pattern
+    Dev->>Agent: Submit research prompt (2-3 paragraphs)
+    Agent->>Agent: Autonomous execution (10-30 min)
+    Agent->>Agent: Install deps, fetch data, run experiments
+    Agent->>Repo: Commit results via PR
+
+    Note over Dev,Repo: Minimal Human Review
+    Repo->>Dev: Notification: Research complete
+    Dev->>Repo: Skim report for key insights
+    Dev->>Repo: Merge if useful, discard if not
+
+    Note over Dev,Repo: Cumulative Learning
+    Dev->>Agent: New research building on previous
+    Agent->>Repo: Reference earlier research findings
+    Agent->>Repo: Commit enhanced results
+```
+
+**4. Network Access Configuration**
+
+Simon's critical insight: For dedicated research repos, **unrestricted network access is safe and essential**.
+
+**Why it's safe:** "Lethal trifecta" prompt injection attacks only matter if there are secrets to steal. Research repos have no production credentials.
+
+**What unrestricted access enables:**
+- Install any dependencies (pip, npm, cargo, apt-get)
+- Fetch data from web APIs and documentation
+- Clone external repositories
+- Download datasets for benchmarking
+- Access Stack Overflow, documentation sites
+
+**5. Result Capture & Deliverables**
+
+**Typical agent outputs:**
+- Working proof-of-concept code
+- Benchmark results with charts/visualizations
+- Test scripts proving functionality
+- Markdown reports explaining findings
+- JSON data files with measurements
+
+**Simon's example results:**
+
+**python-markdown-comparison:**
+- Benchmarked 7 Markdown libraries
+- Generated performance bar charts
+- Found cmarkgfm 10-52x faster than alternatives
+- Feature comparison matrix
+
+**cmarkgfm-in-pyodide:**
+- Compiled 88.4KB `.whl` with C extension for WebAssembly
+- Proved it loads in Pyodide inside Node.js
+- When stuck, Simon prompted: *"Complete this project, actually run emscripten, I do not care how long it takes"*
+
+**blog-tags-scikit-learn:**
+- Downloaded SQLite database, trained ML models
+- Generated JSON results for multiple approaches
+- Python scripts for reproduction
+
+**Human review approach:**
+- Skim report for key insights
+- Verify research question was answered
+- Don't audit code line-by-line (it's exploratory)
+- Accept as "slop" (AI-generated, not production-quality)
+
+**6. Cross-Project Learning**
+
+Research tasks build on each other within same repository:
+
+```bash
+# Research task 1: Prove Node.js can run Pyodide
+# Result: node-pyodide/ folder with working example
+
+# Research task 2: Build on previous finding
+# Prompt: "Building on the node-pyodide example, compile cmarkgfm
+# C extension for Pyodide and prove it works in Node.js"
+# Result: cmarkgfm-in-pyodide/ folder reusing earlier work
+```
+
+Simon added `AGENTS.md` to his research repo with guidance for future agent runs—creating institutional memory.
+
+#### Example Research Tasks
+
+**Performance Benchmark:**
+```
+Work in new folder: redis-performance/
+
+Build Redis Streams notification system.
+Simulate 10,000 users receiving 100 notifications/second.
+Run for 1 hour and measure:
+- Memory usage over time
+- P95 latency for delivery
+- Behavior under network partition
+- Recovery after Redis restart
+
+Produce Python code, charts, detailed markdown report.
+```
+
+**Library Comparison:**
+```
+Work in new folder: python-markdown-comparison/
+
+Benchmark these Python Markdown libraries:
+- cmarkgfm, mistune, markdown2, commonmark, mistletoe, marko, markdown
+
+For each library:
+1. Clone from GitHub, analyze features from source
+2. Run performance tests (small/medium/large documents)
+3. Measure parsing speed, memory usage
+4. Generate comparison charts
+5. Create feature matrix
+
+Output: README.md with embedded charts, raw benchmark data as JSON.
+```
+
+**Feasibility Study:**
+```
+Work in new folder: rust-wasm-integration/
+
+Investigate if Rust crate 'pulldown-cmark' can compile to WebAssembly
+and run in browser with acceptable performance.
+
+Tasks:
+1. Compile pulldown-cmark to wasm32-unknown-unknown target
+2. Create minimal HTML page loading the WASM module
+3. Benchmark parse time vs JavaScript alternatives
+4. Document build process and dependencies
+5. Identify any browser compatibility issues
+
+Deliverable: Working demo + performance comparison + build guide.
+```
+
+#### Platforms (as of November 2025)
+
+| Platform | Free Tier | Network Access | Best For |
+|----------|-----------|----------------|----------|
+| **Claude Code (web)** | $250 credits for $20/month users (until Nov 18, 2025) | Configurable | Complex research, multi-file projects |
+| **Gemini Jules** | Free tier available | Default unrestricted | Quick explorations, proof-of-concepts |
+| **Codex Cloud** | Pay-as-you-go | Configurable | Enterprise research workflows |
+| **GitHub Copilot Agent** | Enterprise plans | Configurable | GitHub-integrated research |
+
+#### Simon's Success Metrics
+
+From 2 weeks of practice (as of November 6, 2025):
+
+- **13 research projects** completed in 2 weeks (~1/day average)
+- **2-3 research tasks/day** at peak
+- **Minutes of human time** per task (just prompt formulation + review)
+- **10-30 minutes** typical agent execution time
+- **Frequent useful results** informing development decisions
+
+**Quote from Simon:** *"I'm firing off 2-3 code research projects a day right now. My own time commitment is minimal and they frequently come back with useful or interesting results."*
+
+#### Integration with Development Workflow
+
+**Research → Decision → Implementation cycle:**
+
+```
+Technical Question
+  ↓
+Research Prompt (2-3 paragraphs)
+  ↓
+Async Agent Execution (10-30 min)
+  ↓
+Working Code + Findings
+  ↓
+Informed Decision
+  ↓
+Choice Generation / Planned Implementation
+  ↓
+Production Code
+```
+
+**How it complements other patterns:**
+
+- **Before Choice Generation**: Validate which options are technically feasible
+- **Before Planned Implementation**: Provide real performance data for planning
+- **With Context Persistence**: Archive research for future sessions
+- **With Parallel Agents**: Run multiple research questions simultaneously
+
+#### Complete Example
+
+See [examples/asynchronous-research/](examples/asynchronous-research/) for:
+- Setup scripts for research repositories
+- Platform configuration guides (Claude Code, Jules, Codex)
+- Reusable prompt templates
+- Sample research projects
+- GitHub Action for auto-generating research index
+
+#### Anti-pattern: Blind Investigation
+
+**Problem**: Vague research prompts without clear goals or success criteria.
+
+```bash
+# Bad - No clear objective
+"Investigate Redis and try some stuff with notifications"
+
+# Why it fails:
+# - Agent doesn't know what to prove
+# - No measurable success criteria
+# - Results won't connect to actual use case
+# - Wastes compute on unfocused exploration
+
+# Good - Specific, testable hypothesis
+"Build proof-of-concept notification system using Redis Streams.
+Simulate 10,000 concurrent users, 100 notifications/second.
+Measure memory, P95 latency, partition behavior over 1 hour.
+Produce Python code, charts, detailed report."
+```
+
+#### Anti-pattern: Uncontained Slop
+
+**Problem**: Publishing AI-generated research directly to main documentation without review.
+
+Simon's approach:
+- Keep research in dedicated repo
+- Mark repo as `noindex` for search engines
+- *"I still like to keep AI-generated content out of search, to avoid contributing more to the dead internet."*
+
+#### Anti-pattern: Secret Leakage
+
+**Problem**: Running unrestricted agents on production repos containing credentials.
+
+Simon warns: *"A prompt injection attack of the lethal trifecta variety could easily be used to steal sensitive code or environment variables."*
+
+**Solution**: Only use unrestricted access on dedicated, secret-free research repos.
+
+#### Anti-pattern: Proving Impossibility
+
+**Problem**: Expecting agents to prove something can't be done.
+
+Simon's caveat: *"They can't prove something is impossible—just because the coding agent couldn't find a way to do something doesn't mean it can't be done."*
+
+**Use for**: Proving feasibility, not impossibility.
 
 ---
 
