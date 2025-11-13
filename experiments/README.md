@@ -15,7 +15,7 @@ These experimental patterns extend the core AI development patterns with advance
 | Pattern | Maturity | Type | Description | Dependencies |
 |---------|----------|------|-------------|--------------|
 | **[Handoff Protocols](#handoff-protocols)** | Intermediate | Foundation | Clear boundaries and procedures for transitioning work between human developers and AI | Developer Lifecycle |
-| **[Testing Orchestration](#testing-orchestration)** | Intermediate | Workflow | Unified approach to test-first development, automated generation, and quality assurance | Spec-First |
+| **[Testing Orchestration](#testing-orchestration)** | Intermediate | Workflow | Unified approach to test-first development, automated generation, and quality assurance | Spec-Driven Development |
 | **[Workflow Orchestration](#workflow-orchestration)** | Advanced | Workflow | Coordinate sequential pipelines, parallel workflows, and hybrid human-AI processes | Testing Orchestration, Tool Integration |
 | **[Review Automation](#review-automation)** | Intermediate | Operations | Automate review process for parallel agent outputs using AI to detect conflicts and coordinate integration | Workflow Orchestration, Atomic Decomposition |
 | **[Debt Forecasting](#debt-forecasting)** | Intermediate | Operations | Proactively identify and prioritize technical debt using AI-powered code analysis | Guided Refactoring, Guided Architecture, Tool Integration |
@@ -31,9 +31,9 @@ These experimental patterns extend the core AI development patterns with advance
 | **[ChatOps Security](#chatops-security)** | Beginner | Operations | Deploy security scanning capabilities through chat commands for immediate feedback | Security Orchestration |
 | **[Evidence Automation](#evidence-automation)** | Advanced | Operations | Generate audit evidence matrices from logs and configuration changes automatically | Security Orchestration |
 | **[Context Optimization](#context-optimization)** | Advanced | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive Enhancement |
-| **[Image Spec](#image-spec)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Spec-First, Progressive Enhancement, Context Optimization |
+| **[Image Spec](#image-spec)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Spec-Driven Development, Progressive Enhancement, Context Optimization |
 | **[Event Automation](#event-automation)** | Intermediate | Development | Execute custom commands automatically at specific lifecycle events in AI coding assistants to enforce policies and automate workflows | Codified Rules, Security Sandbox |
-| **[Custom Commands](#custom-commands)** | Intermediate | Development | Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and project-specific workflows | Event Automation, Spec-First |
+| **[Custom Commands](#custom-commands)** | Intermediate | Development | Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and project-specific workflows | Event Automation, Spec-Driven Development |
 | **[Asynchronous Research](#asynchronous-research)** | Intermediate | Development | Use fire-and-forget coding agents in dedicated repositories to conduct autonomous code investigations that prove technical feasibility through executable experiments | Parallel Agents, Context Persistence, Choice Generation |
 
 ---
@@ -144,11 +144,11 @@ Allowing AI and humans to work on the same task simultaneously without clear han
 
 **Pattern Boundary Clarification**:
 - **This pattern** focuses on overall testing strategy and test generation
-- **Spec-First** focuses on writing specs before implementation
+- **Spec-Driven Development** focuses on writing specs before implementation
 - **Observable Development** focuses on logging and debugging for AI understanding
 - **Automated Traceability** focuses on linking requirements to tests and implementation
 
-**Related Patterns**: [Spec-First](../README.md#spec-first), [Observable Development](../README.md#observable-development)
+**Related Patterns**: [Spec-Driven Development](../README.md#spec-driven-development), [Observable Development](../README.md#observable-development)
 
 **Integrated Testing Framework**
 
@@ -403,7 +403,7 @@ Always using the most powerful (expensive) AI model for simple tasks wastes reso
 **Maturity**: Intermediate
 **Description**: Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context.
 
-**Related Patterns**: [Spec-First](../README.md#spec-first), [Progressive Enhancement](../README.md#progressive-enhancement), [Context Optimization](#context-optimization)
+**Related Patterns**: [Spec-Driven Development](../README.md#spec-driven-development), [Progressive Enhancement](../README.md#progressive-enhancement), [Context Optimization](#context-optimization)
 
 #### Core Implementation
 
@@ -582,7 +582,7 @@ Running automation from untrusted sources without review exposes your system to 
 **Maturity**: Intermediate
 **Description**: Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and sophisticated workflows.
 
-**Related Patterns**: [Event Automation](#event-automation), [Spec-First](../README.md#spec-first), [Codified Rules](../README.md#codified-rules)
+**Related Patterns**: [Event Automation](#event-automation), [Spec-Driven Development](../README.md#spec-driven-development), [Codified Rules](../README.md#codified-rules)
 
 **Core Concept**
 

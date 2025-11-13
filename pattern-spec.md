@@ -58,7 +58,8 @@ All pattern names MUST follow these strict naming conventions:
 
 1. **Exactly two words, Title Case**
    - No more, no less (e.g., "Context Persistence", "Guided Refactoring")
-   - Hyphenated compounds count as one word (e.g., "Spec-First" = 1 word)
+   - Hyphenated compounds count as one word (e.g., "Spec-Driven" = 1 word)
+   - Special case: "-Driven Development" patterns (e.g., "Spec-Driven Development", "Test-Driven Development") follow industry convention where "X-Driven" + "Development" = 2 words
 
 2. **Format: Noun + Noun OR Adjective + Noun**
    - Noun + Noun: "Pipeline Synthesis", "Context Persistence", "Error Resolution"
@@ -117,7 +118,7 @@ All antipattern names MUST follow these strict conventions:
    - Example: "Lazy Testing" is judgmental (avoid)
 
 4. **Symmetrical with positive patterns where logical**
-   - Pattern: "Spec-First" → Antipattern: "Spec-Ignored"
+   - Pattern: "Spec-Driven Development" → Antipattern: "Spec-Ignored"
    - Pattern: "Pipeline Synthesis" → Antipattern: "Manual Pipelines"
    - Pattern: "Workflow Orchestration" → Antipattern: "Chaotic Orchestration"
    - Symmetry helps learners understand the contrast
@@ -156,7 +157,7 @@ All antipattern names MUST follow these strict conventions:
 | Blind Generation | Negative + Noun | "Blind" prefix, technical focus |
 | Over-Alerting | Negative + Noun | "Over-" prefix, clear excess problem |
 | Uncoordinated Agents | Negative + Noun | "Un-" prefix, symmetrical with "Parallel Agents" |
-| Spec-Ignored | Negative + Noun | Symmetrical with "Spec-First" pattern |
+| Spec-Ignored | Negative + Noun | Symmetrical with "Spec-Driven Development" pattern |
 
 #### Examples of Antipattern Names Violating Rules
 

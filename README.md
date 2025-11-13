@@ -33,7 +33,7 @@ graph TD
     end
 
     subgraph "Phase 2: Development (Weeks 3-4)"
-        D --> G[Spec-First]
+        D --> G[Spec-Driven Development]
         D --> H[Planned Implementation]
         G --> I[Progressive Enhancement]
         H --> I
@@ -62,7 +62,7 @@ graph TD
 | **[Developer Lifecycle](#developer-lifecycle)** | Intermediate | Workflow | Structured 9-stage process from problem definition through deployment with AI assistance | Codified Rules, Security Sandbox |
 | **[Tool Integration](#tool-integration)** | Intermediate | Foundation | Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions | Security Sandbox, Developer Lifecycle |
 | **[Issue Generation](#issue-generation)** | Intermediate | Foundation | Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies | Readiness Assessment |
-| **[Spec-First](#spec-first)** | Intermediate | Development | Use executable specifications to guide AI code generation with clear acceptance criteria before implementation | Developer Lifecycle |
+| **[Spec-Driven Development](#spec-driven-development)** | Intermediate | Development | Use executable specifications to guide AI code generation with clear acceptance criteria before implementation | Developer Lifecycle |
 | **[Planned Implementation](#planned-implementation)** | Beginner | Development | Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration | None |
 | **[Progressive Enhancement](#progressive-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | None |
 | **[Choice Generation](#choice-generation)** | Intermediate | Development | Generate multiple implementation options for exploration and comparison rather than accepting first AI solution | Progressive Enhancement |
@@ -161,7 +161,7 @@ graph TD
 
     D --> M{Multiple Developers/Agents?}
     M -->|Yes| N[Parallel Agents]
-    M -->|No| O[Spec-First]
+    M -->|No| O[Spec-Driven Development]
     N --> P[Atomic Decomposition]
     O --> Q[Automated Traceability]
 
@@ -182,7 +182,7 @@ graph TD
 
 **For Development Teams (Weeks 3-8)**:
 1. **[Developer Lifecycle](#developer-lifecycle)** - Structured development process
-2. **[Spec-First](#spec-first)** - Quality-focused development
+2. **[Spec-Driven Development](#spec-driven-development)** - Quality-focused development
 3. **[Issue Generation](#issue-generation)** - Organized work breakdown
 4. **[Testing Orchestration](experiments/README.md#testing-orchestration)** - Quality assurance
 
@@ -229,7 +229,7 @@ graph TD
 
 **Two-Pizza Teams** (small, autonomous teams):
 - Implement **[Issue Generation](#issue-generation)** for coordination
-- Use **[Spec-First](#spec-first)** for quality
+- Use **[Spec-Driven Development](#spec-driven-development)** for quality
 - Consider **[Tool Integration](#tool-integration)** for role clarity
 - Full **[Developer Lifecycle](#developer-lifecycle)** implementation
 - **[Parallel Agents](#parallel-agents)** for complex features
@@ -394,7 +394,7 @@ Allowing multiple parallel agents to write to the same directories creates race 
 **Maturity**: Intermediate
 **Description**: Structured 9-stage process from problem definition through deployment with AI assistance.
 
-**Related Patterns**: [Codified Rules](#codified-rules), [Spec-First](#spec-first), [Planned Implementation](#planned-implementation), [Atomic Decomposition](#atomic-decomposition), [Observable Development](#observable-development)
+**Related Patterns**: [Codified Rules](#codified-rules), [Spec-Driven Development](#spec-driven-development), [Planned Implementation](#planned-implementation), [Atomic Decomposition](#atomic-decomposition), [Observable Development](#observable-development)
 
 **Workflow Interaction Sequence**
 
@@ -559,7 +559,7 @@ Attempting to solve complex data analysis, system integration, or real-time prob
 **Maturity**: Intermediate  
 **Description**: Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies.
 
-**Related Patterns**: [Readiness Assessment](#readiness-assessment), [Spec-First](#spec-first)
+**Related Patterns**: [Readiness Assessment](#readiness-assessment), [Spec-Driven Development](#spec-driven-development)
 
 **[Issue Generation](#issue-generation) Framework**
 
@@ -638,9 +638,9 @@ Creating issues without CI workflow integration, file tracking, or traceability 
 
 Development patterns provide tactical approaches for day-to-day AI-assisted coding workflows, focusing on quality, maintainability, and team collaboration.
 
-## Spec-First
+## Spec-Driven Development
 
-**Maturity**: Intermediate  
+**Maturity**: Intermediate
 **Description**: Use executable specifications to guide AI code generation with clear acceptance criteria before implementation.
 
 **Core Principle: Precision Enables Productivity**
@@ -749,7 +749,7 @@ Coverage: 94% (31/33 spec requirements covered)"
 
 **Complete Implementation**
 
-See [examples/spec-first/](examples/spec-first/) for:
+See [examples/spec-driven-development/](examples/spec-driven-development/) for:
 - Complete IAM Policy Generator implementation
 - spec_validator.py tool for automated compliance checking
 - Pre-commit hooks and Git workflow integration
@@ -769,7 +769,7 @@ Saving collections of prompts as if they were specifications. Prompts are implem
 **Maturity**: Beginner
 **Description**: Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Spec-First](#spec-first), [Progressive Enhancement](#progressive-enhancement), [Choice Generation](#choice-generation)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Progressive Enhancement](#progressive-enhancement), [Choice Generation](#choice-generation)
 
 **Core Principle: Think Before You Code**
 
@@ -1665,7 +1665,7 @@ ai-assistant design-architecture \
 **Maturity**: Intermediate  
 **Description**: Maintain automated links between requirements, specifications, tests, implementation, and documentation using AI.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Spec-First](#spec-first), [Testing Orchestration](experiments/README.md#testing-orchestration)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Testing Orchestration](experiments/README.md#testing-orchestration)
 
 **Core Implementation**
 
@@ -2079,7 +2079,7 @@ Manual thresholds quickly become stale, causing alert storms or blind spots.
 5. **[Issue Generation](#issue-generation)** - Generate structured work items from requirements
 
 ### Phase 2: Development (Weeks 3-4)
-1. **[Spec-First](#spec-first)** - Implement specification-first approach
+1. **[Spec-Driven Development](#spec-driven-development)** - Implement specification-first approach
 2. **[Progressive Enhancement](#progressive-enhancement)** - Practice iterative development
 3. **[Choice Generation](#choice-generation)** - Generate multiple implementation options
 4. **[Atomic Decomposition](#atomic-decomposition)** - Break down complex features

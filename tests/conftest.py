@@ -53,7 +53,7 @@ REQUIRED_PATTERN_SECTIONS = {
 PATTERN_CATEGORIES = {
     "Foundation": ["Readiness Assessment", "Codified Rules", "Security Sandbox",
                    "Developer Lifecycle", "Tool Integration", "Issue Generation"],
-    "Development": ["Spec-First", "Planned Implementation", "Progressive Enhancement",
+    "Development": ["Spec-Driven Development", "Planned Implementation", "Progressive Enhancement",
                     "Choice Generation", "Parallel Agents", "Context Persistence",
                     "Constrained Generation", "Atomic Decomposition",
                     "Observable Development", "Guided Refactoring",
@@ -70,7 +70,7 @@ EXPECTED_PATTERNS = [
     "Developer Lifecycle",
     "Tool Integration",
     "Issue Generation",
-    "Spec-First",
+    "Spec-Driven Development",
     "Planned Implementation",
     "Progressive Enhancement",
     "Choice Generation",
