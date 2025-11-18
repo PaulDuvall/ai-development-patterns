@@ -9,6 +9,74 @@
 
 A comprehensive collection of patterns based on my experience for building software with AI assistance, organized by implementation maturity and development lifecycle phases. These patterns are subject to change as the field evolves.
 
+## Pattern Dependency Overview
+
+```mermaid
+graph TD
+    %% FOUNDATION PATTERNS
+    subgraph F1["Foundation Patterns"]
+        RA[Readiness Assessment]
+        CR[Codified Rules]
+        SS[Security Sandbox]
+        DL[Developer Lifecycle]
+        TI[Tool Integration]
+        IG[Issue Generation]
+        CP[Context Persistence]
+    end
+
+    %% DEVELOPMENT PATTERNS
+    subgraph D1["Development Patterns"]
+        PI[Planned Implementation]
+        PE[Progressive Enhancement]
+        SD[Spec-Driven Development]
+        CG[Choice Generation]
+        AD[Atomic Decomposition]
+        PA[Parallel Agents]
+        CGN[Constrained Generation]
+        OD[Observable Development]
+        GR[Guided Refactoring]
+        GA[Guided Architecture]
+        AT[Automated Traceability]
+        ER[Error Resolution]
+    end
+
+    %% OPERATIONS PATTERNS
+    subgraph O1["Operations Patterns"]
+        PG[Policy Generation]
+        SO[Security Orchestration]
+        BM[Baseline Management]
+    end
+
+    %% FOUNDATION DEPENDENCIES
+    RA --> CR
+    CR --> SS
+    SS --> DL
+    CR --> DL
+    SS --> TI
+    DL --> TI
+    RA --> IG
+    CR --> CP
+
+    %% DEVELOPMENT DEPENDENCIES
+    DL --> SD
+    DL --> OD
+    DL --> GA
+    CR --> GA
+    DL --> AT
+    CR --> GR
+    PE --> CG
+    PE --> AD
+    AD --> PA
+    DL --> ER
+    OD --> ER
+    TI --> ER
+
+    %% OPERATIONS DEPENDENCIES
+    SS --> PG
+    SS --> SO
+    TI --> BM
+```
+
 ## Pattern Organization
 
 This repository provides a structured approach to AI-assisted development through three pattern categories:
