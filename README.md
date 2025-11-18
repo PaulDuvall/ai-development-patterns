@@ -12,31 +12,29 @@ A comprehensive collection of patterns based on my experience for building softw
 ## Pattern Dependency Overview
 
 ```mermaid
-graph LR
-    %% FOUNDATION CHAIN
-    RA[Readiness<br/>Assessment] --> CR[Codified<br/>Rules]
-    CR --> SS[Security<br/>Sandbox]
-    SS --> DL[Developer<br/>Lifecycle]
-    DL --> TI[Tool<br/>Integration]
+graph TB
+    %% ROW 1: Foundation start (left to right)
+    RA([Readiness<br/>Assessment]) --> CR([Codified<br/>Rules])
+    CR --> SS([Security<br/>Sandbox])
+    SS --> DL([Developer<br/>Lifecycle])
+    DL --> TI([Tool<br/>Integration])
 
-    %% FOUNDATION BRANCHES
-    RA --> IG[Issue<br/>Generation]
-    CR --> CP[Context<br/>Persistence]
+    %% ROW 2: Operations & branches (loops back)
+    TI --> BM([Baseline<br/>Management])
+    SS --> SO([Security<br/>Orchestration])
+    SS --> PG([Policy<br/>Generation])
 
-    %% DEVELOPMENT FROM FOUNDATION
-    DL --> SD[Spec-Driven<br/>Development]
-    DL --> OD[Observable<br/>Development]
-    DL --> AT[Automated<br/>Traceability]
-    CR --> GR[Guided<br/>Refactoring]
+    %% ROW 3: Development patterns (flows forward again)
+    DL --> OD([Observable<br/>Development])
+    DL --> SD([Spec-Driven<br/>Development])
+    DL --> AT([Automated<br/>Traceability])
+    CR --> GR([Guided<br/>Refactoring])
+    CR --> CP([Context<br/>Persistence])
+    RA --> IG([Issue<br/>Generation])
 
-    %% DEVELOPMENT CHAIN
-    PE[Progressive<br/>Enhancement] --> AD[Atomic<br/>Decomposition]
-    AD --> PA[Parallel<br/>Agents]
-
-    %% OPERATIONS
-    SS --> PG[Policy<br/>Generation]
-    SS --> SO[Security<br/>Orchestration]
-    TI --> BM[Baseline<br/>Management]
+    %% ROW 4: Development chain
+    PE([Progressive<br/>Enhancement]) --> AD([Atomic<br/>Decomposition])
+    AD --> PA([Parallel<br/>Agents])
 
     %% STYLING
     classDef foundation fill:#a8d5ba,stroke:#2d5a3f,stroke-width:2px,color:#1a3a25
