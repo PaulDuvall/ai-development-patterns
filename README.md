@@ -1999,8 +1999,8 @@ Operations patterns focus on CI/CD, security, compliance, and production managem
 
 ### Policy Generation
 
-**Maturity**: Advanced  
-**Description**: Transform compliance requirements into executable Cedar/OPA policy files with AI assistance, ensuring regulatory requirements become testable code.
+**Maturity**: Advanced
+**Description**: Transform compliance requirements into executable policy files with AI assistance, ensuring regulatory requirements become testable code.
 
 **Related Patterns**: [Security Sandbox](#security-sandbox), [Codified Rules](#codified-rules)
 
