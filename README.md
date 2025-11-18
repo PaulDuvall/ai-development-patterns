@@ -9,8 +9,6 @@
 
 A comprehensive collection of patterns based on my experience for building software with AI assistance, organized by implementation maturity and development lifecycle phases. These patterns are subject to change as the field evolves.
 
-## Agentic AI Patterns
-
 ```mermaid
 graph TB
     %% ROW 1: Foundation start (left to right)
