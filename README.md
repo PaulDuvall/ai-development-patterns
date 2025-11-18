@@ -12,69 +12,31 @@ A comprehensive collection of patterns based on my experience for building softw
 ## Pattern Dependency Overview
 
 ```mermaid
-graph TD
-    %% FOUNDATION PATTERNS
-    subgraph F1["Foundation Patterns"]
-        RA[Readiness Assessment]
-        CR[Codified Rules]
-        SS[Security Sandbox]
-        DL[Developer Lifecycle]
-        TI[Tool Integration]
-        IG[Issue Generation]
-        CP[Context Persistence]
-    end
+graph LR
+    %% FOUNDATION CHAIN
+    RA[Readiness<br/>Assessment] --> CR[Codified<br/>Rules]
+    CR --> SS[Security<br/>Sandbox]
+    SS --> DL[Developer<br/>Lifecycle]
+    DL --> TI[Tool<br/>Integration]
 
-    %% DEVELOPMENT PATTERNS
-    subgraph D1["Development Patterns"]
-        PI[Planned Implementation]
-        PE[Progressive Enhancement]
-        SD[Spec-Driven Development]
-        CG[Choice Generation]
-        AD[Atomic Decomposition]
-        PA[Parallel Agents]
-        CGN[Constrained Generation]
-        OD[Observable Development]
-        GR[Guided Refactoring]
-        GA[Guided Architecture]
-        AT[Automated Traceability]
-        ER[Error Resolution]
-    end
+    %% FOUNDATION BRANCHES
+    RA --> IG[Issue<br/>Generation]
+    CR --> CP[Context<br/>Persistence]
 
-    %% OPERATIONS PATTERNS
-    subgraph O1["Operations Patterns"]
-        PG[Policy Generation]
-        SO[Security Orchestration]
-        BM[Baseline Management]
-    end
+    %% DEVELOPMENT FROM FOUNDATION
+    DL --> SD[Spec-Driven<br/>Development]
+    DL --> OD[Observable<br/>Development]
+    DL --> AT[Automated<br/>Traceability]
+    CR --> GR[Guided<br/>Refactoring]
 
-    %% FOUNDATION DEPENDENCIES
-    RA --> CR
-    CR --> SS
-    SS --> DL
-    CR --> DL
-    SS --> TI
-    DL --> TI
-    RA --> IG
-    CR --> CP
+    %% DEVELOPMENT CHAIN
+    PE[Progressive<br/>Enhancement] --> AD[Atomic<br/>Decomposition]
+    AD --> PA[Parallel<br/>Agents]
 
-    %% DEVELOPMENT DEPENDENCIES
-    DL --> SD
-    DL --> OD
-    DL --> GA
-    CR --> GA
-    DL --> AT
-    CR --> GR
-    PE --> CG
-    PE --> AD
-    AD --> PA
-    DL --> ER
-    OD --> ER
-    TI --> ER
-
-    %% OPERATIONS DEPENDENCIES
-    SS --> PG
-    SS --> SO
-    TI --> BM
+    %% OPERATIONS
+    SS --> PG[Policy<br/>Generation]
+    SS --> SO[Security<br/>Orchestration]
+    TI --> BM[Baseline<br/>Management]
 
     %% STYLING
     classDef foundation fill:#a8d5ba,stroke:#2d5a3f,stroke-width:2px,color:#1a3a25
@@ -82,7 +44,7 @@ graph TD
     classDef operations fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,color:#78281f
 
     class RA,CR,SS,DL,TI,IG,CP foundation
-    class PI,PE,SD,CG,AD,PA,CGN,OD,GR,GA,AT,ER development
+    class PE,SD,AD,PA,OD,GR,AT development
     class PG,SO,BM operations
 ```
 
