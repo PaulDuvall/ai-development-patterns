@@ -75,7 +75,18 @@ graph TD
     SS --> PG
     SS --> SO
     TI --> BM
+
+    %% STYLING
+    classDef foundation fill:#a8d5ba,stroke:#2d5a3f,stroke-width:2px,color:#1a3a25
+    classDef development fill:#f9e79f,stroke:#b7950b,stroke-width:2px,color:#7d6608
+    classDef operations fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,color:#78281f
+
+    class RA,CR,SS,DL,TI,IG,CP foundation
+    class PI,PE,SD,CG,AD,PA,CGN,OD,GR,GA,AT,ER development
+    class PG,SO,BM operations
 ```
+
+**Legend**: 🟢 Foundation | 🟡 Development | 🔴 Operations
 
 ## Pattern Organization
 
