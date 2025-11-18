@@ -42,6 +42,25 @@ graph TB
     class RA,CR,SS,DL,TI,IG,CP foundation
     class PE,SD,AD,PA,OD,GR,AT development
     class PG,SO,BM operations
+
+    %% CLICKABLE LINKS
+    click RA "#readiness-assessment"
+    click CR "#codified-rules"
+    click SS "#security-sandbox"
+    click DL "#developer-lifecycle"
+    click TI "#tool-integration"
+    click IG "#issue-generation"
+    click CP "#context-persistence"
+    click PE "#progressive-enhancement"
+    click SD "#spec-driven-development"
+    click AD "#atomic-decomposition"
+    click PA "#parallel-agents"
+    click OD "#observable-development"
+    click GR "#guided-refactoring"
+    click AT "#automated-traceability"
+    click PG "#policy-generation"
+    click SO "#security-orchestration"
+    click BM "#baseline-management"
 ```
 
 **Legend**: 🟢 Foundation | 🟡 Development | 🔴 Operations
