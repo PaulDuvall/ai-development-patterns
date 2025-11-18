@@ -156,25 +156,25 @@ jobs:
   dependency-validation:
     runs-on: ubuntu-latest
     name: Pattern Dependencies
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python 3.11
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    
+
     - name: Install dependencies
       run: |
         python3 -m pip install --upgrade pip
         python3 -m pip install -r tests/requirements.txt
-    
+
     - name: Run dependency validation tests
       run: |
         cd tests
         python3 -m pytest test_dependencies.py -v --tb=short
-    
+
     - name: Upload dependency validation results
       uses: actions/upload-artifact@v4
       if: always()
@@ -182,10 +182,39 @@ jobs:
         name: dependency-validation-results
         path: tests/test-results/
 
+  diagram-validation:
+    runs-on: ubuntu-latest
+    name: Diagram Accuracy
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r tests/requirements.txt
+
+    - name: Run diagram validation tests
+      run: |
+        cd tests
+        python3 -m pytest test_diagram.py -v --tb=short
+
+    - name: Upload diagram validation results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: diagram-validation-results
+        path: tests/test-results/
+
   comprehensive-validation:
     runs-on: ubuntu-latest
     name: Full Test Suite
-    needs: [pattern-compliance, readme-accuracy, link-validation, example-validation, dependency-validation]
+    needs: [pattern-compliance, readme-accuracy, link-validation, example-validation, dependency-validation, diagram-validation]
     if: always()
     
     steps:
@@ -258,7 +287,7 @@ jobs:
   notify-failure:
     runs-on: ubuntu-latest
     name: Notify on Failure
-    needs: [pattern-compliance, readme-accuracy, link-validation, example-validation, dependency-validation]
+    needs: [pattern-compliance, readme-accuracy, link-validation, example-validation, dependency-validation, diagram-validation]
     if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
@@ -278,10 +307,11 @@ jobs:
           
           Please review the failed checks and fix any issues with:
           - Pattern specification compliance
-          - README accuracy and consistency  
+          - README accuracy and consistency
           - Hyperlink integrity
           - Example code validation
           - Pattern dependencies
+          - Diagram accuracy
           
           [View failed workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId})
           `;
