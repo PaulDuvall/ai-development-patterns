@@ -26,8 +26,6 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
-        with:
-          enablement: true
 
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
