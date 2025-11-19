@@ -9,7 +9,11 @@ Validates that the pattern dependency diagram:
 
 import pytest
 import re
+import os
 from conftest import EXPECTED_PATTERNS, README_PATH
+
+# Path to index.html for GitHub Pages
+INDEX_HTML_PATH = os.path.join(os.path.dirname(README_PATH), 'index.html')
 
 
 class TestMermaidDiagram:
@@ -181,3 +185,116 @@ class TestMermaidDiagram:
 
         assert not duplicates, \
             f"Duplicate node IDs found: {duplicates}"
+
+
+class TestIndexHtmlDiagram:
+    """Tests for GitHub Pages index.html diagram synchronization"""
+
+    @pytest.fixture
+    def index_html_content(self):
+        """Load index.html content"""
+        if not os.path.exists(INDEX_HTML_PATH):
+            pytest.skip("index.html not found")
+        with open(INDEX_HTML_PATH, 'r', encoding='utf-8') as f:
+            return f.read()
+
+    @pytest.fixture
+    def readme_content(self):
+        """Load README content"""
+        with open(README_PATH, 'r', encoding='utf-8') as f:
+            return f.read()
+
+    @pytest.fixture
+    def index_mermaid_diagram(self, index_html_content):
+        """Extract Mermaid diagram from index.html"""
+        pattern = r'<div class="mermaid">\s*(.*?)\s*</div>'
+        match = re.search(pattern, index_html_content, re.DOTALL)
+        return match.group(1) if match else ""
+
+    @pytest.fixture
+    def readme_mermaid_diagram(self, readme_content):
+        """Extract Mermaid diagram from README"""
+        pattern = r'```mermaid\n(.*?)```'
+        match = re.search(pattern, readme_content, re.DOTALL)
+        return match.group(1) if match else ""
+
+    @pytest.fixture
+    def index_click_links(self, index_mermaid_diagram):
+        """Extract click links from index.html diagram"""
+        pattern = r'click\s+(\w+)\s+"([^"]+)"'
+        return dict(re.findall(pattern, index_mermaid_diagram))
+
+    @pytest.fixture
+    def readme_click_links(self, readme_mermaid_diagram):
+        """Extract click links from README diagram"""
+        pattern = r'click\s+(\w+)\s+"([^"]+)"'
+        return dict(re.findall(pattern, readme_mermaid_diagram))
+
+    def test_index_has_mermaid_diagram(self, index_mermaid_diagram):
+        """Verify index.html contains a mermaid diagram"""
+        assert index_mermaid_diagram, \
+            "index.html should contain a mermaid diagram in <div class='mermaid'>"
+
+    def test_index_diagram_has_click_links(self, index_click_links):
+        """Verify index.html diagram has clickable links"""
+        assert len(index_click_links) > 0, \
+            "index.html diagram should have clickable links"
+
+    def test_index_matches_readme_patterns(self, index_mermaid_diagram, readme_mermaid_diagram):
+        """Verify index.html diagram includes same patterns as README"""
+        # Extract node IDs from both
+        node_pattern = r'^\s*(\w+)\s*[\[\(]'
+
+        index_nodes = set(re.findall(node_pattern, index_mermaid_diagram, re.MULTILINE))
+        readme_nodes = set(re.findall(node_pattern, readme_mermaid_diagram, re.MULTILINE))
+
+        missing_in_index = readme_nodes - index_nodes
+        extra_in_index = index_nodes - readme_nodes
+
+        errors = []
+        if missing_in_index:
+            errors.append(f"Patterns in README but missing from index.html: {missing_in_index}")
+        if extra_in_index:
+            errors.append(f"Patterns in index.html but not in README: {extra_in_index}")
+
+        assert not errors, \
+            f"index.html diagram out of sync with README:\n" + "\n".join(errors)
+
+    def test_index_matches_readme_click_links(self, index_click_links, readme_click_links):
+        """Verify index.html has same click links as README"""
+        missing_links = []
+        mismatched_links = []
+
+        for node_id, readme_url in readme_click_links.items():
+            if node_id not in index_click_links:
+                missing_links.append(node_id)
+            elif index_click_links[node_id] != readme_url:
+                mismatched_links.append({
+                    "node": node_id,
+                    "readme_url": readme_url,
+                    "index_url": index_click_links[node_id]
+                })
+
+        errors = []
+        if missing_links:
+            errors.append(f"Click links in README but missing from index.html: {missing_links}")
+        if mismatched_links:
+            errors.append(f"Mismatched click link URLs: {mismatched_links}")
+
+        assert not errors, \
+            f"index.html click links out of sync with README:\n" + "\n".join(errors)
+
+    def test_index_links_use_github_urls(self, index_click_links):
+        """Verify index.html click links use absolute GitHub URLs"""
+        invalid_links = []
+
+        for node_id, url in index_click_links.items():
+            if not url.startswith("https://github.com/PaulDuvall/ai-development-patterns#"):
+                invalid_links.append({
+                    "node": node_id,
+                    "url": url,
+                    "issue": "Should use absolute GitHub URL with anchor"
+                })
+
+        assert not invalid_links, \
+            f"Invalid link formats in index.html: {invalid_links}"
