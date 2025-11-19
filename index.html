@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Development Patterns</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            color: #24292f;
+        }
+        h1 { border-bottom: 1px solid #d0d7de; padding-bottom: 0.3em; }
+        h2 { border-bottom: 1px solid #d0d7de; padding-bottom: 0.3em; margin-top: 1.5em; }
+        h3 { margin-top: 1.5em; }
+        a { color: #0969da; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .badges img { margin-right: 4px; }
+        .mermaid { margin: 2rem 0; text-align: center; }
+        .legend { text-align: center; margin: 1rem 0; }
+        ul { padding-left: 2em; }
+        li { margin: 0.5em 0; }
+        .pattern-link { font-weight: 600; }
+        .resources { background: #f6f8fa; padding: 1rem; border-radius: 6px; margin: 1rem 0; }
+        .cta { text-align: center; margin: 2rem 0; padding: 1rem; background: #f6f8fa; border-radius: 6px; }
+        .cta a { font-size: 1.2em; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <h1>AI Development Patterns</h1>
+
+    <div class="badges">
+        <a href="https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml">
+            <img src="https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml/badge.svg" alt="Tests">
+        </a>
+        <a href="https://opensource.org/licenses/MIT">
+            <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+        </a>
+        <a href="https://github.com/PaulDuvall/ai-development-patterns#complete-pattern-reference">
+            <img src="https://img.shields.io/badge/patterns-22-blue.svg" alt="Patterns">
+        </a>
+    </div>
+
+    <p>A comprehensive collection of patterns for building software with AI assistance, organized by implementation maturity and development lifecycle phases.</p>
+
+    <div class="mermaid">
+graph TB
+    RA([Readiness<br/>Assessment]) --> CR([Codified<br/>Rules])
+    CR --> SS([Security<br/>Sandbox])
+    SS --> DL([Developer<br/>Lifecycle])
+    DL --> TI([Tool<br/>Integration])
+
+    TI --> BM([Baseline<br/>Management])
+    SS --> SO([Security<br/>Orchestration])
+    SS --> PG([Policy<br/>Generation])
+
+    DL --> OD([Observable<br/>Development])
+    DL --> SD([Spec-Driven<br/>Development])
+    DL --> AT([Automated<br/>Traceability])
+    CR --> GR([Guided<br/>Refactoring])
+    CR --> CP([Context<br/>Persistence])
+    RA --> IG([Issue<br/>Generation])
+
+    PE([Progressive<br/>Enhancement]) --> AD([Atomic<br/>Decomposition])
+    AD --> PA([Parallel<br/>Agents])
+
+    classDef foundation fill:#a8d5ba,stroke:#2d5a3f,stroke-width:2px,color:#1a3a25
+    classDef development fill:#f9e79f,stroke:#b7950b,stroke-width:2px,color:#7d6608
+    classDef operations fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,color:#78281f
+
+    class RA,CR,SS,DL,TI,IG,CP foundation
+    class PE,SD,AD,PA,OD,GR,AT development
+    class PG,SO,BM operations
+    </div>
+
+    <p class="legend"><strong>Legend</strong>: 🟢 Foundation | 🟡 Development | 🔴 Operations</p>
+
+    <h2>Quick Start</h2>
+    <p>New to AI-assisted development? Start here:</p>
+    <ol>
+        <li><a class="pattern-link" href="https://github.com/PaulDuvall/ai-development-patterns#readiness-assessment">Readiness Assessment</a> - Evaluate your team's AI readiness</li>
+        <li><a class="pattern-link" href="https://github.com/PaulDuvall/ai-development-patterns#codified-rules">Codified Rules</a> - Establish AI behavior guidelines</li>
+        <li><a class="pattern-link" href="https://github.com/PaulDuvall/ai-development-patterns#security-sandbox">Security Sandbox</a> - Set up secure AI execution environments</li>
+    </ol>
+
+    <h2>Pattern Categories</h2>
+
+    <h3>🟢 Foundation Patterns</h3>
+    <p>Essential patterns for team readiness and basic AI integration.</p>
+    <ul>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#readiness-assessment">Readiness Assessment</a> - Team preparation evaluation</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#codified-rules">Codified Rules</a> - AI behavior specifications</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#security-sandbox">Security Sandbox</a> - Isolated execution environments</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#developer-lifecycle">Developer Lifecycle</a> - AI-integrated workflows</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#tool-integration">Tool Integration</a> - IDE and tool connections</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#issue-generation">Issue Generation</a> - Automated issue creation</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#context-persistence">Context Persistence</a> - Session state management</li>
+    </ul>
+
+    <h3>🟡 Development Patterns</h3>
+    <p>Daily practice patterns for AI-assisted coding workflows.</p>
+    <ul>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#spec-driven-development">Spec-Driven Development</a> - Specification-first approach</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#progressive-enhancement">Progressive Enhancement</a> - Incremental improvements</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#atomic-decomposition">Atomic Decomposition</a> - Task breakdown strategies</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#parallel-agents">Parallel Agents</a> - Concurrent AI execution</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#observable-development">Observable Development</a> - Development monitoring</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#guided-refactoring">Guided Refactoring</a> - AI-assisted code improvement</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#automated-traceability">Automated Traceability</a> - Requirement tracking</li>
+    </ul>
+
+    <h3>🔴 Operations Patterns</h3>
+    <p>CI/CD, security, and production management with AI.</p>
+    <ul>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#policy-generation">Policy Generation</a> - Automated policy creation</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#security-orchestration">Security Orchestration</a> - Security automation</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#baseline-management">Baseline Management</a> - Configuration standards</li>
+    </ul>
+
+    <div class="cta">
+        <a href="https://github.com/PaulDuvall/ai-development-patterns#ai-development-patterns">View Full Documentation on GitHub →</a>
+    </div>
+
+    <div class="resources">
+        <h3>Resources</h3>
+        <ul>
+            <li><a href="https://github.com/PaulDuvall/ai-development-patterns">Full Pattern Reference</a> - Complete documentation</li>
+            <li><a href="https://github.com/PaulDuvall/ai-development-patterns/blob/main/pattern-spec.md">Pattern Specification</a> - How patterns are structured</li>
+            <li><a href="https://github.com/PaulDuvall/ai-development-patterns/tree/main/examples">Examples Directory</a> - Working implementations</li>
+            <li><a href="https://github.com/PaulDuvall/ai-development-patterns/tree/main/experiments">Experimental Patterns</a> - Patterns under development</li>
+        </ul>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</body>
+</html>
