@@ -11,20 +11,17 @@ title: Home
 
 A comprehensive collection of patterns for building software with AI assistance, organized by implementation maturity and development lifecycle phases.
 
-```mermaid
+<div class="mermaid">
 graph TB
-    %% ROW 1: Foundation start (left to right)
     RA([Readiness<br/>Assessment]) --> CR([Codified<br/>Rules])
     CR --> SS([Security<br/>Sandbox])
     SS --> DL([Developer<br/>Lifecycle])
     DL --> TI([Tool<br/>Integration])
 
-    %% ROW 2: Operations & branches (loops back)
     TI --> BM([Baseline<br/>Management])
     SS --> SO([Security<br/>Orchestration])
     SS --> PG([Policy<br/>Generation])
 
-    %% ROW 3: Development patterns (flows forward again)
     DL --> OD([Observable<br/>Development])
     DL --> SD([Spec-Driven<br/>Development])
     DL --> AT([Automated<br/>Traceability])
@@ -32,11 +29,9 @@ graph TB
     CR --> CP([Context<br/>Persistence])
     RA --> IG([Issue<br/>Generation])
 
-    %% ROW 4: Development chain
     PE([Progressive<br/>Enhancement]) --> AD([Atomic<br/>Decomposition])
     AD --> PA([Parallel<br/>Agents])
 
-    %% STYLING
     classDef foundation fill:#a8d5ba,stroke:#2d5a3f,stroke-width:2px,color:#1a3a25
     classDef development fill:#f9e79f,stroke:#b7950b,stroke-width:2px,color:#7d6608
     classDef operations fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,color:#78281f
@@ -44,7 +39,7 @@ graph TB
     class RA,CR,SS,DL,TI,IG,CP foundation
     class PE,SD,AD,PA,OD,GR,AT development
     class PG,SO,BM operations
-```
+</div>
 
 **Legend**: 🟢 Foundation | 🟡 Development | 🔴 Operations
 
