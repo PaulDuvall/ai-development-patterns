@@ -1,3 +1,9 @@
+---
+layout: default
+title: AI Development Patterns
+permalink: /README/
+---
+
 # AI Development Patterns
 
 [![Tests](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml/badge.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
