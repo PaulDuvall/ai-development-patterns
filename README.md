@@ -412,6 +412,16 @@ Each developer maintains their own prompts and preferences, leading to inconsist
 
 **Core Security Implementation**
 
+**Claude Code Users**: Use the `/sandbox` command to instantly create isolated environments without manual Docker configuration:
+```bash
+/sandbox
+# Creates a secure, isolated environment with:
+# - No access to credentials or sensitive files
+# - Restricted network access
+# - Controlled file system permissions
+```
+
+**Docker-Based Implementation**: For custom isolation or multi-agent scenarios:
 ```yaml
 # Basic AI isolation with complete network isolation
 services:
@@ -429,13 +439,21 @@ services:
 - Security monitoring and violation detection
 - Multi-agent coordination with conflict resolution
 
-**Production Implementation**: [Amazon Bedrock AgentCore](https://aws.amazon.com/bedrock/agentcore/) provides enterprise-grade implementation of these security controls:
-- **Isolated runtimes**: microVM session isolation for complete workload separation
-- **Identity layer**: IAM integration for fine-grained access control
-- **Secure tool gateway**: MCP-compatible interface with controlled tool access
-- **Code execution sandbox**: Safe environment for AI-generated code execution
-- **Controlled web browsing**: Network access limited to approved domains
-- **Observability & guardrails**: CloudWatch/CloudTrail logging with Bedrock Guardrails integration
+**Production Implementations**
+
+Modern AI development platforms provide enterprise-grade implementations of these security controls:
+
+**Cloud-Based Sandboxes**:
+- **[Claude Code for the web](https://www.claude.ai/code)**: Sandboxed AI coding with isolated execution environments
+- **[Google Jules](https://jules.google/)**: Google's AI coding assistant with secure development environments
+- **[OpenAI Codex Cloud](https://developers.openai.com/codex/cloud/)**: Cloud-based AI coding with secure execution environments
+- **[Google Vertex AI Agent Engine Code Execution](https://cloud.google.com/vertex-ai/agent-builder/docs/code-execution)**: Managed secure runtimes for AI agent code execution
+- **[GitHub Codespaces](https://docs.github.com/en/codespaces/overview)**: Isolated cloud development VMs with configurable security policies
+- **[E2B](https://e2b.dev)**: Specialized AI agent sandboxes with microVM isolation
+
+**Cloud & Self-Hosted Options**:
+- **[Daytona](https://www.daytona.io)**: microVM-based isolation for development environments (available as cloud service or self-hosted)
+- **[Coder](https://coder.com)**: Cloud development environments with enterprise security controls (available as cloud service or self-hosted)
 
 **Anti-pattern: Unrestricted Access**
 Allowing AI tools full system access risks credential leaks, data breaches, and security compliance violations.
