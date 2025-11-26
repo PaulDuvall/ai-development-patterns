@@ -446,7 +446,7 @@ Modern AI development platforms provide enterprise-grade implementations of thes
 **Cloud-Based Sandboxes**:
 - **[Claude Code for the web](https://www.claude.ai/code)**: Sandboxed AI coding with isolated execution environments
 - **[Google Jules](https://jules.google/)**: Google's AI coding assistant with secure development environments
-- **[OpenAI Codex Cloud](https://developers.openai.com/codex/cloud/)**: Cloud-based AI coding with secure execution environments
+- **[OpenAI Codex](https://chatgpt.com/codex)**: Cloud-based AI coding with secure execution environments
 - **[Google Vertex AI Agent Engine Code Execution](https://cloud.google.com/vertex-ai/agent-builder/docs/code-execution)**: Managed secure runtimes for AI agent code execution
 - **[GitHub Codespaces](https://docs.github.com/en/codespaces/overview)**: Isolated cloud development VMs with configurable security policies
 - **[E2B](https://e2b.dev)**: Specialized AI agent sandboxes with microVM isolation
