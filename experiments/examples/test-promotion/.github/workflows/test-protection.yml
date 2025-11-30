@@ -1,0 +1,97 @@
+name: Golden Test Protection
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  protect-golden-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for diff
+
+      - name: Detect golden test modifications
+        run: |
+          # Get list of modified files in this PR/push
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HEAD="${{ github.event.pull_request.head.sha }}"
+          else
+            BASE="${{ github.event.before }}"
+            HEAD="${{ github.sha }}"
+          fi
+
+          echo "Checking for modifications to tests/golden/..."
+          MODIFIED_GOLDEN=$(git diff --name-only "$BASE...$HEAD" | grep '^tests/golden/' || true)
+
+          if [ -n "$MODIFIED_GOLDEN" ]; then
+            echo "❌ BLOCKED: Golden tests cannot be modified directly"
+            echo ""
+            echo "Modified golden tests:"
+            echo "$MODIFIED_GOLDEN"
+            echo ""
+            echo "Golden tests are immutable behavioral contracts."
+            echo "To update tests, use the promotion workflow:"
+            echo "  1. Create/modify test in tests/generated/"
+            echo "  2. Run: ./scripts/promote-test.sh tests/generated/<test-file>"
+            echo "  3. Create PR with 'test-promotion' label"
+            echo "  4. Require 2+ approvals"
+            echo ""
+            echo "For test removal or modification, consult team lead."
+            exit 1
+          fi
+
+          echo "✅ No golden test modifications detected"
+
+      - name: Validate promotion PRs
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'test-promotion')
+        run: |
+          echo "🔍 Validating test promotion PR..."
+
+          # Check that ONLY golden tests were added (not modified)
+          ADDED=$(git diff --name-status "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}" | grep '^A' | grep 'tests/golden/' || true)
+          MODIFIED=$(git diff --name-status "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}" | grep '^M' | grep 'tests/golden/' || true)
+
+          if [ -n "$MODIFIED" ]; then
+            echo "❌ Promotion PRs should only ADD tests, not MODIFY"
+            echo "Modified files:"
+            echo "$MODIFIED"
+            exit 1
+          fi
+
+          if [ -z "$ADDED" ]; then
+            echo "⚠️  No tests added in promotion PR"
+          else
+            echo "✅ Test promotion validated:"
+            echo "$ADDED"
+          fi
+
+      - name: Check golden test permissions
+        run: |
+          echo "🔍 Verifying golden test permissions..."
+
+          # Check that all golden tests have 444 permissions
+          INCORRECT_PERMS=0
+          while IFS= read -r -d '' file; do
+            PERMS=$(stat -f "%OLp" "$file" 2>/dev/null || stat -c "%a" "$file" 2>/dev/null)
+            if [ "$PERMS" != "444" ]; then
+              echo "❌ Incorrect permissions: $file ($PERMS, should be 444)"
+              ((INCORRECT_PERMS++))
+            fi
+          done < <(find tests/golden -type f -name "*.py" -print0)
+
+          if [ "$INCORRECT_PERMS" -gt 0 ]; then
+            echo ""
+            echo "Run: ./scripts/enforce-permissions.sh"
+            exit 1
+          fi
+
+          echo "✅ All golden tests have correct permissions (444)"

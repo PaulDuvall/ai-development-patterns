@@ -25,6 +25,7 @@ These experimental patterns extend the core AI development patterns with advance
 | **[Release Synthesis](#release-synthesis)** | Beginner | Operations | Automatically generate structured release notes by analyzing git commit history | Pipeline Synthesis |
 | **[Incident Automation](#incident-automation)** | Advanced | Operations | Generate actionable incident response playbooks from historical incident data | Baseline Management |
 | **[Suite Health](#suite-health)** | Intermediate | Operations | Analyze build history to identify and remediate flaky tests automatically | Testing Orchestration |
+| **[Test Promotion](#test-promotion)** | Intermediate | Development | Separate AI-generated tests from immutable golden tests to prevent AI from weakening test assertions | Testing Orchestration, Spec-Driven Development |
 | **[Upgrade Advisor](#upgrade-advisor)** | Intermediate | Operations | Intelligently manage dependency upgrades with compatibility analysis and risk assessment | Debt Forecasting |
 | **[Handoff Automation](#handoff-automation)** | Intermediate | Operations | Generate comprehensive handoff briefs that summarize system state and active issues | Incident Automation |
 | **[Chaos Engineering](#chaos-engineering)** | Advanced | Operations | Generate targeted chaos experiments based on system architecture and dependencies | Baseline Management |
@@ -1322,6 +1323,140 @@ ai "Analyze Jenkins/GitHub Actions history for flaky tests:
 
 **Anti-pattern: Ignored Flakiness**
 Accepting unreliable tests as normal instead of systematically identifying and fixing test suite stability issues.
+
+---
+
+### Test Promotion
+
+**Maturity**: Intermediate
+**Description**: Separate AI-generated tests from immutable golden tests to prevent AI from weakening test assertions, with human-approved promotion ensuring only validated tests become behavioral contracts.
+
+**Related Patterns**: [Testing Orchestration](#testing-orchestration), [Spec-Driven Development](../README.md#spec-driven-development), [Suite Health](#suite-health)
+
+**Core Problem**
+
+When AI generates both code AND tests, it can make tests pass by weakening them—the "self-grading student" problem. This applies to all AI code generation: new features, bug fixes, refactoring, or any implementation task.
+
+**Test Separation Architecture**
+
+```
+tests/
+├── golden/          # Immutable (444 permissions) - AI blocked
+│   ├── auth/
+│   │   └── test_jwt_validation.py
+│   └── api/
+│       └── test_payment.py
+└── generated/       # Mutable - AI can freely generate/modify
+    ├── test_edge_cases.py
+    └── test_new_feature.py
+```
+
+**Defense-in-Depth Enforcement**
+
+The pattern uses multiple enforcement layers because **file permissions alone are insufficient** - AI with bash access could bypass them with `chmod`.
+
+```bash
+# Layer 1: File permissions (prevents accidental edits)
+chmod 444 tests/golden/**/*.py
+# ⚠️  NOT SUFFICIENT: AI can run "chmod 644" via Bash to bypass
+
+# Layer 2: AI hooks (blocks Edit/Write tools)
+# .ai/hooks/protect-golden.sh
+[[ "$TOOL_INPUT_FILE_PATH" =~ ^tests/golden/ ]] && exit 2  # BLOCK
+# ⚠️  NOT SUFFICIENT: AI can still modify via Bash commands
+
+# Layer 3: CI/CD enforcement (detects ANY git diff)
+git diff --name-only origin/main...HEAD | grep '^tests/golden/' && {
+  echo "❌ BLOCKED: Golden tests cannot be modified"
+  exit 1
+}
+# ✅ RELIABLE: Catches all modifications regardless of method
+
+# Layer 4: CODEOWNERS (requires human approval)
+# .github/CODEOWNERS
+tests/golden/**  @tech-leads @qa-leads
+# ✅ RELIABLE: Human gate prevents merge even if AI commits changes
+```
+
+**Threat Model:**
+- **Accidental Edit**: Blocked by file permissions (444)
+- **AI Edit/Write Tool**: Blocked by AI hooks
+- **AI Bash Bypass**: Detected by CI/CD git diff check
+- **Committed Changes**: Blocked by CODEOWNERS requiring human approval
+
+**Primary Enforcement**: CI/CD + CODEOWNERS, not file permissions.
+
+**Promotion Workflow**
+
+```bash
+# AI generates test freely in tests/generated/
+ai "Write payment idempotency test in tests/generated/test_payment.py"
+
+# Human reviews and promotes
+./scripts/promote-test.sh tests/generated/test_payment.py
+# → Runs pytest validation
+# → Interactive quality checklist
+# → Copies to tests/golden/ with 444 permissions
+# → Creates promotion PR requiring 2+ approvals
+```
+
+**Example: Golden Test Protection**
+
+```python
+# AI generates test freely
+# tests/generated/test_new_feature.py
+def test_payment_idempotency():
+    """Payment processing should prevent duplicate charges."""
+    process_payment(id="123", amount=100)
+    with pytest.raises(DuplicateTransactionError):
+        process_payment(id="123", amount=100)
+
+# Human reviews → promotes to golden
+# tests/golden/test_payment.py (444 perms, AI blocked)
+```
+
+**Complete Implementation**
+
+See [examples/test-promotion/](examples/test-promotion/) for:
+- Complete promotion workflow scripts
+- CI/CD enforcement configuration
+- AI protection hooks
+- Example application demonstrating the pattern
+
+**Anti-pattern: Mutable Baselines**
+
+Allowing AI to modify existing tests to make its code pass, removing critical assertions.
+
+```python
+# BEFORE (correct test):
+def test_payment_idempotency():
+    process_payment(id="123", amount=100)
+    with pytest.raises(DuplicateTransactionError):
+        process_payment(id="123", amount=100)
+
+# AFTER AI weakens test to pass buggy code:
+def test_payment_idempotency():
+    process_payment(id="123", amount=100)
+    process_payment(id="123", amount=100)  # No error check!
+    # BUG: Allows double-charging customers in production
+```
+
+Without immutable golden tests, AI can weaken assertions to make failing tests pass, eliminating regression protection.
+
+**Anti-pattern: Permission-Only Protection**
+
+Relying solely on file permissions (444) without CI/CD enforcement.
+
+```bash
+# INSUFFICIENT: AI can bypass via Bash
+chmod 444 tests/golden/**  # AI runs: chmod 644 && edit && chmod 444
+
+# REQUIRED: CI/CD + CODEOWNERS as primary enforcement
+git diff tests/golden/ → CI blocks merge
+tests/golden/** → CODEOWNERS requires human approval
+```
+
+File permissions provide defense-in-depth but are not sufficient alone. CI/CD git diff detection and CODEOWNERS are the primary enforcement mechanisms.
 
 ---
 

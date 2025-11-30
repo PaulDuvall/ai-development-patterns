@@ -1,0 +1,17 @@
+# Golden Test Protection via CODEOWNERS
+#
+# This is the PRIMARY enforcement mechanism for immutable golden tests.
+# File permissions (444) and AI hooks provide defense-in-depth but can be
+# bypassed by AI using bash commands like chmod.
+#
+# CODEOWNERS ensures that ANY modification to tests/golden/** requires
+# explicit human approval, regardless of how the change was made.
+
+# Golden tests require approval from tech leads and QA leads
+tests/golden/**  @tech-leads @qa-leads
+
+# Promotion workflow changes also require approval
+scripts/promote-test.sh  @tech-leads
+
+# Note: Replace @tech-leads and @qa-leads with actual GitHub team names
+# or individual usernames (e.g., @alice @bob)
