@@ -24,8 +24,7 @@ Learn how to generate Kanban-optimized issues for AI-assisted development with <
 ├── 04-workflow-examples.md        # Epic breakdown and relationship patterns
 ├── 05-ci-integration.md           # CI/CD integration and traceability
 ├── beads-guide.md                 # Beads setup and usage guide
-├── issue-generator.py             # Python script for automated generation
-└── ANALYSIS.md                    # MECE analysis and restructuring notes
+└── issue-generator.py             # Python script for automated generation
 ```
 
 ## Key Concepts
@@ -185,7 +184,6 @@ A: Yes! See hybrid approach in [02-choosing-tools.md#hybrid-approach](02-choosin
 ## Resources
 
 - **Python Script**: [issue-generator.py](issue-generator.py) - Automated issue generation
-- **Analysis**: [ANALYSIS.md](ANALYSIS.md) - MECE analysis of this directory structure
 - **Main Pattern**: [../../README.md#issue-generation](../../README.md#issue-generation) - Pattern documentation
 
 ## Getting Help
