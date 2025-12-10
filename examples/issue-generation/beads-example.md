@@ -78,85 +78,16 @@ create_beads_issue("Setup database schema", "RED/GREEN/REFACTOR", parent=epic_id
 create_beads_issue("Implement login endpoint", "RED/GREEN/REFACTOR", parent=epic_id)
 ```
 
-## Beads vs Traditional Tools
+## Why Beads?
 
-### Where Beads Wins
+Beads is optimized for AI agent workflows with:
+- **Native CLI access**: No API tokens or authentication complexity
+- **Offline-first**: Create/update without internet, sync via git
+- **Git-native**: Issues version with code in `.beads/issues.jsonl`
+- **Fast queries**: <50ms (local SQLite) vs 100-500ms API calls
+- **Zero dependencies**: No accounts, tokens, or external services
 
-**AI Agent Integration**: Native CLI vs API tokens
-```bash
-bd list --status open --json | jq '.[] | select(.priority == 0)'
-```
-
-**Offline-First**: Create/update without internet, sync via git later
-
-**Git-Native**: Issues version with code
-```bash
-git log -p .beads/issues.jsonl  # See issue history
-git diff HEAD~1 .beads/issues.jsonl  # What changed?
-```
-
-**Speed**: <50ms queries (local SQLite) vs 100-500ms API calls
-
-**Zero Dependencies**: No accounts, tokens, or costs
-
-### Where GitHub/JIRA/Linear Win
-
-**Team Collaboration**: Web UI for non-technical users (PMs, designers)
-
-**Rich Features**:
-- GitHub: PR auto-linking (`closes #123`), Actions, project boards
-- JIRA: Custom workflows, time tracking, sprint planning, burndown charts
-- Linear: Fast UI, cycles, roadmaps, beautiful design
-
-**Integrations**: Slack, webhooks, Zapier, analytics tools
-
-**Search**: Full-text search, advanced filters, saved queries
-
-**Reporting**: Burndown charts, velocity tracking, dashboards
-
-### Quick Comparison
-
-| Feature | Beads | GitHub Issues | JIRA | Linear |
-|---------|-------|---------------|------|--------|
-| **AI Agent Access** | ✅ Native CLI | ⚠️ API + token | ⚠️ Complex API | ⚠️ API + token |
-| **Offline Work** | ✅ Full | ❌ Limited | ❌ None | ❌ None |
-| **Git Integration** | ✅ Native | ⚠️ External | ❌ Separate | ❌ Separate |
-| **Setup Time** | ✅ Instant | ⚠️ Minutes | ❌ Hours/Days | ⚠️ Minutes |
-| **Query Speed** | ✅ <50ms | ⚠️ 100-500ms | ⚠️ 200-1000ms | ⚠️ 100-300ms |
-| **Non-tech Users** | ❌ CLI only | ✅ Web UI | ✅ Web UI | ✅ Web UI |
-| **Collaboration** | ⚠️ Basic | ✅ Rich | ✅ Enterprise | ✅ Modern |
-| **Integrations** | ❌ Minimal | ✅ Extensive | ✅ Enterprise | ✅ Modern |
-| **Cost** | ✅ Free | ✅ Free | ❌ Paid | ⚠️ Paid |
-
-### When to Use Each
-
-**Use Beads When:**
-- ✅ AI-assisted development is core to your workflow
-- ✅ Solo developer or small technical team
-- ✅ You want issues versioned with code
-- ✅ You work offline frequently
-
-**Use GitHub/JIRA/Linear When:**
-- ✅ Team includes non-technical stakeholders
-- ✅ Need rich collaboration (comments, mentions, web UI)
-- ✅ Open source with external contributors
-- ✅ Enterprise requirements (SSO, audit trails)
-
-### Hybrid Approach
-
-Combine both for different purposes:
-
-```bash
-# Use Beads for internal tech tasks (refactoring, tech debt)
-bd create "Refactor authentication module"
-
-# Sync to GitHub/Linear for stakeholder visibility
-bd sync --to linear  # Experimental feature
-
-# Or keep them separate:
-# - Beads: AI agent work tracking
-# - GitHub Issues: User-facing features/bugs
-```
+For a detailed comparison with GitHub/JIRA/Linear, see the [comparison table in README.md](README.md#comparison-table).
 
 ## Best Practices
 

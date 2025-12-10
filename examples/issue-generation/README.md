@@ -105,3 +105,22 @@ The key is providing clear, specific instructions to AI that result in properly 
 - You need rich collaboration features (comments, mentions, web UI)
 - Open source project requiring external contributor visibility
 - Enterprise requirements (SSO, audit trails, complex workflows)
+
+### Comparison Table
+
+| Feature | Beads | GitHub Issues | JIRA | Linear |
+|---------|-------|---------------|------|--------|
+| **AI Agent Access** | ✅ Native CLI | ⚠️ API + token | ⚠️ Complex API | ⚠️ API + token |
+| **Offline Work** | ✅ Full | ❌ Limited | ❌ None | ❌ None |
+| **Git Integration** | ✅ Native | ⚠️ External | ❌ Separate | ❌ Separate |
+| **Setup Time** | ✅ Instant | ⚠️ Minutes | ❌ Hours/Days | ⚠️ Minutes |
+| **Query Speed** | ✅ <50ms | ⚠️ 100-500ms | ⚠️ 200-1000ms | ⚠️ 100-300ms |
+| **Non-tech Users** | ❌ CLI only | ✅ Web UI | ✅ Web UI | ✅ Web UI |
+| **Collaboration** | ⚠️ Basic | ✅ Rich | ✅ Enterprise | ✅ Modern |
+| **Integrations** | ❌ Minimal | ✅ Extensive | ✅ Enterprise | ✅ Modern |
+| **Cost** | ✅ Free | ✅ Free | ❌ Paid | ⚠️ Paid |
+
+**Key Insights**:
+- **Beads excels** for AI agent workflows, offline development, and git-native issue tracking
+- **GitHub/JIRA/Linear excel** for team collaboration, rich features, and stakeholder visibility
+- **Consider a hybrid approach**: Use Beads for internal tech work, traditional tools for external visibility
