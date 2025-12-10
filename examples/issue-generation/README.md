@@ -1,8 +1,8 @@
 # AI Issue Generation Examples
 
-Learn how to generate Kanban-optimized issues for AI-assisted development with <1 hour cycle times.
+Learn how to generate small, deployable work items for AI-assisted development with <1 hour cycle times.
 
-> **Pattern Definition**: This directory provides implementation examples for the [Issue Generation pattern](../../README.md#issue-generation) - an intermediate-level foundation pattern that uses AI to generate Kanban-optimized work items from requirements, ensuring continuous flow with clear acceptance criteria and dependencies.
+> **Pattern Definition**: This directory provides implementation examples for the [Issue Generation pattern](../../README.md#issue-generation) - an intermediate-level foundation pattern that uses AI to generate small work items (<1 hour) from requirements, ensuring continuous delivery with clear acceptance criteria and dependencies. Works with any methodology (Kanban, Scrum, or ad-hoc workflows).
 
 ## 🚀 Quick Start
 
@@ -33,6 +33,8 @@ Learn how to generate Kanban-optimized issues for AI-assisted development with <
 
 ### Why <1 Hour Tasks?
 
+**Methodology-Agnostic**: Whether you use Kanban, Scrum, or continuous delivery, <1 hour tasks enable rapid feedback and reduce risk.
+
 AI-assisted development is fundamentally faster than manual coding:
 
 | Activity | Manual | AI-Assisted |
@@ -50,10 +52,12 @@ See [01-getting-started.md](01-getting-started.md) for detailed velocity compari
 
 ### Core Principles
 
-1. **Flow over estimates**: Split work until each task is <1 hour
+1. **Small batch sizing**: Split work until each task is <1 hour (enables continuous delivery)
 2. **Independent deployment**: Every task ships without waiting
 3. **RED/GREEN/REFACTOR**: Test-first, minimal implementation, then clean
 4. **CI/CD always**: Every task runs through the pipeline
+
+**Works with any methodology**: These principles support Kanban (continuous flow), Scrum (sprint tasks), or ad-hoc delivery.
 
 ## Tool Decision Framework
 

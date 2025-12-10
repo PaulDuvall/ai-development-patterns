@@ -631,7 +631,9 @@ Attempting to solve complex data analysis, system integration, or real-time prob
 ## Issue Generation
 
 **Maturity**: Intermediate
-**Description**: Generate Kanban-optimized work items (<1 hour for AI-assisted development) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies.
+**Description**: Generate small, deployable work items (<1 hour with AI assistance) from requirements using AI to ensure continuous delivery with clear acceptance criteria and dependency tracking.
+
+**Methodology Note**: This pattern aligns well with Kanban principles (continuous flow, small batches) but works with any development methodology including Scrum, Scrumban, or ad-hoc workflows.
 
 **Related Patterns**: [Readiness Assessment](#readiness-assessment), [Spec-Driven Development](#spec-driven-development)
 
@@ -648,12 +650,12 @@ graph TD
     F --> G[Acceptance Criteria]
     G --> H[Cycle Time Target]
     H --> I[Dependency Mapping]
-    I --> J[Kanban Card Creation]
+    I --> J[Work Item Creation]
 ```
 
 **Core Principles**
 
-- **Kanban Optimization**: Each work item sized for <1 hour (AI-assisted development velocity) to ensure continuous flow
+- **Small Batch Sizing**: Each work item sized for <1 hour (AI-assisted development velocity) to enable continuous delivery and rapid feedback
 - **AI-Assisted Decomposition**: Use AI to break down requirements into implementable tasks
 - **Traceability Integration**: Connect issues to implementation files and CI workflows
 - **Dependency Mapping**: Establish clear relationships between work items and epics
@@ -678,11 +680,10 @@ Generated issues must include:
 
 **Implementation Examples**: See [examples/issue-generation/](examples/issue-generation/) for detailed AI prompts, epic breakdown workflows, CI integration patterns, and traceability implementations. For AI-first workflows, see [Beads guide](examples/issue-generation/beads-guide.md) - a git-native issue tracker with CLI access and persistent agent memory.
 
-> "If a task takes more than one day, split it."
-> – Kanban Guide, Lean Kanban University
-
 > "Small, frequent deliveries expose issues early and keep teams aligned."
-> – Agile Alliance, Kanban Glossary
+> – Agile Alliance
+
+**Kanban Context**: This pattern embodies Kanban principles of continuous flow and small batch sizes. If using Kanban: "If a task takes more than one day, split it." (Kanban Guide, Lean Kanban University). However, the pattern works equally well with Scrum sprints, continuous delivery, or any methodology that values incremental progress.
 
 **Anti-pattern: Under-Specified Issues**
 Creating generic tasks without specific acceptance criteria, proper sizing, or clear dependencies leads to scope creep and estimation errors.
