@@ -2,6 +2,8 @@
 
 Learn how to generate Kanban-optimized issues for AI-assisted development with <1 hour cycle times.
 
+> **Pattern Definition**: This directory provides implementation examples for the [Issue Generation pattern](../../README.md#issue-generation) - an intermediate-level foundation pattern that uses AI to generate Kanban-optimized work items from requirements, ensuring continuous flow with clear acceptance criteria and dependencies.
+
 ## 🚀 Quick Start
 
 **New to AI issue generation?** Follow this learning path:
