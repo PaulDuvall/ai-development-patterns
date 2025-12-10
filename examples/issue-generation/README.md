@@ -8,7 +8,10 @@ This directory demonstrates the AI Issue Generation pattern focusing on practica
 ai-issue-generation/
 ├── README.md                           # This file
 ├── issue-generator.py                  # Basic issue generation example
-└── ai-prompts-for-epic-management.md  # Practical AI prompts for epic-subissue management
+├── ai-prompts-for-epic-management.md  # Practical AI prompts for epic-subissue management
+├── beads-example.md                    # Git-based issue tracking for AI agents with persistent memory
+├── ci-integration-examples.md          # CI/CD integration patterns
+└── detailed-kanban-workflow.md         # Kanban workflow optimization
 ```
 
 ## Key Features
@@ -85,5 +88,20 @@ Rather than complex API scripts, use AI prompts that work with your existing iss
 - **Platform-Agnostic Prompts**: Same prompt structure works across GitHub, JIRA, Azure DevOps
 - **Focus on Requirements**: Specify what you need (timing, dependencies, CI/CD), not how to implement
 - **Automation Through Simplicity**: Use platform's built-in automation rather than custom scripts
+- **Git-Native Option**: For AI-first workflows, consider Beads for CLI-native, offline-capable issue tracking (see `beads-example.md`)
 
 The key is providing clear, specific instructions to AI that result in properly structured, deployable work items.
+
+### When to Use Beads vs Traditional Tools
+
+**Use Beads** (`beads-example.md`) when:
+- AI-assisted development is core to your workflow (Claude Code, Cursor, etc.)
+- You're a solo developer or small technical team
+- You want issues versioned with code in the same git repository
+- You work offline frequently or want zero external dependencies
+
+**Use GitHub/JIRA/Linear** when:
+- Your team includes non-technical stakeholders (PMs, designers)
+- You need rich collaboration features (comments, mentions, web UI)
+- Open source project requiring external contributor visibility
+- Enterprise requirements (SSO, audit trails, complex workflows)
