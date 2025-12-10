@@ -259,4 +259,4 @@ Remember: Flow over estimates, rapid feedback over perfect planning."
 
 ## CI Integration Examples
 
-See [ci-integration-examples.md](ci-integration-examples.md) for detailed examples of how to integrate AI-generated issues with CI workflows, including commit message formats, traceability, and automated reporting.
+See [05-ci-integration.md](05-ci-integration.md) for detailed examples of how to integrate AI-generated issues with CI workflows, including commit message formats, traceability, and automated reporting.

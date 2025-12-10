@@ -1,112 +1,77 @@
-# AI Issue Generation Example
+# AI Issue Generation Examples
 
-This directory demonstrates the AI Issue Generation pattern focusing on practical AI prompts for creating Kanban-optimized work items with proper epic-subissue relationships.
+Learn how to generate Kanban-optimized issues for AI-assisted development with <1 hour cycle times.
+
+## 🚀 Quick Start
+
+**New to AI issue generation?** Follow this learning path:
+
+1. **[Getting Started](01-getting-started.md)** - Core concepts, why <1 hour tasks, AI development velocity
+2. **[Choosing Tools](02-choosing-tools.md)** - Decision framework: Beads vs GitHub/JIRA/Linear
+3. **[AI Prompts](03-ai-prompts.md)** - Templates for epic breakdown, progress tracking, dependencies
+4. **[Workflow Examples](04-workflow-examples.md)** - Real-world epic management and relationship patterns
+5. **[CI Integration](05-ci-integration.md)** - Traceability, file validation, automated reporting
+
+**For Beads users**: See [beads-guide.md](beads-guide.md) for git-native, AI-first issue tracking
 
 ## Directory Structure
 
 ```
-ai-issue-generation/
-├── README.md                           # This file
-├── issue-generator.py                  # Basic issue generation example
-├── ai-prompts-for-epic-management.md  # Practical AI prompts for epic-subissue management
-├── beads-example.md                    # Git-based issue tracking for AI agents with persistent memory
-├── ci-integration-examples.md          # CI/CD integration patterns
-└── detailed-kanban-workflow.md         # Kanban workflow optimization
+├── README.md                      # You are here - navigation hub
+├── 01-getting-started.md          # Core concepts and AI-first principles
+├── 02-choosing-tools.md           # Tool comparison and decision framework
+├── 03-ai-prompts.md               # AI prompt templates for issue generation
+├── 04-workflow-examples.md        # Epic breakdown and relationship patterns
+├── 05-ci-integration.md           # CI/CD integration and traceability
+├── beads-guide.md                 # Beads setup and usage guide
+├── issue-generator.py             # Python script for automated generation
+└── ANALYSIS.md                    # MECE analysis and restructuring notes
 ```
 
-## Key Features
+## Key Concepts
 
-- **Kanban-Optimized Work Items**: <1 hour tasks for continuous flow in AI-assisted development
-- **Epic-Subissue Relationship Management**: Bidirectional linking and progress tracking
-- **Multi-Platform Integration**: GitHub Issues, JIRA, Azure DevOps with native relationship support
-- **Template-Based Generation**: Consistent issue formatting with relationship metadata
-- **Dependency Mapping**: Automatic task dependency detection and validation
-- **Automated Progress Tracking**: Real-time epic status updates based on subissue completion
-- **Workflow Automation**: CI/CD integration for epic lifecycle management
-- **Cross-Platform Compatibility**: Universal linking strategies that work across tools
+### Why <1 Hour Tasks?
 
-## Quick Start
+AI-assisted development is fundamentally faster than manual coding:
 
-The most effective approach is using AI prompts directly with your issue tracking system. See `ai-prompts-for-epic-management.md` for comprehensive prompt templates that ensure:
-- Tasks deployable in <1 hour (AI-assisted development velocity)
-- Independent deployment capability
-- Epic-subissue cross-linking
-- RED/GREEN/REFACTOR development cycle
-- CI/CD integration for each task
+| Activity | Manual | AI-Assisted |
+|----------|--------|-------------|
+| Code generation | Hours | Minutes |
+| Iteration cycle | Hours | 5-15 minutes |
+| Deployment | 1-2x/day | Multiple times/hour |
+| **Total task time** | **4-8 hours** | **<1 hour** |
 
-Example:
-```bash
-ai "Create epic for User Authentication with subissues that are:
-1. Deployable in <1 hour each (AI-assisted development)
-2. Independently deployable
-3. Cross-linked to parent epic
-4. Include RED/GREEN/REFACTOR acceptance criteria
-5. Have CI/CD pipeline hooks"
-```
+**Traditional**: `Planning (30min) + Coding (6hrs) + Testing (1hr) + Review (30min) = 8 hours`
 
-## Usage Examples
+**AI-Assisted**: `Planning (5min) + AI prompting (10min) + Review (20min) + Testing (15min) = 50 minutes`
 
-### Feature Breakdown
-```bash
-# Input: High-level feature request
-python issue-generator.py \
-  --feature "Password reset via email" \
-  --platform github \
-  --max-hours 8 \
-  --output password-reset-issues.json
-```
+See [01-getting-started.md](01-getting-started.md) for detailed velocity comparisons.
 
-### Epic Decomposition with Relationship Management
+### Core Principles
 
-Use AI prompts to create properly structured epics:
+1. **Flow over estimates**: Split work until each task is <1 hour
+2. **Independent deployment**: Every task ships without waiting
+3. **RED/GREEN/REFACTOR**: Test-first, minimal implementation, then clean
+4. **CI/CD always**: Every task runs through the pipeline
 
-```bash
-ai "Break down 'User Dashboard' epic following these rules:
-- Each subissue must be deployable in <1 hour (AI-assisted development)
-- Create bidirectional epic-subissue links
-- Use RED/GREEN/REFACTOR for development tasks
-- Include CI/CD pipeline triggers for each subissue
-- Auto-update epic progress when subissues complete"
-```
+## Tool Decision Framework
 
-See `ai-prompts-for-epic-management.md` for complete prompt templates.
+### Choose Beads if:
+- AI-assisted development is your primary workflow
+- Solo developer or small technical team
+- Want git-native issues versioned with code
+- Work offline frequently
+- Need <50ms query speed for AI agents
 
-### Bug Triage
-```bash
-# Input: Bug report
-python issue-generator.py \
-  --bug "Login fails with 500 error" \
-  --priority high \
-  --assign-team backend
-```
+### Choose GitHub/JIRA/Linear if:
+- Team includes non-technical stakeholders
+- Need rich collaboration (comments, mentions, web UI)
+- Open source with external contributors
+- Enterprise requirements (SSO, compliance)
 
-## Integration Philosophy
+See [02-choosing-tools.md](02-choosing-tools.md) for complete comparison and decision tree.
 
-Rather than complex API scripts, use AI prompts that work with your existing issue tracking tools:
-
-- **Direct AI Interface**: Let AI tools create issues directly through their integrations
-- **Platform-Agnostic Prompts**: Same prompt structure works across GitHub, JIRA, Azure DevOps
-- **Focus on Requirements**: Specify what you need (timing, dependencies, CI/CD), not how to implement
-- **Automation Through Simplicity**: Use platform's built-in automation rather than custom scripts
-- **Git-Native Option**: For AI-first workflows, consider Beads for CLI-native, offline-capable issue tracking (see `beads-example.md`)
-
-The key is providing clear, specific instructions to AI that result in properly structured, deployable work items.
-
-### When to Use Beads vs Traditional Tools
-
-**Use Beads** (`beads-example.md`) when:
-- AI-assisted development is core to your workflow (Claude Code, Cursor, etc.)
-- You're a solo developer or small technical team
-- You want issues versioned with code in the same git repository
-- You work offline frequently or want zero external dependencies
-
-**Use GitHub/JIRA/Linear** when:
-- Your team includes non-technical stakeholders (PMs, designers)
-- You need rich collaboration features (comments, mentions, web UI)
-- Open source project requiring external contributor visibility
-- Enterprise requirements (SSO, audit trails, complex workflows)
-
-### Comparison Table
+## Comparison Table
 
 | Feature | Beads | GitHub Issues | JIRA | Linear |
 |---------|-------|---------------|------|--------|
@@ -124,3 +89,110 @@ The key is providing clear, specific instructions to AI that result in properly 
 - **Beads excels** for AI agent workflows, offline development, and git-native issue tracking
 - **GitHub/JIRA/Linear excel** for team collaboration, rich features, and stakeholder visibility
 - **Consider a hybrid approach**: Use Beads for internal tech work, traditional tools for external visibility
+
+## Quick Examples
+
+### Create Epic with <1 Hour Tasks
+
+```bash
+ai "Create epic for User Authentication with subissues that are:
+1. Deployable in <1 hour each (AI-assisted development)
+2. Independently deployable
+3. Cross-linked to parent epic
+4. Include RED/GREEN/REFACTOR acceptance criteria
+5. Have CI/CD pipeline hooks"
+```
+
+### Break Down Feature
+
+```bash
+ai "Break down 'User Dashboard' epic following these rules:
+- Each subissue must be deployable in <1 hour (AI-assisted development)
+- Create bidirectional epic-subissue links
+- Use RED/GREEN/REFACTOR for development tasks
+- Include CI/CD pipeline triggers for each subissue
+- Auto-update epic progress when subissues complete"
+```
+
+See [03-ai-prompts.md](03-ai-prompts.md) for complete prompt library.
+
+### Beads Workflow (CLI)
+
+```bash
+# Create epic
+bd create --title "Epic: User Auth System"
+
+# Create subtask with RED/GREEN/REFACTOR
+bd create --title "Add JWT validation" \
+  --body "RED: Write failing test
+GREEN: Implement validation
+REFACTOR: Extract key management" \
+  --parent issue-generation-7c9
+
+# Query ready work (<50ms)
+bd ready
+
+# Update status
+bd update issue-generation-7c9.1 --status done
+
+# Sync via git
+git add .beads/ && git commit -m "beads: complete JWT validation"
+```
+
+See [beads-guide.md](beads-guide.md) for complete Beads tutorial.
+
+## Integration Philosophy
+
+Rather than complex API scripts, use AI prompts that work with your existing issue tracking tools:
+
+- **Direct AI Interface**: Let AI tools create issues directly through their integrations
+- **Platform-Agnostic Prompts**: Same prompt structure works across GitHub, JIRA, Azure DevOps
+- **Focus on Requirements**: Specify what you need (timing, dependencies, CI/CD), not how to implement
+- **Automation Through Simplicity**: Use platform's built-in automation rather than custom scripts
+- **Git-Native Option**: For AI-first workflows, consider Beads for CLI-native, offline-capable issue tracking
+
+## Learning Path
+
+### Beginners
+1. Start: [01-getting-started.md](01-getting-started.md)
+2. Choose: [02-choosing-tools.md](02-choosing-tools.md)
+3. Try: Pick one AI prompt from [03-ai-prompts.md](03-ai-prompts.md)
+
+### Intermediate
+1. Review: [04-workflow-examples.md](04-workflow-examples.md)
+2. Implement: [05-ci-integration.md](05-ci-integration.md)
+3. Automate: Use [issue-generator.py](issue-generator.py)
+
+### Advanced
+1. Customize: Modify prompts for your workflow
+2. Integrate: Build CI/CD automation
+3. Scale: Implement hybrid Beads + traditional tools
+
+## Common Questions
+
+**Q: Why <1 hour instead of 4-8 hours?**
+A: AI generates code in minutes, not hours. See [01-getting-started.md#why-1-hour-tasks](01-getting-started.md#why-1-hour-tasks-for-ai-development)
+
+**Q: Which tool should I use?**
+A: See the decision tree in [02-choosing-tools.md#quick-decision-tree](02-choosing-tools.md#quick-decision-tree)
+
+**Q: How do I break down large epics?**
+A: Use AI prompts from [03-ai-prompts.md#epic-creation](03-ai-prompts.md#epic-creation-with-subissue-breakdown)
+
+**Q: Can I use Beads with GitHub?**
+A: Yes! See hybrid approach in [02-choosing-tools.md#hybrid-approach](02-choosing-tools.md#hybrid-approach)
+
+## Resources
+
+- **Python Script**: [issue-generator.py](issue-generator.py) - Automated issue generation
+- **Analysis**: [ANALYSIS.md](ANALYSIS.md) - MECE analysis of this directory structure
+- **Main Pattern**: [../../README.md#issue-generation](../../README.md#issue-generation) - Pattern documentation
+
+## Getting Help
+
+- **Beads Issues**: [GitHub - steveyegge/beads](https://github.com/steveyegge/beads)
+- **Pattern Issues**: [GitHub - PaulDuvall/ai-development-patterns](https://github.com/PaulDuvall/ai-development-patterns)
+
+---
+
+**Start here**: [01-getting-started.md](01-getting-started.md) to learn AI-first issue generation principles.

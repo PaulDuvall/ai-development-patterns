@@ -676,7 +676,7 @@ Generated issues must include:
 - **Dependency Validation**: Automated checking for circular dependencies
 - **Status Propagation**: Subissue changes update epic progress
 
-**Implementation Examples**: See [examples/issue-generation/](examples/issue-generation/) for detailed AI prompts, epic breakdown workflows, CI integration patterns, and traceability implementations. For AI-first workflows, see [Beads example](examples/issue-generation/beads-example.md) - a git-native issue tracker with CLI access and persistent agent memory.
+**Implementation Examples**: See [examples/issue-generation/](examples/issue-generation/) for detailed AI prompts, epic breakdown workflows, CI integration patterns, and traceability implementations. For AI-first workflows, see [Beads guide](examples/issue-generation/beads-guide.md) - a git-native issue tracker with CLI access and persistent agent memory.
 
 > "If a task takes more than one day, split it."
 > – Kanban Guide, Lean Kanban University
