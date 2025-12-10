@@ -630,8 +630,8 @@ Attempting to solve complex data analysis, system integration, or real-time prob
 
 ## Issue Generation
 
-**Maturity**: Intermediate  
-**Description**: Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies.
+**Maturity**: Intermediate
+**Description**: Generate Kanban-optimized work items (<1 hour for AI-assisted development) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies.
 
 **Related Patterns**: [Readiness Assessment](#readiness-assessment), [Spec-Driven Development](#spec-driven-development)
 
@@ -641,7 +641,7 @@ Attempting to solve complex data analysis, system integration, or real-time prob
 graph TD
     A[Requirements Document] --> B[AI Feature Analysis]
     B --> C[Work Item Splitting]
-    C --> D{<8 hours?}
+    C --> D{<1 hour?}
     D -->|No| E[Split Further]
     E --> C
     D -->|Yes| F[Story Generation]
@@ -653,7 +653,7 @@ graph TD
 
 **Core Principles**
 
-- **Kanban Optimization**: Each work item sized for <8 hours to ensure continuous flow
+- **Kanban Optimization**: Each work item sized for <1 hour (AI-assisted development velocity) to ensure continuous flow
 - **AI-Assisted Decomposition**: Use AI to break down requirements into implementable tasks
 - **Traceability Integration**: Connect issues to implementation files and CI workflows
 - **Dependency Mapping**: Establish clear relationships between work items and epics
@@ -663,7 +663,7 @@ graph TD
 
 Generated issues must include:
 - **Title**: Specific, actionable description of the work
-- **Cycle Time Target**: Estimated completion time (4-8 hours)
+- **Cycle Time Target**: Estimated completion time (<1 hour with AI assistance)
 - **Acceptance Criteria**: Testable conditions for completion
 - **File Scope**: Which files will be added, updated, or removed
 - **CI Requirements**: Test coverage, pipeline steps, quality gates
@@ -697,13 +697,14 @@ Creating issues without CI workflow integration, file tracking, or traceability 
 ❌ "Add some tests"
 ❌ "AUTH-002: Implement password validation" (no file tracking or CI requirements)
 
-✅ "Add OAuth 2.0 token validation endpoint (8 hours)"
-✅ "Implement dashboard metric WebSocket connection (6 hours)"
-✅ "Write unit tests for user service login method (4 hours)"
+✅ "Add OAuth 2.0 token validation endpoint (<1 hour with AI)"
+✅ "Implement dashboard metric WebSocket connection (45 minutes)"
+✅ "Write unit tests for user service login method (30 minutes)"
 ✅ "AUTH-002: Password validation service with CI integration"
    - Files: src/auth/validators.py, tests/test_validators.py
    - Coverage: 95%, unit + integration tests
    - CI: lint, test, security-scan must pass
+   - AI-assisted: Use AI for implementation and test generation
 ```
 
 ---
