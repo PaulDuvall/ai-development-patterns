@@ -10,6 +10,10 @@ These experimental patterns extend the core AI development patterns with advance
 - **[Operations Automation](#operations-automation)** - Experimental automation patterns for CI/CD and production management
 - **[Monitoring & Intelligence](#monitoring--intelligence)** - Advanced observability and predictive maintenance patterns
 
+## Pattern Exploration
+
+**[NOTES.md](NOTES.md)** - Tracks patterns under early exploration before formalization. This is where new pattern ideas are documented, evaluated, and refined before becoming full experimental patterns. Current explorations include voice-to-code interfaces and other emerging AI development approaches.
+
 ## Experimental Pattern Reference
 
 | Pattern | Maturity | Type | Description | Dependencies |
