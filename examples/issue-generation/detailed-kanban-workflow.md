@@ -17,7 +17,7 @@ ai "Break down this epic for optimal Kanban flow:
 Epic: User Dashboard with Analytics
 
 Kanban task requirements:
-- Maximum 4-8 hours per task (1 day)
+- Maximum <1 hour per task (AI-assisted development)
 - If a task would take longer, split it
 - Each task independently deployable
 - Focus on flow over estimates
@@ -45,7 +45,7 @@ Goal: Continuous flow with rapid feedback cycles."
       "Include user_id, event_type, timestamp, metadata columns",
       "Add appropriate constraints and foreign keys"
     ],
-    "cycle_time_target": "4 hours",
+    "cycle_time_target": "<1 hour",
     "labels": ["backend", "database", "kanban-ready"],
     "dependencies": []
   },
@@ -237,20 +237,20 @@ Output:
 ai "Apply Kanban principles to split these work items:
 
 Kanban splitting rules:
-- Maximum cycle time: 4-8 hours (1 day)
-- If >8 hours, must split into smaller items
+- Maximum cycle time: <1 hour (AI-assisted development)
+- If >1 hour, must split into smaller items
 - Each item independently deployable
 - Measure actual cycle time, not estimates
 
-Historical cycle times for reference:
-- Authentication token generation: 8 hours
-- Email template setup: 4 hours
-- Password reset form: 4 hours
-- API endpoint creation: 6 hours
-- Database migration: 3 hours per table
+Historical cycle times for AI-assisted reference:
+- Authentication token generation: 30-45 minutes
+- Email template setup: 15-20 minutes
+- Password reset form: 20-30 minutes
+- API endpoint creation: 30-40 minutes
+- Database migration: 15-25 minutes per table
 
 For each task:
-1. Can it be completed in <8 hours?
+1. Can it be completed in <1 hour with AI assistance?
 2. If no, how to split it?
 3. What's the smallest valuable increment?
 

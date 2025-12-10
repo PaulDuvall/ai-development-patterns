@@ -16,7 +16,7 @@ ai-issue-generation/
 
 ## Key Features
 
-- **Kanban-Optimized Work Items**: 4-8 hour tasks for continuous flow
+- **Kanban-Optimized Work Items**: <1 hour tasks for continuous flow in AI-assisted development
 - **Epic-Subissue Relationship Management**: Bidirectional linking and progress tracking
 - **Multi-Platform Integration**: GitHub Issues, JIRA, Azure DevOps with native relationship support
 - **Template-Based Generation**: Consistent issue formatting with relationship metadata
@@ -28,7 +28,7 @@ ai-issue-generation/
 ## Quick Start
 
 The most effective approach is using AI prompts directly with your issue tracking system. See `ai-prompts-for-epic-management.md` for comprehensive prompt templates that ensure:
-- Tasks deployable in <1 day (4-8 hours max)
+- Tasks deployable in <1 hour (AI-assisted development velocity)
 - Independent deployment capability
 - Epic-subissue cross-linking
 - RED/GREEN/REFACTOR development cycle
@@ -37,7 +37,7 @@ The most effective approach is using AI prompts directly with your issue trackin
 Example:
 ```bash
 ai "Create epic for User Authentication with subissues that are:
-1. Deployable in <8 hours each
+1. Deployable in <1 hour each (AI-assisted development)
 2. Independently deployable
 3. Cross-linked to parent epic
 4. Include RED/GREEN/REFACTOR acceptance criteria
@@ -62,7 +62,7 @@ Use AI prompts to create properly structured epics:
 
 ```bash
 ai "Break down 'User Dashboard' epic following these rules:
-- Each subissue must be deployable same day (4-8 hours)
+- Each subissue must be deployable in <1 hour (AI-assisted development)
 - Create bidirectional epic-subissue links
 - Use RED/GREEN/REFACTOR for development tasks
 - Include CI/CD pipeline triggers for each subissue

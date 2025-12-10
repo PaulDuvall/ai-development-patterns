@@ -91,7 +91,7 @@ For a detailed comparison with GitHub/JIRA/Linear, see the [comparison table in 
 
 ## Best Practices
 
-**Keep tasks atomic (4-8 hours)**:
+**Keep tasks atomic (<1 hour for AI development)**:
 ```bash
 ✅ bd create --title "Implement JWT token generation"
 ❌ bd create --title "Build entire authentication system"

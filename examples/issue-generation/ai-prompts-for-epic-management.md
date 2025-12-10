@@ -8,7 +8,7 @@ Direct AI instructions for creating and managing epic-subissue relationships acr
 ai "Create an epic for User Authentication System with the following requirements:
 
 EPIC REQUIREMENTS:
-1. Break into tasks that can be deployed in less than a day (4-8 hours max)
+1. Break into tasks that can be deployed in <1 hour (AI-assisted development velocity)
 2. Each task must be independently deployable
 3. Use RED/GREEN/REFACTOR approach for all code tasks
 4. Ensure CI/CD pipeline can run for each task
