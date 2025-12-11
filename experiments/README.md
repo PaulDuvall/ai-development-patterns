@@ -711,7 +711,7 @@ Deploy to database: $1 (default: $STAGING_DB)
 ### Progressive Disclosure
 
 **Maturity**: Intermediate
-**Description**: Load AI assistant rules incrementally based on task context rather than bundling all instructions upfront, preventing context bloat and maintaining instruction-following consistency across any AI coding assistant (Claude Code, Cursor, Aider, etc.).
+**Description**: Load AI assistant rules incrementally based on task context rather than bundling all instructions upfront, preventing context bloat and maintaining instruction-following consistency across any AI coding assistant (Claude Code, Cursor, Codex, Gemini, etc.).
 
 **Related Patterns**: [Codified Rules](../README.md#codified-rules), [Context Optimization](#context-optimization), [Custom Commands](#custom-commands), [Event Automation](#event-automation)
 
@@ -726,18 +726,18 @@ Deploy to database: $1 (default: $STAGING_DB)
 - Cognitive overload for the AI
 - Slower response times from processing unnecessary context
 
-**Example of bloat**: A 500-line configuration file (CLAUDE.md, AGENTS.md, .cursorrules, .aiderules, etc.) with security rules, deployment procedures, architecture patterns, testing standards, code style guides, API conventions, database migration rules, monitoring setup, and team workflows—but only 10% is relevant to any single task.
+**Example of bloat**: A 500-line configuration file (CLAUDE.md, AGENTS.md, .cursorrules, etc.) with security rules, deployment procedures, architecture patterns, testing standards, code style guides, API conventions, database migration rules, monitoring setup, and team workflows—but only 10% is relevant to any single task.
 
 #### Implementation Strategy
 
 **Three-tier rule architecture:**
 
-This pattern works with any AI assistant configuration file. Examples shown use CLAUDE.md, but apply equally to AGENTS.md (OpenCode/Zed), .cursorrules (Cursor), .aiderules (Aider), or other AI coding assistant configuration files.
+This pattern works with any AI assistant configuration file. Examples shown use CLAUDE.md, but apply equally to .cursorrules (Cursor), AGENTS.md, or other AI coding assistant configuration files (Codex, Gemini, etc.).
 
 ```
 .ai/
 ├── CLAUDE.md                    # Main rules file: Universal rules only (<60 lines)
-│                                # (or AGENTS.md, .cursorrules, .aiderules, etc.)
+│                                # (or AGENTS.md, .cursorrules, etc.)
 ├── rules/                       # Specialized rules loaded on-demand
 │   ├── security/
 │   │   ├── secrets.md          # Load when: editing .env, credentials
@@ -764,7 +764,7 @@ This pattern works with any AI assistant configuration file. Examples shown use 
 
 **Keep it minimal** - only universally applicable rules.
 
-This example uses CLAUDE.md, but the same structure applies to AGENTS.md, .cursorrules, .aiderules, or any AI assistant configuration file:
+This example uses CLAUDE.md, but the same structure applies to AGENTS.md, .cursorrules, or any AI assistant configuration file:
 
 ```markdown
 # AI Development Rules
@@ -1054,7 +1054,7 @@ cat .ai/context-usage.log | grep -oE "rules/[^/]+/[^ ]+" | sort | uniq -c | sort
 
 ```markdown
 # AI Configuration File - WRONG APPROACH (500+ lines)
-# (applies to CLAUDE.md, AGENTS.md, .cursorrules, .aiderules, etc.)
+# (applies to CLAUDE.md, AGENTS.md, .cursorrules, etc.)
 
 ## Security Rules (100 lines)
 - Secret management for .env files
