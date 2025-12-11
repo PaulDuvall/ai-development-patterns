@@ -1451,7 +1451,7 @@ Simon's approach:
 - Mark repo as `noindex` for search engines
 - *"I still like to keep AI-generated content out of search, to avoid contributing more to the dead internet."*
 
-#### Anti-pattern: Secret Leakage
+#### Anti-pattern: Leaked Secrets
 
 **Problem**: Running unrestricted agents on production repos containing credentials.
 
@@ -1459,7 +1459,7 @@ Simon warns: *"A prompt injection attack of the lethal trifecta variety could ea
 
 **Solution**: Only use unrestricted access on dedicated, secret-free research repos.
 
-#### Anti-pattern: Proving Impossibility
+#### Anti-pattern: Unfounded Impossibility
 
 **Problem**: Expecting agents to prove something can't be done.
 

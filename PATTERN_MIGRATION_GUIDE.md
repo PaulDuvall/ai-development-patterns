@@ -66,9 +66,9 @@ This change aligns with established pattern naming conventions:
 | Rushing Into AI | Premature Adoption | Added negative prefix | "Premature" clearly indicates timing failure |
 | Context Drift | Broken Context | Added negative prefix | "Broken" indicates failure state |
 | Unrestricted Access | Unrestricted Access | No change | Already compliant |
-| Shared Agent Workspaces | Overlapping Workspaces | Changed to negative implication | "Overlapping" suggests conflict |
+| Shared Agent Workspaces | Conflicting Workspaces | Changed to negative implication | "Conflicting" clearly indicates problem |
 | Ad-Hoc AI Development | Unplanned Development | Added negative prefix | "Unplanned" clearly negative |
-| Prompt-Only AI Development | Isolated Prompting | Simplified, negative implication | "Isolated" suggests insufficient approach |
+| Prompt-Only AI Development | Disconnected Prompting | Simplified, negative implication | "Disconnected" clearly indicates isolation from tools |
 | Vague Issue Generation | Under-Specified Issues | Added negative prefix | "Under-Specified" indicates insufficiency |
 | Missing CI Integration | Broken Integration | Added negative prefix | "Broken" indicates failure |
 | Implementation-First AI | Spec-Ignored | Symmetrical with "Spec-First" | Opposite of the pattern |
@@ -80,7 +80,7 @@ This change aligns with established pattern naming conventions:
 | Knowledge Hoarding | Over-Documentation | Changed to "Over-" prefix | More technical description |
 | Context Bloat | Bloated Context | Adjusted word order | "Bloated" is negative adjective |
 | Unconstrained Generation | Unconstrained Generation | No change | Already compliant |
-| Constraint Overload | Constraint Overload | No change | Already compliant |
+| Constraint Overload | Over-Constrained | Changed to negative prefix | "Over-" prefix indicates excess |
 | Pseudo-Atomic Tasks | False Atomicity | Changed to "False" | More precise negative indicator |
 | Over-Decomposition | Over-Decomposition | No change | Already compliant |
 | Black Box Development | Blind Development | Changed "Black Box" to "Blind" | Simpler, maintains meaning |

@@ -458,7 +458,7 @@ Modern AI development platforms provide enterprise-grade implementations of thes
 **Anti-pattern: Unrestricted Access**
 Allowing AI tools full system access risks credential leaks, data breaches, and security compliance violations.
 
-**Anti-pattern: Overlapping Workspaces**
+**Anti-pattern: Conflicting Workspaces**
 Allowing multiple parallel agents to write to the same directories creates race conditions, file conflicts, and unpredictable behavior that can corrupt the development environment.
 
 ---
@@ -622,7 +622,7 @@ See [examples/tool-integration/](examples/tool-integration/) for:
 - Usage patterns and deployment guidelines
 - Integration with [Security Sandbox](#security-sandbox)
 
-**Anti-pattern: Isolated Prompting**
+**Anti-pattern: Disconnected Prompting**
 Attempting to solve complex data analysis, system integration, or real-time problems using only natural language prompts without providing AI access to actual data sources, APIs, or system tools. This leads to hallucinated responses, outdated information, and inability to interact with real systems.
 
 ---
@@ -1372,7 +1372,7 @@ Good: "Reduce p99 latency to <50ms without new dependencies"
 **Anti-pattern: Unconstrained Generation**
 Giving AI vague instructions like "make it better" or "add features" leads to over-engineered solutions that are hard to maintain and review.
 
-**Anti-pattern: Constraint Overload**  
+**Anti-pattern: Over-Constrained**
 Adding too many constraints ("use exactly 50 lines, 2 methods, no dependencies, 100% test coverage, sub-10ms response time") paralyzes AI decision-making and produces suboptimal solutions.
 
 ---
