@@ -98,9 +98,9 @@ apply_renames() {
     # Antipattern Renames
     sed -i 's/\*\*Anti-pattern: Rushing Into AI\*\*/\*\*Anti-pattern: Premature Adoption\*\*/g' "$file"
     sed -i 's/\*\*Anti-pattern: Context Drift\*\*/\*\*Anti-pattern: Broken Context\*\*/g' "$file"
-    sed -i 's/\*\*Anti-pattern: Shared Agent Workspaces\*\*/\*\*Anti-pattern: Overlapping Workspaces\*\*/g' "$file"
+    sed -i 's/\*\*Anti-pattern: Shared Agent Workspaces\*\*/\*\*Anti-pattern: Conflicting Workspaces\*\*/g' "$file"
     sed -i 's/\*\*Anti-pattern: Ad-Hoc AI Development\*\*/\*\*Anti-pattern: Unplanned Development\*\*/g' "$file"
-    sed -i 's/\*\*Anti-pattern: Prompt-Only AI Development\*\*/\*\*Anti-pattern: Isolated Prompting\*\*/g' "$file"
+    sed -i 's/\*\*Anti-pattern: Prompt-Only AI Development\*\*/\*\*Anti-pattern: Disconnected Prompting\*\*/g' "$file"
     sed -i 's/\*\*Anti-pattern: Vague Issue Generation\*\*/\*\*Anti-pattern: Under-Specified Issues\*\*/g' "$file"
     sed -i 's/\*\*Anti-pattern: Missing CI Integration\*\*/\*\*Anti-pattern: Broken Integration\*\*/g' "$file"
     sed -i 's/\*\*Anti-pattern: Implementation-First AI\*\*/\*\*Anti-pattern: Spec-Ignored\*\*/g' "$file"

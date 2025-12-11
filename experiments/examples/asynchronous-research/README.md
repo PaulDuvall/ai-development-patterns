@@ -373,13 +373,13 @@ python automation/result-parser.py research-folder/
 
 **Solution**: Keep research in dedicated repo, mark as `noindex`.
 
-### ❌ Secret Leakage
+### ❌ Leaked Secrets
 
 **Problem**: Running unrestricted agents on repos with production secrets.
 
 **Solution**: Only use unrestricted access on dedicated, secret-free research repos.
 
-### ❌ Proving Impossibility
+### ❌ Unfounded Impossibility
 
 **Problem**: Expecting agents to prove something can't be done.
 
