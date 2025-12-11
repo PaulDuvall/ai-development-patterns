@@ -39,6 +39,7 @@ These experimental patterns extend the core AI development patterns with advance
 | **[Image Spec](#image-spec)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Spec-Driven Development, Progressive Enhancement, Context Optimization |
 | **[Event Automation](#event-automation)** | Intermediate | Development | Execute custom commands automatically at specific lifecycle events in AI coding assistants to enforce policies and automate workflows | Codified Rules, Security Sandbox |
 | **[Custom Commands](#custom-commands)** | Intermediate | Development | Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and project-specific workflows | Event Automation, Spec-Driven Development |
+| **[Progressive Disclosure](#progressive-disclosure)** | Intermediate | Development | Load AI assistant rules incrementally based on task context to prevent instruction saturation and maintain consistency | Codified Rules, Context Optimization |
 | **[Asynchronous Research](#asynchronous-research)** | Intermediate | Development | Use fire-and-forget coding agents in dedicated repositories to conduct autonomous code investigations that prove technical feasibility through executable experiments | Parallel Agents, Context Persistence, Choice Generation |
 | **[Centralized Rules](#centralized-rules)** | Advanced | Operations | Enforce organization-wide AI rules through a central gateway service or shared SDK library rather than distributing configuration files | Codified Rules, Policy Generation, Security Orchestration |
 
@@ -704,6 +705,459 @@ Deploy to prod-db-instance-1.us-east-1.rds.amazonaws.com
 # Good: Parameterized
 Deploy to database: $1 (default: $STAGING_DB)
 ```
+
+---
+
+### Progressive Disclosure
+
+**Maturity**: Intermediate
+**Description**: Load AI assistant rules incrementally based on task context rather than bundling all instructions upfront, preventing context bloat and maintaining instruction-following consistency.
+
+**Related Patterns**: [Codified Rules](../README.md#codified-rules), [Context Optimization](#context-optimization), [Custom Commands](#custom-commands), [Event Automation](#event-automation)
+
+**Source**: HumanLayer, "Context engineering: Why your CLAUDE.md is probably too long" (research on instruction limits and context optimization)
+
+#### Core Problem
+
+**Instruction saturation**: LLMs can follow ~150-200 instructions with reasonable consistency. Claude Code's system prompt already contains ~50 instructions, leaving ~100-150 for your project rules. Loading all rules every session causes:
+
+- Linear decay in instruction-following accuracy
+- Context window waste on irrelevant rules
+- Cognitive overload for the AI
+- Slower response times from processing unnecessary context
+
+**Example of bloat**: A 500-line CLAUDE.md with security rules, deployment procedures, architecture patterns, testing standards, code style guides, API conventions, database migration rules, monitoring setup, and team workflows—but only 10% is relevant to any single task.
+
+#### Implementation Strategy
+
+**Three-tier rule architecture:**
+
+```
+.ai/
+├── CLAUDE.md                    # Main file: Universal rules only (<60 lines)
+├── rules/                       # Specialized rules loaded on-demand
+│   ├── security/
+│   │   ├── secrets.md          # Load when: editing .env, credentials
+│   │   ├── dependencies.md     # Load when: package.json, requirements.txt
+│   │   └── authentication.md   # Load when: auth/ directory work
+│   ├── development/
+│   │   ├── api-design.md       # Load when: working in api/ or routes/
+│   │   ├── database.md         # Load when: migrations/, models/
+│   │   ├── testing.md          # Load when: tests/ or spec files
+│   │   └── frontend.md         # Load when: components/, styles/
+│   ├── operations/
+│   │   ├── deployment.md       # Load when: Dockerfile, k8s/, terraform/
+│   │   ├── monitoring.md       # Load when: logs, metrics, alerts
+│   │   └── cicd.md            # Load when: .github/workflows/
+│   └── architecture/
+│       ├── patterns.md         # Load when: major refactoring
+│       └── performance.md      # Load when: optimization tasks
+└── prompts/                     # Reusable task templates
+    ├── implement-feature.md
+    └── fix-bug.md
+```
+
+#### Main Rules File (CLAUDE.md)
+
+**Keep it minimal** - only universally applicable rules:
+
+```markdown
+# AI Development Rules
+
+## Universal Principles (Always Apply)
+
+### Code Quality
+- Write clear, self-documenting code with meaningful names
+- Follow existing patterns in the codebase
+- Include error handling for all external calls
+
+### Communication
+- Ask clarifying questions before major changes
+- Explain non-obvious decisions in comments
+- Reference task/issue numbers in commits
+
+### Safety
+- Never commit secrets, API keys, or credentials
+- Run tests before committing code changes
+- Check git diff before every commit
+
+### Context Loading (Progressive Disclosure)
+When working in specific areas, load specialized rules:
+
+- **Security work** (auth/, .env, credentials): Read .ai/rules/security/
+- **API development** (api/, routes/): Read .ai/rules/development/api-design.md
+- **Database changes** (migrations/, models/): Read .ai/rules/development/database.md
+- **Testing** (tests/, specs/): Read .ai/rules/development/testing.md
+- **Frontend** (components/, styles/): Read .ai/rules/development/frontend.md
+- **Deployment** (Dockerfile, k8s/): Read .ai/rules/operations/deployment.md
+- **CI/CD** (.github/workflows/): Read .ai/rules/operations/cicd.md
+
+**How to load**: "Before proceeding, read the relevant rules from .ai/rules/[category]/"
+```
+
+**Key insight**: The main file becomes a **router** that tells the AI which specialized rules to load based on context.
+
+#### Specialized Rules Examples
+
+**Example: .ai/rules/security/secrets.md**
+
+```markdown
+# Security: Secret Management Rules
+
+## When to Load
+Load this file when working with:
+- .env files or environment variables
+- credentials.json, secrets.yaml, config files with sensitive data
+- Authentication tokens or API keys
+- Deployment configurations with passwords
+
+## Rules
+
+### Secret Detection
+1. Run `gitleaks detect --no-git --source=<file>` before committing
+2. Block commits containing patterns: AWS keys, JWT tokens, database passwords
+3. Use environment variable references, never hardcoded values
+
+### Environment Variables
+# CORRECT: Reference variables
+DATABASE_URL=${DATABASE_URL}
+API_KEY=${STRIPE_API_KEY}
+
+# WRONG: Hardcoded secrets
+DATABASE_URL=postgresql://admin:password123@prod-db.com
+API_KEY=sk_live_abc123xyz
+
+### Credential Files
+- NEVER edit .env files directly
+- Use .env.example templates with placeholder values
+- All secrets go in secret management (AWS Secrets Manager, 1Password)
+
+### Validation
+Before committing, verify:
+# No secrets in staged files
+git diff --cached | gitleaks detect --no-git --verbose --source=/dev/stdin
+
+# No .env files staged
+git diff --cached --name-only | grep -E "(\.env$|credentials)" && exit 1
+```
+
+**Example: .ai/rules/development/api-design.md**
+
+```markdown
+# Development: API Design Rules
+
+## When to Load
+Load this file when working with:
+- api/, routes/, controllers/ directories
+- HTTP endpoint implementation
+- API contract changes
+
+## Rules
+
+### RESTful Design
+- Use standard HTTP methods: GET (read), POST (create), PUT/PATCH (update), DELETE
+- Plural nouns for resources: `/users`, `/orders`, not `/getUser`
+- Nest related resources: `/users/:id/orders` for user-specific orders
+
+### Response Format
+All API responses must use this structure:
+{
+  "success": true,
+  "data": { ... },
+  "error": null,
+  "meta": {
+    "timestamp": "2025-01-15T10:30:00Z",
+    "request_id": "abc-123"
+  }
+}
+
+### Error Handling
+// CORRECT: Structured errors
+res.status(404).json({
+  success: false,
+  data: null,
+  error: {
+    code: "USER_NOT_FOUND",
+    message: "User with ID 123 not found",
+    details: { user_id: 123 }
+  }
+});
+
+// WRONG: Generic errors
+res.status(500).send("Error");
+
+### Validation
+- Validate all inputs at API boundary
+- Return 400 Bad Request with specific validation errors
+- Document all endpoints in OpenAPI/Swagger spec
+```
+
+#### Decision Framework for Rule Loading
+
+```mermaid
+graph TD
+    A[AI Assistant Receives Task] --> B{Analyze Task Context}
+
+    B -->|File paths mentioned| C[Extract directory/file patterns]
+    B -->|Task description keywords| D[Identify domain area]
+
+    C --> E{Match Pattern}
+    D --> E
+
+    E -->|auth/, .env, credentials| F[Load security/ rules]
+    E -->|api/, routes/| G[Load api-design.md]
+    E -->|migrations/, models/| H[Load database.md]
+    E -->|tests/, spec/| I[Load testing.md]
+    E -->|components/, styles/| J[Load frontend.md]
+    E -->|Dockerfile, k8s/| K[Load deployment.md]
+    E -->|.github/workflows/| L[Load cicd.md]
+    E -->|No specific pattern| M[Use main rules only]
+
+    F --> N[Execute Task with Specialized Context]
+    G --> N
+    H --> N
+    I --> N
+    J --> N
+    K --> N
+    L --> N
+    M --> N
+```
+
+#### Automatic Loading with Event Hooks
+
+Combine Progressive Disclosure with [Event Automation](#event-automation) for automatic context loading:
+
+```bash
+#!/bin/bash
+# .ai/hooks/auto-load-context.sh
+# Runs before AI tool use to automatically load relevant rules
+
+FILE_PATH="$TOOL_INPUT_FILE_PATH"
+LOADED_RULES=""
+
+# Security context
+if echo "$FILE_PATH" | grep -E "(\.env|credentials|secrets|auth/)" > /dev/null; then
+  LOADED_RULES="$LOADED_RULES .ai/rules/security/"
+fi
+
+# API development context
+if echo "$FILE_PATH" | grep -E "(api/|routes/|controllers/)" > /dev/null; then
+  LOADED_RULES="$LOADED_RULES .ai/rules/development/api-design.md"
+fi
+
+# Database context
+if echo "$FILE_PATH" | grep -E "(migrations/|models/|database/)" > /dev/null; then
+  LOADED_RULES="$LOADED_RULES .ai/rules/development/database.md"
+fi
+
+# Testing context
+if echo "$FILE_PATH" | grep -E "(tests?/|spec/|\.test\.|\.spec\.)" > /dev/null; then
+  LOADED_RULES="$LOADED_RULES .ai/rules/development/testing.md"
+fi
+
+# Output loaded context as AI message
+if [ -n "$LOADED_RULES" ]; then
+  echo "📋 Auto-loading specialized rules for this context:"
+  for rule in $LOADED_RULES; do
+    echo "  - $rule"
+  done
+  echo ""
+  echo "AI: Please read these files before proceeding: $LOADED_RULES"
+fi
+
+exit 0  # Allow operation to continue
+```
+
+**Hook configuration (Claude Code)**:
+```json
+{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Edit|Write",
+      "hooks": [{"type": "command", "command": ".ai/hooks/auto-load-context.sh"}]
+    }]
+  }
+}
+```
+
+#### Integration with Custom Commands
+
+Create commands that automatically load relevant context:
+
+```markdown
+---
+description: Implement API endpoint with auto-loaded API design rules
+argument-hint: endpoint_name (e.g., "GET /users/:id")
+---
+
+# API Implementation with Progressive Disclosure
+
+Before implementing the API endpoint, I will:
+
+1. **Auto-load specialized context**:
+   - Read `.ai/rules/development/api-design.md` for API standards
+   - Read `.ai/rules/security/authentication.md` if endpoint requires auth
+   - Read `.ai/rules/development/testing.md` for test requirements
+
+2. **Implement endpoint** following loaded rules:
+   - RESTful design patterns from api-design.md
+   - Error handling standards
+   - Input validation requirements
+   - Response format consistency
+
+3. **Generate tests** following testing.md:
+   - Happy path tests
+   - Error case coverage
+   - Authentication/authorization tests
+   - Input validation tests
+
+4. **Verify compliance**:
+   - Check against API design rules
+   - Run security validation
+   - Ensure test coverage >80%
+
+Implement: $ARGUMENTS
+```
+
+#### Validation & Metrics
+
+**Measure effectiveness**:
+
+```bash
+# Count instructions in main file (target: <60 lines of actual rules)
+grep -v "^#" .ai/CLAUDE.md | grep -v "^$" | wc -l
+
+# Count specialized rule files (aim for 5-10 domain areas)
+find .ai/rules -name "*.md" | wc -l
+
+# Track context loading patterns (add to event hooks)
+echo "$(date): Loaded $LOADED_RULES for $FILE_PATH" >> .ai/context-usage.log
+
+# Analyze which rules are most frequently loaded
+cat .ai/context-usage.log | grep -oE "rules/[^/]+/[^ ]+" | sort | uniq -c | sort -rn
+```
+
+**Success criteria**:
+- Main CLAUDE.md: <60 lines of actual instructions (excluding comments/blank lines)
+- Specialized rules: 5-10 focused files, each <100 lines
+- Context loading: Automatic via hooks or explicit in commands
+- Instruction count per session: <150 total (main + loaded specializations)
+
+#### Anti-pattern: Bloated Configuration
+
+**Problem**: Putting all rules in a single CLAUDE.md file regardless of relevance.
+
+```markdown
+# CLAUDE.md - WRONG APPROACH (500+ lines)
+
+## Security Rules (100 lines)
+- Secret management for .env files
+- Dependency scanning procedures
+- Authentication implementation standards
+- OAuth flow requirements
+- API key rotation policies
+...
+
+## Database Rules (80 lines)
+- Migration file naming
+- Model relationship patterns
+- Query optimization guidelines
+- Index creation standards
+...
+
+## API Design Rules (90 lines)
+- RESTful endpoint patterns
+- Response format requirements
+- Error handling standards
+...
+
+## Frontend Rules (110 lines)
+- Component structure
+- State management patterns
+- CSS conventions
+...
+
+## Deployment Rules (70 lines)
+- Docker build optimization
+- Kubernetes manifests
+- Blue-green deployment
+...
+
+## Testing Rules (50 lines)
+...
+```
+
+**Why it fails**:
+- AI task: "Fix typo in README.md"
+- Loaded context: ALL 500 lines of rules (security, database, API, frontend, deployment, testing)
+- Relevant context: Maybe 10 lines about code quality and git commit messages
+- Result: 490 lines of wasted context, reduced instruction-following accuracy
+- Performance: Slower responses, more hallucinations, missed critical instructions
+
+**Consequences**:
+1. **Instruction decay**: With 500+ instructions loaded, AI follows maybe 60-70% accurately
+2. **Context waste**: 90% of loaded rules are irrelevant to the task
+3. **Maintenance burden**: Editing security rules requires opening 500-line file
+4. **Slow responses**: AI processes unnecessary context before every response
+5. **Higher costs**: More tokens consumed per interaction
+6. **Cognitive overload**: New team members overwhelmed by monolithic config
+
+**Correct approach**: Progressive Disclosure
+- Main file: 40 lines of universal rules + routing instructions
+- Specialized files: 8 files × 60 lines = 480 lines total
+- Per-task context: 40 (main) + 60 (relevant specialization) = 100 instructions
+- Result: 3x better instruction-following, faster responses, easier maintenance
+
+#### Anti-pattern: Over-Fragmentation
+
+**Problem**: Creating too many tiny rule files that require constant loading.
+
+```
+.ai/rules/
+├── api/
+│   ├── get-endpoints.md      # 10 lines
+│   ├── post-endpoints.md     # 12 lines
+│   ├── put-endpoints.md      # 11 lines
+│   ├── delete-endpoints.md   # 9 lines
+│   ├── error-handling.md     # 8 lines
+│   ├── validation.md         # 15 lines
+│   ├── response-format.md    # 10 lines
+│   └── versioning.md         # 7 lines
+...
+```
+
+**Why it fails**:
+- API implementation task requires loading 8 different files
+- Overhead of reading 8 files > benefit of separation
+- Harder to maintain consistency across related rules
+- AI must constantly re-read interconnected files
+
+**Correct approach**: Balance granularity
+- Combine related rules: api-design.md (all API rules, ~80 lines)
+- Split by clear domains: security/, development/, operations/
+- Aim for 5-10 specialized files, not 50
+
+#### Anti-pattern: No Loading Guidance
+
+**Problem**: Creating specialized rule files but not telling the AI when to load them.
+
+```markdown
+# CLAUDE.md (no routing)
+Follow the project coding standards.
+
+# (Specialized rules exist in .ai/rules/ but AI never knows to load them)
+```
+
+**Why it fails**:
+- AI doesn't know specialized rules exist
+- Relies on human to remember: "also read .ai/rules/security/secrets.md"
+- No automation or consistency
+
+**Correct approach**: Explicit routing in main file
+- Document WHEN to load each specialized file
+- Provide file path patterns that trigger loading
+- Use event hooks for automatic loading
+- Include loading instructions in custom commands
 
 ---
 
