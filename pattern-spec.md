@@ -224,6 +224,35 @@ Before finalizing an antipattern name, verify:
 - Provide specific consequences
 - Examples: "Manual Policy Translation", "Alert Fatigue", "Blind Chaos Testing"
 
+### Pattern Length Guidelines
+
+**Recommended maximum lengths:**
+- **Complete pattern**: 200-400 lines (target), 600 lines (max before splitting)
+- **Description**: 1-2 sentences
+- **Core implementation**: 150-300 lines
+- **Individual anti-patterns**: 50-100 lines each
+- **Code examples in README**: 30-50 lines max
+
+**When a pattern exceeds 600 lines:**
+1. Review for unnecessary repetition or verbosity
+2. Move detailed implementations to `examples/pattern-name/` directory
+3. Consider splitting into multiple focused patterns
+4. Remove "nice-to-have" scenarios that don't demonstrate core concepts
+
+**Philosophy**: Patterns should be **scannable in 2-3 minutes**. Readers should grasp the core concept quickly and reference examples/ for deep implementation details.
+
+**Enforcement Strategy**
+
+For AI-generated patterns:
+1. **Auto-warning at 500+ lines**: "This pattern is getting long. Review for bloat."
+2. **Hard review at 600+ lines**: "Consider splitting or moving detail to examples/"
+3. **Guidance**: "Each additional 100 lines should add significant new value"
+
+**Quality over quantity:**
+- ✅ 300 well-focused lines > 600 lines with repetition
+- ✅ Clear core examples > exhaustive scenario coverage
+- ✅ Scannable structure > comprehensive documentation
+
 ## Formatting Standards
 
 ### Code Blocks

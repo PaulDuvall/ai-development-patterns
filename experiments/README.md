@@ -1143,7 +1143,7 @@ cat .ai/context-usage.log | grep -oE "rules/[^/]+/[^ ]+" | sort | uniq -c | sort
 - Split by clear domains: security/, development/, operations/
 - Aim for 5-10 specialized files, not 50
 
-#### Anti-pattern: No Loading Guidance
+#### Anti-pattern: Missing Guidance
 
 **Problem**: Creating specialized rule files but not telling the AI when to load them.
 
