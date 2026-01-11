@@ -98,6 +98,7 @@ This file tracks patterns under exploration that may eventually be formalized in
 - Vague completion criteria ("make it good" vs. explicit success metrics)
 - Tasks requiring human judgment or design decisions
 - Prompts without self-correction guidance (test → fix → retry cycles)
+- Generating large codebases you don't understand or know how to maintain
 
 ---
 
