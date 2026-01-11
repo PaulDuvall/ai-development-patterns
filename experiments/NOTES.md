@@ -19,7 +19,7 @@ This file tracks patterns under exploration that may eventually be formalized in
 - Hands-free code review and exploration
 
 **Tools to Evaluate**:
-- [WisprFlow](https://whisperflow.com/) - Voice-to-text for coding
+- [WisprFlow](https://wisprflow.ai/) - Voice-to-text for coding
 - [Talon Voice](https://talonvoice.com/) - Voice control for development
 - [Voice Control for VSCode](https://marketplace.visualstudio.com/items?itemName=pokey.cursorless) - VSCode voice extensions
 - Native OS voice control (macOS Voice Control, Windows Speech Recognition)
@@ -40,13 +40,107 @@ This file tracks patterns under exploration that may eventually be formalized in
 
 **Related Patterns**:
 - [Tool Integration](../README.md#tool-integration) - Voice as input tool for AI
-- [Custom Commands](#custom-commands) - Voice-triggered slash commands
-- [Event Automation](#event-automation) - Voice input as lifecycle event
+- [Developer Lifecycle](../README.md#developer-lifecycle) - Voice-triggered workflow commands
+- [Context Persistence](../README.md#context-persistence) - Voice input as context source
 
 **Anti-patterns to Avoid**:
 - Over-reliance on voice for precise code editing (better for high-level commands)
 - Using voice in noisy environments (poor transcription accuracy)
 - Voice-only workflow without keyboard fallback (voice fatigue)
+
+---
+
+### Agentic Loops
+
+**Status**: Early exploration
+**Date Added**: 2025-01-11
+
+**Description**: Autonomous agent loops that continuously execute tasks, evaluate results, and iterate until completion or user intervention. Examples include the [Claude Code Ralph Wiggum plugin](https://github.com/anthropics/claude-code/blob/main/plugins/ralph-wiggum/README.md).
+
+**Potential Use Cases**:
+- Autonomous code generation with self-correction
+- Continuous refactoring until quality thresholds are met
+- Iterative test writing until coverage goals are achieved
+- Self-healing pipelines that retry with different approaches
+- Long-running research tasks with progressive refinement
+
+**Tools to Evaluate**:
+- [Ralph Wiggum Plugin](https://github.com/anthropics/claude-code/blob/main/plugins/ralph-wiggum/README.md) - Claude Code agentic loop implementation
+- Claude Code Task tool with background agents
+- Custom loop implementations with exit conditions
+
+**Research Questions**:
+1. What are effective exit conditions to prevent infinite loops?
+2. How do you balance autonomy vs. user oversight in agentic loops?
+3. What metrics indicate loop progress vs. thrashing?
+4. How should loops handle conflicting or contradictory results?
+5. What's the optimal checkpoint frequency for long-running loops?
+
+**Next Steps**:
+- [ ] Document /ralph-loop behavior and configuration options
+- [ ] Identify common loop patterns (retry, refinement, exploration)
+- [ ] Define safety guardrails (max iterations, timeout, resource limits)
+- [ ] Test loop effectiveness for different task types
+- [ ] Measure token usage and cost implications of loops
+
+**Related Patterns**:
+- [Parallel Agents](../README.md#parallel-agents) - Multiple loops running concurrently
+- [Developer Lifecycle](../README.md#developer-lifecycle) - Triggering loops on events
+- [CheckPoint](#checkpoint) - Validation gates within loops
+
+**Anti-patterns to Avoid**:
+- Unbounded loops without termination conditions (runaway costs)
+- Loops that ignore previous iteration context (repeated failures)
+- Over-automation without human checkpoints for critical decisions
+- Single-threaded loops for parallelizable tasks
+
+---
+
+### CheckPoint
+
+**Status**: Early exploration
+**Date Added**: 2025-01-11
+
+**Description**: A systematic validation gate that runs a series of quality checks (refactoring, security, code quality, performance, architecture, documentation) after each development task to ensure continuous quality.
+
+**Potential Use Cases**:
+- Post-commit quality validation before pushing
+- Pre-merge checks in pull request workflows
+- Continuous compliance verification during development
+- Architecture drift detection after feature additions
+- Documentation freshness validation
+
+**Tools to Evaluate**:
+- Claude Code slash commands (/xsecurity, /xquality, /xrefactor, etc.)
+- Pre-commit hooks with multi-check orchestration
+- Custom checkpoint scripts with configurable check suites
+- CI/CD pipeline quality gates
+
+**Research Questions**:
+1. What's the optimal set of checks to run after each task?
+2. How do you balance thoroughness vs. developer velocity?
+3. Should checkpoints be blocking or advisory?
+4. How do you handle check failures mid-workflow?
+5. Can AI assistants auto-remediate checkpoint failures?
+
+**Next Steps**:
+- [ ] Define standard checkpoint check categories
+- [ ] Create configurable checkpoint profiles (quick, standard, thorough)
+- [ ] Implement checkpoint as Claude Code custom command
+- [ ] Measure impact on code quality metrics over time
+- [ ] Document checkpoint integration with CI/CD pipelines
+
+**Related Patterns**:
+- [Code Quality Prerequisites](../README.md#code-quality-prerequisites) - CI/CD quality enforcement
+- [Security Sandbox](../README.md#security-sandbox) - Security-focused checks
+- [Agentic Loops](#agentic-loops) - Checkpoints as loop exit conditions
+- [Guided Refactoring](../README.md#guided-refactoring) - Code improvement checks
+
+**Anti-patterns to Avoid**:
+- Running all checks on every minor change (developer fatigue)
+- Checkpoint failures without actionable remediation guidance
+- Skipping checkpoints under time pressure (quality debt)
+- One-size-fits-all checks regardless of change scope
 
 ---
 

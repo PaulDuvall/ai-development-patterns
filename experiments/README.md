@@ -1474,52 +1474,72 @@ Simon's caveat: *"They can't prove something is impossible—just because the co
 ### Centralized Rules
 
 **Maturity**: Advanced
-**Description**: Enforce organization-wide AI rules through a central gateway service or shared SDK library rather than distributing configuration files to each repository.
+**Description**: Enforce organization-wide AI rules through a central Git repository that syncs to standard AI assistant configuration files (CLAUDE.md, AGENTS.md, .cursorrules) with automatic language and framework detection.
 
-**Related Patterns**: [Codified Rules](../README.md#codified-rules), [Policy Generation](../README.md#policy-generation), [Security Orchestration](../README.md#security-orchestration)
+**Related Patterns**: [Codified Rules](../README.md#codified-rules), [Progressive Disclosure](#progressive-disclosure), [Security Orchestration](../README.md#security-orchestration)
 
 #### Core Implementation
 
-Centralize AI rules in a three-layer architecture:
+**Sync-based Architecture** (Recommended):
 
-1. **Gateway service** - Internal service that owns all org rules, calls AI providers
-2. **Wrapper library** - Shared SDK package that embeds org rules in system prompts
-3. **CLI/editor layer** - Developer tools that call gateway or wrapper, never AI providers directly
-
-**Gateway pattern**:
 ```
-Developer tool → Internal gateway → AI provider
-                      ↓
-              Org rules applied
-              Input/output filtered
-              Usage logged
-```
-
-**Wrapper library pattern**:
-```
-Developer tool → @yourorg/ai-client → AI provider
-                        ↓
-                Org rules in system prompt
-                Consistent across all repos
+Central Rules Repository (Git)
+  ├── base/universal-rules.md
+  ├── languages/ (python.md, typescript.md, go.md)
+  └── frameworks/ (react.md, django.md, fastapi.md)
+           ↓
+    [sync-ai-rules.sh]
+           ↓
+  Project Repository
+    ├── CLAUDE.md (auto-generated)
+    ├── AGENTS.md (auto-generated)
+    └── .cursorrules (auto-generated)
 ```
 
-**Governance capabilities**:
-- Input filters (block secrets, enforce read-only paths)
-- Output filters (scan for banned APIs, license violations)
-- Policy-as-code integration (OPA rules before/after AI calls)
-- Centralized audit logging (repo, task type, tokens, files touched)
+**How it works**:
 
-**Benefits over distributed config**:
-- Change rules once, all tools updated
-- Enforceable guardrails (not just suggestions)
-- Aggregate metrics across teams
-- Model switching without repo changes
+1. **Central repository** stores organization rules organized by language/framework
+2. **Sync script** detects project language (Python, TypeScript, Go) and framework (React, Django, FastAPI)
+3. **Auto-generates** standard config files (CLAUDE.md, .cursorrules, etc.) with relevant rules
+4. **Works offline** - no API calls, no internet dependencies after initial sync
 
-Complete Example: See [examples/centralized-rules/](examples/centralized-rules/) for working gateway, wrapper library, and CLI implementations.
+**Example sync**:
+```bash
+# One-time setup per project
+curl -O https://yourorg.com/sync-ai-rules.sh
+chmod +x sync-ai-rules.sh
+
+# Run sync (manual or via pre-commit hook)
+./sync-ai-rules.sh
+
+# Generates CLAUDE.md with:
+# - Universal org rules
+# - Python-specific rules (auto-detected from pyproject.toml)
+# - FastAPI rules (auto-detected from dependencies)
+```
+
+**Key benefits**:
+- ✅ **Works with existing AI tools** - Claude Code, Cursor, Gemini all read standard config files
+- ✅ **Offline-friendly** - No API gateway, no internet dependencies
+- ✅ **Simple** - Single bash script, no Node.js services to deploy
+- ✅ **Language-aware** - Auto-detects Python/TypeScript/Go and pulls relevant rules
+- ✅ **Version-controlled** - Rules in Git, changes are auditable
+
+**Alternative: Gateway Pattern** (for advanced use cases):
+
+For organizations needing input/output filtering, policy enforcement, or usage logging, see [examples/centralized-rules/gateway-strategy/](examples/centralized-rules/gateway-strategy/) for API gateway approach with:
+- Request/response filtering
+- Policy-as-code integration (OPA/Cedar)
+- Centralized audit logging
+- Usage metrics aggregation
+
+Complete Examples:
+- **[Sync Strategy](examples/centralized-rules/sync-strategy/)** - Simple Git-based sync (recommended)
+- **[Gateway Strategy](examples/centralized-rules/gateway-strategy/)** - Advanced API gateway pattern
 
 #### Anti-pattern: Scattered Configuration
 
-Copying AI rule files into every repository:
+Copying AI rule files into every repository without central source:
 
 ```
 repo-a/.cursorrules    # v1.2 of org rules
@@ -1529,9 +1549,11 @@ repo-c/.ai/rules/      # Custom fork, diverged
 
 **Problems**:
 - Rules drift across repositories
-- No enforcement (developers can ignore or modify)
-- No visibility into AI usage patterns
-- Model/rule changes require updating every repo
+- Manual updates required for every repo
+- No consistency enforcement
+- Difficult to track which repos have current rules
+
+**Solution**: Use centralized sync approach where rules are maintained in one place and automatically distributed to projects.
 
 ---
 
