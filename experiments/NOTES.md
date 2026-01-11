@@ -132,7 +132,7 @@ This file tracks patterns under exploration that may eventually be formalized in
 
 **Related Patterns**:
 - [Code Quality Prerequisites](../README.md#code-quality-prerequisites) - CI/CD quality enforcement
-- [Security Sandbox](../README.md#security-sandbox) - Security-focused checks
+- [Security Sandbox](../README.md#security-sandbox) - Running agents in isolated environments
 - [Agentic Loops](#agentic-loops) - Checkpoints as loop exit conditions
 - [Guided Refactoring](../README.md#guided-refactoring) - Code improvement checks
 
