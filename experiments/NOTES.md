@@ -55,44 +55,49 @@ This file tracks patterns under exploration that may eventually be formalized in
 **Status**: Early exploration
 **Date Added**: 2025-01-11
 
-**Description**: Autonomous agent loops that continuously execute tasks, evaluate results, and iterate until completion or user intervention. Examples include the [Claude Code Ralph Wiggum plugin](https://github.com/anthropics/claude-code/blob/main/plugins/ralph-wiggum/README.md).
+**Description**: Enable long autonomous coding sessions where AI iteratively improves work until explicit completion criteria are met. Uses a stop hook to intercept exit attempts and feed the same prompt back, allowing Claude to self-correct through test failures, error messages, and its own code. See the [Claude Code Ralph Wiggum plugin](https://github.com/anthropics/claude-code/blob/main/plugins/ralph-wiggum/README.md).
+
+**Core Mechanics**:
+- **Stop hook** intercepts exit attempts and re-injects the original prompt
+- **File persistence** allows each iteration to see previous work
+- **Completion promise** (e.g., `<promise>COMPLETE</promise>`) signals success
+- **Iteration limits** provide safety bounds (e.g., `--max-iterations 50`)
 
 **Potential Use Cases**:
-- Autonomous code generation with self-correction
-- Continuous refactoring until quality thresholds are met
-- Iterative test writing until coverage goals are achieved
-- Self-healing pipelines that retry with different approaches
-- Long-running research tasks with progressive refinement
+- Greenfield projects you can start and walk away from
+- TDD workflows: write failing tests → implement → run tests → fix → repeat
+- Multi-phase feature builds with clear success criteria
+- Tasks with automatic verification (tests, linters, type checkers)
 
 **Tools to Evaluate**:
-- [Ralph Wiggum Plugin](https://github.com/anthropics/claude-code/blob/main/plugins/ralph-wiggum/README.md) - Claude Code agentic loop implementation
-- Claude Code Task tool with background agents
-- Custom loop implementations with exit conditions
+- [Ralph Wiggum Plugin](https://github.com/anthropics/claude-code/blob/main/plugins/ralph-wiggum/README.md) - Official Claude Code agentic loop implementation
+- Custom stop hooks with iteration tracking
+- Prompt templates with completion promises
 
 **Research Questions**:
-1. What are effective exit conditions to prevent infinite loops?
-2. How do you balance autonomy vs. user oversight in agentic loops?
-3. What metrics indicate loop progress vs. thrashing?
-4. How should loops handle conflicting or contradictory results?
-5. What's the optimal checkpoint frequency for long-running loops?
+1. How do you craft effective completion promises that prevent false positives?
+2. What iteration limits balance thoroughness vs. cost for different task types?
+3. How should prompts structure incremental goals for multi-phase work?
+4. When should loops include explicit fallback/escape instructions?
+5. What metrics distinguish productive iteration from thrashing?
 
 **Next Steps**:
-- [ ] Document /ralph-loop behavior and configuration options
-- [ ] Identify common loop patterns (retry, refinement, exploration)
-- [ ] Define safety guardrails (max iterations, timeout, resource limits)
-- [ ] Test loop effectiveness for different task types
-- [ ] Measure token usage and cost implications of loops
+- [ ] Test /ralph-loop with various task types (API builds, test suites, refactoring)
+- [ ] Document effective prompt templates with completion promises
+- [ ] Measure iteration counts and API costs for common workflows
+- [ ] Define prompt patterns for self-correction (TDD cycles, debug loops)
+- [ ] Identify tasks unsuitable for agentic loops (design decisions, unclear criteria)
 
 **Related Patterns**:
 - [Parallel Agents](../README.md#parallel-agents) - Multiple loops running concurrently
 - [Developer Lifecycle](../README.md#developer-lifecycle) - Triggering loops on events
-- [CheckPoint](#checkpoint) - Validation gates within loops
+- [CheckPoint](#checkpoint) - Validation criteria within loop iterations
 
 **Anti-patterns to Avoid**:
-- Unbounded loops without termination conditions (runaway costs)
-- Loops that ignore previous iteration context (repeated failures)
-- Over-automation without human checkpoints for critical decisions
-- Single-threaded loops for parallelizable tasks
+- Missing iteration limits (runaway costs, infinite loops)
+- Vague completion criteria ("make it good" vs. explicit success metrics)
+- Tasks requiring human judgment or design decisions
+- Prompts without self-correction guidance (test → fix → retry cycles)
 
 ---
 
@@ -133,7 +138,7 @@ This file tracks patterns under exploration that may eventually be formalized in
 **Related Patterns**:
 - [Code Quality Prerequisites](../README.md#code-quality-prerequisites) - CI/CD quality enforcement
 - [Security Sandbox](../README.md#security-sandbox) - Running agents in isolated environments
-- [Agentic Loops](#agentic-loops) - Checkpoints as loop exit conditions
+- [Agentic Loops](#agentic-loops) - Long autonomous coding sessions with self-correction
 - [Guided Refactoring](../README.md#guided-refactoring) - Code improvement checks
 
 **Anti-patterns to Avoid**:
