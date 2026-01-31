@@ -1,16 +1,18 @@
-# Technical Debt Forecasting Implementation
+# Debt Forecasting Implementation
 
-This directory contains a complete implementation of the Technical Debt Forecasting pattern, proactively identifying and prioritizing technical debt using AI-powered code analysis.
+This directory contains a complete implementation of the Debt Forecasting pattern, proactively identifying and prioritizing technical debt using AI-powered code analysis.
 
 ## Overview
 
-Technical Debt Forecasting enables teams to:
+Debt Forecasting enables teams to:
 - Proactively identify technical debt before it becomes critical
 - Prioritize debt remediation by business impact and maintenance cost
 - Forecast future maintenance burden and resource requirements
 - Track technical debt trends and improvement progress
 
 ## Files in this Implementation
+
+For complete pattern documentation, see: [Debt Forecasting](../../README.md#debt-forecasting)
 
 - `debt_analysis.md` - Complete technical debt forecasting documentation
 - `analyzers/` - Code quality and complexity analysis tools

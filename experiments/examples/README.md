@@ -1,131 +1,32 @@
 # Experimental Pattern Examples
 
-This directory contains working implementations of experimental AI development patterns. These examples demonstrate cutting-edge approaches that are under active development and evaluation.
+This directory contains working implementations of selected experimental patterns from the catalog in [experiments/README.md](../README.md).
 
-## Pattern Implementation Status
+## Example Catalog
 
-| Pattern | Implementation Status | Directory | Description |
-|---------|----------------------|-----------|-------------|
-| **Human-AI Handoff Protocol** | ✅ Complete | `human-ai-handoff/` | Decision framework and automation for task transitions |
-| **Comprehensive AI Testing Strategy** | ✅ Complete | `comprehensive-ai-testing-strategy/` | Unified test-first development and quality assurance |
-| **AI Workflow Orchestration** | ✅ Complete | `ai-workflow-orchestration/` | Multi-agent coordination and parallel execution |
-| **AI Review Automation** | ✅ Complete | `ai-review-automation/` | Automated parallel agent output review |
-| **Technical Debt Forecasting** | ✅ Complete | `technical-debt-forecasting/` | Proactive technical debt analysis and prioritization |
-| **Pipeline Synthesis** | ✅ Complete | `pipeline-synthesis/` | Generate CI/CD pipelines from plain-English specifications |
-| **AI-Guided Blue-Green Deployment** | ✅ Complete | `ai-guided-blue-green-deployment/` | Generate validated blue-green deployment scripts |
-| **Drift Detection & Remediation** | ✅ Complete | `drift-detection-remediation/` | Automated infrastructure drift detection and fixes |
-| **Incident Response Automation** | ✅ Complete | `incident-response-automation/` | Generate incident response playbooks from historical data |
-| **Dependency Upgrade Advisor** | ✅ Complete | `dependency-upgrade-advisor/` | Intelligent dependency upgrade management |
-| **Context Window Optimization** | 🚧 In Progress | `context-window-optimization/` | AI tool selection and cost optimization |
-| **Test Suite Health Management** | 🚧 In Progress | `test-suite-health/` | Flaky test detection and remediation |
-| **On-Call Handoff Automation** | 📋 Planned | `on-call-handoff/` | Automated handoff brief generation |
-
-## Usage Guidelines
-
-### Experimental Nature Warning
-⚠️ **These patterns are experimental and may:**
-- Contain incomplete implementations
-- Change significantly based on feedback
-- Have limited testing and validation
-- Require advanced AI development experience
-
-### Implementation Approach
-Each experimental pattern example includes:
-- **Working code samples** demonstrating the core concepts
-- **Configuration files** for setup and customization  
-- **Documentation** explaining usage and limitations
-- **Integration examples** showing how to combine with stable patterns
-
-### Prerequisites
-- Familiarity with core AI development patterns
-- Experience with AI tool integration
-- Understanding of advanced development workflows
-- Access to multiple AI development tools
+| Experimental Pattern | Example Directory | Notes |
+|----------------------|------------------|-------|
+| [Asynchronous Research](../README.md#asynchronous-research) | [`asynchronous-research/`](asynchronous-research/) | Fire-and-forget research workflows |
+| [Centralized Rules](../README.md#centralized-rules) | [`centralized-rules/`](centralized-rules/) | Gateway-style enforcement and distribution |
+| [Custom Commands](../README.md#custom-commands) | [`custom-commands/`](custom-commands/) | Extend assistants with project-specific commands |
+| [Debt Forecasting](../README.md#debt-forecasting) | [`debt-forecasting/`](debt-forecasting/) | Proactive technical debt analysis |
+| [Deployment Synthesis](../README.md#deployment-synthesis) | [`deployment-synthesis/`](deployment-synthesis/) | Generate validated deployment configurations |
+| [Drift Remediation](../README.md#drift-remediation) | [`drift-remediation/`](drift-remediation/) | Detect and correct infrastructure drift |
+| [Event Automation](../README.md#event-automation) | [`event-automation/`](event-automation/) | Automate actions at assistant lifecycle events |
+| [Handoff Protocols](../README.md#handoff-protocols) | [`handoff-protocols/`](handoff-protocols/) | Human ↔ AI handoff decisioning and procedures |
+| [Incident Automation](../README.md#incident-automation) | [`incident-automation/`](incident-automation/) | Generate incident response playbooks |
+| [Pipeline Synthesis](../README.md#pipeline-synthesis) | [`pipeline-synthesis/`](pipeline-synthesis/) | Convert build specs into pipeline configs |
+| [Review Automation](../README.md#review-automation) | [`review-automation/`](review-automation/) | Automate review of parallel outputs |
+| [Test Promotion](../README.md#test-promotion) | [`test-promotion/`](test-promotion/) | Separate generated tests from golden tests |
+| [Testing Orchestration](../README.md#testing-orchestration) | [`testing-orchestration/`](testing-orchestration/) | Coordinated testing strategy and automation |
+| [Upgrade Advisor](../README.md#upgrade-advisor) | [`upgrade-advisor/`](upgrade-advisor/) | Intelligent dependency upgrades |
+| [Workflow Orchestration](../README.md#workflow-orchestration) | [`workflow-orchestration/`](workflow-orchestration/) | Coordinate sequential and parallel workflows |
 
 ## Getting Started
 
-### 1. Review Core Patterns First
-Before implementing experimental patterns, ensure you have:
-- Established [AI Security Sandbox](../../examples/ai-security-sandbox/)
-- Implemented [Specification Driven Development](../../examples/specification-driven-development/)
-- Set up [Observable AI Development](../../examples/observable-ai-development/)
-
-### 2. Choose Appropriate Patterns
-Select experimental patterns based on:
-- **Team maturity**: Advanced patterns require experienced AI developers
-- **Use case complexity**: Match pattern sophistication to problem complexity
-- **Risk tolerance**: Experimental patterns may have unexpected behaviors
-
-### 3. Implement with Caution
-- Start with small, isolated experiments
-- Monitor results carefully and document learnings
-- Have rollback plans for production systems
-- Share findings with the community
-
-## Contributing to Experimental Patterns
-
-### Pattern Development Lifecycle
-1. **Concept**: Initial pattern idea and problem statement
-2. **Prototype**: Basic implementation and validation
-3. **Experiment**: Extended testing and refinement
-4. **Stabilization**: Production-ready implementation
-5. **Graduation**: Move to core patterns in main examples/
-
-### Feedback and Iteration
-- Report issues and suggestions via GitHub issues
-- Share implementation experiences and learnings
-- Contribute improvements and extensions
-- Help validate patterns in different environments
-
-## Integration with Stable Patterns
-
-### Dependency Management
-Experimental patterns often build on stable patterns:
-```mermaid
-graph TD
-    A[AI Security Sandbox] --> B[Human-AI Handoff Protocol]
-    C[Specification Driven Development] --> D[AI Workflow Orchestration]
-    E[Observable AI Development] --> F[Context Window Optimization]
-    G[Comprehensive AI Testing Strategy] --> H[Test Suite Health Management]
-```
-
-### Migration Path
-As experimental patterns mature:
-1. **Validation**: Thorough testing across multiple use cases
-2. **Documentation**: Complete usage guides and best practices
-3. **Standardization**: Consistent APIs and integration patterns
-4. **Community Adoption**: Widespread usage and feedback
-5. **Graduation**: Move to main examples/ directory
-
-## Safety Considerations
-
-### Risk Assessment
-Before implementing experimental patterns:
-- **Impact Analysis**: Assess potential effects on existing systems
-- **Rollback Planning**: Ensure ability to revert changes quickly
-- **Monitoring**: Set up observability for experimental features
-- **Isolation**: Use sandboxed environments for initial testing
-
-### Best Practices
-- **Gradual Rollout**: Implement patterns incrementally
-- **Team Training**: Ensure team understands experimental nature
-- **Documentation**: Maintain detailed logs of experiments
-- **Community Engagement**: Share learnings and get feedback
-
-## Support and Resources
-
-### Getting Help
-- Review pattern documentation thoroughly
-- Check GitHub issues for known problems
-- Engage with the community on discussions
-- Consider consulting for complex implementations
-
-### Additional Resources
-- [Main AI Development Patterns](../../README.md)
-- [Pattern Creation Specification](../../pattern-spec.md)
-- [Community Guidelines](../../docs/)
-- [Integration Examples](../../examples/)
-
----
-
-**Remember**: Experimental patterns are evolving rapidly. Always check for updates and community feedback before production deployment.
+1. Review stable prerequisites in the main catalog:
+   - [Security Sandbox](../../README.md#security-sandbox)
+   - [Tool Integration](../../README.md#tool-integration)
+   - [Spec-Driven Development](../../README.md#spec-driven-development)
+2. Pick an experimental example directory from the table above.
+3. Follow the `README.md` in that directory.

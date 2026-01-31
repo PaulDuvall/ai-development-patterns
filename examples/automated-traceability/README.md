@@ -1,10 +1,10 @@
-# AI-Driven Traceability Implementation
+# Automated Traceability Implementation
 
-This directory contains a complete implementation of the AI-Driven Traceability pattern, maintaining automated links between requirements, specifications, tests, implementation, and documentation using AI.
+This directory contains a complete implementation of the Automated Traceability pattern, maintaining automated links between requirements, specifications, tests, implementation, and documentation using AI.
 
 ## Overview
 
-AI-Driven Traceability enables teams to:
+Automated Traceability enables teams to:
 - Automatically link code changes to requirements and user stories
 - Validate existing traceability links for accuracy
 - Generate impact analysis for code changes

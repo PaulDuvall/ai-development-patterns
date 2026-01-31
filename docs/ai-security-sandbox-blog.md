@@ -1,4 +1,4 @@
-# AI Security Sandbox: Isolating AI Development Tools from Your Credentials
+# Security Sandbox: Isolating AI Development Tools from Your Credentials
 
 ## The Problem
 
@@ -8,7 +8,7 @@ AI development tools like Claude Code, GitHub Copilot, and ChatGPT plugins can a
 
 ## The Solution: Complete Network Isolation
 
-The **AI Security Sandbox** provides complete credential isolation using Docker containers with `network_mode: none`. Even if AI tools suggest real credentials or generate malicious code, they cannot exfiltrate data or make external API calls.
+The **Security Sandbox** provides complete credential isolation using Docker containers with `network_mode: none`. Even if AI tools suggest real credentials or generate malicious code, they cannot exfiltrate data or make external API calls.
 
 ## Quick Start (5 Minutes)
 
@@ -16,12 +16,12 @@ The **AI Security Sandbox** provides complete credential isolation using Docker 
    ```bash
    git clone https://github.com/PaulDuvall/ai-development-patterns.git
    cd ai-development-patterns
-   ./sandbox/ai-sandbox.sh start
+   ./examples/security-sandbox/ai-sandbox.sh start
    ```
 
 2. **Enter the sandbox:**
    ```bash
-   ./sandbox/ai-sandbox.sh shell
+   ./examples/security-sandbox/ai-sandbox.sh shell
    ```
 
 3. **Verify isolation (these should ALL FAIL):**
@@ -77,13 +77,13 @@ volumes:
 
 ```bash
 # Start sandbox
-./sandbox/ai-sandbox.sh start
+./examples/security-sandbox/ai-sandbox.sh start
 
 # Run Claude Code in isolation
-./sandbox/ai-sandbox.sh exec "claude 'Review this code for security issues' --file src/auth.py"
+./examples/security-sandbox/ai-sandbox.sh exec "claude 'Review this code for security issues' --file src/auth.py"
 
 # Interactive session
-./sandbox/ai-sandbox.sh shell
+./examples/security-sandbox/ai-sandbox.sh shell
 # Inside sandbox:
 claude "Generate unit tests" --output tests/test_auth.py
 ```
@@ -92,7 +92,7 @@ claude "Generate unit tests" --output tests/test_auth.py
 
 ```bash
 # Built-in security checks
-./sandbox/ai-sandbox.sh validate
+./examples/security-sandbox/ai-sandbox.sh validate
 
 # Expected output:
 # ✅ Network isolation: ENABLED (network_mode: none)
@@ -102,7 +102,7 @@ claude "Generate unit tests" --output tests/test_auth.py
 # ✅ Memory limit: 4GB
 
 # Test isolation
-./sandbox/ai-sandbox.sh demo
+./examples/security-sandbox/ai-sandbox.sh demo
 ```
 
 ## Common Limitations and Solutions
@@ -113,7 +113,7 @@ claude "Generate unit tests" --output tests/test_auth.py
 # Download documentation
 curl https://docs.python.org/3/library/index.html > ./docs/python-docs.html
 
-# Mount in sandbox (edit docker-compose.ai-sandbox.yml)
+# Mount in sandbox (edit examples/security-sandbox/docker-compose.ai-sandbox.yml)
 volumes:
   - ./docs:/workspace/docs:ro
 ```
@@ -126,20 +126,20 @@ mkdir -p ./mocks/api/
 echo '{"status": "success", "data": {"id": 123}}' > ./mocks/api/user.json
 
 # Start mock server inside sandbox
-./sandbox/ai-sandbox.sh shell
+./examples/security-sandbox/ai-sandbox.sh shell
 cd /workspace/mocks && python -m http.server 8000 &
 ```
 
 ### 3. No Dynamic Package Installation
 **Solution**: Pre-install packages:
 ```bash
-# Edit sandbox/requirements-sandbox.txt
-echo "requests==2.31.0" >> sandbox/requirements-sandbox.txt
+# Edit examples/security-sandbox/requirements-sandbox.txt
+echo "requests==2.31.0" >> examples/security-sandbox/requirements-sandbox.txt
 
 # Rebuild sandbox
-./sandbox/ai-sandbox.sh stop
-./sandbox/ai-sandbox.sh build
-./sandbox/ai-sandbox.sh start
+./examples/security-sandbox/ai-sandbox.sh stop
+./examples/security-sandbox/ai-sandbox.sh build
+./examples/security-sandbox/ai-sandbox.sh start
 ```
 
 ## Architecture Overview
@@ -154,7 +154,7 @@ graph TB
         Creds["AWS Keys, SSH Keys<br/>Database Passwords"]
     end
     
-    subgraph Sandbox["AI Security Sandbox"]
+    subgraph Sandbox["Security Sandbox"]
         Container["Isolated Container<br/>(network_mode: none)"]
         Workspace["/workspace<br/>Read-only source<br/>Write-only output"]
     end
@@ -250,10 +250,10 @@ volumes:
 
 ```bash
 # Each developer runs isolated sandbox
-./sandbox/ai-sandbox.sh start
+./examples/security-sandbox/ai-sandbox.sh start
 
 # Version control shared configuration
-cp sandbox/docker-compose.ai-sandbox.yml team-sandbox.yml
+cp examples/security-sandbox/docker-compose.ai-sandbox.yml team-sandbox.yml
 git add team-sandbox.yml
 git commit -m "Add team sandbox configuration"
 ```
@@ -261,32 +261,32 @@ git commit -m "Add team sandbox configuration"
 ## Troubleshooting
 
 ### Common Issues:
-1. **Slow AI responses**: Increase resource limits in docker-compose.ai-sandbox.yml
+1. **Slow AI responses**: Increase resource limits in examples/security-sandbox/docker-compose.ai-sandbox.yml
 2. **Need API access**: Use mock servers or fixture files
 3. **Missing packages**: Pre-install in requirements-sandbox.txt
 4. **File permissions**: Check user ID mapping (1000:1000)
 
 ### Quick Diagnostics:
 ```bash
-./sandbox/ai-sandbox.sh status    # Check sandbox health
-./sandbox/ai-sandbox.sh validate  # Security validation
-./sandbox/ai-sandbox.sh demo      # Test isolation
+./examples/security-sandbox/ai-sandbox.sh status    # Check sandbox health
+./examples/security-sandbox/ai-sandbox.sh validate  # Security validation
+./examples/security-sandbox/ai-sandbox.sh demo      # Test isolation
 ```
 
 ## The Challenge
 
-**Don't use any AI development tool again until you've implemented the AI Security Sandbox.**
+**Don't use any AI development tool again until you've implemented the Security Sandbox.**
 
 Why? Every AI session without the sandbox is a potential credential leak. The 5-minute setup time is nothing compared to the months of recovery from a security incident.
 
 ## Get Started Now
 
 1. **Clone**: `git clone https://github.com/PaulDuvall/ai-development-patterns.git`
-2. **Start**: `./sandbox/ai-sandbox.sh start`
-3. **Validate**: `./sandbox/ai-sandbox.sh validate`
+2. **Start**: `./examples/security-sandbox/ai-sandbox.sh start`
+3. **Validate**: `./examples/security-sandbox/ai-sandbox.sh validate`
 
 **The result**: Complete credential isolation with zero impact on AI productivity.
 
 ---
 
-*Complete implementation available in the [AI Development Patterns repository](https://github.com/PaulDuvall/ai-development-patterns/tree/main/sandbox).*
+*Complete implementation available in the [AI Development Patterns repository](https://github.com/PaulDuvall/ai-development-patterns/tree/main/examples/security-sandbox).*

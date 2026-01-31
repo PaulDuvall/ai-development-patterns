@@ -9,21 +9,16 @@ This is the AI Development Patterns repository - a comprehensive collection of p
 ## Repository Structure
 
 ```
-├── README.md                    # Main pattern documentation (3000+ lines)
-├── pattern-spec.md             # Pattern creation specification and formatting rules
-├── examples/                   # Working implementations of patterns
-│   └── parallel-agents/ # Complete Docker-based parallel agent example
-├── docs/                       # Additional documentation and specs
-│   ├── specs.md               # Specification-driven development patterns
-│   └── examples/              # Pattern implementation examples (au1a.md, pm7a.md, etc.)
-├── sandbox/                    # AI security isolation examples
-├── specs/                      # Example specifications (OpenAPI, Gherkin, etc.)
-├── policies/                   # Policy-as-code examples (Cedar, OPA)
-├── tests/                      # Testing pattern examples
-├── monitoring/                 # Observability and chaos engineering examples
-├── ops/                        # Operations pattern implementations
-├── pipelines/                  # CI/CD pattern examples
-└── deployment/                 # Deployment automation examples
+├── README.md                    # Main pattern documentation
+├── pattern-spec.md              # Pattern creation specification and formatting rules
+├── PATTERN_MIGRATION_GUIDE.md   # Naming/anchor migration reference (historical + mapping)
+├── index.html                   # GitHub Pages landing page
+├── docs/                        # Additional documentation
+├── examples/                    # Working implementations of stable patterns
+├── experiments/                 # Experimental patterns + examples
+├── scripts/                     # Repo automation scripts (validation, updates)
+├── tests/                       # Pytest-based validation suite
+└── .github/                     # GitHub Actions workflows
 ```
 
 ## Key Architectural Principles
@@ -36,7 +31,7 @@ This is the AI Development Patterns repository - a comprehensive collection of p
 
 ### Pattern Reference System
 - **Hyperlinked navigation**: Every pattern reference must link to its section using `#pattern-name-in-lowercase-with-hyphens`
-- **Comprehensive reference table**: Lines 50-89 in README.md contain the master pattern index
+- **Comprehensive reference table**: See "Complete Pattern Reference" in `README.md`
 - **Related patterns**: Each pattern explicitly lists dependencies and related patterns
 
 ### Documentation Standards
@@ -49,15 +44,15 @@ This is the AI Development Patterns repository - a comprehensive collection of p
 
 ### Adding New Patterns
 1. **Follow pattern-spec.md**: Strict adherence to the specification format is required
-2. **Update reference table**: Add new pattern to the table at lines 50-89 with proper dependencies
-3. **Add to correct section**: Foundation (lines 270+), Development (lines 1400+), or Operations (lines 2500+)
+2. **Update reference table**: Add the pattern to the "Complete Pattern Reference" table with proper dependencies
+3. **Add to correct section**: Add the full pattern under `README.md` headings: "Foundation Patterns", "Development Patterns", or "Operations Patterns"
 4. **Include anti-pattern**: Every pattern must show what NOT to do
 5. **Link related patterns**: Use proper markdown hyperlinks to related patterns
 
 ### Pattern Dependencies
-- **Foundation patterns** (lines 270-960): Establish team readiness, security, and basic AI integration
-- **Development patterns** (lines 960-1830): Daily workflows for AI-assisted coding
-- **Operations patterns** (lines 1830+): CI/CD, security, compliance, and production management
+- **Foundation patterns**: Establish team readiness, security, and basic AI integration
+- **Development patterns**: Daily workflows for AI-assisted coding
+- **Operations patterns**: CI/CD, security, compliance, and production management
 
 ### Content Guidelines
 - **Kanban workflow assumed**: No sprint-based or fixed iteration references

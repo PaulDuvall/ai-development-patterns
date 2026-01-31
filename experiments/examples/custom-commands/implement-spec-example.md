@@ -79,5 +79,5 @@ EOF
 
 ## Related Patterns
 
-- [Specification Driven Development](../../README.md#specification-driven-development)
-- [AI-Driven Traceability](../../README.md#ai-driven-traceability)
+- [Spec-Driven Development](../../../README.md#spec-driven-development)
+- [Automated Traceability](../../../README.md#automated-traceability)

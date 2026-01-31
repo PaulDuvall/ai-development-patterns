@@ -1,6 +1,6 @@
-# Specification Driven Development - Complete Implementation
+# Spec-Driven Development - Complete Implementation
 
-This directory contains the complete implementation of the **Specification Driven Development** pattern, demonstrating machine-readable specifications with authority levels, automated coverage tracking, and rigorous Test-Driven Development (TDD) integration.
+This directory contains the complete implementation of the **Spec-Driven Development** pattern, demonstrating machine-readable specifications with authority levels, automated coverage tracking, and rigorous Test-Driven Development (TDD) integration.
 
 ## Pattern Overview
 
@@ -9,7 +9,7 @@ SpecDriven AI combines three key elements:
 - **Rigorous Test-Driven Development** with coverage tracking and automated validation
 - **AI-powered implementation** with persistent context through structured specifications
 
-For complete pattern documentation, see: [Specification Driven Development](../../README.md#specification-driven-development)
+For complete pattern documentation, see: [Spec-Driven Development](../../README.md#spec-driven-development)
 
 ## Files in This Directory
 
@@ -215,15 +215,15 @@ Coverage: 89% (31/35 spec requirements covered)"
 ## Integration with Other Patterns
 
 This implementation demonstrates integration with:
-- [AI Security Sandbox](../../sandbox/) - Secure testing environment
-- [Comprehensive AI Testing Strategy](../../README.md#comprehensive-ai-testing-strategy) - Multi-layered testing approach
-- [Observable AI Development](../../README.md#observable-ai-development) - Logging and debugging capabilities
+- [Security Sandbox](../security-sandbox/) - Secure testing environment
+- [Testing Orchestration](../../experiments/README.md#testing-orchestration) - Multi-layered testing approach
+- [Observable Development](../../README.md#observable-development) - Logging and debugging capabilities
 
 ## Running the Complete Example
 
 1. **Install dependencies:**
    ```bash
-   cd examples/specification-driven-development
+   cd examples/spec-driven-development
    pip install -r requirements.txt
    ```
 

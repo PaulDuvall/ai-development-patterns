@@ -21,7 +21,7 @@ Equally important are the **anti-patterns**—those seemingly reasonable approac
 
 ## Open Source from Day One
 
-I've published these patterns in a public GitHub repository: https://github.com/PaulDuvall/ai-development-patterns
+I've published these patterns in a public GitHub repository: [PaulDuvall/ai-development-patterns](https://github.com/PaulDuvall/ai-development-patterns)
 
 Why make it public while it's still evolving? Three reasons:
 
@@ -37,21 +37,23 @@ The repository currently organizes patterns into three main categories:
 
 ### Foundation Patterns
 Essential patterns for team readiness and basic AI integration:
-- **AI Readiness Assessment**: Evaluating if your codebase and team are prepared for AI adoption
-- **Rules as Code**: Versioning AI coding standards like infrastructure
-- **AI Security Sandbox**: Running AI tools without credential leak risks
+- **[Readiness Assessment](../README.md#readiness-assessment)**: Evaluating if your codebase and team are prepared for AI adoption
+- **[Codified Rules](../README.md#codified-rules)**: Versioning AI coding standards like infrastructure
+- **[Security Sandbox](../README.md#security-sandbox)**: Running AI tools without credential leak risks
 
 ### Development Patterns  
 Daily practice patterns for AI-assisted coding workflows:
-- **Specification Driven Development**: Using executable specs to guide AI code generation
-- **Progressive AI Enhancement**: Building features incrementally rather than all at once
-- **Context Window Optimization**: Matching AI tool selection to task complexity
+- **[Spec-Driven Development](../README.md#spec-driven-development)**: Using executable specs to guide AI code generation
+- **[Progressive Enhancement](../README.md#progressive-enhancement)**: Building features incrementally rather than all at once
+- **[Context Persistence](../README.md#context-persistence)**: Managing context and continuity across AI-assisted sessions
 
 ### Operations Patterns
 CI/CD, security, and production management with AI:
-- **Pipeline Synthesis**: Converting plain English to CI/CD configurations
-- **Security Scanning Orchestration**: AI-powered security finding summarization
-- **Technical Debt Forecasting**: Proactive AI-driven code quality management
+- **[Policy Generation](../README.md#policy-generation)**: Transforming compliance requirements into executable policy files
+- **[Security Orchestration](../README.md#security-orchestration)**: Aggregating security tools and summarizing findings for actionable insights
+- **[Baseline Management](../README.md#baseline-management)**: Establishing intelligent performance baselines and monitoring thresholds
+
+For advanced and in-progress ideas, see the experimental catalog in [experiments/](../experiments/), including patterns like **[Pipeline Synthesis](../experiments/README.md#pipeline-synthesis)**, **[Debt Forecasting](../experiments/README.md#debt-forecasting)**, and **[Context Optimization](../experiments/README.md#context-optimization)**.
 
 ## What Makes This Different?
 
@@ -85,7 +87,7 @@ The goal isn't to create rigid rules but to capture flexible practices that team
 
 ## Get Started
 
-Visit https://github.com/PaulDuvall/ai-development-patterns to explore the current practices. Star the repository to stay updated, and consider contributing your own experiences.
+Visit [PaulDuvall/ai-development-patterns](https://github.com/PaulDuvall/ai-development-patterns) to explore the current practices. Star the repository to stay updated, and consider contributing your own experiences.
 
 ---
 

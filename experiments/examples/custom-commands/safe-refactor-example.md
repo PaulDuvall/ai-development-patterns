@@ -92,5 +92,5 @@ Automatic approval if ALL conditions met:
 
 ## Related Patterns
 
-- [AI-Driven Refactoring](../../README.md#ai-driven-refactoring)
-- [Comprehensive AI Testing Strategy](../README.md#comprehensive-ai-testing-strategy)
+- [Guided Refactoring](../../../README.md#guided-refactoring)
+- [Testing Orchestration](../../README.md#testing-orchestration)

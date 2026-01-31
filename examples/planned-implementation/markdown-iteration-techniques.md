@@ -1,6 +1,6 @@
 # Markdown Iteration Techniques
 
-This guide provides detailed techniques for iterating on implementation plans using structured markdown documentation, as referenced in the [AI Plan-First Development](../../README.md#ai-plan-first-development) pattern.
+This guide provides detailed techniques for iterating on implementation plans using structured markdown documentation, as referenced in the [Planned Implementation](../../README.md#planned-implementation) pattern.
 
 ## Overview
 

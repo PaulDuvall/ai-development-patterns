@@ -1,6 +1,6 @@
-# Custom AI Commands Example
+# Custom Commands Example
 
-Complete implementation of the Custom AI Commands pattern with ready-to-use command examples.
+Complete implementation of the Custom Commands pattern with ready-to-use command examples.
 
 ## Quick Start
 
@@ -357,7 +357,7 @@ To improve these commands:
 
 ## Additional Resources
 
-- [Custom AI Commands Pattern](../../README.md#custom-ai-commands) - Full pattern documentation
+- [Custom Commands Pattern](../../README.md#custom-commands) - Full pattern documentation
 - [Claude Code Slash Commands](https://docs.claude.com/en/docs/claude-code/slash-commands) - Official documentation
 - [Martin Fowler's Refactoring Catalog](https://refactoring.com/catalog/) - Refactoring reference
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/) - Security guidelines

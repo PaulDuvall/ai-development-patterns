@@ -33,7 +33,7 @@ This change aligns with established pattern naming conventions:
 
 ## Complete Name Mapping
 
-### Main Patterns (21 patterns)
+### Main Patterns (22 patterns)
 
 | Old Name | New Name | Change Type | Notes |
 |----------|----------|-------------|-------|
@@ -43,7 +43,7 @@ This change aligns with established pattern naming conventions:
 | AI Developer Lifecycle | Developer Lifecycle | Removed "AI" prefix | Lifecycle applies to AI development by default |
 | AI Tool Integration | Tool Integration | Removed "AI" prefix | Tools are AI tools in this context |
 | AI Issue Generation | Issue Generation | Removed "AI" prefix | Generation implies AI automation |
-| Specification Driven Development | Spec-First | Simplified to 2 words | "Spec-First" is standard industry term |
+| Specification Driven Development | Spec-Driven Development | Hyphenated compound + clarified | Aligns with the repository's current canonical naming |
 | AI Plan-First Development | Planned Implementation | Removed "AI", clarified | Describes planned approach to implementation |
 | Progressive AI Enhancement | Progressive Enhancement | Removed "AI" prefix | Progressive enhancement is well-known pattern |
 | AI Choice Generation | Choice Generation | Removed "AI" prefix | Generation implies AI automation |
@@ -58,6 +58,7 @@ This change aligns with established pattern naming conventions:
 | Policy-as-Code Generation | Policy Generation | Simplified | "Generation" implies automation |
 | Security Scanning Orchestration | Security Orchestration | Simplified | Orchestration implies scanning/automation |
 | Performance Baseline Management | Baseline Management | Simplified | Context makes "Performance" implicit |
+| Error Resolution | Error Resolution | No change | Already compliant (stable core pattern) |
 
 ### Main Antipatterns (31 antipatterns)
 
@@ -71,7 +72,7 @@ This change aligns with established pattern naming conventions:
 | Prompt-Only AI Development | Disconnected Prompting | Simplified, negative implication | "Disconnected" clearly indicates isolation from tools |
 | Vague Issue Generation | Under-Specified Issues | Added negative prefix | "Under-Specified" indicates insufficiency |
 | Missing CI Integration | Broken Integration | Added negative prefix | "Broken" indicates failure |
-| Implementation-First AI | Spec-Ignored | Symmetrical with "Spec-First" | Opposite of the pattern |
+| Implementation-First AI | Spec-Ignored | Symmetrical with "Spec-Driven Development" | Opposite of the pattern |
 | Prompt Hoarding | Over-Prompting | Changed to "Over-" prefix | Indicates excess prompting |
 | Blind Code Generation | Blind Generation | Simplified | "Blind" already negative |
 | Analysis Paralysis | Over-Analysis | Changed to "Over-" prefix | More technical than "Paralysis" |
@@ -92,7 +93,7 @@ This change aligns with established pattern naming conventions:
 | Alert Fatigue | Over-Alerting | Changed to "Over-" prefix | Indicates root cause (too many alerts) |
 | One-Off Alerts | Static Thresholds | Changed to technical term | "Static" indicates inflexibility |
 
-### Experimental Patterns (21 patterns)
+### Experimental Patterns (20 patterns)
 
 | Old Name | New Name | Change Type | Notes |
 |----------|----------|-------------|-------|
@@ -116,7 +117,6 @@ This change aligns with established pattern naming conventions:
 | Visual Context Scaffolding | Image Spec | Simplified | More concise, "Image" specifies visual type |
 | AI Event Automation | Event Automation | Removed "AI" prefix | Automation implies AI |
 | Custom AI Commands | Custom Commands | Removed "AI" prefix | Commands are AI commands in context |
-| Error Resolution | Error Resolution | No change | Already compliant |
 
 ### Experimental Antipatterns (25 antipatterns)
 
@@ -161,9 +161,9 @@ This change aligns with established pattern naming conventions:
 - **Compliance after**: 98/98 (100%)
 
 ### By Category
-- **Main Patterns**: 21 renamed, 0 unchanged
+- **Main Patterns**: 21 renamed, 1 unchanged
 - **Main Antipatterns**: 28 renamed, 3 unchanged
-- **Experimental Patterns**: 19 renamed, 2 unchanged
+- **Experimental Patterns**: 19 renamed, 1 unchanged
 - **Experimental Antipatterns**: 22 renamed, 3 unchanged
 
 ---
@@ -172,10 +172,10 @@ This change aligns with established pattern naming conventions:
 
 ### Internal Repository Changes
 
-All references within this repository have been updated:
+Core references within this repository were updated during the migration:
 
 1. **README.md**
-   - Pattern reference table (lines 50-89)
+   - Complete Pattern Reference table
    - All pattern section headers
    - All hyperlinks and cross-references
    - All antipattern subsections
@@ -189,6 +189,8 @@ All references within this repository have been updated:
 3. **Example Directories**
    - Renamed to match new pattern names
    - Updated internal documentation
+
+**Note**: The repository continues to evolve. If you find legacy names/anchors in other docs or example READMEs, treat them as stale references to be updated to match the current canonical names and anchors in `README.md`.
 
 4. **Configuration Files**
    - CLAUDE.md updated with new pattern references
@@ -245,7 +247,7 @@ All GitHub markdown anchor links have changed. Update your hyperlinks:
 | `#ai-developer-lifecycle` | `#developer-lifecycle` |
 | `#ai-tool-integration` | `#tool-integration` |
 | `#ai-issue-generation` | `#issue-generation` |
-| `#specification-driven-development` | `#spec-first` |
+| `#specification-driven-development` | `#spec-driven-development` |
 | `#ai-plan-first-development` | `#planned-implementation` |
 | `#progressive-ai-enhancement` | `#progressive-enhancement` |
 | `#ai-choice-generation` | `#choice-generation` |
@@ -330,7 +332,7 @@ The old names are deprecated. This change improves consistency, discoverability,
 
 ### Are there any exceptions to the two-word rule?
 
-No. All 98 patterns and antipatterns now comply with exactly two words (hyphenated compounds like "Spec-First" count as one word in this context).
+No. All 98 patterns and antipatterns now comply with exactly two words (hyphenated compounds like "Spec-Driven" count as one word in this context).
 
 ### Will the old names ever be brought back?
 

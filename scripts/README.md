@@ -7,16 +7,16 @@ This directory contains automation scripts for maintaining the AI Development Pa
 ### Pattern Count Management
 
 #### `update-pattern-count.py`
-**Purpose**: Automatically updates the pattern count badge in README.md based on the current number of patterns in `tests/conftest.py`.
+**Purpose**: Automatically updates the pattern count badges in README.md and index.html based on the current number of patterns in `tests/conftest.py`.
 
 **Usage**:
 ```bash
-python scripts/update-pattern-count.py
+python3 scripts/update-pattern-count.py
 ```
 
 **Features**:
 - Counts patterns from the `EXPECTED_PATTERNS` list in conftest.py
-- Updates the shields.io badge in README.md with the exact count
+- Updates the shields.io badge in README.md and index.html with the exact count
 - Outputs pattern count for GitHub Actions integration
 - Validates that the badge pattern exists before updating
 
@@ -67,7 +67,7 @@ The pattern count automation is integrated into the GitHub Actions workflow:
 When adding or removing patterns:
 
 1. **Automatic (recommended)**: Install the pre-commit hook for automatic updates
-2. **Manual**: Run `python scripts/update-pattern-count.py` before committing
+2. **Manual**: Run `python3 scripts/update-pattern-count.py` before committing
 3. **CI-only**: Let GitHub Actions catch and report badge mismatches
 
 ### For CI/CD
@@ -79,9 +79,9 @@ The GitHub Actions integration ensures:
 ### Example Output
 ```bash
 🔍 Counting patterns from conftest.py...
-✓ Found 21 patterns
-📝 Updating README.md badge...
-✅ Successfully updated pattern count badge to 21
+✓ Found 22 patterns
+📝 Updating pattern count badges...
+✅ Successfully updated pattern count badges to 22
 ```
 
 ## Troubleshooting

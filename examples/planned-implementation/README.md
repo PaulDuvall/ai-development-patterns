@@ -1,10 +1,12 @@
-# AI Plan-First Development - Complete Implementation
+# Planned Implementation - Complete Implementation
 
-This directory contains comprehensive examples and templates for implementing the **AI Plan-First Development** pattern across different AI coding tools and development scenarios.
+This directory contains comprehensive examples and templates for implementing the **Planned Implementation** pattern across different AI coding tools and development scenarios.
 
 ## Pattern Overview
 
-AI Plan-First Development leverages the planning capabilities built into modern AI coding tools to create structured implementation approaches before writing any code. This pattern reduces iterations, improves code quality, and enables better team collaboration.
+Planned Implementation leverages the planning capabilities built into modern AI coding tools to create structured implementation approaches before writing any code. This pattern reduces iterations, improves code quality, and enables better team collaboration.
+
+For complete pattern documentation, see: [Planned Implementation](../../README.md#planned-implementation)
 
 **Core Principle**: Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration.
 

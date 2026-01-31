@@ -1,12 +1,12 @@
-# AI Tool Integration - Complete Implementation
+# Tool Integration - Complete Implementation
 
-This directory contains the full implementation of the **AI Tool Integration** pattern, demonstrating how to connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions.
+This directory contains the full implementation of the **Tool Integration** pattern, demonstrating how to connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions.
 
 ## Pattern Overview
 
-The AI Tool Integration pattern enables the architectural shift from isolated prompt-only AI to connected AI systems that can interact with real-world data and services. This includes database queries, file operations, API calls, and system information access.
+The Tool Integration pattern enables the architectural shift from isolated prompt-only AI to connected AI systems that can interact with real-world data and services. This includes database queries, file operations, API calls, and system information access.
 
-For complete pattern documentation, see: [AI Tool Integration](../../README.md#ai-tool-integration)
+For complete pattern documentation, see: [Tool Integration](../../README.md#tool-integration)
 
 ## Files in This Directory
 
@@ -80,9 +80,9 @@ The implementation includes multiple security layers:
 - **Timeout Controls**: Prevents hanging requests and resource exhaustion
 - **Error Handling**: Graceful failure without exposing system details
 
-### AI Security Sandbox Integration
+### Security Sandbox Integration
 
-When deployed with the [AI Security Sandbox](../../sandbox/), tool access remains secure:
+When deployed with the [Security Sandbox](../security-sandbox/), tool access remains secure:
 
 ```yaml
 services:
@@ -137,13 +137,13 @@ The tool-augmented approach provides accurate, current information instead of ed
 ## Integration with Other Patterns
 
 This pattern enables and enhances:
-- [Specification Driven Development](../../README.md#specification-driven-development) - AI can validate against actual system state
-- [Observable AI Development](../../README.md#observable-ai-development) - AI can read logs and monitoring data
-- [AI Workflow Orchestration](../../README.md#ai-workflow-orchestration) - Enables data-driven workflow decisions
-- [Performance Baseline Management](../../README.md#performance-baseline-management) - AI can analyze actual performance metrics
+- [Spec-Driven Development](../../README.md#spec-driven-development) - AI can validate against actual system state
+- [Observable Development](../../README.md#observable-development) - AI can read logs and monitoring data
+- [Workflow Orchestration](../../experiments/README.md#workflow-orchestration) - Enables data-driven workflow decisions
+- [Baseline Management](../../README.md#baseline-management) - AI can analyze actual performance metrics
 
 ## Further Reading
 
 - [Model Context Protocol (MCP) Documentation](https://www.anthropic.com/news/model-context-protocol)
 - [AI Development Patterns Collection](../../README.md)
-- [AI Security Sandbox Pattern](../../sandbox/)
+- [Security Sandbox Example](../security-sandbox/)

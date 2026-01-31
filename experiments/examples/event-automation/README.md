@@ -1,6 +1,8 @@
-# AI Event Automation Example
+# Event Automation Example
 
 Simple security automation that blocks sensitive file edits and scans for hardcoded secrets.
+
+For complete pattern documentation, see: [Event Automation](../../README.md#event-automation)
 
 ## Quick Start
 

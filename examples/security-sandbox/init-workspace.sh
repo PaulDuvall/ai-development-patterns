@@ -1,7 +1,7 @@
 #!/bin/bash
-# AI Security Sandbox Workspace Initialization
+# Security Sandbox Workspace Initialization
 
-echo "🔒 Initializing AI Security Sandbox..."
+echo "🔒 Initializing Security Sandbox..."
 echo "Workspace: $(pwd)"
 echo "User: $(whoami) ($(id))"
 echo "Python: $(python --version)"
@@ -21,6 +21,6 @@ echo "✅ Non-root user: $(if [[ $(id -u) -eq 0 ]]; then echo 'DISABLED ⚠️';
 echo "✅ Read-only source: $(if [[ -w /workspace/src ]] 2>/dev/null; then echo 'DISABLED ⚠️'; else echo 'ENABLED'; fi)"
 
 echo ""
-echo "🚀 AI Security Sandbox ready for secure development!"
+echo "🚀 Security Sandbox ready for secure development!"
 echo "   Use 'python /workspace/healthcheck.py' to run full health check"
 echo ""

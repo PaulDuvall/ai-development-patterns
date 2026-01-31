@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# AI Security Sandbox Management Script
-# Simplifies setup and usage of the AI Security Sandbox pattern
+# Security Sandbox Management Script
+# Simplifies setup and usage of the Security Sandbox pattern
 # Based on: https://github.com/PaulDuvall/ai-development-patterns
 
 set -euo pipefail
@@ -39,7 +39,7 @@ log_error() {
 # Help function
 show_help() {
     cat << EOF
-AI Security Sandbox Management Script
+Security Sandbox Management Script
 
 USAGE:
     $0 [COMMAND] [OPTIONS]
@@ -88,7 +88,7 @@ SECURITY FEATURES:
     ✓ Credential isolation (no AWS/SSH/env mounts)
 
 For more information, see:
-https://github.com/PaulDuvall/ai-development-patterns/tree/main/sandbox
+https://github.com/PaulDuvall/ai-development-patterns/tree/main/examples/security-sandbox
 
 EOF
 }

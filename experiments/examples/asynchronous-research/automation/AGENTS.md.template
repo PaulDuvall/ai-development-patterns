@@ -1,0 +1,12 @@
+# Agent Guidance (Template)
+
+## Research Standards
+- Create one folder per research task.
+- Include `prompt.md` (what you were asked) and `README.md` (what you found).
+- Prefer runnable experiments and reproducible commands.
+
+## Output Expectations
+- Summarize the key conclusion first.
+- Include raw data artifacts when you benchmark (JSON/CSV).
+- Note limitations and follow-up questions.
+

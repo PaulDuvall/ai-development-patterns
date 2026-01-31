@@ -3,12 +3,14 @@
 
 set -e
 
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+
 echo "Renaming example directories..."
 
 # Main examples
 echo "Renaming main example directories..."
 
-cd /home/user/ai-development-patterns
+cd "$REPO_ROOT"
 
 # Use git mv for proper tracking
 git mv examples/ai-context-persistence examples/context-persistence
@@ -26,7 +28,7 @@ git mv examples/performance-baseline-management examples/baseline-management
 git mv examples/policy-as-code-generation examples/policy-generation
 git mv examples/rules-as-code examples/codified-rules
 git mv examples/security-scanning-orchestration examples/security-orchestration
-git mv examples/specification-driven-development examples/spec-first
+git mv examples/specification-driven-development examples/spec-driven-development
 
 echo "  ✅ Renamed 16 main example directories"
 

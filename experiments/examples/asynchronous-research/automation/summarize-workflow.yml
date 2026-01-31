@@ -1,0 +1,17 @@
+name: Summarize Asynchronous Research
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Summarize research tasks
+        run: |
+          python3 automation/result-parser.py .
+

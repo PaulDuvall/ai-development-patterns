@@ -389,7 +389,7 @@ Running parallel agents without proper isolation, conflict detection, or sync po
 **Maturity**: Advanced  
 **Description**: Match AI tool selection to task complexity and optimize cost/performance trade-offs by understanding different AI models' context window capabilities and computational costs.
 
-**Related Patterns**: [Progressive Enhancement](../README.md#progressive-enhancement), [Choice Generation](../README.md#ai-choice-generation)
+**Related Patterns**: [Progressive Enhancement](../README.md#progressive-enhancement), [Choice Generation](../README.md#choice-generation)
 
 **Tool Selection Decision Matrix**
 
@@ -576,7 +576,7 @@ Event commands run with full system access. Always review scripts before enablin
 
 **Complete Example**
 
-See [examples/ai-event-automation/](examples/ai-event-automation/) for working implementation with security scanning and slash command integration.
+See [examples/event-automation/](examples/event-automation/) for a working implementation with security scanning and hooks.
 
 **Anti-pattern: Unchecked Events**
 
@@ -656,10 +656,10 @@ Generate step-by-step refactoring plan prioritized by impact.
 
 Additional command examples with detailed implementations:
 
-- **[Implement-Spec](examples/custom-ai-commands/implement-spec-example.md)** - Spec-driven implementation with TDD and traceability
-- **[Security Review](examples/custom-ai-commands/security-review-example.md)** - Multi-layer security analysis (secrets, vulnerabilities, config)
-- **[Safe-Refactor](examples/custom-ai-commands/safe-refactor-example.md)** - Safe refactoring with automated testing and rollback
-- **[Test Runner](examples/custom-ai-commands/test-example.md)** - Smart test selection with coverage and health monitoring
+- **[Implement-Spec](examples/custom-commands/implement-spec-example.md)** - Spec-driven implementation with TDD and traceability
+- **[Security Review](examples/custom-commands/security-review-example.md)** - Multi-layer security analysis (secrets, vulnerabilities, config)
+- **[Safe-Refactor](examples/custom-commands/safe-refactor-example.md)** - Safe refactoring with automated testing and rollback
+- **[Test Runner](examples/custom-commands/test-example.md)** - Smart test selection with coverage and health monitoring
 
 **Tool Support**
 
@@ -677,7 +677,7 @@ mkdir -p .ai/commands
 
 **Complete Implementation**
 
-See [examples/custom-ai-commands/](examples/custom-ai-commands/) for ready-to-use commands, configuration files, and setup guide.
+See [examples/custom-commands/](examples/custom-commands/) for ready-to-use commands, configuration files, and setup guide.
 
 **Anti-pattern: Redundant Commands**
 
@@ -1562,7 +1562,7 @@ repo-c/.ai/rules/      # Custom fork, diverged
 **Maturity**: Intermediate  
 **Description**: Automate review process for parallel agent outputs using AI to detect conflicts and coordinate integration.
 
-**Related Patterns**: [Workflow Orchestration](#workflow-orchestration), [Atomic Decomposition](../README.md#atomic-decomposition), [Parallel Agents](../README.md#parallelized-ai-coding-agents)
+**Related Patterns**: [Workflow Orchestration](#workflow-orchestration), [Atomic Decomposition](../README.md#atomic-decomposition), [Parallel Agents](../README.md#parallel-agents)
 
 **Automated Review and Merge System**
 

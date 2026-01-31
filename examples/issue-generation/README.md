@@ -1,4 +1,4 @@
-# AI Issue Generation Examples
+# Issue Generation Examples
 
 Learn how to generate small, deployable work items for AI-assisted development with <1 hour cycle times.
 

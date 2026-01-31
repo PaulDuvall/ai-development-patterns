@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Script to automatically update the pattern count badge in README.md
-This script counts patterns from conftest.py and updates the badge dynamically.
+Script to automatically update the pattern count badges in README.md and index.html.
+This script counts patterns from conftest.py and updates any matching shields.io badges.
 """
 
 import os
@@ -33,62 +33,30 @@ def count_patterns_from_conftest():
 
     return pattern_count
 
-def update_readme_badge(pattern_count):
-    """Update the pattern count badge in README.md"""
-    readme_path = Path(__file__).parent.parent / "README.md"
-
-    if not readme_path.exists():
-        print(f"Error: README.md not found at {readme_path}")
+def update_pattern_badge(file_path: Path, pattern_count: int) -> bool:
+    """Update the pattern count badge in a given file."""
+    if not file_path.exists():
+        print(f"Error: File not found at {file_path}")
         return False
 
-    with open(readme_path, 'r', encoding='utf-8') as f:
+    with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    print(f"✓ README.md found, length: {len(content)} characters")
+    badge_pattern = re.compile(r'(https://img\.shields\.io/badge/patterns-)(\d+)(-blue\.svg)')
+    updated_content, substitutions = badge_pattern.subn(rf'\g<1>{pattern_count}\g<3>', content)
 
-    # Multiple patterns to try, from most specific to most general
-    badge_patterns = [
-        # Exact pattern with complete-pattern-reference link
-        r'(\[!\[Patterns\]\(https://img\.shields\.io/badge/patterns-)(\d+)(-blue\.svg\)\]\(#complete-pattern-reference\))',
-        # Pattern with any anchor link
-        r'(\[!\[Patterns\]\(https://img\.shields\.io/badge/patterns-)(\d+)(-blue\.svg\)\]\([^)]+\))',
-        # Pattern without link
-        r'(\[!\[Patterns\]\(https://img\.shields\.io/badge/patterns-)(\d+)(-blue\.svg\))',
-    ]
-
-    updated_content = content
-    pattern_found = False
-
-    for i, pattern in enumerate(badge_patterns):
-        def replace_count(match):
-            nonlocal pattern_found
-            pattern_found = True
-            return f"{match.group(1)}{pattern_count}{match.group(3)}"
-
-        test_content = re.sub(pattern, replace_count, content)
-        if test_content != content:
-            updated_content = test_content
-            print(f"✓ Used pattern {i+1} to update badge")
-            break
-
-    if not pattern_found:
-        print("Warning: No badge pattern found to update")
-        print("Searching for any Patterns badge in content...")
-
-        # Debug: show what patterns we can find
-        lines = content.split('\n')
-        for line_num, line in enumerate(lines, 1):
-            if 'Patterns' in line and 'shields.io' in line:
-                print(f"Found badge-like line {line_num}: {repr(line)}")
+    if substitutions == 0:
+        print(f"Warning: No pattern badges found to update in {file_path.name}")
         return False
 
-    with open(readme_path, 'w', encoding='utf-8') as f:
+    with open(file_path, 'w', encoding='utf-8') as f:
         f.write(updated_content)
 
+    print(f"✓ Updated {substitutions} badge reference(s) in {file_path.name}")
     return True
 
 def main():
-    """Main function to count patterns and update README"""
+    """Main function to count patterns and update badges"""
     print("🔍 Counting patterns from conftest.py...")
 
     pattern_count = count_patterns_from_conftest()
@@ -98,9 +66,16 @@ def main():
 
     print(f"✓ Found {pattern_count} patterns")
 
-    print("📝 Updating README.md badge...")
-    if update_readme_badge(pattern_count):
-        print(f"✅ Successfully updated pattern count badge to {pattern_count}")
+    repo_root = Path(__file__).parent.parent
+    readme_path = repo_root / "README.md"
+    index_path = repo_root / "index.html"
+
+    print("📝 Updating pattern count badges...")
+    updated_readme = update_pattern_badge(readme_path, pattern_count)
+    updated_index = update_pattern_badge(index_path, pattern_count)
+
+    if updated_readme and updated_index:
+        print(f"✅ Successfully updated pattern count badges to {pattern_count}")
 
         # Output for GitHub Actions
         if 'GITHUB_OUTPUT' in os.environ:
@@ -109,7 +84,7 @@ def main():
 
         return pattern_count
     else:
-        print("❌ Failed to update README.md badge")
+        print("❌ Failed to update one or more pattern count badges")
         sys.exit(1)
 
 if __name__ == "__main__":

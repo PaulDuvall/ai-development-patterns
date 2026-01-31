@@ -55,7 +55,7 @@ class PatternValidator:
 
     def count_words(self, name: str) -> int:
         """Count words in a pattern name. Hyphenated words count as one word."""
-        # Remove hyphens within words (e.g., "Spec-First" is 1 word, "AI-Driven" is 1 word)
+        # Remove hyphens within words (e.g., "Spec-Driven" is 1 word, "AI-Driven" is 1 word)
         # Split by spaces
         words = name.strip().split()
         return len(words)
@@ -93,7 +93,7 @@ class PatternValidator:
         """Check if name follows Title Case convention."""
         words = name.split()
         for word in words:
-            # Handle hyphenated words (e.g., "Spec-First")
+            # Handle hyphenated words (e.g., "Spec-Driven")
             parts = word.split('-')
             for part in parts:
                 if part and not part[0].isupper():

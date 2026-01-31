@@ -104,5 +104,5 @@ git diff --name-only HEAD~1 HEAD
 
 ## Related Patterns
 
-- [Comprehensive AI Testing Strategy](../README.md#comprehensive-ai-testing-strategy)
-- [Test Suite Health Management](../README.md#test-suite-health-management)
+- [Testing Orchestration](../../README.md#testing-orchestration)
+- [Suite Health](../../README.md#suite-health)

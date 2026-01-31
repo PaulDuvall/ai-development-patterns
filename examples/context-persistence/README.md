@@ -1,4 +1,4 @@
-# AI Context Persistence Implementation
+# Context Persistence Implementation
 
 Manage AI context as a finite resource through structured memory schemas and session continuity.
 
@@ -259,7 +259,7 @@ For enterprise features, see [ADVANCED.md](ADVANCED.md):
 ## Files in this Implementation
 
 ```
-examples/ai-context-persistence/
+examples/context-persistence/
 ├── README.md              # This file
 ├── ADVANCED.md           # Advanced features
 ├── templates/            # Memory schema templates

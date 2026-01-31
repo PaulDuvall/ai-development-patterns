@@ -1,10 +1,10 @@
-# Performance Baseline Management Implementation
+# Baseline Management Implementation
 
-This directory contains a complete implementation of the Performance Baseline Management pattern, establishing intelligent performance baselines and configuring monitoring thresholds automatically.
+This directory contains a complete implementation of the Baseline Management pattern, establishing intelligent performance baselines and configuring monitoring thresholds automatically.
 
 ## Overview
 
-Performance Baseline Management enables teams to:
+Baseline Management enables teams to:
 - Establish intelligent performance baselines using historical data
 - Configure monitoring thresholds automatically based on patterns
 - Minimize false positives while catching real performance issues

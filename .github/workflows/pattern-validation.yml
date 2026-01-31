@@ -62,13 +62,13 @@ jobs:
 
     - name: Check for pattern count changes
       run: |
-        if git diff --quiet README.md; then
-          echo "✓ Pattern count badge is up to date"
+        if git diff --quiet README.md index.html; then
+          echo "✓ Pattern count badges are up to date"
         else
-          echo "⚠️ Pattern count badge was updated"
-          git diff README.md
+          echo "⚠️ Pattern count badges were updated"
+          git diff README.md index.html
           # Fail the job if pattern count is wrong to remind developers to commit the change
-          echo "::error::Pattern count badge was out of date. Please run 'python3 scripts/update-pattern-count.py' and commit the changes."
+          echo "::error::Pattern count badges were out of date. Please run 'python3 scripts/update-pattern-count.py' and commit the changes."
           exit 1
         fi
 
@@ -273,11 +273,11 @@ jobs:
       run: |
         cd tests
         # Run only critical tests that should block merges
-        python -m pytest test_pattern_compliance.py::TestPatternSpecCompliance::test_all_expected_patterns_exist -v
-        python -m pytest test_pattern_compliance.py::TestPatternSpecCompliance::test_pattern_header_structure -v
-        python -m pytest test_readme_accuracy.py::TestReadmeAccuracy::test_pattern_reference_table_matches_implementations -v
-        python -m pytest test_links.py::TestHyperlinkIntegrity::test_internal_anchor_links_valid -v
-        python -m pytest test_dependencies.py::TestPatternDependencies::test_no_circular_dependencies -v
+        python3 -m pytest test_pattern_compliance.py::TestPatternSpecCompliance::test_all_expected_patterns_exist -v
+        python3 -m pytest test_pattern_compliance.py::TestPatternSpecCompliance::test_pattern_header_structure -v
+        python3 -m pytest test_readme_accuracy.py::TestReadmeAccuracy::test_pattern_reference_table_matches_implementations -v
+        python3 -m pytest test_links.py::TestHyperlinkIntegrity::test_internal_anchor_links_valid -v
+        python3 -m pytest test_dependencies.py::TestPatternDependencies::test_no_circular_dependencies -v
     
     - name: Check critical test results
       run: |

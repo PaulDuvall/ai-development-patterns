@@ -1,11 +1,11 @@
-# AI Developer Lifecycle Example
+# Developer Lifecycle Example
 
-This directory contains a working bash script that implements the 9-stage AI Developer Lifecycle, enhanced implementation techniques including the Five-Try Rule and systematic retry strategies, and a comprehensive workflow example showing how to apply these techniques in practice.
+This directory contains a working bash script that implements the 9-stage Developer Lifecycle, enhanced implementation techniques including the Five-Try Rule and systematic retry strategies, and a comprehensive workflow example showing how to apply these techniques in practice.
 
 ## Current Structure
 
 ```
-ai-development-lifecycle/
+developer-lifecycle/
 ├── README.md                  # This file
 ├── lifecycle-workflow.sh      # ✅ Complete 9-stage workflow automation script
 └── examples/                  # Empty directory for future examples
@@ -16,7 +16,7 @@ ai-development-lifecycle/
 A full implementation would include:
 
 ```
-ai-development-lifecycle/
+developer-lifecycle/
 ├── README.md                          # This file
 ├── lifecycle-workflow.sh              # ✅ Complete 9-stage workflow automation script
 ├── comprehensive-workflow-example.md  # ✅ Complete 7-step implementation example
@@ -173,4 +173,4 @@ To extend this example:
 3. Add CI/CD integration templates in `ci-integration/`
 4. Enhance the bash script with additional features
 
-The current script provides a solid foundation for the complete AI Developer Lifecycle pattern.
+The current script provides a solid foundation for the complete [Developer Lifecycle](../../README.md#developer-lifecycle) pattern.

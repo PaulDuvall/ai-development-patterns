@@ -5,6 +5,7 @@ Tests for hyperlink integrity validation - internal and external links
 import pytest
 import os
 from utils.link_checker import LinkChecker
+from utils.markdown_link_validator import MarkdownLinkValidator
 from utils.pattern_parser import PatternParser, ReferenceTableParser
 from conftest import EXPECTED_PATTERNS
 
@@ -283,3 +284,22 @@ class TestLinkQuality:
         # This is a quality check - warn but don't fail
         if poor_link_text:
             print(f"Quality issue: Non-descriptive link text found: {poor_link_text}")
+
+
+class TestRepositoryMarkdownLinks:
+    """Validate internal anchors + relative links across docs/examples/experiments markdown."""
+
+    def test_repo_wide_markdown_links_valid(self, repo_root):
+        validator = MarkdownLinkValidator(repo_root)
+        files = validator.markdown_files_in_scope()
+        errors = validator.validate_files(files)
+
+        if errors:
+            sample = "\n".join(
+                f"{e.source_file}:{e.source_line} {e.link} -> {e.message}"
+                for e in errors[:25]
+            )
+            pytest.fail(
+                f"Broken markdown links found: {len(errors)} total.\n"
+                f"First {min(len(errors), 25)}:\n{sample}"
+            )

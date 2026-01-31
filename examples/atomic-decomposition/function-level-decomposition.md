@@ -1,6 +1,6 @@
 # Function-Level Decomposition Techniques
 
-This guide provides detailed techniques for decomposing atomic tasks into individual functions when AI struggles with larger implementations, as referenced in the [Atomic Task Decomposition](../../README.md#atomic-task-decomposition) pattern.
+This guide provides detailed techniques for decomposing atomic tasks into individual functions when AI struggles with larger implementations, as referenced in the [Atomic Decomposition](../../README.md#atomic-decomposition) pattern.
 
 ## Overview
 

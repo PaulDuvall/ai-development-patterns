@@ -137,7 +137,7 @@ This file tracks patterns under exploration that may eventually be formalized in
 - [ ] Document checkpoint integration with CI/CD pipelines
 
 **Related Patterns**:
-- [Code Quality Prerequisites](../README.md#code-quality-prerequisites) - CI/CD quality enforcement
+- [Readiness Assessment](../README.md#readiness-assessment) - Code quality prerequisites before automation
 - [Security Sandbox](../README.md#security-sandbox) - Running agents in isolated environments
 - [Agentic Loops](#agentic-loops) - Long autonomous coding sessions with self-correction
 - [Guided Refactoring](../README.md#guided-refactoring) - Code improvement checks

@@ -1,16 +1,18 @@
-# Drift Detection & Remediation Implementation
+# Drift Remediation Implementation
 
-This directory contains a complete implementation of the Drift Detection & Remediation pattern, detecting infrastructure configuration drift and generating corrective patches automatically.
+This directory contains a complete implementation of the Drift Remediation pattern, detecting infrastructure configuration drift and generating corrective patches automatically.
 
 ## Overview
 
-Drift Detection & Remediation enables teams to:
+Drift Remediation enables teams to:
 - Automatically detect infrastructure configuration drift
 - Generate corrective Terraform/CloudFormation patches
 - Assess drift risk levels and prioritize remediation
 - Maintain infrastructure as intended by IaC definitions
 
 ## Files in this Implementation
+
+For complete pattern documentation, see: [Drift Remediation](../../README.md#drift-remediation)
 
 - `infrastructure_drift.md` - Complete drift detection pattern documentation
 - `drift_scanners/` - Automated drift detection tools for various platforms

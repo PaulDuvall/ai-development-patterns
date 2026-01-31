@@ -1,16 +1,18 @@
-# AI-Guided Blue-Green Deployment Implementation
+# Deployment Synthesis Implementation
 
-This directory contains a complete implementation of the AI-Guided Blue-Green Deployment pattern, generating blue-green deployment scripts with validation to prevent AI misconceptions about deployment strategies.
+This directory contains a complete implementation of the Deployment Synthesis pattern, generating blue-green deployment scripts with validation to prevent AI misconceptions about deployment strategies.
 
 ## Overview
 
-AI-Guided Blue-Green Deployment enables teams to:
+Deployment Synthesis enables teams to:
 - Generate accurate blue-green deployment configurations using AI
 - Ensure proper atomic traffic switching (not gradual like canary)
 - Maintain two identical production environments
 - Implement instant rollback capabilities
 
 ## Files in this Implementation
+
+For complete pattern documentation, see: [Deployment Synthesis](../../README.md#deployment-synthesis)
 
 - `blue_green_deployment.md` - Complete blue-green deployment pattern documentation
 - `deployment_templates/` - Infrastructure templates for blue-green environments

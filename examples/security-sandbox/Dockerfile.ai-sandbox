@@ -1,13 +1,13 @@
-# AI Security Sandbox Dockerfile
+# Security Sandbox Dockerfile
 # Secure, isolated environment for AI-assisted development
-# Based on AI Security Sandbox pattern from README.md
+# Based on the Security Sandbox pattern from README.md
 
 # Use official Python slim image for smaller attack surface
 FROM python:3.11-slim-bullseye
 
 # Metadata
 LABEL maintainer="AI Development Team"
-LABEL description="AI Security Sandbox - Isolated development environment"
+LABEL description="Security Sandbox - Isolated development environment"
 LABEL ai.sandbox="true"
 LABEL ai.security.level="high"
 LABEL version="1.0"
@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean
 
 # Set up Python environment
-COPY sandbox/requirements-sandbox.txt /tmp/requirements-sandbox.txt
+COPY requirements-sandbox.txt /tmp/requirements-sandbox.txt
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /tmp/requirements-sandbox.txt && \
     rm /tmp/requirements-sandbox.txt
@@ -88,11 +88,11 @@ ENV HTTP_PROXY=""
 ENV HTTPS_PROXY=""
 
 # Health check script
-COPY --chown=aiuser:aiuser sandbox/healthcheck.py /workspace/healthcheck.py
+COPY --chown=aiuser:aiuser healthcheck.py /workspace/healthcheck.py
 RUN chmod +x /workspace/healthcheck.py
 
 # Create AI workspace initialization script
-COPY --chown=aiuser:aiuser sandbox/init-workspace.sh /workspace/init-workspace.sh
+COPY --chown=aiuser:aiuser init-workspace.sh /workspace/init-workspace.sh
 RUN chmod +x /workspace/init-workspace.sh
 
 # Security: Final permission lockdown
@@ -123,5 +123,5 @@ CMD ["/bin/bash", "-c", "/workspace/init-workspace.sh && exec /bin/bash"]
 # 8. Health checks ensure container responsiveness
 
 # Usage:
-# docker-compose -f sandbox/docker-compose.ai-sandbox.yml up ai-development
+# docker-compose -f docker-compose.ai-sandbox.yml up ai-development
 # docker exec -it ai-dev-sandbox /bin/bash

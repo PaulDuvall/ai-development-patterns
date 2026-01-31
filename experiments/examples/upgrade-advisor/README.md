@@ -1,16 +1,18 @@
-# Dependency Upgrade Advisor Implementation
+# Upgrade Advisor Implementation
 
-This directory contains a complete implementation of the Dependency Upgrade Advisor pattern, intelligently managing dependency upgrades with compatibility analysis and risk assessment.
+This directory contains a complete implementation of the Upgrade Advisor pattern, intelligently managing dependency upgrades with compatibility analysis and risk assessment.
 
 ## Overview
 
-Dependency Upgrade Advisor enables teams to:
+Upgrade Advisor enables teams to:
 - Analyze dependencies for security vulnerabilities and upgrade opportunities
 - Assess breaking change risk for dependency upgrades
 - Generate staged upgrade plans with rollback procedures
 - Automate dependency management across multiple languages and platforms
 
 ## Files in this Implementation
+
+For complete pattern documentation, see: [Upgrade Advisor](../../README.md#upgrade-advisor)
 
 - `dependency_advisor.md` - Complete dependency management pattern documentation
 - `analyzers/` - Dependency analysis tools for different package managers

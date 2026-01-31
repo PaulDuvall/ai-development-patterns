@@ -1,11 +1,11 @@
-# Atomic Task Decomposition Example
+# Atomic Decomposition Example
 
-This directory contains a complete implementation of the Atomic Task Decomposition pattern with contract validation, dependency resolution, and parallel execution coordination for AI agents.
+This directory contains a complete implementation of the Atomic Decomposition pattern with contract validation, dependency resolution, and parallel execution coordination for AI agents.
 
 ## Directory Structure
 
 ```
-atomic-task-decomposition/
+atomic-decomposition/
 ├── README.md                           # This file
 ├── function-level-decomposition.md     # Function-level decomposition techniques when AI struggles
 ├── task-decomposer.py                  # AI-powered task decomposition tool

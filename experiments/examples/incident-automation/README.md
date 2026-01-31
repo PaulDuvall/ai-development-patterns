@@ -1,16 +1,18 @@
-# Incident Response Automation Implementation
+# Incident Automation Implementation
 
-This directory contains a complete implementation of the Incident Response Automation pattern, generating actionable incident response playbooks from historical incident data.
+This directory contains a complete implementation of the Incident Automation pattern, generating actionable incident response playbooks from historical incident data.
 
 ## Overview
 
-Incident Response Automation enables teams to:
+Incident Automation enables teams to:
 - Generate step-by-step incident response runbooks
 - Create automated triage rules from historical patterns
 - Suggest preventive monitoring alerts
 - Continuously improve response procedures based on actual incidents
 
 ## Files in this Implementation
+
+For complete pattern documentation, see: [Incident Automation](../../README.md#incident-automation)
 
 - `incident_playbook.md` - Complete incident response automation documentation
 - `runbook_generators/` - AI-powered runbook generation from incident history

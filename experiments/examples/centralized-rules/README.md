@@ -1,6 +1,8 @@
-# Centralized AI Rules
+# Centralized Rules
 
 Sync organization-wide AI development rules from a central Git repository to your projects. Auto-generates CLAUDE.md, AGENTS.md, and .cursorrules with language/framework-specific rules.
+
+For complete pattern documentation, see: [Centralized Rules](../../README.md#centralized-rules)
 
 ## TL;DR - 30 Second Start
 

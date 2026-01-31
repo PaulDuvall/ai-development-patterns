@@ -1,11 +1,11 @@
-# AI-Driven Refactoring Example
+# Guided Refactoring Example
 
-This directory contains a complete implementation of the AI-Driven Refactoring pattern with automated code smell detection, refactoring pipeline, and quality metrics tracking.
+This directory contains a complete implementation of the Guided Refactoring pattern with automated code smell detection, refactoring pipeline, and quality metrics tracking.
 
 ## Directory Structure
 
 ```
-ai-driven-refactoring/
+guided-refactoring/
 ├── README.md                    # This file
 ├── refactoring-rules.md        # Configurable refactoring rules and thresholds
 ├── refactor-pipeline.sh        # Automated refactoring pipeline script

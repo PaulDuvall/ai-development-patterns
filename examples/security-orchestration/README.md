@@ -1,10 +1,10 @@
-# Security Scanning Orchestration Implementation
+# Security Orchestration Implementation
 
-This directory contains a complete implementation of the Security Scanning Orchestration pattern, aggregating multiple security tools and using AI to summarize findings for actionable insights.
+This directory contains a complete implementation of the Security Orchestration pattern, aggregating multiple security tools and using AI to summarize findings for actionable insights.
 
 ## Overview
 
-Security Scanning Orchestration enables teams to:
+Security Orchestration enables teams to:
 - Aggregate results from multiple security scanning tools
 - Use AI to summarize and prioritize findings
 - Reduce alert fatigue while maintaining security rigor

@@ -1,10 +1,10 @@
-# Rules as Code Example
+# Codified Rules Example
 
 Comprehensive rules framework for enforcing development standards, quality gates, and delivery practices through machine-readable rule files.
 
 ## Overview
 
-This example demonstrates the **Rules as Code** pattern through three rule files that establish mandatory guardrails for AI-assisted development:
+This example demonstrates the **Codified Rules** pattern through three rule files that establish mandatory guardrails for AI-assisted development:
 
 1. **DEVELOPMENT_RULES.md** - Test-first specification-driven development
 2. **QUALITY_RULES.md** - Code quality standards and observability
@@ -283,16 +283,16 @@ echo "✅ All rules validated"
 ## Integration with Main Patterns
 
 This example demonstrates:
-- **[Rules as Code](../../README.md#rules-as-code)** - Machine-readable development standards
-- **[Specification Driven Development](../../README.md#specification-driven-development)** - Test-first with traceability
-- **[Observable AI Development](../../README.md#observable-ai-development)** - Structured logging requirements
-- **[AI-Driven Traceability](../../README.md#ai-driven-traceability)** - Spec-test-code linking
+- **[Codified Rules](../../README.md#codified-rules)** - Machine-readable development standards
+- **[Spec-Driven Development](../../README.md#spec-driven-development)** - Test-first with traceability
+- **[Observable Development](../../README.md#observable-development)** - Structured logging requirements
+- **[Automated Traceability](../../README.md#automated-traceability)** - Spec-test-code linking
 
 ## Related Patterns
 
-- [Progressive AI Enhancement](../../README.md#progressive-ai-enhancement) - Gradual feature rollout
-- [AI Security Sandbox](../../README.md#ai-security-sandbox) - Security validation rules
-- [AI Developer Lifecycle](../../README.md#ai-developer-lifecycle) - Complete workflow integration
+- [Progressive Enhancement](../../README.md#progressive-enhancement) - Gradual feature rollout
+- [Security Sandbox](../../README.md#security-sandbox) - Security validation rules
+- [Developer Lifecycle](../../README.md#developer-lifecycle) - Complete workflow integration
 
 ## Contributing
 

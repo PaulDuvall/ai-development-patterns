@@ -10,6 +10,7 @@ import yaml
 import json
 from typing import List, Dict, Tuple, Optional
 from pathlib import Path
+from utils.git_utils import git_ls_files, git_tracked_child_dirs
 
 
 class CodeValidator:
@@ -209,7 +210,7 @@ class ExampleDirectoryValidator:
             except Exception as e:
                 errors.append(f"Error reading README.md: {e}")
         
-        # Validate all code files
+        # Validate code files (tracked only to keep local runs aligned with CI)
         code_file_extensions = {
             '.py': self.code_validator.validate_python_syntax,
             '.sh': self.code_validator.validate_bash_syntax,
@@ -217,40 +218,46 @@ class ExampleDirectoryValidator:
             '.yml': self.code_validator.validate_yaml_syntax,
             '.json': self.code_validator.validate_json_syntax
         }
-        
-        for file_path in dir_path.rglob('*'):
-            if file_path.is_file():
-                suffix = file_path.suffix.lower()
-                
-                if suffix in code_file_extensions:
-                    try:
-                        with open(file_path, 'r', encoding='utf-8') as f:
-                            content = f.read()
-                        
-                        validator_func = code_file_extensions[suffix]
-                        is_valid, error_msg = validator_func(content, str(file_path.relative_to(self.repo_root)))
-                        
-                        if not is_valid:
-                            errors.append(error_msg)
-                            
-                    except Exception as e:
-                        errors.append(f"Error reading {file_path.relative_to(self.repo_root)}: {e}")
-                
-                # Special case for Dockerfiles
-                elif file_path.name.lower().startswith('dockerfile'):
-                    try:
-                        with open(file_path, 'r', encoding='utf-8') as f:
-                            content = f.read()
-                        
-                        is_valid, error_msg = self.code_validator.validate_dockerfile_syntax(
-                            content, str(file_path.relative_to(self.repo_root))
-                        )
-                        
-                        if not is_valid:
-                            errors.append(error_msg)
-                            
-                    except Exception as e:
-                        errors.append(f"Error reading {file_path.relative_to(self.repo_root)}: {e}")
+
+        rel_dir = str(dir_path.relative_to(self.repo_root)).replace("\\", "/")
+        tracked_files = git_ls_files(self.repo_root, rel_dir)
+        tracked_paths = [self.repo_root / path for path in tracked_files]
+
+        for file_path in tracked_paths:
+            if not file_path.is_file():
+                continue
+
+            suffix = file_path.suffix.lower()
+
+            if suffix in code_file_extensions:
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+
+                    validator_func = code_file_extensions[suffix]
+                    is_valid, error_msg = validator_func(content, str(file_path.relative_to(self.repo_root)))
+
+                    if not is_valid:
+                        errors.append(error_msg)
+
+                except Exception as e:
+                    errors.append(f"Error reading {file_path.relative_to(self.repo_root)}: {e}")
+
+            # Special case for Dockerfiles
+            elif file_path.name.lower().startswith('dockerfile'):
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+
+                    is_valid, error_msg = self.code_validator.validate_dockerfile_syntax(
+                        content, str(file_path.relative_to(self.repo_root))
+                    )
+
+                    if not is_valid:
+                        errors.append(error_msg)
+
+                except Exception as e:
+                    errors.append(f"Error reading {file_path.relative_to(self.repo_root)}: {e}")
         
         # Check for requirements files and validate they exist
         requirements_files = list(dir_path.glob('*requirements*.txt'))
@@ -279,8 +286,8 @@ class ExampleDirectoryValidator:
             'valid': len(errors) == 0,
             'errors': errors,
             'warnings': warnings,
-            'files_checked': len(list(dir_path.rglob('*'))),
-            'code_files': len([f for f in dir_path.rglob('*') if f.suffix.lower() in code_file_extensions])
+            'files_checked': len(tracked_paths),
+            'code_files': len([p for p in tracked_paths if p.suffix.lower() in code_file_extensions])
         }
     
     def validate_all_examples(self) -> Dict[str, Dict[str, any]]:
@@ -289,14 +296,16 @@ class ExampleDirectoryValidator:
         
         # Validate main examples
         if self.examples_dir.exists():
-            for example_dir in self.examples_dir.iterdir():
+            tracked_example_dirs = git_tracked_child_dirs(self.repo_root, "examples")
+            for example_dir in tracked_example_dirs:
                 if example_dir.is_dir() and not example_dir.name.startswith('.'):
                     results[f"examples/{example_dir.name}"] = self.validate_example_directory(example_dir)
         
         # Validate experimental examples
         experiments_examples_dir = self.experiments_dir / "examples"
         if experiments_examples_dir.exists():
-            for example_dir in experiments_examples_dir.iterdir():
+            tracked_experiment_dirs = git_tracked_child_dirs(self.repo_root, "experiments/examples")
+            for example_dir in tracked_experiment_dirs:
                 if example_dir.is_dir() and not example_dir.name.startswith('.'):
                     results[f"experiments/examples/{example_dir.name}"] = self.validate_example_directory(example_dir)
         

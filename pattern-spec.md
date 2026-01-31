@@ -8,7 +8,10 @@ This document defines the standard structure, content requirements, and formatti
 The main documentation MUST include a comprehensive reference table at the beginning that:
 - Lists ALL patterns in the collection
 - Includes maturity level, category, description, and dependencies for each pattern
-- Provides internal reference links to each pattern using format: `[Pattern Name](#pattern-name-anchor)`
+- Provides internal reference links to each pattern using format:
+  ```markdown
+  [Pattern Name](#pattern-name-anchor)
+  ```
 - Organizes patterns by category (Foundation → Development → Operations)
 - Uses sub-category headers for Operations patterns (Security & Compliance, Deployment Automation, Monitoring & Maintenance)
 
@@ -306,7 +309,10 @@ graph LR
 ```
 
 ### Hyperlinks
-- ALL pattern references MUST be hyperlinked using format: `[Pattern Name](#pattern-name-anchor)`
+- ALL pattern references MUST be hyperlinked using format:
+  ```markdown
+  [Pattern Name](#pattern-name-anchor)
+  ```
 - This applies to: Reference table, Related Patterns sections, pattern mentions in descriptions, implementation examples, and any other pattern references
 - External links should include brief context
 - Ensure all internal links work correctly
@@ -317,7 +323,10 @@ graph LR
 - Keep README examples concise and scannable (prioritize clarity and understanding)
 - Show the pattern's essence and core value proposition with practical detail
 - For complex patterns, create `examples/pattern-name/` directories with complete working code
-- ALWAYS reference detailed implementations: "Complete Example: See [examples/pattern-name/](examples/pattern-name/) for..." or "Complete Implementation: See [examples/pattern-name/](examples/pattern-name/) for..."
+- ALWAYS reference detailed implementations using non-clickable code formatting (so the spec itself never contains broken links), for example:
+  ```markdown
+  Complete Example: See `examples/pattern-name/` for a full implementation.
+  ```
 - Prefer real-world scenarios over abstract examples
 - Use consistent naming conventions (e.g., "myapp" for applications)
 - Include the most important commands, code snippets, or configurations that demonstrate the pattern

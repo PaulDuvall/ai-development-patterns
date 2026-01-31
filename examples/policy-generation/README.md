@@ -1,6 +1,6 @@
-# Policy-as-Code Generation Implementation
+# Policy Generation Implementation
 
-This directory contains a complete implementation of the Policy-as-Code Generation pattern, transforming compliance requirements into executable Cedar/OPA policy files using AI assistance.
+This directory contains a complete implementation of the Policy Generation pattern, transforming compliance requirements into executable Cedar/OPA policy files using AI assistance.
 
 ## Overview
 

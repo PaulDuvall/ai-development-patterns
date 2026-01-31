@@ -1,6 +1,6 @@
-# Parallelized AI Coding Agents - Example Implementation
+# Parallel Agents - Example Implementation
 
-This directory contains a complete, practical implementation of the Parallelized AI Coding Agents pattern. The example demonstrates how to run multiple AI agents concurrently to build a Task Management SaaS application.
+This directory contains a complete, practical implementation of the Parallel Agents pattern. The example demonstrates how to run multiple AI agents concurrently to build a Task Management SaaS application.
 
 ## 🎯 Overview
 
@@ -14,7 +14,7 @@ This example shows how to:
 ## 📁 Directory Structure
 
 ```
-parallelized-ai-agents/
+parallel-agents/
 ├── config/
 │   └── tasks.yaml           # Task definitions for agents
 ├── docker/
@@ -48,7 +48,7 @@ parallelized-ai-agents/
 ```bash
 # Clone the repository
 git clone <your-repo>
-cd examples/parallelized-ai-agents
+cd examples/parallel-agents
 
 # Create necessary directories
 mkdir -p workspace/{frontend,backend,database,tests}
@@ -587,7 +587,7 @@ The agents work in parallel, share discoveries through shared memory, and their 
 
 ## 📚 Additional Resources
 
-- [Pattern Documentation](../../README.md#parallelized-ai-coding-agents)
+- [Pattern Documentation](../../README.md#parallel-agents)
 - [Shared Memory Module](scripts/shared_memory.py)
 - [Docker Compose Reference](https://docs.docker.com/compose/)
 - [Git Worktree Documentation](https://git-scm.com/docs/git-worktree)

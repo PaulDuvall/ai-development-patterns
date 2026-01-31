@@ -10,6 +10,7 @@ from utils.example_validator import (
     CodeValidator
 )
 from utils.pattern_parser import PatternParser
+from utils.git_utils import git_ls_files, git_tracked_child_dirs
 
 
 class TestCodeExamples:
@@ -154,146 +155,151 @@ class TestExampleDirectories:
     
     def test_example_directories_have_readmes(self, repo_root):
         """Verify all example directories contain README.md files"""
-        examples_dir = repo_root / "examples"
         missing_readmes = []
-        
-        if examples_dir.exists():
-            for example_dir in examples_dir.iterdir():
-                if example_dir.is_dir() and not example_dir.name.startswith('.'):
-                    readme_path = example_dir / "README.md"
-                    if not readme_path.exists():
-                        missing_readmes.append(str(example_dir.relative_to(repo_root)))
+
+        for example_dir in git_tracked_child_dirs(repo_root, "examples"):
+            readme_path = example_dir / "README.md"
+            if not readme_path.exists():
+                missing_readmes.append(str(example_dir.relative_to(repo_root)))
         
         assert not missing_readmes, f"Example directories missing README.md: {missing_readmes}"
     
     def test_python_files_in_examples_valid(self, repo_root):
         """Test all Python files in example directories"""
-        examples_dir = repo_root / "examples"
         code_validator = CodeValidator(repo_root)
         invalid_python_files = []
-        
-        if examples_dir.exists():
-            for python_file in examples_dir.rglob("*.py"):
-                try:
-                    with open(python_file, 'r', encoding='utf-8') as f:
-                        content = f.read()
-                    
-                    is_valid, error = code_validator.validate_python_syntax(
-                        content, str(python_file.relative_to(repo_root))
-                    )
-                    
-                    if not is_valid:
-                        invalid_python_files.append({
-                            'file': str(python_file.relative_to(repo_root)),
-                            'error': error
-                        })
-                        
-                except Exception as e:
+
+        tracked_files = git_ls_files(repo_root, "examples")
+        for rel_path in tracked_files:
+            if not rel_path.endswith(".py"):
+                continue
+            python_file = repo_root / rel_path
+
+            try:
+                with open(python_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+
+                is_valid, error = code_validator.validate_python_syntax(content, rel_path)
+
+                if not is_valid:
                     invalid_python_files.append({
-                        'file': str(python_file.relative_to(repo_root)),
-                        'error': f"Failed to read file: {e}"
+                        'file': rel_path,
+                        'error': error
                     })
+
+            except Exception as e:
+                invalid_python_files.append({
+                    'file': rel_path,
+                    'error': f"Failed to read file: {e}"
+                })
         
         assert not invalid_python_files, f"Invalid Python files in examples: {invalid_python_files}"
     
     def test_shell_scripts_in_examples_valid(self, repo_root):
         """Test all shell scripts in example directories"""
-        examples_dir = repo_root / "examples"
         code_validator = CodeValidator(repo_root)
         invalid_shell_files = []
-        
-        if examples_dir.exists():
-            for shell_file in examples_dir.rglob("*.sh"):
-                try:
-                    with open(shell_file, 'r', encoding='utf-8') as f:
-                        content = f.read()
-                    
-                    is_valid, error = code_validator.validate_bash_syntax(
-                        content, str(shell_file.relative_to(repo_root))
-                    )
-                    
-                    if not is_valid:
-                        invalid_shell_files.append({
-                            'file': str(shell_file.relative_to(repo_root)),
-                            'error': error
-                        })
-                        
-                except Exception as e:
+
+        tracked_files = git_ls_files(repo_root, "examples")
+        for rel_path in tracked_files:
+            if not rel_path.endswith(".sh"):
+                continue
+            shell_file = repo_root / rel_path
+
+            try:
+                with open(shell_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+
+                is_valid, error = code_validator.validate_bash_syntax(content, rel_path)
+
+                if not is_valid:
                     invalid_shell_files.append({
-                        'file': str(shell_file.relative_to(repo_root)),
-                        'error': f"Failed to read file: {e}"
+                        'file': rel_path,
+                        'error': error
                     })
+
+            except Exception as e:
+                invalid_shell_files.append({
+                    'file': rel_path,
+                    'error': f"Failed to read file: {e}"
+                })
         
         assert not invalid_shell_files, f"Invalid shell scripts in examples: {invalid_shell_files}"
     
     def test_dockerfile_syntax_in_examples(self, repo_root):
         """Test Dockerfile syntax in example directories"""
-        examples_dir = repo_root / "examples"
         code_validator = CodeValidator(repo_root)
         invalid_dockerfiles = []
-        
-        if examples_dir.exists():
-            # Find all Dockerfiles (various naming conventions)
-            dockerfile_patterns = ["Dockerfile*", "*.dockerfile", "*Dockerfile*"]
-            dockerfiles = []
-            
-            for pattern in dockerfile_patterns:
-                dockerfiles.extend(examples_dir.rglob(pattern))
-            
-            for dockerfile in dockerfiles:
-                if dockerfile.is_file():
-                    try:
-                        with open(dockerfile, 'r', encoding='utf-8') as f:
-                            content = f.read()
-                        
-                        is_valid, error = code_validator.validate_dockerfile_syntax(
-                            content, str(dockerfile.relative_to(repo_root))
-                        )
-                        
-                        if not is_valid:
-                            invalid_dockerfiles.append({
-                                'file': str(dockerfile.relative_to(repo_root)),
-                                'error': error
-                            })
-                            
-                    except Exception as e:
-                        invalid_dockerfiles.append({
-                            'file': str(dockerfile.relative_to(repo_root)),
-                            'error': f"Failed to read file: {e}"
-                        })
+
+        tracked_files = git_ls_files(repo_root, "examples")
+        for rel_path in tracked_files:
+            filename = rel_path.split("/")[-1]
+            is_dockerfile = (
+                filename.lower().startswith("dockerfile")
+                or filename.lower().endswith(".dockerfile")
+                or "dockerfile" in filename.lower()
+            )
+            if not is_dockerfile:
+                continue
+
+            dockerfile = repo_root / rel_path
+            if not dockerfile.is_file():
+                continue
+
+            try:
+                with open(dockerfile, 'r', encoding='utf-8') as f:
+                    content = f.read()
+
+                is_valid, error = code_validator.validate_dockerfile_syntax(content, rel_path)
+
+                if not is_valid:
+                    invalid_dockerfiles.append({
+                        'file': rel_path,
+                        'error': error
+                    })
+
+            except Exception as e:
+                invalid_dockerfiles.append({
+                    'file': rel_path,
+                    'error': f"Failed to read file: {e}"
+                })
         
         assert not invalid_dockerfiles, f"Invalid Dockerfiles in examples: {invalid_dockerfiles}"
     
     def test_requirements_files_format(self, repo_root):
         """Test requirements.txt files format in examples"""
-        examples_dir = repo_root / "examples"
         invalid_requirements = []
-        
-        if examples_dir.exists():
-            for req_file in examples_dir.rglob("*requirements*.txt"):
-                try:
-                    with open(req_file, 'r', encoding='utf-8') as f:
-                        content = f.read()
-                    
-                    lines = content.strip().split('\n')
-                    for line_num, line in enumerate(lines, 1):
-                        line = line.strip()
-                        if line and not line.startswith('#'):
-                            # Basic validation for package names
-                            # Should contain alphanumeric, hyphens, underscores, and version specifiers
-                            if not any(c.isalnum() for c in line):
-                                invalid_requirements.append({
-                                    'file': str(req_file.relative_to(repo_root)),
-                                    'line': line_num,
-                                    'content': line,
-                                    'error': 'Line does not appear to be a valid requirement'
-                                })
-                
-                except Exception as e:
-                    invalid_requirements.append({
-                        'file': str(req_file.relative_to(repo_root)),
-                        'error': f"Failed to read file: {e}"
-                    })
+
+        tracked_files = git_ls_files(repo_root, "examples")
+        for rel_path in tracked_files:
+            filename = rel_path.split("/")[-1]
+            if "requirements" not in filename or not filename.endswith(".txt"):
+                continue
+
+            req_file = repo_root / rel_path
+            try:
+                with open(req_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+
+                lines = content.strip().split('\n')
+                for line_num, line in enumerate(lines, 1):
+                    line = line.strip()
+                    if line and not line.startswith('#'):
+                        # Basic validation for package names
+                        # Should contain alphanumeric, hyphens, underscores, and version specifiers
+                        if not any(c.isalnum() for c in line):
+                            invalid_requirements.append({
+                                'file': rel_path,
+                                'line': line_num,
+                                'content': line,
+                                'error': 'Line does not appear to be a valid requirement'
+                            })
+
+            except Exception as e:
+                invalid_requirements.append({
+                    'file': rel_path,
+                    'error': f"Failed to read file: {e}"
+                })
         
         assert not invalid_requirements, f"Invalid requirements files: {invalid_requirements}"
 
