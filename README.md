@@ -21,6 +21,7 @@ graph TB
     TI --> BM([Baseline<br/>Management])
     SS --> SO([Security<br/>Orchestration])
     SS --> PG([Policy<br/>Generation])
+    SO --> CZR([Centralized<br/>Rules])
 
     %% ROW 3: Development patterns (flows forward again)
     DL --> OD([Observable<br/>Development])
@@ -29,10 +30,19 @@ graph TB
     CR --> GR([Guided<br/>Refactoring])
     CR --> CP([Context<br/>Persistence])
     RA --> IG([Issue<br/>Generation])
+    CR --> EA([Event<br/>Automation])
+    SS --> EA
+    EA --> CC([Custom<br/>Commands])
+    SD --> CC
+    CP --> PD([Progressive<br/>Disclosure])
+    CR --> PD
+    SD --> IS([Image<br/>Spec])
+    PD --> CZR
 
     %% ROW 4: Development chain
     PE([Progressive<br/>Enhancement]) --> AD([Atomic<br/>Decomposition])
     AD --> PA([Parallel<br/>Agents])
+    PE --> IS
 
     %% STYLING
     classDef foundation fill:#a8d5ba,stroke:#2d5a3f,stroke-width:2px,color:#1a3a25
@@ -40,8 +50,8 @@ graph TB
     classDef operations fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,color:#78281f
 
     class RA,CR,SS,DL,TI,IG,CP foundation
-    class PE,SD,AD,PA,OD,GR,AT development
-    class PG,SO,BM operations
+    class PE,SD,AD,PA,OD,GR,AT,EA,CC,PD,IS development
+    class PG,SO,BM,CZR operations
 
     %% CLICKABLE LINKS
     click RA "https://github.com/PaulDuvall/ai-development-patterns#readiness-assessment"
@@ -58,8 +68,13 @@ graph TB
     click OD "https://github.com/PaulDuvall/ai-development-patterns#observable-development"
     click GR "https://github.com/PaulDuvall/ai-development-patterns#guided-refactoring"
     click AT "https://github.com/PaulDuvall/ai-development-patterns#automated-traceability"
+    click EA "https://github.com/PaulDuvall/ai-development-patterns#event-automation"
+    click CC "https://github.com/PaulDuvall/ai-development-patterns#custom-commands"
+    click PD "https://github.com/PaulDuvall/ai-development-patterns#progressive-disclosure"
+    click IS "https://github.com/PaulDuvall/ai-development-patterns#image-spec"
     click PG "https://github.com/PaulDuvall/ai-development-patterns#policy-generation"
     click SO "https://github.com/PaulDuvall/ai-development-patterns#security-orchestration"
+    click CZR "https://github.com/PaulDuvall/ai-development-patterns#centralized-rules"
     click BM "https://github.com/PaulDuvall/ai-development-patterns#baseline-management"
 ```
 
