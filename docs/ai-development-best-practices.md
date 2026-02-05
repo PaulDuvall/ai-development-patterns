@@ -56,7 +56,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 22. **Context Optimization**: Match AI tool selection to task complexity using [Context Optimization](../experiments/README.md#context-optimization) and defined criteria: simple models for queries <500 tokens, complex models for architecture decisions >2000 tokens.
 
-23. **Image Spec**: Use diagrams, mockups, and flows as primary specifications for complex needs using [Image Spec](../experiments/README.md#image-spec), supplemented with structured text for precise details.
+23. **Image Spec**: Use diagrams, mockups, and flows as primary specifications for complex needs using [Image Spec](../README.md#image-spec), supplemented with structured text for precise details.
 
 24. **Version Knowledge Assets**: Treat AI development knowledge as code with semantic versioning, peer review processes, and automated quality checks.
 
@@ -66,9 +66,9 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 26. **Smart Defaults with Extensibility**: Design AI development tools that work perfectly with no configuration while supporting advanced customization options.
 
-27. **Self-Documenting Commands**: Include comprehensive built-in help with usage patterns, examples, and parameter explanations in every AI development tool using [Custom Commands](../experiments/README.md#custom-commands).
+27. **Self-Documenting Commands**: Include comprehensive built-in help with usage patterns, examples, and parameter explanations in every AI development tool using [Custom Commands](../README.md#custom-commands).
 
-28. **Hooks-Based Governance**: Implement flexible hook systems for automated monitoring, logging, and policy enforcement at critical development workflow points using [Event Automation](../experiments/README.md#event-automation).
+28. **Hooks-Based Governance**: Implement flexible hook systems for automated monitoring, logging, and policy enforcement at critical development workflow points using [Event Automation](../README.md#event-automation).
 
 29. **Modular Command Architecture**: Organize AI tools into clear categories with well-defined scopes (project-specific vs. machine-wide) for flexible workflows.
 

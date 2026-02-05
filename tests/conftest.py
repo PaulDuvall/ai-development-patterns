@@ -54,12 +54,12 @@ PATTERN_CATEGORIES = {
     "Foundation": ["Readiness Assessment", "Codified Rules", "Security Sandbox",
                    "Developer Lifecycle", "Tool Integration", "Issue Generation"],
     "Development": ["Spec-Driven Development", "Planned Implementation", "Progressive Enhancement",
-                    "Choice Generation", "Parallel Agents", "Context Persistence",
-                    "Constrained Generation", "Atomic Decomposition",
+                    "Image Spec", "Choice Generation", "Parallel Agents", "Context Persistence",
+                    "Constrained Generation", "Event Automation", "Custom Commands", "Progressive Disclosure", "Atomic Decomposition",
                     "Observable Development", "Guided Refactoring",
                     "Guided Architecture", "Automated Traceability", "Error Resolution"],
     "Operations": ["Policy Generation", "Security Orchestration",
-                   "Baseline Management"]
+                   "Centralized Rules", "Baseline Management"]
 }
 
 # Expected patterns from the reference table
@@ -71,6 +71,7 @@ EXPECTED_PATTERNS = [
     "Tool Integration",
     "Issue Generation",
     "Spec-Driven Development",
+    "Image Spec",
     "Planned Implementation",
     "Progressive Enhancement",
     "Choice Generation",
@@ -78,6 +79,9 @@ EXPECTED_PATTERNS = [
     "Parallel Agents",
     "Context Persistence",
     "Constrained Generation",
+    "Event Automation",
+    "Custom Commands",
+    "Progressive Disclosure",
     "Observable Development",
     "Guided Refactoring",
     "Guided Architecture",
@@ -85,5 +89,6 @@ EXPECTED_PATTERNS = [
     "Error Resolution",
     "Policy Generation",
     "Security Orchestration",
+    "Centralized Rules",
     "Baseline Management"
 ]

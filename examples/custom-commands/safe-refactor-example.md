@@ -92,5 +92,5 @@ Automatic approval if ALL conditions met:
 
 ## Related Patterns
 
-- [Guided Refactoring](../../../README.md#guided-refactoring)
-- [Testing Orchestration](../../README.md#testing-orchestration)
+- [Guided Refactoring](../../README.md#guided-refactoring)
+- [Testing Orchestration](../../experiments/README.md#testing-orchestration)

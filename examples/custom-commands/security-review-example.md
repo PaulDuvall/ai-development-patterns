@@ -95,5 +95,5 @@ if (!API_KEY) throw new Error("STRIPE_API_KEY required")
 
 ## Related Patterns
 
-- [Security Orchestration](../../../README.md#security-orchestration)
-- [Security Sandbox](../../../README.md#security-sandbox)
+- [Security Orchestration](../../README.md#security-orchestration)
+- [Security Sandbox](../../README.md#security-sandbox)

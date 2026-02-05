@@ -3,7 +3,7 @@
 [![Tests](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml/badge.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/docs-comprehensive-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns#ai-development-patterns)
-[![Patterns](https://img.shields.io/badge/patterns-22-blue.svg)](#complete-pattern-reference)
+[![Patterns](https://img.shields.io/badge/patterns-27-blue.svg)](#complete-pattern-reference)
 [![Quality Gate](https://img.shields.io/badge/quality%20gate-passing-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/tree/main/tests)
 [![Hyperlinks](https://img.shields.io/badge/hyperlinks-validated-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
 
@@ -94,6 +94,10 @@ graph TD
         G --> I[Progressive Enhancement]
         H --> I
         I --> J[Choice Generation]
+        Q[Event Automation]
+        R[Custom Commands]
+        S[Progressive Disclosure]
+        U[Image Spec]
         G --> K[Atomic Decomposition]
         K --> L[Parallel Agents]
     end
@@ -101,9 +105,21 @@ graph TD
     subgraph "Phase 3: Operations (Weeks 5-6)"
         C --> M[Policy Generation]
         M --> N[Security Orchestration]
+        N --> T[Centralized Rules]
         L --> O[Baseline Management]
         D --> P[Automated Traceability]
     end
+
+    B --> Q
+    C --> Q
+    Q --> R
+    G --> R
+    B --> S
+    R --> S
+    B --> T
+    S --> T
+    G --> U
+    I --> U
 ```
 
 **Continuous Implementation Note**: Security patterns ([Security Sandbox](#security-sandbox), AI Security & Compliance) and deployment patterns should be implemented continuously throughout development, not delayed until specific phases. The dependencies shown represent learning prerequisites, not deployment gates.
@@ -119,6 +135,7 @@ graph TD
 | **[Tool Integration](#tool-integration)** | Intermediate | Foundation | Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions | Security Sandbox, Developer Lifecycle |
 | **[Issue Generation](#issue-generation)** | Intermediate | Foundation | Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies | Readiness Assessment |
 | **[Spec-Driven Development](#spec-driven-development)** | Intermediate | Development | Use executable specifications to guide AI code generation with clear acceptance criteria before implementation | Developer Lifecycle |
+| **[Image Spec](#image-spec)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Spec-Driven Development, Progressive Enhancement |
 | **[Planned Implementation](#planned-implementation)** | Beginner | Development | Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration | None |
 | **[Progressive Enhancement](#progressive-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | None |
 | **[Choice Generation](#choice-generation)** | Intermediate | Development | Generate multiple implementation options for exploration and comparison rather than accepting first AI solution | Progressive Enhancement |
@@ -126,6 +143,9 @@ graph TD
 | **[Parallel Agents](#parallel-agents)** | Advanced | Development | Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration | Atomic Decomposition |
 | **[Context Persistence](#context-persistence)** | Intermediate | Development | Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols | Codified Rules |
 | **[Constrained Generation](#constrained-generation)** | Beginner | Development | Give AI specific constraints to prevent over-engineering and ensure focused solutions | None |
+| **[Event Automation](#event-automation)** | Intermediate | Development | Execute custom commands automatically at assistant lifecycle events to enforce policies and automate workflows | Codified Rules, Security Sandbox |
+| **[Custom Commands](#custom-commands)** | Intermediate | Development | Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and sophisticated workflows | Event Automation, Spec-Driven Development, Codified Rules |
+| **[Progressive Disclosure](#progressive-disclosure)** | Intermediate | Development | Load AI assistant rules incrementally based on task context to prevent instruction saturation and context bloat | Codified Rules, Context Persistence |
 | **[Observable Development](#observable-development)** | Intermediate | Development | Strategic logging and debugging that makes system behavior visible to AI | Developer Lifecycle |
 | **[Guided Refactoring](#guided-refactoring)** | Intermediate | Development | Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics | Codified Rules |
 | **[Guided Architecture](#guided-architecture)** | Intermediate | Development | Apply architectural frameworks (DDD, Well-Architected, 12-Factor) using AI to ensure sound system design | Developer Lifecycle, Codified Rules |
@@ -134,6 +154,7 @@ graph TD
 | **Security & Compliance** | | Operations | *Category containing security and compliance patterns* | |
 | **[Policy Generation](#policy-generation)** | Advanced | Operations | Transform compliance requirements into executable Cedar/OPA policy files with AI assistance | Security Sandbox |
 | **[Security Orchestration](#security-orchestration)** | Intermediate | Workflow | Aggregate multiple security tools and use AI to summarize findings for actionable insights | Security Sandbox |
+| **[Centralized Rules](#centralized-rules)** | Advanced | Operations | Enforce organization-wide AI rules through a central Git repository that syncs to standard AI assistant configuration files with automatic language and framework detection | Codified Rules, Progressive Disclosure, Security Orchestration |
 | **Deployment Automation** | | Operations | *Category containing deployment and pipeline patterns* | |
 | **Monitoring & Maintenance** | | Operations | *Category containing monitoring and maintenance patterns* | |
 | **[Baseline Management](#baseline-management)** | Advanced | Operations | Establish intelligent performance baselines and configure monitoring thresholds automatically | Tool Integration |
@@ -368,7 +389,7 @@ Starting AI adoption without proper assessment leads to inconsistent practices, 
 **Maturity**: Beginner
 **Description**: Version and maintain AI coding standards as explicit configuration files that persist across sessions and team members.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Context Persistence](#context-persistence)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Context Persistence](#context-persistence), [Progressive Disclosure](#progressive-disclosure), [Event Automation](#event-automation), [Custom Commands](#custom-commands), [Centralized Rules](#centralized-rules)
 
 **Standardized Project Structure**
 ```bash
@@ -408,7 +429,7 @@ Each developer maintains their own prompts and preferences, leading to inconsist
 **Maturity**: Beginner
 **Description**: Run AI tools in isolated environments without access to secrets or sensitive data to prevent credential leaks and maintain security compliance.
 
-**Related Patterns**: [Security & Compliance Patterns](#security-compliance-patterns), [Codified Rules](#codified-rules)
+**Related Patterns**: [Security & Compliance Patterns](#security-compliance-patterns), [Codified Rules](#codified-rules), [Event Automation](#event-automation)
 
 **Core Security Implementation**
 
@@ -735,7 +756,7 @@ Specifications use authority levels to resolve conflicts and establish precedenc
 
 When requirements conflict, higher authority levels take precedence, enabling clear decision-making for AI implementation.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Tool Integration](#tool-integration), [Testing Orchestration](experiments/README.md#testing-orchestration), [Observable Development](#observable-development)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Tool Integration](#tool-integration), [Custom Commands](#custom-commands), [Image Spec](#image-spec), [Testing Orchestration](experiments/README.md#testing-orchestration), [Observable Development](#observable-development)
 
 **SpecDriven AI Workflow**
 
@@ -837,6 +858,47 @@ Writing code with AI first, then trying to retrofit tests, resulting in tests th
 
 **Anti-pattern: Over-Prompting**
 Saving collections of prompts as if they were specifications. Prompts are implementation details; specifications are behavioral contracts.
+
+---
+
+## Image Spec
+
+**Maturity**: Intermediate
+**Description**: Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context.
+
+**Related Patterns**: [Spec-Driven Development](#spec-driven-development), [Progressive Enhancement](#progressive-enhancement), [Context Optimization](experiments/README.md#context-optimization)
+
+**Core Implementation**
+
+Use images as the source of truth for structure and intent, then supplement with minimal text constraints:
+
+```bash
+# 1. Prepare visual specifications
+# - architecture.png (components + labeled ports)
+# - data-model.png (fields + relationships)
+# - ui-mock.png (layout + key interactions)
+
+# 2. Attach images and provide a minimal build request
+cat > build-request.txt << 'EOF'
+Build the system from the attached diagrams.
+Tech stack: Node.js + Express + PostgreSQL
+Start with the User Service exactly as shown.
+Include /health endpoints for every service.
+EOF
+
+# 3. Iterate with visual feedback
+# - Screenshot the running output
+# - Annotate with required changes
+# - Re-attach and request the next iteration
+```
+
+**Complete Implementation**
+
+See [examples/image-spec/](examples/image-spec/) for prompt templates, diagram checklists, and a repeatable image-first iteration loop.
+
+**Anti-pattern: Overwhelming Visuals**
+
+Uploading many diagrams at once without hierarchy or a clear starting point overwhelms context, increases contradictions, and reduces accuracy. Start with one high-level diagram, implement one slice, then add more visuals progressively.
 
 ---
 
@@ -982,7 +1044,7 @@ Spending excessive time refining plans without moving to implementation, missing
 **Maturity**: Beginner  
 **Description**: Build complex features through small, deployable iterations rather than big-bang generation.
 
-**Related Patterns**: [Planned Implementation](#planned-implementation), [Developer Lifecycle](#developer-lifecycle), [Constrained Generation](#constrained-generation), [Choice Generation](#choice-generation), [Guided Architecture](#guided-architecture)
+**Related Patterns**: [Planned Implementation](#planned-implementation), [Developer Lifecycle](#developer-lifecycle), [Image Spec](#image-spec), [Constrained Generation](#constrained-generation), [Choice Generation](#choice-generation), [Guided Architecture](#guided-architecture)
 
 **Examples**
 Building authentication progressively:
@@ -1227,14 +1289,14 @@ Running multiple agents without isolation, shared memory, or conflict resolution
 **Maturity**: Intermediate
 **Description**: Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols for efficient multi-session development.
 
-**Related Patterns**: [Codified Rules](#codified-rules), [Automated Traceability](#automated-traceability), [Parallel Agents](#parallel-agents)
+**Related Patterns**: [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure), [Automated Traceability](#automated-traceability), [Parallel Agents](#parallel-agents)
 
 **Core Principles**
 
 AI context is a finite resource with diminishing returns. Effective context engineering requires:
 - **Minimal High-Signal Tokens**: Find the smallest set of information that maximizes outcomes
 - **Just-in-Time Retrieval**: Load context dynamically rather than pre-loading everything
-- **Progressive Disclosure**: Explore and discover information as needed, not upfront
+- **[Progressive Disclosure](#progressive-disclosure)**: Explore and discover information as needed, not upfront
 
 **Structured Memory Schemas**
 
@@ -1374,6 +1436,325 @@ Giving AI vague instructions like "make it better" or "add features" leads to ov
 
 **Anti-pattern: Over-Constrained**
 Adding too many constraints ("use exactly 50 lines, 2 methods, no dependencies, 100% test coverage, sub-10ms response time") paralyzes AI decision-making and produces suboptimal solutions.
+
+---
+
+## Event Automation
+
+**Maturity**: Intermediate
+**Description**: Execute custom commands automatically at assistant lifecycle events (pre/post tool use, session start, prompt submission) for workflow automation, validation, and policy enforcement.
+
+**Related Patterns**: [Codified Rules](#codified-rules), [Security Sandbox](#security-sandbox), [Custom Commands](#custom-commands)
+
+**Core Concept**
+
+Attach shell commands to AI assistant lifecycle events. Commands receive context via environment variables (file paths, tool names, user prompts) and return exit codes to allow/block/warn.
+
+**Event Flow Example**
+
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant AI as AI Assistant
+    participant Pre as PreToolUse Hook
+    participant Post as PostToolUse Hook
+
+    Dev->>AI: Edit .env file
+    AI->>Pre: Run security-hook.sh
+    Pre->>Pre: Check if file is sensitive
+    Pre-->>AI: Exit 2 (BLOCK)
+    AI->>Dev: ❌ Blocked: Cannot edit sensitive file
+
+    Dev->>AI: Edit src/api.js
+    AI->>Pre: Run security-hook.sh
+    Pre->>Pre: Check if file is sensitive
+    Pre-->>AI: Exit 0 (Allow)
+    AI->>AI: Execute file edit
+    AI->>Post: Run security-hook.sh
+    Post->>Post: Scan for secrets with gitleaks
+    alt Secret Found
+        Post-->>AI: Exit 1 (Warning)
+        AI->>Dev: ⚠️ Secret detected! Review before committing
+    else No Secret
+        Post-->>AI: Exit 0 (Success)
+        AI->>Dev: ✅ Edit complete
+    end
+```
+
+**Simple Security Example**
+
+Prevent editing sensitive files and scan for secrets:
+
+```bash
+#!/bin/bash
+# security-hook.sh
+
+FILE="$TOOL_INPUT_FILE_PATH"
+
+# Block .env and credentials files
+if echo "$FILE" | grep -E "(\\.env|secrets\\.json|credentials)" > /dev/null; then
+  echo "❌ Blocked: Cannot edit sensitive file"
+  exit 2
+fi
+
+# Scan for hardcoded secrets (requires gitleaks)
+if command -v gitleaks > /dev/null; then
+  if gitleaks detect --no-git --source="$FILE" 2>&1 | grep -q "leaks found"; then
+    echo "⚠️ Secret detected! Review before committing."
+    exit 1
+  fi
+fi
+
+exit 0
+```
+
+**Configuration Example (Claude Code)**
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Edit",
+      "hooks": [{"type": "command", "command": "./security-hook.sh"}]
+    }],
+    "PostToolUse": [{
+      "matcher": "Edit",
+      "hooks": [{"type": "command", "command": "./security-hook.sh"}]
+    }]
+  }
+}
+```
+
+**Common Use Cases**
+- Auto-format code after edits (`prettier`, `black`, `gofmt`)
+- Block sensitive file modifications
+- Log AI interactions for compliance
+- Run linters before commits
+
+**Security Warning**
+
+Event commands run with full system access. Always review scripts before enabling. Test in isolated environments first.
+
+**Complete Implementation**
+
+See [examples/event-automation/](examples/event-automation/) for a working implementation with security scanning and hooks.
+
+**Anti-pattern: Unchecked Events**
+
+Running automation from untrusted sources without review exposes your system to malicious code execution and credential theft. Always audit event scripts before installation.
+
+---
+
+## Custom Commands
+
+**Maturity**: Intermediate
+**Description**: Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and sophisticated workflows.
+
+**Related Patterns**: [Event Automation](#event-automation), [Spec-Driven Development](#spec-driven-development), [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure)
+
+**Core Concept**
+
+AI coding tools provide built-in commands for common operations and support custom commands (markdown files with AI instructions) for project-specific workflows. Commands are manual/on-demand (invoked like `/refactor`), while events fire automatically (see [Event Automation](#event-automation)).
+
+**Command Discovery**
+
+Discover built-in commands first:
+
+```bash
+# Claude Code
+/help /model /clear /review
+
+# Cursor IDE
+Cmd+K /edit /chat
+
+# Gemini CLI
+/stats /memory /tools /clear
+```
+
+| Use Built-in Commands | Create [Custom Commands](#custom-commands) |
+|-----------------------|------------------------|
+| Generic operations (clear, help, model) | Domain expertise (refactoring, security analysis) |
+| Tool features (review, edit) | Project workflows (deploy, implement-spec) |
+| Universal commands | Team standards and conventions |
+
+**Example: Refactoring Assistant**
+
+Encode Martin Fowler's refactoring catalog for systematic code improvement:
+
+```markdown
+---
+description: Interactive refactoring assistant based on Martin Fowler's refactoring catalog
+argument-hint: Optional flags (--smell, --duplicates, --suggest)
+---
+
+# Refactoring Assistant
+
+You are helping a developer improve code maintainability by identifying code smells and recommending specific refactoring techniques from Martin Fowler's catalog.
+
+# Usage
+/refactor              # Full analysis
+/refactor --smell      # Code smells only
+
+# Implementation
+
+### 1. Code Smell Detection
+- Long methods (>20 lines), duplicate code, complex conditionals
+- For each: location (file:line), severity, specific refactoring, effort estimate
+
+### 2. Bloater Detection
+- Excessive parameters (>4), data clumps, primitive obsession
+
+### 3. Refactoring Strategy
+1. Name the code smell
+2. Recommend technique from Fowler's catalog
+3. Show before/after example
+4. Estimate maintainability improvement
+
+Generate step-by-step refactoring plan prioritized by impact.
+```
+
+**More Examples**
+
+Additional command examples with detailed implementations:
+
+- **[Implement-Spec](examples/custom-commands/implement-spec-example.md)** - Spec-driven implementation with TDD and traceability
+- **[Security Review](examples/custom-commands/security-review-example.md)** - Multi-layer security analysis (secrets, vulnerabilities, config)
+- **[Safe-Refactor](examples/custom-commands/safe-refactor-example.md)** - Safe refactoring with automated testing and rollback
+- **[Test Runner](examples/custom-commands/test-example.md)** - Smart test selection with coverage and health monitoring
+
+**Tool Support**
+
+```bash
+# Claude Code: .claude/commands/*.md
+mkdir -p .claude/commands
+cp examples/custom-commands/commands/*.md .claude/commands/
+
+# Cursor IDE: .cursorrules
+cat examples/custom-commands/commands/refactor.md >> .cursorrules
+
+# Generic: .ai/commands/ (tool-agnostic)
+mkdir -p .ai/commands
+cp examples/custom-commands/commands/*.md .ai/commands/
+```
+
+**Complete Implementation**
+
+See [examples/custom-commands/](examples/custom-commands/) for ready-to-use commands, configuration files, and setup guide.
+
+**Anti-pattern: Redundant Commands**
+
+Creating `/clear` when the tool already provides it. Always discover built-in commands first.
+
+**Anti-pattern: Shallow Commands**
+
+```markdown
+# Bad: Just wraps shell command
+Run: npm run deploy:staging
+
+# Good: Encodes expertise
+1. Verify staging environment health
+2. Check for active incidents
+3. Review recent commits for risk
+4. Run deployment with rollback plan
+```
+
+**Anti-pattern: Hardcoded Context**
+
+```markdown
+# Bad: Hardcoded values
+Deploy to prod-db-instance-1.us-east-1.rds.amazonaws.com
+
+# Good: Parameterized
+Deploy to database: $1 (default: $STAGING_DB)
+```
+
+---
+
+## Progressive Disclosure
+
+**Maturity**: Intermediate
+**Description**: Load AI assistant rules incrementally based on task context rather than bundling all instructions upfront, preventing context bloat and improving instruction-following consistency.
+
+**Related Patterns**: [Codified Rules](#codified-rules), [Context Persistence](#context-persistence), [Custom Commands](#custom-commands), [Event Automation](#event-automation), [Centralized Rules](#centralized-rules), [Context Optimization](experiments/README.md#context-optimization)
+
+**Core Problem**
+
+AI coding assistants already consume part of their context window with built-in system instructions. When a project loads a single, monolithic rules file (hundreds of lines) for every task, instruction-following accuracy drops and irrelevant guidance crowds out what the model needs right now.
+
+**Implementation Strategy: Three-Tier Rule Architecture**
+
+Keep a small universal rules file, and load specialized rules only when the task touches the relevant area:
+
+```
+.ai/
+├── CLAUDE.md                    # Universal rules only (<60 lines)
+├── rules/                       # Specialized rules loaded on-demand
+│   ├── security/                # secrets, auth, dependencies
+│   ├── development/             # api-design, database, testing
+│   ├── operations/              # deployment, monitoring, cicd
+│   └── architecture/            # patterns, performance
+└── prompts/                     # Reusable task templates
+```
+
+**Main Rules File = Router**
+
+The main file should explicitly tell the assistant what to load based on context:
+
+```markdown
+# AI Development Rules
+
+# Universal Principles (Always Apply)
+- Follow existing patterns in the codebase
+- Never commit secrets or credentials
+- Run tests after code changes
+
+# Progressive Disclosure (Context Loading)
+- **Security work** (auth/, .env, credentials): Read `.ai/rules/security/`
+- **API development** (api/, routes/): Read `.ai/rules/development/api-design.md`
+- **Database changes** (migrations/, models/): Read `.ai/rules/development/database.md`
+- **Testing** (tests/, specs/): Read `.ai/rules/development/testing.md`
+- **CI/CD** (.github/workflows/): Read `.ai/rules/operations/cicd.md`
+```
+
+**Automatic Loading with Hooks**
+
+Combine with [Event Automation](#event-automation) to auto-load the right rules before tool use:
+
+```bash
+#!/bin/bash
+# .ai/hooks/auto-load-context.sh
+
+FILE_PATH="$TOOL_INPUT_FILE_PATH"
+LOADED_RULES=""
+
+if echo "$FILE_PATH" | rg -q "(\\.env|credentials|secrets|auth/)"; then
+  LOADED_RULES="$LOADED_RULES .ai/rules/security/"
+fi
+
+if echo "$FILE_PATH" | rg -q "(api/|routes/|controllers/)"; then
+  LOADED_RULES="$LOADED_RULES .ai/rules/development/api-design.md"
+fi
+
+if echo "$FILE_PATH" | rg -q "(tests?/|spec/|\\.test\\.|\\.spec\\.)"; then
+  LOADED_RULES="$LOADED_RULES .ai/rules/development/testing.md"
+fi
+
+if [ -n "$LOADED_RULES" ]; then
+  echo "AI: Before proceeding, read these files: $LOADED_RULES"
+fi
+```
+
+**Complete Implementation**
+
+See [examples/progressive-disclosure/](examples/progressive-disclosure/) for templates and a ready-to-adapt rules router + directory layout.
+
+**Anti-pattern: Bloated Configuration**
+
+Loading a single, massive rules file for every task wastes context and reduces instruction-following accuracy—especially for small edits that need only a handful of universal rules.
+
+**Anti-pattern: Missing Guidance**
+
+Creating specialized rule files but never documenting when/how to load them forces humans to remember the routing and prevents consistent, automated context loading.
 
 ---
 
@@ -2022,7 +2403,7 @@ Operations patterns focus on CI/CD, security, compliance, and production managem
 **Maturity**: Advanced
 **Description**: Transform compliance requirements into executable policy files with AI assistance, ensuring regulatory requirements become testable code.
 
-**Related Patterns**: [Security Sandbox](#security-sandbox), [Codified Rules](#codified-rules)
+**Related Patterns**: [Security Sandbox](#security-sandbox), [Codified Rules](#codified-rules), [Centralized Rules](#centralized-rules)
 
 ```bash
 # Transform compliance requirements into executable policies
@@ -2049,7 +2430,7 @@ Hand-coding policies from written requirements introduces inconsistencies and in
 **Maturity**: Intermediate  
 **Description**: Aggregate multiple security tools and use AI to summarize findings for actionable insights, reducing alert fatigue while maintaining security rigor.
 
-**Related Patterns**: [Policy Generation](#policy-generation)
+**Related Patterns**: [Policy Generation](#policy-generation), [Centralized Rules](#centralized-rules)
 
 ```bash
 # Orchestrate multiple security tools
@@ -2070,6 +2451,58 @@ gh pr comment --body-file pr-comment.txt
 
 **Anti-pattern: Over-Alerting**
 Posting every low-severity finding buries real issues and frustrates developers.
+
+---
+
+### Centralized Rules
+
+**Maturity**: Advanced
+**Description**: Enforce organization-wide AI rules through a central Git repository that syncs language- and framework-specific guidance into standard assistant configuration files.
+
+**Related Patterns**: [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure), [Security Orchestration](#security-orchestration)
+
+**Core Implementation**
+
+**Sync-based Architecture** (Recommended):
+
+```
+Central Rules Repository (Git)
+  ├── base/universal-rules.md
+  ├── languages/ (python.md, typescript.md, go.md)
+  └── frameworks/ (react.md, django.md, fastapi.md)
+           ↓
+    [sync-ai-rules.sh]
+           ↓
+  Project Repository
+    ├── CLAUDE.md (auto-generated)
+    ├── AGENTS.md (auto-generated)
+    └── .cursorrules (auto-generated)
+```
+
+**How it works**:
+1. A central repository stores organization rules organized by language/framework.
+2. A sync script detects the project language/framework (from files and dependencies).
+3. The script generates standard configuration files that common assistants read automatically.
+
+**Key benefits**:
+- ✅ Works with existing AI tools (no gateway required)
+- ✅ Offline-friendly after initial sync
+- ✅ Version-controlled and auditable in Git
+- ✅ Language-aware via auto-detection
+
+**Alternative: Gateway Strategy** (advanced use cases)
+
+For organizations needing request/response filtering, policy enforcement, or usage logging, use the gateway approach:
+- [Gateway Strategy](examples/centralized-rules/gateway-strategy/README-GATEWAY.md)
+
+**Complete Implementation**
+
+- [Sync Strategy](examples/centralized-rules/sync-strategy/) - Simple Git-based sync (recommended)
+- [Gateway Strategy](examples/centralized-rules/gateway-strategy/README-GATEWAY.md) - Central policy + logging + filters
+
+**Anti-pattern: Scattered Configuration**
+
+Copying AI rules into every repository without a central source causes drift, inconsistent enforcement, and manual update toil across teams.
 
 ---
 

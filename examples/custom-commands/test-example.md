@@ -104,5 +104,5 @@ git diff --name-only HEAD~1 HEAD
 
 ## Related Patterns
 
-- [Testing Orchestration](../../README.md#testing-orchestration)
-- [Suite Health](../../README.md#suite-health)
+- [Testing Orchestration](../../experiments/README.md#testing-orchestration)
+- [Suite Health](../../experiments/README.md#suite-health)

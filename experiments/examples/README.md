@@ -7,12 +7,9 @@ This directory contains working implementations of selected experimental pattern
 | Experimental Pattern | Example Directory | Notes |
 |----------------------|------------------|-------|
 | [Asynchronous Research](../README.md#asynchronous-research) | [`asynchronous-research/`](asynchronous-research/) | Fire-and-forget research workflows |
-| [Centralized Rules](../README.md#centralized-rules) | [`centralized-rules/`](centralized-rules/) | Gateway-style enforcement and distribution |
-| [Custom Commands](../README.md#custom-commands) | [`custom-commands/`](custom-commands/) | Extend assistants with project-specific commands |
 | [Debt Forecasting](../README.md#debt-forecasting) | [`debt-forecasting/`](debt-forecasting/) | Proactive technical debt analysis |
 | [Deployment Synthesis](../README.md#deployment-synthesis) | [`deployment-synthesis/`](deployment-synthesis/) | Generate validated deployment configurations |
 | [Drift Remediation](../README.md#drift-remediation) | [`drift-remediation/`](drift-remediation/) | Detect and correct infrastructure drift |
-| [Event Automation](../README.md#event-automation) | [`event-automation/`](event-automation/) | Automate actions at assistant lifecycle events |
 | [Handoff Protocols](../README.md#handoff-protocols) | [`handoff-protocols/`](handoff-protocols/) | Human ↔ AI handoff decisioning and procedures |
 | [Incident Automation](../README.md#incident-automation) | [`incident-automation/`](incident-automation/) | Generate incident response playbooks |
 | [Pipeline Synthesis](../README.md#pipeline-synthesis) | [`pipeline-synthesis/`](pipeline-synthesis/) | Convert build specs into pipeline configs |
