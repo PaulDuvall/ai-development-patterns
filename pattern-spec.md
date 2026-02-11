@@ -7,7 +7,7 @@ This document defines the standard structure, content requirements, and formatti
 ### Complete Pattern Reference Table
 The main documentation MUST include a comprehensive reference table at the beginning that:
 - Lists ALL patterns in the collection
-- Includes maturity level, category, description, and dependencies for each pattern
+- Includes maturity level, category, type, description, and dependencies for each pattern
 - Provides internal reference links to each pattern using format:
   ```markdown
   [Pattern Name](#pattern-name-anchor)
@@ -16,10 +16,11 @@ The main documentation MUST include a comprehensive reference table at the begin
 - Uses sub-category headers for Operations patterns (Security & Compliance, Deployment Automation, Monitoring & Maintenance)
 
 ### Internal Reference Links
-- EVERY pattern mentioned anywhere in the document MUST be hyperlinked to its section
+- EVERY pattern mentioned in prose anywhere in the document MUST be hyperlinked to its section
 - Use consistent anchor format: `#pattern-name-in-lowercase-with-hyphens`
 - Ensure all internal links work correctly throughout the document
 - Pattern names in "Related Patterns" sections MUST always be hyperlinked
+- Pattern references inside code blocks and inline code (for example `examples/pattern-name/`) are exempt from hyperlink requirements
 
 ## Pattern Structure
 
@@ -50,6 +51,12 @@ Patterns are organized into three main categories:
 - **Development Patterns**: Daily coding workflows and tactical approaches
 - **Operations Patterns**: CI/CD, security, compliance, and production management
   - Sub-categories: Security & Compliance, Deployment Automation, Monitoring & Maintenance
+
+To avoid taxonomy drift, use these metadata fields consistently:
+
+- **Category** (required): `Foundation | Development | Operations`
+- **Type** (required in reference table): `Foundation | Development | Workflow | Operations`
+- **Rule**: Category determines placement in the progression (Foundation -> Development -> Operations). Type describes the pattern's operational nature (for example, process-centric patterns may use `Workflow` as Type while still belonging to a Category section).
 
 ## Content Requirements
 
@@ -110,10 +117,12 @@ All antipattern names MUST follow these strict conventions:
    - Use: Negative adjectives (Premature, Reckless, Static, Manual, Scattered)
    - Example: "Broken Context", "Blind Generation", "Over-Alerting"
 
-2. **Two words, Title Case**
+2. **Exactly two words OR one hyphenated compound, Title Case**
    - Same format as pattern names
+   - Hyphenated compounds count as one word
    - Negative prefix counts as part of the first word
    - Example: "Uncoordinated Agents" (not "Un Coordinated Agents")
+   - Example: "Over-Alerting" (single hyphenated compound form)
 
 3. **Must imply a failure mode or misuse of a valid pattern**
    - Should describe what went wrong, not just criticize
@@ -121,7 +130,7 @@ All antipattern names MUST follow these strict conventions:
    - Example: "Lazy Testing" is judgmental (avoid)
 
 4. **Symmetrical with positive patterns where logical**
-   - Pattern: "Spec-Driven Development" → Antipattern: "Spec-Ignored"
+   - Pattern: "Spec-Driven Development" → Antipattern: "Spec Neglect"
    - Pattern: "Pipeline Synthesis" → Antipattern: "Manual Pipelines"
    - Pattern: "Workflow Orchestration" → Antipattern: "Chaotic Orchestration"
    - Symmetry helps learners understand the contrast
@@ -148,9 +157,9 @@ All antipattern names MUST follow these strict conventions:
 |------------------|-----------|---------------|
 | AI Readiness Assessment | 3 words, "AI" redundant | Readiness Assessment |
 | Comprehensive AI Testing Strategy | 4 words, vague | Testing Orchestration |
-| AI-Guided Blue-Green Deployment | 4 words, too specific | Deployment Synthesis |
+| AI-Guided Blue-Green Deployment | 3 words (hyphen compounds count as one), too specific | Deployment Synthesis |
 | Rules as Code | 3 words, preposition | Codified Rules |
-| Constraint-Based AI Development | 4 words, "AI" redundant | Constrained Generation |
+| Constraint-Based AI Development | 3 words (hyphen compounds count as one), "AI" redundant | Constrained Generation |
 
 #### Examples of Good Antipattern Names
 
@@ -158,9 +167,9 @@ All antipattern names MUST follow these strict conventions:
 |------------------|--------|--------------|
 | Broken Context | Negative + Noun | "Broken" prefix, describes failure mode |
 | Blind Generation | Negative + Noun | "Blind" prefix, technical focus |
-| Over-Alerting | Negative + Noun | "Over-" prefix, clear excess problem |
+| Over-Alerting | Hyphenated compound | "Over-" prefix, clear excess problem |
 | Uncoordinated Agents | Negative + Noun | "Un-" prefix, symmetrical with "Parallel Agents" |
-| Spec-Ignored | Negative + Noun | Symmetrical with "Spec-Driven Development" pattern |
+| Spec Neglect | Noun + failure mode | Symmetrical with "Spec-Driven Development" pattern |
 
 #### Examples of Antipattern Names Violating Rules
 
@@ -168,7 +177,7 @@ All antipattern names MUST follow these strict conventions:
 |----------------------|-----------|---------------|
 | Rushing Into AI | 3 words, no clear prefix | Premature Adoption |
 | Test Generation Without Strategy | 4 words, no negative prefix | Scattered Testing |
-| Kitchen Sink Upload | 3 words, informal/humorous | Overwhelming Visuals |
+| Kitchen Sink Upload | 3 words, informal/humorous | Excessive Context |
 | Analysis Paralysis | No negative prefix (common phrase) | Over-Analysis |
 | Blue-Green-Canary Confusion | 3+ words, too specific | Confused Deployment |
 
@@ -176,7 +185,7 @@ All antipattern names MUST follow these strict conventions:
 
 Before finalizing a pattern name, verify:
 
-- [ ] Exactly 2 words
+- [ ] Exactly 2 words (hyphenated compounds count as one word; "-Driven Development" special case allowed)
 - [ ] Title Case formatting
 - [ ] Noun+Noun or Adj+Noun format
 - [ ] No "AI" prefix (redundant in AI development context)
@@ -190,7 +199,7 @@ Before finalizing a pattern name, verify:
 
 Before finalizing an antipattern name, verify:
 
-- [ ] Exactly 2 words
+- [ ] Exactly 2 words OR one hyphenated compound
 - [ ] Has negative/cautionary prefix or adjective
 - [ ] Describes technical failure mode
 - [ ] Not judgmental or humorous
@@ -217,7 +226,7 @@ Before finalizing an antipattern name, verify:
 - Keep primary examples concise and scannable (aim for clarity over strict line limits)
 - Use real commands, file paths, and tool names to show the pattern's essence
 - Show the most critical code snippets that illustrate the core concept
-- ALWAYS reference detailed implementations in `examples/pattern-name/` directories for complete working code
+- For complex patterns with extended implementations, reference `examples/pattern-name/` directories for complete working code
 - Focus on the most important use cases that capture the pattern's value
 - Complex patterns may include multiple examples if they address different aspects (e.g., workflow diagrams + code examples + configuration)
 
@@ -225,18 +234,18 @@ Before finalizing an antipattern name, verify:
 - Name the anti-pattern with a descriptive title
 - Explain why it's problematic
 - Provide specific consequences
-- Examples: "Manual Policy Translation", "Alert Fatigue", "Blind Chaos Testing"
+- Examples: "Policy Drift", "Alert Fatigue", "Blind Testing"
 
 ### Pattern Length Guidelines
 
-**Recommended maximum lengths:**
-- **Complete pattern**: 200-400 lines (target), 600 lines (max before splitting)
+**Recommended maximum lengths (primary metric = words):**
+- **Complete pattern**: 1,200-2,400 words (target), 3,500 words (max before splitting)
 - **Description**: 1-2 sentences
-- **Core implementation**: 150-300 lines
-- **Individual anti-patterns**: 50-100 lines each
+- **Core implementation**: 700-1,500 words
+- **Individual anti-patterns**: 250-500 words each
 - **Code examples in README**: 30-50 lines max
 
-**When a pattern exceeds 600 lines:**
+**When a pattern exceeds 3,500 words:**
 1. Review for unnecessary repetition or verbosity
 2. Move detailed implementations to `examples/pattern-name/` directory
 3. Consider splitting into multiple focused patterns
@@ -247,12 +256,12 @@ Before finalizing an antipattern name, verify:
 **Enforcement Strategy**
 
 For AI-generated patterns:
-1. **Auto-warning at 500+ lines**: "This pattern is getting long. Review for bloat."
-2. **Hard review at 600+ lines**: "Consider splitting or moving detail to examples/"
-3. **Guidance**: "Each additional 100 lines should add significant new value"
+1. **Auto-warning at 3,000+ words**: "This pattern is getting long. Review for bloat."
+2. **Hard review at 3,500+ words**: "Consider splitting or moving detail to examples/"
+3. **Guidance**: "Each additional 200 words should add significant new value"
 
 **Quality over quantity:**
-- ✅ 300 well-focused lines > 600 lines with repetition
+- ✅ 1,500 well-focused words > 3,500 words with repetition
 - ✅ Clear core examples > exhaustive scenario coverage
 - ✅ Scannable structure > comprehensive documentation
 
@@ -313,17 +322,18 @@ graph LR
   ```markdown
   [Pattern Name](#pattern-name-anchor)
   ```
-- This applies to: Reference table, Related Patterns sections, pattern mentions in descriptions, implementation examples, and any other pattern references
+- This applies to: Reference table, Related Patterns sections, pattern mentions in descriptions, implementation examples, and any other prose pattern references
 - External links should include brief context
 - Ensure all internal links work correctly
-- Use consistent anchor naming: convert pattern names to lowercase with hyphens replacing spaces and special characters
+- Use consistent anchor naming: convert pattern names to lowercase, replace spaces with hyphens, and remove non-alphanumeric punctuation except hyphens
+- To avoid renderer differences, prefer explicit, stable anchors for headings when supported by the documentation tooling
 
 ### Examples
 - Each pattern should include focused examples that demonstrate the core concept clearly
 - Keep README examples concise and scannable (prioritize clarity and understanding)
 - Show the pattern's essence and core value proposition with practical detail
 - For complex patterns, create `examples/pattern-name/` directories with complete working code
-- ALWAYS reference detailed implementations using non-clickable code formatting (so the spec itself never contains broken links), for example:
+- When an `examples/pattern-name/` directory exists, reference it using non-clickable code formatting (so the spec itself never contains broken links), for example:
   ```markdown
   Complete Example: See `examples/pattern-name/` for a full implementation.
   ```
@@ -390,7 +400,7 @@ For experimental or future patterns not yet ready for the main documentation:
 
 ### Reference Table Requirements
 - MUST be the first major section after introduction/overview
-- Include maturity level, category, and brief description for each pattern
+- Include maturity level, category, type, and brief description for each pattern
 - List primary dependencies for each pattern
 - Organize by logical grouping (Foundation → Development → Operations)
 - Every pattern name MUST be a working hyperlink to its section
@@ -429,6 +439,7 @@ Before adding a new pattern, verify:
 - [ ] Follows exact header structure
 - [ ] Has clear, single-sentence description
 - [ ] Includes appropriate maturity level
+- [ ] Includes valid Category and Type metadata
 - [ ] Contains focused working examples that demonstrate the core concept
 - [ ] Defines specific anti-pattern with clear explanation
 - [ ] Uses correct markdown formatting
@@ -443,7 +454,7 @@ Before adding a new pattern, verify:
 - [ ] Writing is clear and concise
 - [ ] Fits logically within existing pattern organization
 - [ ] Added to Complete Pattern Reference table with correct hyperlink
-- [ ] All pattern references throughout document are hyperlinked
+- [ ] All prose pattern references throughout document are hyperlinked
 - [ ] Internal anchor link works correctly from reference table
 - [ ] Examples are focused and demonstrate different essential aspects when multiple are included
 
