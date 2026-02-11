@@ -37,6 +37,8 @@ These experimental patterns extend the core AI development patterns with advance
 | **[Evidence Automation](#evidence-automation)** | Advanced | Operations | Generate audit evidence matrices from logs and configuration changes automatically | Security Orchestration |
 | **[Context Optimization](#context-optimization)** | Advanced | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive Enhancement |
 | **[Asynchronous Research](#asynchronous-research)** | Intermediate | Development | Use fire-and-forget coding agents in dedicated repositories to conduct autonomous code investigations that prove technical feasibility through executable experiments | Parallel Agents, Context Persistence, Choice Generation |
+| **[Long-Running Orchestration](#long-running-orchestration)** | Advanced | Workflow | Coordinate agents working autonomously for hours or days, maintaining coherent state across sessions with strategic human checkpoints | Parallel Agents, Context Persistence, Workflow Orchestration |
+| **[Autonomous Defense](#autonomous-defense)** | Advanced | Operations | Deploy AI agents for real-time security threat detection and automated response at machine speed to match the pace of autonomous threats | Security Orchestration, Incident Automation |
 
 ---
 
@@ -700,6 +702,227 @@ Simon's caveat: *"They can't prove something is impossible—just because the co
 
 ---
 
+### Long-Running Orchestration
+
+**Maturity**: Advanced
+**Description**: Coordinate agents working autonomously for hours or days, maintaining coherent state across work sessions with strategic human checkpoints and failure recovery.
+
+**Related Patterns**: [Parallel Agents](../README.md#parallel-agents), [Context Persistence](../README.md#context-persistence), [Workflow Orchestration](#workflow-orchestration), [Handoff Protocols](#handoff-protocols)
+
+**Source**: [Anthropic 2026 Agentic Coding Trends Report](https://resources.anthropic.com/hubfs/2026%20Agentic%20Coding%20Trends%20Report.pdf) (Trend 3: Long-running agents build complete systems)
+
+#### Core Concept
+
+Early agents handled one-shot tasks in minutes. Long-running orchestration enables agents to work autonomously for extended periods—building entire applications and systems with minimal human intervention focused on strategic oversight at key decision points.
+
+**Key shift**: Task horizons expand from minutes to days or weeks. Agents plan, iterate, and refine across dozens of work sessions, adapting to discoveries, recovering from failures, and maintaining coherent state throughout complex projects.
+
+**Long-Running Orchestration Lifecycle**
+
+```mermaid
+graph TD
+    A[Project Backlog] --> B[Agent Session Start]
+    B --> C[Autonomous Work Phase]
+    C --> D{Checkpoint Trigger?}
+    D -->|Time-based| E[State Snapshot]
+    D -->|Task boundary| E
+    D -->|Uncertainty detected| F[Human Checkpoint]
+    D -->|Failure| G[Recovery Protocol]
+    E --> C
+    F --> H{Human Decision}
+    H -->|Continue| C
+    H -->|Redirect| I[Adjust Plan]
+    I --> C
+    H -->|Stop| J[Graceful Shutdown]
+    G --> K{Recoverable?}
+    K -->|Yes| L[Rollback to Last Good State]
+    L --> C
+    K -->|No| F
+
+    style C fill:#e1f5e1
+    style F fill:#ffe6e6
+    style G fill:#ffe6e6
+```
+
+#### Implementation
+
+**1. Session State Persistence**
+
+Maintain coherent state across agent restarts and context window resets:
+
+```markdown
+# .agent/session-state.md
+
+## Current Session
+- **Session ID**: session-2026-02-10-001
+- **Started**: 2026-02-10T08:00:00Z
+- **Phase**: Implementation (3 of 5)
+- **Completed Tasks**: 12/23
+
+## Active Context
+- Working on: Payment service integration
+- Blocked by: None
+- Last checkpoint: 2026-02-10T14:30:00Z (all tests passing)
+
+## Decision Log
+- 14:15: Chose Redis Streams over Kafka for event bus (lower ops complexity)
+- 11:30: Switched from REST to gRPC for inter-service calls (latency requirements)
+
+## Recovery Points
+- checkpoint-003: Pre-payment-integration (clean, tests green)
+- checkpoint-002: Post-auth-service (clean, tests green)
+- checkpoint-001: Initial scaffold (clean)
+```
+
+**2. Checkpoint Strategy**
+
+```bash
+# Define checkpoint triggers in agent configuration
+# .agent/orchestration.yml
+checkpoints:
+  time_based:
+    interval: 2h              # Snapshot every 2 hours
+    actions: [commit, test, report]
+
+  task_boundary:
+    on: task_complete          # Checkpoint between tasks
+    actions: [commit, test, update_state]
+
+  uncertainty:
+    confidence_threshold: 0.6  # Escalate to human below 60% confidence
+    actions: [pause, notify_human, wait_for_input]
+
+  failure:
+    max_retries: 3             # Three-strike rule
+    actions: [rollback, notify_human, create_handoff]
+
+recovery:
+  strategy: rollback_to_last_green
+  state_dir: .agent/checkpoints/
+  max_checkpoints: 10
+```
+
+**3. Backlog-Driven Autonomous Execution**
+
+```bash
+#!/bin/bash
+# agent-runner.sh - Long-running agent with checkpoint management
+
+SESSION_ID="session-$(date +%Y%m%d-%H%M%S)"
+CHECKPOINT_DIR=".agent/checkpoints"
+STATE_FILE=".agent/session-state.md"
+mkdir -p "$CHECKPOINT_DIR"
+
+# Create checkpoint before each task
+create_checkpoint() {
+    local name="$1"
+    git add -A && git commit -m "checkpoint: $name [$SESSION_ID]"
+    git tag "checkpoint-$SESSION_ID-$(date +%s)"
+    cp "$STATE_FILE" "$CHECKPOINT_DIR/$name.md"
+    echo "Checkpoint created: $name"
+}
+
+# Recover from failure
+recover() {
+    local last_good=$(git tag -l "checkpoint-$SESSION_ID-*" | tail -1)
+    if [ -n "$last_good" ]; then
+        echo "Rolling back to: $last_good"
+        git checkout "$last_good" -- .
+        return 0
+    fi
+    return 1
+}
+
+# Process backlog items sequentially with checkpoints
+while read -r task; do
+    echo "Starting task: $task"
+    create_checkpoint "pre-$task"
+
+    # Agent executes task with retry logic
+    attempts=0
+    while [ $attempts -lt 3 ]; do
+        if ai "Execute task: $task
+            Context: $(cat $STATE_FILE)
+            Constraints: Run tests after changes, commit atomically"; then
+            create_checkpoint "post-$task"
+            break
+        fi
+        attempts=$((attempts + 1))
+        echo "Attempt $attempts failed for: $task"
+        recover
+    done
+
+    if [ $attempts -eq 3 ]; then
+        echo "Task failed after 3 attempts: $task"
+        ai "Create HANDOFF.md for blocked task: $task"
+        # Notify human and continue with next task
+    fi
+done < backlog.txt
+```
+
+**4. Human Checkpoint Protocol**
+
+```bash
+# Periodic human review of autonomous work
+ai "Generate progress report for human checkpoint:
+
+1. Tasks completed since last review (with test results)
+2. Architectural decisions made (with rationale)
+3. Current blockers or uncertainties
+4. Remaining backlog estimate
+5. Any deviations from original plan
+
+Format for 2-minute executive review."
+```
+
+#### When to Use Long-Running Orchestration
+
+- **Multi-day feature builds**: Complete features or applications spanning multiple work sessions
+- **Technical debt elimination**: Agents systematically working through debt backlogs
+- **Large-scale migrations**: Database migrations, API versioning, framework upgrades
+- **Greenfield applications**: Building entire applications from specifications
+
+#### Case Study
+
+From the Anthropic report: Rakuten engineers tested Claude Code on a complex task—implementing a specific activation vector extraction method in vLLM, a massive open-source library with 12.5 million lines of code in multiple programming languages. Claude Code finished the entire job in seven hours of autonomous work in a single run. The implementation achieved 99.9% numerical accuracy compared to the reference method.
+
+#### Anti-pattern: Unmonitored Autonomy
+
+Running agents for extended periods without checkpoint strategies, state persistence, or human review cadence.
+
+**Why it's problematic:**
+- Agents can drift from requirements over long sessions
+- Failures compound without early detection
+- Context window resets lose critical decision history
+- No rollback points when something goes wrong
+
+```bash
+# Bad: Fire and forget for days
+ai "Build the entire payment system" &  # No checkpoints, no monitoring
+
+# Good: Structured autonomy with checkpoints
+./agent-runner.sh \
+  --backlog backlog.txt \
+  --checkpoint-interval 2h \
+  --human-review-cadence 4h \
+  --max-retries 3 \
+  --state-dir .agent/
+```
+
+#### Anti-pattern: Brittle Sessions
+
+Relying on a single context window for multi-day work without external state persistence, causing complete context loss on restart.
+
+```bash
+# Bad: All state lives in the conversation
+# (Context window resets = lost decisions, duplicated work)
+
+# Good: Externalize state to files that survive restarts
+# session-state.md, DECISIONS.log, TODO.md, checkpoints/
+```
+
+---
+
 ## Operations Automation
 
 ### Review Automation
@@ -1193,3 +1416,307 @@ Format as audit-ready evidence matrix with timestamps and responsible parties."
 
 **Anti-pattern: Manual Evidence**
 Manually gathering compliance evidence during audits instead of continuously collecting and organizing audit trail data.
+
+---
+
+### Autonomous Defense
+
+**Maturity**: Advanced
+**Description**: Deploy AI agents for real-time security threat detection and automated response at machine speed to match the pace of autonomous threats.
+
+**Related Patterns**: [Security Orchestration](../README.md#security-orchestration), [Incident Automation](#incident-automation), [Security Sandbox](../README.md#security-sandbox), [Event Automation](../README.md#event-automation)
+
+**Source**: [Anthropic 2026 Agentic Coding Trends Report](https://resources.anthropic.com/hubfs/2026%20Agentic%20Coding%20Trends%20Report.pdf) (Trend 8: Dual-use risk requires security-first architecture)
+
+#### Core Concept
+
+As AI agents become more capable, the same capabilities that help defenders also empower attackers. Traditional security workflows—aggregate findings, create tickets, wait for human review—are too slow against autonomous threats. Autonomous Defense uses AI agents to detect, triage, and respond to security events at machine speed, escalating to humans only for strategic decisions.
+
+**Key insight from the report**: "Automated agentic systems enable security responses at machine speed, automating detection and response to match the pace of autonomous threats." Teams that use agentic tools to bake security in from the start will be better positioned to defend against adversaries using the same technology.
+
+**How Autonomous Defense differs from existing security patterns:**
+
+| Pattern | Focus | Response Time | Human Role |
+|---------|-------|---------------|------------|
+| [Security Orchestration](../README.md#security-orchestration) | Aggregate tool findings, AI summarizes | Minutes-hours (batch) | Reviews all findings |
+| [ChatOps Security](#chatops-security) | On-demand scanning via chat | Minutes (on-demand) | Initiates scans |
+| **Autonomous Defense** | **Real-time detection + automated response** | **Seconds (continuous)** | **Strategic oversight only** |
+
+**Autonomous Defense Workflow**
+
+```mermaid
+graph TD
+    A[Continuous Monitoring] --> B[AI Threat Detection Agent]
+    B --> C{Threat Classification}
+    C -->|Known Pattern| D[Automated Response]
+    C -->|Novel Pattern| E[AI Triage Agent]
+    C -->|Critical/Ambiguous| F[Human Escalation]
+
+    D --> G[Execute Playbook]
+    G --> H[Log & Report]
+
+    E --> I{Confidence Level}
+    I -->|High| D
+    I -->|Medium| J[Contain + Alert]
+    I -->|Low| F
+
+    F --> K[Human Decision]
+    K --> L[Update Response Playbooks]
+    L --> B
+
+    H --> M[Feedback Loop]
+    M --> B
+
+    style D fill:#e1f5e1
+    style F fill:#ffe6e6
+    style J fill:#f9e79f
+```
+
+#### Implementation
+
+**1. Defense Agent Architecture**
+
+```yaml
+# .security/autonomous-defense.yml
+defense_agents:
+  detection:
+    description: "Continuous monitoring of code changes, dependencies, and runtime"
+    sources:
+      - git_commits          # New code analysis
+      - dependency_updates   # Supply chain monitoring
+      - runtime_logs         # Application behavior anomalies
+      - network_traffic      # Unusual API patterns
+    scan_interval: "continuous"
+
+  triage:
+    description: "Classify threats and determine response"
+    confidence_thresholds:
+      auto_respond: 0.95     # High confidence → automated response
+      contain_alert: 0.75    # Medium → contain and alert team
+      human_escalate: 0.0    # Low confidence → human decision
+
+  response:
+    description: "Execute automated countermeasures"
+    playbooks:
+      credential_leak:
+        actions: [rotate_secrets, revoke_tokens, audit_access, notify_team]
+        max_auto_response_time: 30s
+      dependency_vulnerability:
+        actions: [block_deploy, create_patch_pr, notify_team]
+        max_auto_response_time: 60s
+      anomalous_behavior:
+        actions: [isolate_service, capture_forensics, escalate_human]
+        max_auto_response_time: 15s
+
+escalation:
+  channels: [pagerduty, slack_security]
+  require_human_for:
+    - infrastructure_changes
+    - data_access_modifications
+    - novel_attack_patterns
+    - false_positive_overrides
+```
+
+**2. Real-Time Threat Detection**
+
+```bash
+#!/bin/bash
+# defense-agent.sh - Continuous security monitoring with AI triage
+
+# Monitor git pushes for security issues in real-time
+monitor_commits() {
+    ai "Analyze this commit for security threats:
+
+    Commit: $(git log -1 --format='%H %s')
+    Diff: $(git diff HEAD~1 --stat)
+    Changed files: $(git diff HEAD~1 --name-only)
+
+    Check for:
+    1. Hardcoded secrets or API keys
+    2. SQL injection vulnerabilities
+    3. Dependency version downgrades
+    4. Permission escalation patterns
+    5. Suspicious file additions (.env, certificates, key files)
+    6. Known CVE patterns in new dependencies
+
+    Classify: CRITICAL / WARNING / CLEAN
+    If CRITICAL: specify immediate response actions
+    Output as structured JSON."
+}
+
+# Monitor dependency changes for supply chain attacks
+monitor_dependencies() {
+    ai "Analyze dependency changes for supply chain risks:
+
+    Lock file diff: $(git diff HEAD~1 -- '*lock*' '*requirements*' '*package*')
+
+    Check for:
+    1. New packages from unknown publishers
+    2. Version downgrades (potential rollback attacks)
+    3. Typosquatting (similar names to popular packages)
+    4. Packages with post-install scripts
+    5. Known compromised package versions
+    6. Unusual maintainer changes
+
+    Risk level: HIGH / MEDIUM / LOW
+    If HIGH: block deployment pipeline and alert team."
+}
+
+# Automated response for detected threats
+respond_to_threat() {
+    local threat_type="$1"
+    local severity="$2"
+    local context="$3"
+
+    case "$threat_type" in
+        "credential_leak")
+            echo "Rotating affected credentials..."
+            ./scripts/rotate-secrets.sh "$context"
+            ./scripts/revoke-active-tokens.sh
+            ./scripts/audit-recent-access.sh > forensics.log
+            notify_team "CRITICAL: Credential leak detected and mitigated"
+            ;;
+        "vulnerable_dependency")
+            echo "Blocking deployment pipeline..."
+            gh workflow disable deploy.yml
+            ai "Generate patch PR to update vulnerable dependency:
+                Vulnerability: $context
+                Create minimal fix with tests."
+            notify_team "WARNING: Vulnerable dependency blocked, patch PR created"
+            ;;
+        "anomalous_pattern")
+            echo "Isolating affected service..."
+            kubectl scale deployment "$context" --replicas=0
+            kubectl logs deployment/"$context" --since=1h > forensics.log
+            notify_team "CRITICAL: Anomalous behavior detected, service isolated"
+            ;;
+    esac
+}
+```
+
+**3. Proactive Security Hardening**
+
+```bash
+# AI agent continuously improves security posture
+ai "Perform proactive security hardening analysis:
+
+1. Scan codebase for OWASP Top 10 patterns
+2. Review IAM policies for least-privilege violations
+3. Check container configurations for security misconfigurations
+4. Validate network policies and firewall rules
+5. Audit logging coverage for forensic completeness
+
+For each finding:
+- Severity (CRITICAL/HIGH/MEDIUM/LOW)
+- Specific file and line number
+- Recommended fix with code snippet
+- Whether fix can be auto-applied safely
+
+Auto-apply LOW-risk fixes. Create PRs for MEDIUM. Alert for HIGH/CRITICAL."
+```
+
+**4. CI/CD Security Gate Integration**
+
+```yaml
+# .github/workflows/security-defense.yml
+name: Autonomous Security Defense
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+  schedule:
+    - cron: '0 */4 * * *'  # Every 4 hours
+
+jobs:
+  threat-detection:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: AI Threat Analysis
+        run: |
+          # Analyze changes for security threats
+          ai "Analyze all changes since last successful scan:
+          $(git diff ${{ github.event.before }}..HEAD)
+
+          Check for: secrets, vulnerabilities, supply chain risks
+          Output: JSON with threat_level, findings, recommended_actions"
+
+      - name: Dependency Supply Chain Check
+        run: |
+          ai "Audit all dependency changes for supply chain risks:
+          $(git diff ${{ github.event.before }}..HEAD -- '*lock*' '*requirements*')
+
+          Flag: typosquatting, version downgrades, unknown publishers"
+
+      - name: Automated Response
+        if: failure()
+        run: |
+          # Block deployment and notify team
+          gh workflow disable deploy.yml
+          gh issue create --title "Security: Autonomous defense triggered" \
+            --body "$(cat security-findings.json)"
+```
+
+#### When to Use Autonomous Defense
+
+- **High-value targets**: Applications handling financial data, PII, or critical infrastructure
+- **Rapid deployment cycles**: When deployment frequency outpaces manual security review capacity
+- **Supply chain exposure**: Projects with large dependency trees vulnerable to supply chain attacks
+- **Compliance requirements**: Environments requiring continuous security monitoring (SOC 2, PCI-DSS)
+- **Adversarial environments**: Systems likely to face automated/AI-powered attacks
+
+#### Security Democratization
+
+The Anthropic report notes that "security knowledge becomes democratized" with AI agents—any engineer can deliver in-depth security reviews, hardening, and monitoring that previously required specialized expertise. This pattern operationalizes that prediction by embedding security agents directly into the development workflow.
+
+#### Anti-pattern: Passive Scanning
+
+Relying on periodic batch security scans (weekly/monthly) instead of continuous real-time monitoring, leaving windows where threats go undetected.
+
+```bash
+# Bad: Weekly cron job that generates a report nobody reads
+0 0 * * 0 ./run-security-scan.sh > /var/log/security-weekly.log
+
+# Good: Continuous monitoring with automated response
+# - Every commit analyzed in real-time
+# - Every dependency change evaluated for supply chain risk
+# - Automated containment for high-confidence threats
+# - Human escalation for novel or ambiguous patterns
+```
+
+**Why it's problematic:**
+- Attackers exploit the gap between scans
+- Alert backlogs create review fatigue
+- Remediation happens days or weeks after introduction
+- No automated response capability
+
+#### Anti-pattern: Unchecked Response
+
+Allowing defense agents to take drastic automated actions (shutting down production services, revoking all access tokens) without confidence thresholds, blast radius limits, or human escalation paths.
+
+```yaml
+# Bad: Automated response with no guardrails
+response:
+  on_any_threat: shutdown_everything  # No confidence check, no limits
+
+# Good: Tiered response with guardrails
+response:
+  high_confidence_known_threat:
+    actions: [rotate_credentials, block_deploy]
+    require_human: false
+  medium_confidence:
+    actions: [contain, alert]
+    require_human: within_15_minutes
+  low_confidence_or_novel:
+    actions: [log, alert]
+    require_human: true  # Always escalate
+```
+
+**Why it's problematic:**
+- False positives cause outages
+- Over-aggressive response is a denial-of-service against yourself
+- No human oversight for novel situations
+- Can mask real attacks behind automated noise
