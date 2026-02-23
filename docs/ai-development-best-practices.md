@@ -120,27 +120,74 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 50. **Chaos Engineering for AI Systems**: Apply chaos engineering principles to AI systems by introducing controlled failures in AI model responses, degraded model performance, and service dependencies.
 
+## Version Control Security
+
+51. **Signed Commits**: Configure Git to sign all commits and tags using SSH keys to verify author identity and prevent commit spoofing. Anyone can set `user.name` and `user.email` to impersonate another committer — signed commits prove authenticity and display a "Verified" badge on GitHub.
+
+    **SSH signing setup (recommended):**
+    ```bash
+    git config --global gpg.format ssh
+    git config --global user.signingkey ~/.ssh/id_ed25519
+    git config --global commit.gpgsign true
+    git config --global tag.gpgSign true
+    ```
+
+    **GitHub requirement:** Upload the same SSH public key as a **Signing Key** under *Settings > SSH and GPG keys* (this is a separate entry from the Authentication Key).
+
+    **Enforcement:** Enable *"Require signed commits"* in GitHub branch protection rules for all protected branches.
+
+    **Verification:**
+    ```bash
+    git log --show-signature -1
+    git verify-commit HEAD
+    ```
+
+52. **Unicode and Trojan Source Scanning**: Add automated CI/CD checks that reject commits containing invisible Unicode control characters — bidirectional overrides (U+202A, U+202E, U+2066–U+2069), zero-width joiners/non-joiners, and homoglyph substitutions — which attackers use to make malicious code visually appear benign (CVE-2021-42574).
+
+    **Example CI step (GitHub Actions):**
+    ```yaml
+    - name: Scan for Trojan Source characters
+      run: |
+        if grep -rPn '[\x{200B}\x{200C}\x{200D}\x{2060}\x{FEFF}\x{202A}-\x{202E}\x{2066}-\x{2069}]' \
+          --include='*.py' --include='*.js' --include='*.ts' --include='*.go' \
+          --include='*.java' --include='*.rb' --include='*.rs' .; then
+          echo "ERROR: Suspicious Unicode control characters detected"
+          exit 1
+        fi
+    ```
+
+    **Additional measures:** Use language-specific linters (`bidichk` for Go, `pylint` Unicode checks for Python) and block confusable homoglyphs in identifiers (e.g., Cyrillic "а" vs Latin "a").
+
+53. **Prompt Injection Prevention**: Defend AI-integrated applications against prompt injection by enforcing strict boundaries between system instructions and untrusted input, validating both inputs and outputs, and monitoring for anomalous behavior.
+
+    **Core defenses:**
+    - **System/user prompt separation** — never concatenate untrusted input directly into system prompts; use structured message roles and delimiters
+    - **Input sanitization** — strip or escape control tokens, instruction-like prefixes ("Ignore previous instructions…"), and role-override attempts before passing user content to models
+    - **Output validation** — parse AI responses through deterministic validators (schema checks, allowlists, regex) before acting on them; never execute raw model output as code or commands
+    - **Least-privilege tool access** — limit which tools and APIs an AI agent can invoke; scope permissions to the minimum required for the task
+    - **Rate limiting and anomaly detection** — monitor for unusual prompt lengths, repetitive override attempts, and sudden behavioral shifts that indicate injection attacks
+
 ## Anti-Patterns to Avoid
 
-51. **No Assessment Rush**: Don't implement AI development patterns without first evaluating team readiness and codebase architecture quality.
+54. **No Assessment Rush**: Don't implement AI development patterns without first evaluating team readiness and codebase architecture quality.
 
-52. **Avoid Ad-Hoc Development**: Don't jump directly to AI coding without structured lifecycle processes, proper planning, or testing strategy.
+55. **Avoid Ad-Hoc Development**: Don't jump directly to AI coding without structured lifecycle processes, proper planning, or testing strategy.
 
-53. **No Implementation-First Development**: Don't generate code first then retrofit tests - always establish specifications and tests before implementation.
+56. **No Implementation-First Development**: Don't generate code first then retrofit tests - always establish specifications and tests before implementation.
 
-54. **Prevent Uncoordinated Parallelization**: Don't run multiple AI agents without proper isolation, conflict detection, or resolution mechanisms.
+57. **Prevent Uncoordinated Parallelization**: Don't run multiple AI agents without proper isolation, conflict detection, or resolution mechanisms.
 
-55. **No Black Box Systems**: Don't build systems with minimal observability that prevent AI from understanding behavior and diagnosing issues.
+58. **No Black Box Systems**: Don't build systems with minimal observability that prevent AI from understanding behavior and diagnosing issues.
 
-56. **Avoid One-Size-Fits-All Tools**: Don't use the most powerful (expensive) AI models for simple tasks that could be handled by lighter alternatives.
+59. **Avoid One-Size-Fits-All Tools**: Don't use the most powerful (expensive) AI models for simple tasks that could be handled by lighter alternatives.
 
-57. **No Manual Policy Translation**: Don't manually translate compliance specifications when AI can generate consistent, testable policy code.
+60. **No Manual Policy Translation**: Don't manually translate compliance specifications when AI can generate consistent, testable policy code.
 
-58. **Prevent Manual Evidence Collection**: Don't manually gather compliance evidence when AI can continuously collect and organize audit trails automatically.
+61. **Prevent Manual Evidence Collection**: Don't manually gather compliance evidence when AI can continuously collect and organize audit trails automatically.
 
-59. **Avoid Monolithic AI Architecture**: Don't build large, coupled AI systems that violate Single Responsibility Principle and are difficult to test and maintain.
+62. **Avoid Monolithic AI Architecture**: Don't build large, coupled AI systems that violate Single Responsibility Principle and are difficult to test and maintain.
 
-60. **No AI Without Contracts**: Don't integrate AI components without clear interface contracts, error handling specifications, and fallback mechanisms.
+63. **No AI Without Contracts**: Don't integrate AI components without clear interface contracts, error handling specifications, and fallback mechanisms.
 
 ## Implementation Priority Framework
 
@@ -164,8 +211,11 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 - Practices 26-37: Tool design, automation, operations
 - Mature operational capabilities and custom tooling with full lifecycle support
 
+### Continuous: Version Control Security
+- Practices 51-53: Signed commits, Trojan Source scanning, prompt injection prevention
+
 ### Continuous: Anti-Pattern Vigilance
-- Practices 51-60: Ongoing awareness and prevention
+- Practices 54-63: Ongoing awareness and prevention
 - Maintain discipline against common failure modes in both AI and traditional development
 
 ## Success Metrics
@@ -205,4 +255,4 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 ---
 
-*This canonical list of 60 practices represents distilled wisdom from extensive AI development experience, emphasizing security, ethics, quality, and systematic approaches over ad-hoc AI usage. These practices provide a comprehensive MECE framework for teams to adopt AI-assisted development safely and effectively while maintaining high standards for code quality, system reliability, and ethical AI governance.*
+*This canonical list of 63 practices represents distilled wisdom from extensive AI development experience, emphasizing security, ethics, quality, and systematic approaches over ad-hoc AI usage. These practices provide a comprehensive MECE framework for teams to adopt AI-assisted development safely and effectively while maintaining high standards for code quality, system reliability, and ethical AI governance.*
