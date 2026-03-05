@@ -1,0 +1,275 @@
+version: "1.0"
+base_url: "https://github.com/PaulDuvall/ai-development-patterns?tab=readme-ov-file"
+patterns:
+  # Foundation (6 patterns)
+  - id: readiness-assessment
+    name: Readiness Assessment
+    category: foundation
+    maturity: beginner
+    anchor: "#readiness-assessment"
+    automatable: false
+    description: >
+      Systematic evaluation of codebase and team readiness for AI integration.
+    related: [codified-rules, issue-generation]
+
+  - id: codified-rules
+    name: Codified Rules
+    category: foundation
+    maturity: beginner
+    anchor: "#codified-rules"
+    automatable: true
+    description: >
+      Version and maintain AI coding standards as explicit configuration files.
+    related: [readiness-assessment, security-sandbox, context-persistence, progressive-disclosure, event-automation, guided-refactoring]
+
+  - id: security-sandbox
+    name: Security Sandbox
+    category: foundation
+    maturity: beginner
+    anchor: "#security-sandbox"
+    automatable: true
+    description: >
+      Run AI tools in isolated environments without access to secrets or sensitive data.
+    related: [codified-rules, security-orchestration, policy-generation, event-automation]
+
+  - id: developer-lifecycle
+    name: Developer Lifecycle
+    category: foundation
+    maturity: intermediate
+    anchor: "#developer-lifecycle"
+    automatable: false
+    description: >
+      Structured 9-stage process from problem definition through deployment with AI assistance.
+    related: [codified-rules, security-sandbox, spec-driven-development, observable-development, automated-traceability, tool-integration]
+
+  - id: tool-integration
+    name: Tool Integration
+    category: foundation
+    maturity: intermediate
+    anchor: "#tool-integration"
+    automatable: true
+    description: >
+      Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions.
+    related: [security-sandbox, developer-lifecycle]
+
+  - id: issue-generation
+    name: Issue Generation
+    category: foundation
+    maturity: intermediate
+    anchor: "#issue-generation"
+    automatable: true
+    description: >
+      Generate Kanban-optimized work items from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies.
+    related: [readiness-assessment]
+
+  # Development (17 patterns)
+  - id: spec-driven-development
+    name: Spec-Driven Development
+    category: development
+    maturity: intermediate
+    anchor: "#spec-driven-development"
+    automatable: true
+    description: >
+      Use executable specifications to guide AI code generation with clear acceptance criteria before implementation.
+    related: [developer-lifecycle, custom-commands, image-spec, atomic-decomposition]
+
+  - id: planned-implementation
+    name: Planned Implementation
+    category: development
+    maturity: beginner
+    anchor: "#planned-implementation"
+    automatable: true
+    description: >
+      Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration.
+    related: [progressive-enhancement]
+
+  - id: progressive-enhancement
+    name: Progressive Enhancement
+    category: development
+    maturity: beginner
+    anchor: "#progressive-enhancement"
+    automatable: true
+    description: >
+      Build complex features through small, deployable iterations rather than big-bang generation.
+    related: [planned-implementation, atomic-decomposition, image-spec, choice-generation]
+
+  - id: context-persistence
+    name: Context Persistence
+    category: development
+    maturity: intermediate
+    anchor: "#context-persistence"
+    automatable: true
+    description: >
+      Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols.
+    related: [codified-rules, progressive-disclosure]
+
+  - id: event-automation
+    name: Event Automation
+    category: development
+    maturity: intermediate
+    anchor: "#event-automation"
+    automatable: true
+    description: >
+      Execute custom commands automatically at assistant lifecycle events to enforce policies and automate workflows.
+    related: [codified-rules, security-sandbox, custom-commands]
+
+  - id: custom-commands
+    name: Custom Commands
+    category: development
+    maturity: intermediate
+    anchor: "#custom-commands"
+    automatable: true
+    description: >
+      Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and sophisticated workflows.
+    related: [event-automation, spec-driven-development, codified-rules]
+
+  - id: progressive-disclosure
+    name: Progressive Disclosure
+    category: development
+    maturity: intermediate
+    anchor: "#progressive-disclosure"
+    automatable: true
+    description: >
+      Load AI assistant rules incrementally based on task context to prevent instruction saturation and context bloat.
+    related: [codified-rules, context-persistence, centralized-rules]
+
+  - id: constrained-generation
+    name: Constrained Generation
+    category: development
+    maturity: beginner
+    anchor: "#constrained-generation"
+    automatable: true
+    description: >
+      Give AI specific constraints to prevent over-engineering and ensure focused solutions.
+    related: []
+
+  - id: atomic-decomposition
+    name: Atomic Decomposition
+    category: development
+    maturity: intermediate
+    anchor: "#atomic-decomposition"
+    automatable: true
+    description: >
+      Break complex features into atomic, independently implementable tasks for parallel AI agent execution.
+    related: [progressive-enhancement, parallel-agents]
+
+  - id: automated-traceability
+    name: Automated Traceability
+    category: development
+    maturity: intermediate
+    anchor: "#automated-traceability"
+    automatable: true
+    description: >
+      Maintain automated links between requirements, specifications, tests, implementation, and documentation using AI.
+    related: [developer-lifecycle]
+
+  - id: guided-architecture
+    name: Guided Architecture
+    category: development
+    maturity: intermediate
+    anchor: "#guided-architecture"
+    automatable: true
+    description: >
+      Apply architectural frameworks (DDD, Well-Architected, 12-Factor) using AI to ensure sound system design.
+    related: [developer-lifecycle, codified-rules]
+
+  - id: guided-refactoring
+    name: Guided Refactoring
+    category: development
+    maturity: intermediate
+    anchor: "#guided-refactoring"
+    automatable: true
+    description: >
+      Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics.
+    related: [codified-rules]
+
+  - id: observable-development
+    name: Observable Development
+    category: development
+    maturity: intermediate
+    anchor: "#observable-development"
+    automatable: false
+    description: >
+      Strategic logging and debugging that makes system behavior visible to AI.
+    related: [developer-lifecycle]
+
+  - id: image-spec
+    name: Image Spec
+    category: development
+    maturity: intermediate
+    anchor: "#image-spec"
+    automatable: true
+    description: >
+      Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context.
+    related: [spec-driven-development, progressive-enhancement]
+
+  - id: choice-generation
+    name: Choice Generation
+    category: development
+    maturity: intermediate
+    anchor: "#choice-generation"
+    automatable: false
+    description: >
+      Generate multiple implementation options for exploration and comparison rather than accepting first AI solution.
+    related: [progressive-enhancement]
+
+  - id: parallel-agents
+    name: Parallel Agents
+    category: development
+    maturity: advanced
+    anchor: "#parallel-agents"
+    automatable: false
+    description: >
+      Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration.
+    related: [atomic-decomposition]
+
+  - id: error-resolution
+    name: Error Resolution
+    category: development
+    maturity: intermediate
+    anchor: "#error-resolution"
+    automatable: false
+    description: >
+      Automatically collect error context from logs, system state, and git history, then use AI to diagnose root causes and generate validated fixes.
+    related: [developer-lifecycle, observable-development, tool-integration]
+
+  # Operations (4 patterns)
+  - id: security-orchestration
+    name: Security Orchestration
+    category: operations
+    maturity: intermediate
+    anchor: "#security-orchestration"
+    automatable: true
+    description: >
+      Aggregate multiple security tools and use AI to summarize findings for actionable insights.
+    related: [security-sandbox, centralized-rules]
+
+  - id: centralized-rules
+    name: Centralized Rules
+    category: operations
+    maturity: advanced
+    anchor: "#centralized-rules"
+    automatable: true
+    description: >
+      Enforce organization-wide AI rules through a central Git repository that syncs to standard AI assistant configuration files with automatic language and framework detection.
+    related: [codified-rules, progressive-disclosure, security-orchestration]
+
+  - id: policy-generation
+    name: Policy Generation
+    category: operations
+    maturity: advanced
+    anchor: "#policy-generation"
+    automatable: false
+    description: >
+      Transform compliance requirements into executable Cedar/OPA policy files with AI assistance.
+    related: [security-sandbox]
+
+  - id: baseline-management
+    name: Baseline Management
+    category: operations
+    maturity: advanced
+    anchor: "#baseline-management"
+    automatable: false
+    description: >
+      Establish intelligent performance baselines and configure monitoring thresholds automatically.
+    related: [tool-integration]
