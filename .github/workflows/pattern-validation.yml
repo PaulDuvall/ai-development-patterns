@@ -211,10 +211,39 @@ jobs:
         name: diagram-validation-results
         path: tests/test-results/
 
+  yaml-readme-sync:
+    runs-on: ubuntu-latest
+    name: YAML-README Sync
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r tests/requirements.txt
+
+    - name: Run YAML-README sync tests
+      run: |
+        cd tests
+        python3 -m pytest test_yaml_readme_sync.py -v --tb=short
+
+    - name: Upload sync test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: yaml-readme-sync-results
+        path: tests/test-results/
+
   comprehensive-validation:
     runs-on: ubuntu-latest
     name: Full Test Suite
-    needs: [pattern-compliance, readme-accuracy, link-validation, example-validation, dependency-validation, diagram-validation]
+    needs: [pattern-compliance, readme-accuracy, link-validation, example-validation, dependency-validation, diagram-validation, yaml-readme-sync]
     if: always()
     
     steps:
@@ -287,7 +316,7 @@ jobs:
   notify-failure:
     runs-on: ubuntu-latest
     name: Notify on Failure
-    needs: [pattern-compliance, readme-accuracy, link-validation, example-validation, dependency-validation, diagram-validation]
+    needs: [pattern-compliance, readme-accuracy, link-validation, example-validation, dependency-validation, diagram-validation, yaml-readme-sync]
     if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
