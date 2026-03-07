@@ -4,11 +4,13 @@ Test configuration and shared fixtures for AI Development Patterns validation
 
 import pytest
 import os
+import yaml
 from pathlib import Path
 
 # Repository root directory
 REPO_ROOT = Path(__file__).parent.parent
 README_PATH = REPO_ROOT / "README.md"
+PATTERNS_YAML_PATH = REPO_ROOT / "patterns.yaml"
 PATTERN_SPEC_PATH = REPO_ROOT / "pattern-spec.md"
 EXAMPLES_DIR = REPO_ROOT / "examples"
 EXPERIMENTS_DIR = REPO_ROOT / "experiments"
@@ -50,45 +52,16 @@ REQUIRED_PATTERN_SECTIONS = {
     "anti_pattern"
 }
 
-PATTERN_CATEGORIES = {
-    "Foundation": ["Readiness Assessment", "Codified Rules", "Security Sandbox",
-                   "Developer Lifecycle", "Tool Integration", "Issue Generation"],
-    "Development": ["Spec-Driven Development", "Planned Implementation", "Progressive Enhancement",
-                    "Image Spec", "Choice Generation", "Parallel Agents", "Context Persistence",
-                    "Constrained Generation", "Event Automation", "Custom Commands", "Progressive Disclosure", "Atomic Decomposition",
-                    "Observable Development", "Guided Refactoring",
-                    "Guided Architecture", "Automated Traceability", "Error Resolution"],
-    "Operations": ["Policy Generation", "Security Orchestration",
-                   "Centralized Rules", "Baseline Management"]
-}
+# Derive EXPECTED_PATTERNS and PATTERN_CATEGORIES from patterns.yaml (single source of truth)
+def _load_patterns_yaml():
+    with open(PATTERNS_YAML_PATH, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    patterns = data["patterns"]
+    expected = [p["name"] for p in patterns]
+    categories = {}
+    for p in patterns:
+        cat = p["category"].capitalize()
+        categories.setdefault(cat, []).append(p["name"])
+    return expected, categories
 
-# Expected patterns from the reference table
-EXPECTED_PATTERNS = [
-    "Readiness Assessment",
-    "Codified Rules",
-    "Security Sandbox",
-    "Developer Lifecycle",
-    "Tool Integration",
-    "Issue Generation",
-    "Spec-Driven Development",
-    "Image Spec",
-    "Planned Implementation",
-    "Progressive Enhancement",
-    "Choice Generation",
-    "Atomic Decomposition",
-    "Parallel Agents",
-    "Context Persistence",
-    "Constrained Generation",
-    "Event Automation",
-    "Custom Commands",
-    "Progressive Disclosure",
-    "Observable Development",
-    "Guided Refactoring",
-    "Guided Architecture",
-    "Automated Traceability",
-    "Error Resolution",
-    "Policy Generation",
-    "Security Orchestration",
-    "Centralized Rules",
-    "Baseline Management"
-]
+EXPECTED_PATTERNS, PATTERN_CATEGORIES = _load_patterns_yaml()

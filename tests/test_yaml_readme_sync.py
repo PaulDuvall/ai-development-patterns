@@ -9,7 +9,8 @@ import yaml
 import re
 import pytest
 from pathlib import Path
-from conftest import REPO_ROOT, EXPECTED_PATTERNS
+from conftest import REPO_ROOT
+from utils.pattern_parser import PatternParser
 
 
 PATTERNS_YAML_PATH = REPO_ROOT / "patterns.yaml"
@@ -52,12 +53,16 @@ class TestYamlReadmeSync:
             f"patterns.yaml entries with no matching README heading: {missing}"
         )
 
-    def test_every_expected_pattern_in_yaml(self, yaml_patterns):
-        """Every pattern in EXPECTED_PATTERNS must appear in patterns.yaml."""
+    def test_every_readme_pattern_in_yaml(
+        self, yaml_patterns, readme_content
+    ):
+        """Every pattern heading in README must have an entry in patterns.yaml."""
+        parser = PatternParser(readme_content)
+        readme_patterns = set(parser.extract_patterns().keys())
         yaml_names = {p["name"] for p in yaml_patterns}
-        missing = [ep for ep in EXPECTED_PATTERNS if ep not in yaml_names]
+        missing = sorted(readme_patterns - yaml_names)
         assert not missing, (
-            f"EXPECTED_PATTERNS entries missing from patterns.yaml: {missing}"
+            f"README pattern headings missing from patterns.yaml: {missing}"
         )
 
     def test_yaml_anchors_match_readme_headings(
@@ -100,9 +105,14 @@ class TestYamlReadmeSync:
         duplicates = [pid for pid in ids if ids.count(pid) > 1]
         assert not duplicates, f"Duplicate pattern IDs: {set(duplicates)}"
 
-    def test_yaml_pattern_count_matches_expected(self, yaml_patterns):
-        """patterns.yaml should have the same count as EXPECTED_PATTERNS."""
-        assert len(yaml_patterns) == len(EXPECTED_PATTERNS), (
-            f"patterns.yaml has {len(yaml_patterns)} patterns, "
-            f"EXPECTED_PATTERNS has {len(EXPECTED_PATTERNS)}"
+    def test_yaml_and_readme_pattern_counts_match(
+        self, yaml_patterns, readme_content
+    ):
+        """patterns.yaml and README must have the same number of patterns."""
+        parser = PatternParser(readme_content)
+        readme_count = len(parser.extract_patterns())
+        yaml_count = len(yaml_patterns)
+        assert yaml_count == readme_count, (
+            f"patterns.yaml has {yaml_count} patterns, "
+            f"README has {readme_count}"
         )
