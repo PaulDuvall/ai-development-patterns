@@ -7,6 +7,8 @@
 [![Quality Gate](https://img.shields.io/badge/quality%20gate-passing-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/tree/main/tests)
 [![Hyperlinks](https://img.shields.io/badge/hyperlinks-validated-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
 
+> **📋 How ready is your team for AI-assisted development?** Take the free [AI Development Readiness Scorecard](https://redactedventures.com/scorecard) to find out — and discover which patterns to adopt first.
+
 A comprehensive collection of patterns based on my experience for building software with AI assistance, organized by implementation maturity and development lifecycle phases. These patterns are subject to change as the field evolves.
 
 ```mermaid
