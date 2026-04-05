@@ -140,26 +140,29 @@ git commit -m "docs: finalize auth implementation plan (ready for development)"
 
 ### Claude Code
 ```bash
-# Use Plan Mode for initial planning
-claude plan "Create authentication implementation plan for SaaS application"
+# Start interactive session and use plan mode for iterative refinement
+claude
+# Then in the session:
+#   > /plan
+#   > "Create authentication implementation plan for SaaS application"
+#   > "Enhance this plan with security and performance considerations"
+#   > "Check this plan for implementation readiness"
+#   > /exitplan
 
-# Use iterative refinement
-claude refine "Enhance this plan with security and performance considerations: [plan]"
-
-# Final validation
-claude validate "Check this plan for implementation readiness: [refined plan]"
+# Or use single-prompt mode for non-interactive planning
+claude -p "Create an authentication implementation plan for a SaaS application"
 ```
 
 ### Cursor
 ```bash
-# Use /plan command for structured planning
-/plan Authentication implementation with JWT and session migration
+# Use Cmd+L chat with context references for planning
+# "Plan authentication implementation with JWT and session migration" @codebase
 
 # Use @docs for context-aware refinement
-/refine authentication plan @docs considering existing architecture
+# "Refine authentication plan considering existing architecture" @docs
 
 # Validate before implementation
-/validate plan readiness for authentication implementation
+# "Review plan readiness for authentication implementation" @codebase @docs
 ```
 
 ### Other AI Tools

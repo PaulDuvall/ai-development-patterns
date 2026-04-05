@@ -110,9 +110,9 @@ Use Plan Mode to create a detailed implementation strategy.
 ```
 
 ### Cursor
-Use the `/plan` command with this structure:
+Use Composer (Cmd+I) or Chat (Cmd+L) with this structure:
 ```
-/plan Using this planning template, create a detailed implementation plan for [your project description]
+Using this planning template, create a detailed implementation plan for [your project description]
 ```
 
 ### Other AI Tools

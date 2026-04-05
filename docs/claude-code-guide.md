@@ -609,29 +609,25 @@ workflows:
 
 **1. Automated Code Review**
 ```bash
-# .claude/hooks/pre-commit
-claude review --files "$(git diff --cached --name-only)" \
-  --checklist ".claude/review-checklist.md" \
-  --output "review-report.md"
+# Use single-prompt mode in a pre-commit hook or CI step
+claude -p "Review the staged changes for bugs, security issues, and style \
+  violations. Check against the guidelines in .claude/review-checklist.md. \
+  Output a summary of findings." --output-file review-report.md
 ```
 
 **2. Documentation Generation**
 ```bash
-# Generate comprehensive docs
-claude document \
-  --source "src/**/*.ts" \
-  --format "markdown" \
-  --include-examples \
-  --output "docs/api/"
+# Generate docs using single-prompt mode
+claude -p "Generate comprehensive API documentation in markdown for all \
+  exported functions in src/**/*.ts. Include usage examples. \
+  Write the output to docs/api/."
 ```
 
 **3. Test Generation**
 ```bash
-# Generate tests for new code
-claude generate-tests \
-  --target "src/services/newFeature.ts" \
-  --coverage-target 90 \
-  --include-edge-cases
+# Generate tests using single-prompt mode
+claude -p "Generate tests for src/services/newFeature.ts targeting 90% \
+  coverage. Include edge cases for error handling and boundary conditions."
 ```
 
 ### Building Autonomous Agents

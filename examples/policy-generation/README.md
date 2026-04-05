@@ -73,16 +73,29 @@ permit(
 ## Integration Examples
 
 ### CI/CD Pipeline Integration
+
+**Cedar Pipeline:**
 ```yaml
-# .github/workflows/policy-validation.yml
-- name: Generate Policies
+# .github/workflows/cedar-policy-validation.yml
+- name: Generate Cedar Policies
   run: |
     ai "Convert docs/compliance/*.md into Cedar policies" > policies/generated.cedar
-    
-- name: Test Policies
+
+- name: Validate Cedar Policies
   run: |
-    opa test policies/
-    cedar validate policies/generated.cedar
+    cedar validate --schema schema.cedarschema policies/generated.cedar
+```
+
+**OPA/Rego Pipeline:**
+```yaml
+# .github/workflows/opa-policy-validation.yml
+- name: Generate OPA Policies
+  run: |
+    ai "Convert docs/compliance/*.md into OPA Rego policies" > policies/generated.rego
+
+- name: Test OPA Policies
+  run: |
+    opa test policies/ data/test-cases/
 ```
 
 ### Compliance Automation

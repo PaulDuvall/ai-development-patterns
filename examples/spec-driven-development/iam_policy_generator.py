@@ -90,7 +90,7 @@ class IAMPolicyGenerator:
             return False, "Resource ARN cannot be empty"
         
         # AWS ARN format: arn:partition:service:region:account-id:resource-type/resource-id
-        arn_pattern = r'^arn:aws:[a-zA-Z0-9\-]+:[a-zA-Z0-9\-]*:[0-9]*:[a-zA-Z0-9\-\/:_]*$'
+        arn_pattern = r'^arn:aws:[a-zA-Z0-9\-]+:[a-zA-Z0-9\-]*:[0-9]*:[a-zA-Z0-9\-\./*:_]*$'
         
         if not re.match(arn_pattern, arn):
             return False, f"Invalid ARN format. Expected: arn:aws:service:region:account:resource"

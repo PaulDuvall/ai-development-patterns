@@ -1,16 +1,16 @@
 # Cursor Planning Example
 
-This example demonstrates how to use Cursor's `/plan` command and planning features to implement a React component library.
+This example demonstrates how to use Cursor's Composer and Chat features to plan and implement a React component library.
 
 ## Scenario
 Building a reusable design system component library for a React application with TypeScript, Storybook, and automated testing.
 
-## Step 1: Using Cursor's /plan Command
+## Step 1: Using Cursor's Composer for Planning
 
-Open Cursor's chat and use the `/plan` command:
+Open Cursor's Composer (Cmd+I / Ctrl+I) and describe the project:
 
 ```
-/plan Create a React component library with the following requirements:
+Create a React component library with the following requirements:
 - TypeScript support with strict typing
 - Storybook for component documentation
 - Jest testing with React Testing Library
@@ -18,6 +18,8 @@ Open Cursor's chat and use the `/plan` command:
 - Rollup for bundling
 - Publishing to npm
 - Components: Button, Input, Modal, Card
+
+Start by creating an implementation plan before writing any code.
 ```
 
 ## Step 2: Cursor Generated Plan
@@ -80,7 +82,7 @@ src/
 
 ## Step 3: Interactive Plan Refinement
 
-Use Cursor's iterative planning approach:
+Use Cursor's chat (Cmd+L / Ctrl+L) to iterate on the plan:
 
 ```
 This plan looks great! Can you expand the theming section? I need:
@@ -114,7 +116,7 @@ Also, add ESLint and Prettier configuration to Phase 1.
 
 ## Step 4: Execute with Cursor
 
-Start implementation with plan reference:
+Start implementation using the Composer with plan reference:
 
 ```
 Let's start with Phase 1. Begin by creating the package.json and TypeScript configuration according to our plan.
@@ -138,7 +140,7 @@ export const Button = styled.button<ButtonProps>`
 
 ## Benefits Demonstrated
 
-1. **Modular Planning**: Cursor's `/plan` breaks work into logical phases
+1. **Structured Planning**: Composer breaks work into logical phases
 2. **Interactive Refinement**: Easy to modify plan based on new requirements
 3. **Contextual Implementation**: Code generation follows plan structure
 4. **Progress Visibility**: Clear tracking of implementation status
@@ -146,10 +148,10 @@ export const Button = styled.button<ButtonProps>`
 
 ## Cursor-Specific Features Used
 
-- **`/plan` command**: Generates structured implementation roadmap
-- **Interactive chat**: Allows plan iteration and refinement
-- **Context awareness**: Understands existing project structure
-- **Code generation**: Implements following plan specifications
-- **Inline comments**: Tracks progress against plan
+- **Composer (Cmd+I)**: Multi-file code generation following plan specifications
+- **Chat (Cmd+L)**: Plan iteration, refinement, and asking questions with @codebase context
+- **@codebase / @file references**: Provides context awareness of existing project structure
+- **Inline edits (Cmd+K)**: Targeted code changes within plan specifications
+- **`/fix` command**: Addresses failing tests during implementation
 
 This example demonstrates how Cursor's planning features create a structured approach to complex component library development.

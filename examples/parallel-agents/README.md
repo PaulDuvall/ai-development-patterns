@@ -293,7 +293,10 @@ def main(task_file: str, task_id: str):
     agent = AIAgent(agent_id, task_id)
     
     # Run the task
-    asyncio.run(agent.execute_task(asyncio.run(agent.load_task(task_file))))
+    async def run():
+        task = await agent.load_task(task_file)
+        await agent.execute_task(task)
+    asyncio.run(run())
 
 if __name__ == "__main__":
     main()

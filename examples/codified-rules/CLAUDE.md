@@ -35,7 +35,7 @@ Build a simple, reliable subscription reminder system that helps users avoid une
 - **VALIDATE** all AI-generated code
 - **MAINTAIN** .ai/ configuration directory with standards
 
-### 3. DELIVERY_RULES.md - CI/CD Pipeline & Deployment
+### 3. PIPELINE_RULES.md - CI/CD Pipeline & Deployment
 - **ENFORCE** branch age < 2 days
 - **REQUIRE** build time < 10 minutes
 - **VALIDATE** all AI output through security gates
@@ -90,7 +90,7 @@ Per QUALITY_RULES.md requirements:
    ```
 
 ### Pipeline Requirements
-Per DELIVERY_RULES.md requirements:
+Per PIPELINE_RULES.md requirements:
 1. **Version Control**: All configs, specs, and IaC in Git
 2. **Testing Pyramid**: 70% unit, 20% integration, 10% E2E
 3. **Deployment Safety**: Feature flags for gradual rollout
@@ -130,14 +130,14 @@ Per DELIVERY_RULES.md requirements:
    - Follow SOLID principles
    - Include traceability comments
 
-4. **VALIDATE LOCALLY** (DELIVERY_RULES.md)
+4. **VALIDATE LOCALLY** (PIPELINE_RULES.md)
    ```bash
    pytest tests/ --cov=src --cov-fail-under=90
    ./check_traceability.sh
    pre-commit run --all-files
    ```
 
-5. **DEPLOY SAFELY** (DELIVERY_RULES.md)
+5. **DEPLOY SAFELY** (PIPELINE_RULES.md)
    - Complete ORR checklist
    - Use feature flags
    - Monitor rollout
@@ -221,7 +221,7 @@ subscription-alerts/
 ├── docs/
 │   ├── DEVELOPMENT_RULES.md      # Test-first practices
 │   ├── QUALITY_RULES.md          # Code standards
-│   └── DELIVERY_RULES.md         # CI/CD requirements
+│   └── PIPELINE_RULES.md         # CI/CD requirements
 └── run_tests.sh                   # Local = CI
 ```
 
@@ -305,7 +305,7 @@ When reviewing or implementing code:
    - SOLID principles followed?
    - Logging structured?
 
-3. **THIRD**: Check DELIVERY_RULES.md
+3. **THIRD**: Check PIPELINE_RULES.md
    - Branch < 2 days old?
    - Build < 10 minutes?
    - ORR complete?
@@ -319,6 +319,6 @@ If ANY check fails, STOP and report the violation.
 **The three rules are LAW:**
 - DEVELOPMENT_RULES.md = How we write (test-first, traceable)
 - QUALITY_RULES.md = What we write (clean, observable)
-- DELIVERY_RULES.md = How we ship (safe, automated)
+- PIPELINE_RULES.md = How we ship (safe, automated)
 
 **Every code change must comply with ALL THREE rule files. No exceptions.**

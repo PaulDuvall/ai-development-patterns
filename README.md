@@ -107,15 +107,14 @@ graph TD
 
     subgraph "Phase 2: Development (Weeks 3-4)"
         D --> G[Spec-Driven Development]
-        D --> H[Planned Implementation]
-        G --> I[Progressive Enhancement]
-        H --> I
+        H[Planned Implementation]
+        I[Progressive Enhancement]
         I --> J[Choice Generation]
         Q[Event Automation]
         R[Custom Commands]
         S[Progressive Disclosure]
         U[Image Spec]
-        G --> K[Atomic Decomposition]
+        I --> K[Atomic Decomposition]
         K --> L[Parallel Agents]
     end
 
@@ -123,7 +122,7 @@ graph TD
         C --> M[Policy Generation]
         M --> N[Security Orchestration]
         N --> T[Centralized Rules]
-        L --> O[Baseline Management]
+        F --> O[Baseline Management]
         D --> P[Automated Traceability]
     end
 
@@ -446,7 +445,7 @@ Each developer maintains their own prompts and preferences, leading to inconsist
 **Maturity**: Beginner
 **Description**: Run AI tools in isolated environments without access to secrets or sensitive data to prevent credential leaks and maintain security compliance.
 
-**Related Patterns**: [Security & Compliance Patterns](#security-compliance-patterns), [Codified Rules](#codified-rules), [Event Automation](#event-automation)
+**Related Patterns**: [Security & Compliance Patterns](#security--compliance-patterns), [Codified Rules](#codified-rules), [Event Automation](#event-automation)
 
 **Core Security Implementation**
 
@@ -693,7 +692,7 @@ graph TD
 
 **Core Principles**
 
-- **Small Batch Sizing**: Each work item sized for <1 hour (AI-assisted development velocity) to enable continuous delivery and rapid feedback
+- **Small Batch Sizing**: Each work item sized for 4-8 hours max to enable continuous delivery and rapid feedback
 - **AI-Assisted Decomposition**: Use AI to break down requirements into implementable tasks
 - **Traceability Integration**: Connect issues to implementation files and CI workflows
 - **Dependency Mapping**: Establish clear relationships between work items and epics
@@ -1246,7 +1245,9 @@ for branch in $(git branch -r | grep 'agent/'); do
 done
 
 # Cleanup
-git worktree remove ../agent-auth ../agent-api ../agent-tests
+git worktree remove ../agent-auth
+git worktree remove ../agent-api
+git worktree remove ../agent-tests
 ```
 
 **Shared Memory & Coordination**
@@ -2204,7 +2205,7 @@ graph TD
 
 ```bash
 # Create comprehensive error context file
-cat > .error-context.md << 'EOF'
+cat > .error-context.md << EOF
 # Error Analysis
 
 **Error Output:**
@@ -2427,8 +2428,8 @@ Operations patterns focus on CI/CD, security, compliance, and production managem
 ai "Convert compliance requirements into Cedar policy code:
 SOC 2: Data at rest must be AES-256 encrypted" > encryption.cedar
 
-# Test generated policies
-opa test encryption.cedar
+# Validate generated Cedar policies
+cedar validate --schema schema.cedarschema encryption.cedar
 ```
 
 **Complete Implementation**: See [examples/policy-generation/](examples/policy-generation/) for:
@@ -2611,9 +2612,9 @@ Manual thresholds quickly become stale, causing alert storms or blind spots.
 4. **[Atomic Decomposition](#atomic-decomposition)** - Break down complex features
 
 ### Phase 3: Operations (Weeks 5-6)
-1. **[Security & Compliance Patterns](#security-compliance-patterns)** - Implement unified security framework
+1. **[Security & Compliance Patterns](#security--compliance-patterns)** - Implement unified security framework
 2. **[Deployment Automation Patterns](#deployment-automation-patterns)** - Establish AI-powered CI/CD
-3. **[Monitoring & Maintenance Patterns](#monitoring-maintenance-patterns)** - Deploy proactive system management
+3. **[Monitoring & Maintenance Patterns](#monitoring--maintenance-patterns)** - Deploy proactive system management
 
 **Note**: For teams practicing continuous delivery, implement security ([Security Sandbox](#security-sandbox), AI Security & Compliance) and deployment patterns (Deployment Automation) from week 1 alongside foundation patterns. The phases represent learning dependencies, not deployment sequences.
 

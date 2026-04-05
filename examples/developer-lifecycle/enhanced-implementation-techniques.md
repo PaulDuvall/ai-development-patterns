@@ -367,32 +367,42 @@ ai "Break registration validation into individual functions:
 
 ### Claude Code Enhanced Workflow
 ```bash
-# Use Plan Mode for comprehensive planning
-claude plan "Implement comprehensive user authentication with JWT, session migration, and mobile support"
+# Start interactive session with plan mode for comprehensive planning
+claude
+# Then in the session:
+#   > /plan
+#   > "Implement comprehensive user authentication with JWT, session migration,
+#      and mobile support. Consider existing session system, PostgreSQL users
+#      table, and mobile app requirements."
+#   > /exitplan
 
-# Use enhanced context in implementation mode
-claude implement "JWT authentication service" --context="existing session system, PostgreSQL users table, mobile app requirements"
+# Implement with context — reference relevant files directly
+#   > "Implement JWT authentication service. See src/auth/ for the existing
+#      session system and db/schema.sql for the users table."
 
-# Apply Five-Try Rule systematically
-claude retry "authentication implementation" --attempt=3 --previous-failures="token validation errors, session migration issues"
+# Apply Five-Try Rule — provide failure context in follow-up prompts
+#   > "The token validation is failing with [error]. Previous attempts had
+#      session migration issues. Try a different approach."
 
-# Use review mode for integration validation
-claude review "complete authentication flow" --focus="security, performance, integration points"
+# Review the implementation
+#   > "Review the complete authentication flow for security, performance,
+#      and integration concerns."
 ```
 
 ### Cursor Enhanced Workflow
 ```bash
-# Use /plan with comprehensive context
-/plan JWT authentication implementation @codebase @docs considering existing session system and mobile requirements
+# Use Cmd+L chat with comprehensive context references
+# "Implement JWT authentication considering existing session system and mobile
+#  requirements" @codebase @docs
 
-# Enhanced implementation with context
-/implement JWT service @existing-auth @session-middleware following test specifications
+# Use Cmd+K inline edit with specific file context
+# "Implement JWT service following test specifications" @file:auth.test.ts @file:session.ts
 
-# Systematic retry with context
-/fix authentication issues @previous-attempts considering alternative approaches
+# Use /fix with context for systematic retry
+/fix authentication issues @codebase
 
-# Integration validation
-/validate complete auth flow @tests @integration ensuring security and performance standards
+# Review integration with Cmd+L chat
+# "Review complete auth flow for security and performance standards" @codebase
 ```
 
 ## Success Metrics and Validation

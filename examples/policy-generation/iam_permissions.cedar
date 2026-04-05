@@ -73,13 +73,14 @@ forbid(
 };
 
 // Time-based Access Controls
+// Cedar does not have a datetime extension — use a boolean context
+// attribute computed by the application layer before policy evaluation
 forbid(
     principal,
     action,
     resource
 ) when {
-    context.current_time < datetime("2024-01-01T00:00:00Z") ||
-    context.current_time > datetime("2025-12-31T23:59:59Z")
+    context.access_period_active == false
 };
 
 // Rate Limiting Policy
@@ -100,7 +101,7 @@ permit(
 ) when {
     context.connection_secure == true &&
     context.user_agent != "" &&
-    context.source_ip in ipaddr("10.0.0.0/8")
+    context.source_ip.isInRange(ip("10.0.0.0/8"))
 };
 
 // Multi-factor Authentication Requirements
@@ -163,16 +164,16 @@ forbid(
 );
 
 // Cross-Origin Request Policy
+// Use unless with explicit comparisons — Cedar `in` is for entity
+// hierarchy, not string set membership
 forbid(
     principal,
     action == Action::"api_call",
     resource == API::"any"
-) when {
-    context.origin not in [
-        "https://app.example.com",
-        "https://admin.example.com",
-        "https://localhost:3000"
-    ]
+) unless {
+    context.origin == "https://app.example.com" ||
+    context.origin == "https://admin.example.com" ||
+    context.origin == "https://localhost:3000"
 };
 
 // File Upload Restrictions
@@ -187,12 +188,15 @@ permit(
 };
 
 // Database Access Controls
+// Use unless with explicit comparisons for string-based exclusions
 permit(
     principal == ServiceAccount::"application",
     action in [Action::"select", Action::"insert", Action::"update"],
     resource == Database::"application_db"
-) when {
-    resource.table not in ["admin_users", "audit_logs", "system_config"]
+) unless {
+    resource.table == "admin_users" ||
+    resource.table == "audit_logs" ||
+    resource.table == "system_config"
 };
 
 forbid(

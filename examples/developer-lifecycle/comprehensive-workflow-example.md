@@ -318,23 +318,26 @@ Generate monitoring dashboard configuration for authentication metrics."
 
 ### Claude Code
 ```bash
-# Use Plan Mode for initial planning
-claude plan "Implement JWT authentication for SaaS application"
+# Start interactive session and enter plan mode
+claude
+# Then in the session:
+#   > /plan
+#   > "Design JWT authentication for SaaS application"
+#   > /exitplan
+#   > "Implement the JWT service following the OpenAPI specification"
+#   > "Review and validate the complete authentication flow"
 
-# Use implementation mode for function development
-claude implement "Generate JWT service following OpenAPI specification"
-
-# Use review mode for integration testing
-claude review "Validate complete authentication flow implementation"
+# Or use single-prompt mode for scripted workflows
+claude -p "Generate JWT service following OpenAPI specification"
 ```
 
 ### Cursor
 ```bash
-# Use /plan command for structured planning
-/plan JWT authentication implementation with security requirements
+# Use Cmd+L chat with @codebase for planning context
+# "Plan JWT authentication implementation with security requirements" @codebase
 
-# Use @codebase for implementation with context
-/implement JWT service @codebase following test specifications
+# Use Cmd+K inline edit to implement with file context
+# "Implement JWT service following test specifications" @file:auth.test.ts
 
 # Use /fix for handling implementation issues
 /fix authentication endpoint failing test cases

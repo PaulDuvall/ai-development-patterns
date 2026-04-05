@@ -115,7 +115,7 @@ python spec_validator.py --validate-syntax iam_policy_spec.md
 
 ```bash
 # Run all tests with specification coverage
-pytest --cov=src --cov-report=html --spec-coverage
+pytest --cov=src --cov-report=html
 
 # Run specific specification tests
 pytest tests/test_iam_validation.py -v

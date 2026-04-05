@@ -1,4 +1,4 @@
-# DELIVERY_RULES - CI/CD Pipeline & Deployment Excellence
+# PIPELINE_RULES - CI/CD Pipeline & Deployment Excellence
 
 **CRITICAL: Review these rules before EVERY change to code, pipeline, or infrastructure. Non-negotiable requirements for continuous delivery.**
 

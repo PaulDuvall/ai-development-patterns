@@ -33,10 +33,9 @@ This specification defines the authentication system behavior, establishing the 
 
 This specification follows a hierarchical authority structure for conflict resolution:
 
-1. **Platform** (`authority=platform`): Core security and compliance requirements
-2. **System** (`authority=system`): Business logic and functional requirements  
-3. **Feature** (`authority=feature`): Specific implementation details
-4. **Guideline** (`authority=guideline`): Recommended practices
+1. **System** (`authority=system`): Core business logic and security requirements (highest precedence)
+2. **Platform** (`authority=platform`): Infrastructure and technical architecture decisions
+3. **Feature** (`authority=feature`): Specific implementation details (lowest precedence)
 
 Higher authority levels override lower levels when conflicts arise.
 
