@@ -373,7 +373,7 @@ class Coordinator:
     def generate_report(self, status: dict):
         """Generate a status report"""
         report = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "agents": status,
             "summary": {
                 "total_agents": len(status),
@@ -431,16 +431,16 @@ chmod +x scripts/coordinator.py
 
 ```bash
 # Start all agents
-docker-compose -f docker-compose.parallel-agents.yml up -d
+docker compose -f docker-compose.parallel-agents.yml up -d
 
 # Watch the logs
-docker-compose -f docker-compose.parallel-agents.yml logs -f
+docker compose -f docker-compose.parallel-agents.yml logs -f
 
 # Check agent status
-docker-compose -f docker-compose.parallel-agents.yml ps
+docker compose -f docker-compose.parallel-agents.yml ps
 
 # Stop all agents
-docker-compose -f docker-compose.parallel-agents.yml down
+docker compose -f docker-compose.parallel-agents.yml down
 ```
 
 #### Using Git Worktrees
@@ -526,7 +526,7 @@ The coordinator service provides real-time status updates:
 
 ```bash
 # View coordinator dashboard
-docker-compose -f docker-compose.parallel-agents.yml logs -f coordinator
+docker compose -f docker-compose.parallel-agents.yml logs -f coordinator
 ```
 
 ### Generated Reports
@@ -566,10 +566,10 @@ The agents work in parallel, share discoveries through shared memory, and their 
 2. **Agent Failures**
    ```bash
    # Check agent logs
-   docker-compose -f docker-compose.parallel-agents.yml logs agent-frontend
+   docker compose -f docker-compose.parallel-agents.yml logs agent-frontend
    
    # Restart specific agent
-   docker-compose -f docker-compose.parallel-agents.yml restart agent-frontend
+   docker compose -f docker-compose.parallel-agents.yml restart agent-frontend
    ```
 
 3. **Shared Memory Issues**
@@ -579,7 +579,7 @@ The agents work in parallel, share discoveries through shared memory, and their 
    
    # Reset if corrupted
    rm shared-memory/agent_memory.json
-   docker-compose -f docker-compose.parallel-agents.yml restart
+   docker compose -f docker-compose.parallel-agents.yml restart
    ```
 
 ## 🔐 Security Considerations

@@ -84,7 +84,7 @@ pytest --cov=src --cov-report=html --spec-coverage
 ./validate-pipeline.sh --config pipeline_tests/pipeline_tests.yaml
 
 # Run pipeline tests locally
-docker-compose -f pipeline_tests/test-pipeline.yml up --abort-on-container-exit
+docker compose -f pipeline_tests/test-pipeline.yml up --abort-on-container-exit
 ```
 
 ### Configure Test Automation

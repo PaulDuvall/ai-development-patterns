@@ -6,7 +6,7 @@ Debug helpers for AI-friendly log analysis and troubleshooting
 import json
 import argparse
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Any, Optional
 from collections import defaultdict, Counter
 import sys
@@ -39,7 +39,7 @@ def is_within_time_range(timestamp_str: str, time_range: str) -> bool:
     
     try:
         timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         
         if time_range == "last hour":
             return timestamp > now - timedelta(hours=1)

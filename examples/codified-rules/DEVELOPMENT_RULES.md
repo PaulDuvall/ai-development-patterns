@@ -410,7 +410,7 @@ class AuthService:
         payload = {
             "user_id": user.id,
             "email": user.email,
-            "exp": datetime.utcnow() + timedelta(hours=24)
+            "exp": datetime.now(timezone.utc) + timedelta(hours=24)
         }
         return jwt.encode(payload, self.jwt_secret, algorithm="HS256")
 
@@ -420,7 +420,7 @@ class AuthService:
             "event": event,
             "email": email,
             "user_id": user_id,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "ip_address": get_request_ip()
         })
 ```
@@ -449,7 +449,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -502,7 +502,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -1163,7 +1163,7 @@ cp .git/hooks/pre-commit.sample .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 
 # 5. Set up local database
-docker-compose up -d postgres redis
+docker compose up -d postgres redis
 
 # 6. Run migrations
 python scripts/migrate.py

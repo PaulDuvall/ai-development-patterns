@@ -9,7 +9,7 @@ import fcntl
 import os
 import time
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass, asdict
 import hashlib
@@ -48,7 +48,7 @@ class AgentMemory:
                     "conflicts": [],
                     "decisions": {},
                     "metadata": {
-                        "created": datetime.utcnow().isoformat(),
+                        "created": datetime.now(timezone.utc).isoformat(),
                         "version": "1.0"
                     }
                 }, f, indent=2)
@@ -83,7 +83,7 @@ class AgentMemory:
                         "key": discovery.key,
                         "agents": [discovery.agent_id, other_agent],
                         "values": [discovery.value, discoveries[discovery.key]["value"]],
-                        "timestamp": datetime.utcnow().isoformat()
+                        "timestamp": datetime.now(timezone.utc).isoformat()
                     }
                     memory["conflicts"].append(conflict)
                     conflict_found = True
@@ -92,7 +92,7 @@ class AgentMemory:
             agent_discoveries[discovery.key] = asdict(discovery)
             
             # Update metadata
-            memory["metadata"]["last_updated"] = datetime.utcnow().isoformat()
+            memory["metadata"]["last_updated"] = datetime.now(timezone.utc).isoformat()
             memory["metadata"]["total_discoveries"] = sum(
                 len(discoveries) for discoveries in memory["discoveries"].values()
             )
@@ -140,7 +140,7 @@ class AgentMemory:
             memory["decisions"][key] = {
                 "decision": decision,
                 "decided_by": decided_by,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             }
             
             with open(self.memory_path, 'w') as f:
@@ -187,7 +187,7 @@ class AgentMemory:
                 memory = json.load(f)
             
             memory["metadata"]["checkpoint_name"] = checkpoint_name
-            memory["metadata"]["checkpoint_time"] = datetime.utcnow().isoformat()
+            memory["metadata"]["checkpoint_time"] = datetime.now(timezone.utc).isoformat()
             
             with open(checkpoint_path, 'w') as f:
                 json.dump(memory, f, indent=2)
@@ -210,7 +210,7 @@ def example_agent_workflow(agent_id: str, memory: AgentMemory):
             "pattern": "/api/v1/{resource}/{id}",
             "methods": ["GET", "POST", "PUT", "DELETE"]
         },
-        timestamp=datetime.utcnow().isoformat(),
+        timestamp=datetime.now(timezone.utc).isoformat(),
         confidence=0.95,
         tags=["api", "rest", "pattern"]
     )

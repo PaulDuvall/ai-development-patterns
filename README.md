@@ -46,13 +46,23 @@ graph TB
     AD --> PA([Parallel<br/>Agents])
     PE --> IS
 
+    %% ROW 5: Additional development patterns
+    PE --> CG([Choice<br/>Generation])
+    DL --> GA([Guided<br/>Architecture])
+    CR --> GA
+    DL --> ER([Error<br/>Resolution])
+    OD --> ER
+    TI --> ER
+    PI([Planned<br/>Implementation])
+    CnG([Constrained<br/>Generation])
+
     %% STYLING
     classDef foundation fill:#a8d5ba,stroke:#2d5a3f,stroke-width:2px,color:#1a3a25
     classDef development fill:#f9e79f,stroke:#b7950b,stroke-width:2px,color:#7d6608
     classDef operations fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,color:#78281f
 
-    class RA,CR,SS,DL,TI,IG,CP foundation
-    class PE,SD,AD,PA,OD,GR,AT,EA,CC,PD,IS development
+    class RA,CR,SS,DL,TI,IG foundation
+    class PE,SD,AD,PA,OD,GR,AT,EA,CC,PD,IS,CP,CG,GA,ER,PI,CnG development
     class PG,SO,BM,CZR operations
 
     %% CLICKABLE LINKS
@@ -77,6 +87,11 @@ graph TB
     click PG "https://github.com/PaulDuvall/ai-development-patterns#policy-generation"
     click SO "https://github.com/PaulDuvall/ai-development-patterns#security-orchestration"
     click CZR "https://github.com/PaulDuvall/ai-development-patterns#centralized-rules"
+    click PI "https://github.com/PaulDuvall/ai-development-patterns#planned-implementation"
+    click CG "https://github.com/PaulDuvall/ai-development-patterns#choice-generation"
+    click CnG "https://github.com/PaulDuvall/ai-development-patterns#constrained-generation"
+    click ER "https://github.com/PaulDuvall/ai-development-patterns#error-resolution"
+    click GA "https://github.com/PaulDuvall/ai-development-patterns#guided-architecture"
     click BM "https://github.com/PaulDuvall/ai-development-patterns#baseline-management"
 ```
 
@@ -1923,7 +1938,7 @@ Breaking tasks so small that coordination overhead exceeds the benefits of paral
 # AI-friendly structured logging
 def log_operation(operation, **context):
     logging.info(json.dumps({
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "operation": operation,
         "context": context
     }))

@@ -1,6 +1,6 @@
 import logging
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 import uuid
 import threading
@@ -35,7 +35,7 @@ def log_operation(operation: str, level: str = "INFO", **context: Any):
         **context: Additional context data for the operation
     """
     log_entry = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "operation": operation,
         "correlation_id": get_correlation_id(),
         "context": context

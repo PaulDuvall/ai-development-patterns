@@ -1,5 +1,4 @@
 # Basic AI isolation container
-version: '3.8'
 
 services:
   ai-development:

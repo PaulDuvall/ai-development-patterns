@@ -1,5 +1,4 @@
 # Multi-agent parallel sandbox configuration
-version: '3.8'
 
 services:
   ai-agent-backend:

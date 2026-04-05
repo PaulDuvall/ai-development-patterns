@@ -1,5 +1,3 @@
-version: '3.8'
-
 # Security Sandbox - complete network isolation for AI development
 # Based on the Security Sandbox pattern from README.md
 

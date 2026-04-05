@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Agent 1: Frontend Development
   agent-frontend:
@@ -106,4 +104,4 @@ volumes:
 networks:
   agent-network:
     driver: bridge
-    internal: false  # Set to true for complete isolation
+    internal: true  # Isolated by default; set to false only if external networking is required

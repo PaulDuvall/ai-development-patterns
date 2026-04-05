@@ -208,7 +208,7 @@ logger.info({  # ✓
     "event": "item_processing",
     "correlation_id": request.correlation_id,
     "item_id": item.id,
-    "timestamp": datetime.utcnow().isoformat(),
+    "timestamp": datetime.now(timezone.utc).isoformat(),
     "context": {
         "user_id": user.id,
         "session_id": session.id

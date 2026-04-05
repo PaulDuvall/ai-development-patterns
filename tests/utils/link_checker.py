@@ -144,7 +144,6 @@ class LinkChecker:
         anchor = text.lower()
         anchor = re.sub(r'[^a-z0-9\s-]', '', anchor)      # Remove special chars
         anchor = re.sub(r'\s+', '-', anchor)              # Spaces to hyphens
-        anchor = re.sub(r'-+', '-', anchor)                # Multiple hyphens to single
         anchor = anchor.strip('-')                         # Remove leading/trailing hyphens
         
         return anchor
