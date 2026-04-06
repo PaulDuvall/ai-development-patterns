@@ -11,7 +11,7 @@ import argparse
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any
 
 class KanbanIssueGenerator:
     def __init__(self):
@@ -19,7 +19,7 @@ class KanbanIssueGenerator:
         self.min_task_hours = 2
         self.templates_dir = Path("kanban-templates")
         
-    def generate_feature_issues(self, feature_description: str, platform: str = "github") -> List[Dict[str, Any]]:
+    def generate_feature_issues(self, feature_description: str, platform: str = "github") -> list[dict[str, Any]]:
         """
         Generate Kanban-ready issues for a feature request.
         
@@ -51,7 +51,7 @@ class KanbanIssueGenerator:
         
         return issues
     
-    def _create_epic_issue(self, feature_description: str, platform: str) -> Dict[str, Any]:
+    def _create_epic_issue(self, feature_description: str, platform: str) -> dict[str, Any]:
         """Create an epic-level issue for the feature."""
         template = self._load_template("epic", platform)
         
@@ -84,7 +84,7 @@ Generated: {datetime.now().isoformat()}
         
         return self._apply_platform_format(epic, platform)
     
-    def _break_down_feature(self, feature_description: str, platform: str) -> List[Dict[str, Any]]:
+    def _break_down_feature(self, feature_description: str, platform: str) -> list[dict[str, Any]]:
         """Break down feature into Kanban-optimized stories (4-8 hours each)."""
         
         # Example breakdown for "Password reset via email"
@@ -95,7 +95,7 @@ Generated: {datetime.now().isoformat()}
         else:
             return self._generic_breakdown(feature_description, platform)
     
-    def _password_reset_breakdown(self, platform: str) -> List[Dict[str, Any]]:
+    def _password_reset_breakdown(self, platform: str) -> list[dict[str, Any]]:
         """Specific breakdown for password reset feature."""
         stories = [
             {
@@ -196,7 +196,7 @@ None - can develop independently
         
         return [self._apply_platform_format(story, platform) for story in stories]
     
-    def _dashboard_breakdown(self, platform: str) -> List[Dict[str, Any]]:
+    def _dashboard_breakdown(self, platform: str) -> list[dict[str, Any]]:
         """Breakdown for dashboard features."""
         stories = [
             {
@@ -239,7 +239,7 @@ None - can use mock data initially
         
         return [self._apply_platform_format(story, platform) for story in stories]
     
-    def _generic_breakdown(self, feature_description: str, platform: str) -> List[Dict[str, Any]]:
+    def _generic_breakdown(self, feature_description: str, platform: str) -> list[dict[str, Any]]:
         """Generic breakdown for unknown features."""
         stories = [
             {
@@ -288,7 +288,7 @@ Backend API completion recommended
         
         return [self._apply_platform_format(story, platform) for story in stories]
     
-    def _generate_technical_tasks(self, feature_description: str, platform: str) -> List[Dict[str, Any]]:
+    def _generate_technical_tasks(self, feature_description: str, platform: str) -> list[dict[str, Any]]:
         """Generate supporting technical tasks."""
         tasks = [
             {
@@ -337,7 +337,7 @@ Feature implementation complete
         
         return [self._apply_platform_format(task, platform) for task in tasks]
     
-    def _apply_platform_format(self, issue: Dict[str, Any], platform: str) -> Dict[str, Any]:
+    def _apply_platform_format(self, issue: dict[str, Any], platform: str) -> dict[str, Any]:
         """Apply platform-specific formatting."""
         if platform == "github":
             return self._format_for_github(issue)
@@ -348,7 +348,7 @@ Feature implementation complete
         else:
             return issue
     
-    def _format_for_github(self, issue: Dict[str, Any]) -> Dict[str, Any]:
+    def _format_for_github(self, issue: dict[str, Any]) -> dict[str, Any]:
         """Format issue for GitHub Issues API."""
         github_issue = {
             "title": issue["title"],
@@ -364,7 +364,7 @@ Feature implementation complete
         
         return github_issue
     
-    def _format_for_jira(self, issue: Dict[str, Any]) -> Dict[str, Any]:
+    def _format_for_jira(self, issue: dict[str, Any]) -> dict[str, Any]:
         """Format issue for JIRA API."""
         return {
             "fields": {
@@ -380,7 +380,7 @@ Feature implementation complete
             }
         }
     
-    def _format_for_azure(self, issue: Dict[str, Any]) -> Dict[str, Any]:
+    def _format_for_azure(self, issue: dict[str, Any]) -> dict[str, Any]:
         """Format issue for Azure DevOps API."""
         return {
             "op": "add",
@@ -394,7 +394,7 @@ Feature implementation complete
             }
         }
     
-    def _load_template(self, template_type: str, platform: str) -> Dict[str, Any]:
+    def _load_template(self, template_type: str, platform: str) -> dict[str, Any]:
         """Load issue template from file."""
         template_file = self.templates_dir / f"{template_type}-template.json"
         if template_file.exists():
@@ -402,7 +402,7 @@ Feature implementation complete
                 return json.load(f)
         return {}
     
-    def validate_kanban_readiness(self, issues: List[Dict[str, Any]]) -> List[str]:
+    def validate_kanban_readiness(self, issues: list[dict[str, Any]]) -> list[str]:
         """Validate that issues meet Kanban flow criteria."""
         warnings = []
         

@@ -1,16 +1,17 @@
 """
-Tests for Mermaid diagram validation in README.md
+Tests for Mermaid diagram validation in README.md and experiments/README.md
 
-Validates that the pattern dependency diagram:
-1. Includes all expected patterns
-2. Has valid clickable links to pattern sections
-3. Uses correct anchor formats
+Validates that diagrams:
+1. Include all expected patterns
+2. Have valid clickable links to pattern sections
+3. Use correct anchor formats
+4. Have valid Mermaid syntax
 """
 
 import pytest
 import re
 import os
-from conftest import EXPECTED_PATTERNS, README_PATH
+from conftest import EXPECTED_PATTERNS, README_PATH, EXPERIMENTS_DIR
 
 # Path to index.html for GitHub Pages
 INDEX_HTML_PATH = os.path.join(os.path.dirname(README_PATH), 'index.html')
@@ -298,3 +299,104 @@ class TestIndexHtmlDiagram:
 
         assert not invalid_links, \
             f"Invalid link formats in index.html: {invalid_links}"
+
+
+class TestExperimentalMermaidDiagrams:
+    """Validate Mermaid diagrams in experiments/README.md"""
+
+    EXPERIMENTS_README = EXPERIMENTS_DIR / "README.md"
+
+    @pytest.fixture
+    def exp_content(self):
+        with open(self.EXPERIMENTS_README, 'r', encoding='utf-8') as f:
+            return f.read()
+
+    @pytest.fixture
+    def exp_diagrams(self, exp_content):
+        """Extract all Mermaid diagram blocks from experiments/README.md"""
+        diagrams = []
+        lines = exp_content.split('\n')
+        i = 0
+        while i < len(lines):
+            if lines[i].strip() == '```mermaid':
+                start = i + 1
+                i += 1
+                while i < len(lines) and lines[i].strip() != '```':
+                    i += 1
+                content = '\n'.join(lines[start:i])
+                diagrams.append({'start_line': start + 1, 'content': content})
+            i += 1
+        return diagrams
+
+    def test_experimental_diagrams_have_valid_type(self, exp_diagrams):
+        """Each Mermaid diagram must start with a valid diagram type"""
+        valid_types = [
+            'graph', 'flowchart', 'sequenceDiagram', 'classDiagram',
+            'stateDiagram', 'gitGraph', 'gantt', 'pie', 'erDiagram',
+            'journey', 'timeline'
+        ]
+        invalid = []
+        for diag in exp_diagrams:
+            first_line = diag['content'].split('\n')[0].strip()
+            if not any(first_line.startswith(t) for t in valid_types):
+                invalid.append({
+                    'line': diag['start_line'],
+                    'first_line': first_line
+                })
+        assert not invalid, \
+            f"Experimental diagrams with invalid type: {invalid}"
+
+    def test_experimental_diagrams_have_connections(self, exp_diagrams):
+        """Graph/flowchart diagrams must have at least one connection"""
+        missing_connections = []
+        for diag in exp_diagrams:
+            first = diag['content'].split('\n')[0].strip()
+            if first.startswith(('graph', 'flowchart')):
+                if '-->' not in diag['content'] and '---' not in diag['content']:
+                    missing_connections.append(diag['start_line'])
+        assert not missing_connections, \
+            f"Experimental diagrams without connections at lines: {missing_connections}"
+
+    def test_experimental_diagrams_no_duplicate_node_ids(self, exp_diagrams):
+        """Graph/flowchart diagrams should not have duplicate node definitions"""
+        duplicates = []
+        for diag in exp_diagrams:
+            first = diag['content'].split('\n')[0].strip()
+            if first.startswith(('graph', 'flowchart')):
+                node_ids = re.findall(
+                    r'^\s*(\w+)\s*[\[\(\{]', diag['content'], re.MULTILINE
+                )
+                seen = {}
+                for nid in node_ids:
+                    seen[nid] = seen.get(nid, 0) + 1
+                dups = [nid for nid, cnt in seen.items() if cnt > 1]
+                if dups:
+                    duplicates.append({
+                        'line': diag['start_line'], 'duplicates': dups
+                    })
+        assert not duplicates, \
+            f"Duplicate node IDs in experimental diagrams: {duplicates}"
+
+    def test_experimental_diagrams_balanced_brackets(self, exp_diagrams):
+        """Diagram node definitions should have balanced brackets"""
+        unbalanced = []
+        bracket_pairs = [('(', ')'), ('[', ']'), ('{', '}')]
+        for diag in exp_diagrams:
+            for open_b, close_b in bracket_pairs:
+                if diag['content'].count(open_b) != diag['content'].count(close_b):
+                    unbalanced.append({
+                        'line': diag['start_line'],
+                        'bracket': f'{open_b}{close_b}',
+                        'open': diag['content'].count(open_b),
+                        'close': diag['content'].count(close_b)
+                    })
+        # Sequence diagrams often have unbalanced parens in text — only fail for graph types
+        graph_unbalanced = []
+        for item in unbalanced:
+            for diag in exp_diagrams:
+                if diag['start_line'] == item['line']:
+                    first = diag['content'].split('\n')[0].strip()
+                    if first.startswith(('graph', 'flowchart')):
+                        graph_unbalanced.append(item)
+        assert not graph_unbalanced, \
+            f"Unbalanced brackets in experimental graph diagrams: {graph_unbalanced}"

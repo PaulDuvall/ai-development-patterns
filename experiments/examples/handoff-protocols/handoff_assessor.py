@@ -11,7 +11,6 @@ import re
 import yaml
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List, Optional, Tuple
 from pathlib import Path
 
 
@@ -43,8 +42,8 @@ class HandoffRecommendation:
     complexity_score: float
     reasoning: str
     factors: ComplexityFactors
-    estimated_effort: Optional[str] = None
-    risk_level: Optional[str] = None
+    estimated_effort: str | None = None
+    risk_level: str | None = None
 
 
 class TaskComplexityAssessor:
@@ -57,7 +56,7 @@ class TaskComplexityAssessor:
         self.creativity_keywords = self._load_creativity_keywords()
         self.integration_keywords = self._load_integration_keywords()
         
-    def _load_config(self, config_path: str) -> Dict:
+    def _load_config(self, config_path: str) -> dict:
         """Load configuration from YAML file."""
         try:
             with open(config_path, 'r') as f:
@@ -81,7 +80,7 @@ class TaskComplexityAssessor:
                 }
             }
     
-    def _load_security_keywords(self) -> List[str]:
+    def _load_security_keywords(self) -> list[str]:
         """Load security-sensitive keywords."""
         return [
             'authentication', 'authorization', 'jwt', 'oauth', 'token',
@@ -91,7 +90,7 @@ class TaskComplexityAssessor:
             'xss', 'csrf', 'sql injection', 'sanitize', 'validate input'
         ]
     
-    def _load_creativity_keywords(self) -> List[str]:
+    def _load_creativity_keywords(self) -> list[str]:
         """Load creative problem-solving keywords."""
         return [
             'design', 'architecture', 'algorithm', 'optimize', 'performance',
@@ -100,7 +99,7 @@ class TaskComplexityAssessor:
             'research', 'experiment', 'prototype', 'proof of concept'
         ]
     
-    def _load_integration_keywords(self) -> List[str]:
+    def _load_integration_keywords(self) -> list[str]:
         """Load system integration complexity keywords."""
         return [
             'integration', 'api', 'microservice', 'database', 'migration',
@@ -109,7 +108,7 @@ class TaskComplexityAssessor:
             'monitoring', 'logging', 'distributed', 'scalability'
         ]
     
-    def assess_task(self, task_description: str, context: Optional[Dict] = None) -> HandoffRecommendation:
+    def assess_task(self, task_description: str, context: dict | None = None) -> HandoffRecommendation:
         """
         Analyze task complexity and recommend handoff strategy.
         
@@ -149,7 +148,7 @@ class TaskComplexityAssessor:
             risk_level=risk
         )
     
-    def _calculate_complexity_factors(self, task_description: str, context: Dict) -> ComplexityFactors:
+    def _calculate_complexity_factors(self, task_description: str, context: dict) -> ComplexityFactors:
         """Calculate individual complexity factors from task analysis."""
         text = task_description.lower()
         
@@ -248,7 +247,7 @@ class TaskComplexityAssessor:
             
         return min(domain_score, 1.0)
     
-    def _assess_time_pressure(self, text: str, context: Dict) -> float:
+    def _assess_time_pressure(self, text: str, context: dict) -> float:
         """Assess time constraints and urgency."""
         time_score = 0.0
         
@@ -276,7 +275,7 @@ class TaskComplexityAssessor:
                 
         return min(time_score, 1.0)
     
-    def _assess_business_impact(self, text: str, context: Dict) -> float:
+    def _assess_business_impact(self, text: str, context: dict) -> float:
         """Assess business criticality and impact."""
         business_score = 0.0
         

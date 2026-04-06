@@ -5,12 +5,13 @@ Tests for example code validation - README code blocks and example directories
 import pytest
 from pathlib import Path
 from utils.example_validator import (
-    ExampleDirectoryValidator, 
+    ExampleDirectoryValidator,
     ReadmeCodeBlockValidator,
     CodeValidator
 )
 from utils.pattern_parser import PatternParser
 from utils.git_utils import git_ls_files, git_tracked_child_dirs
+from conftest import EXPERIMENTS_DIR
 
 
 class TestCodeExamples:
@@ -374,3 +375,128 @@ class TestExampleCompleteness:
             print(f"Example directories without direct pattern matches: {orphaned_examples}")
         
         # We don't assert failure here since some examples might be shared utilities
+
+
+class TestExperimentalCodeExamples:
+    """Validate code blocks in experiments/README.md"""
+
+    @pytest.fixture
+    def exp_content(self):
+        readme_path = EXPERIMENTS_DIR / "README.md"
+        with open(readme_path, 'r', encoding='utf-8') as f:
+            return f.read()
+
+    def test_experimental_python_blocks_parseable(self, exp_content):
+        """Python code blocks in experiments/README.md must parse"""
+        validator = ReadmeCodeBlockValidator(exp_content)
+        blocks = validator.extract_code_blocks()
+        python_blocks = [
+            b for b in blocks if b['language'].lower() in ('python', 'py')
+        ]
+        code_validator = CodeValidator(Path('.'))
+        invalid = []
+        for block in python_blocks:
+            if block['code'].strip():
+                ok, err = code_validator.validate_python_syntax(
+                    block['code'],
+                    f"experiments/README.md:{block['start_line']}-{block['end_line']}"
+                )
+                if not ok:
+                    invalid.append({
+                        'lines': f"{block['start_line']}-{block['end_line']}",
+                        'error': err,
+                        'preview': block['code'][:200]
+                    })
+        assert not invalid, f"Invalid Python in experiments/README.md: {invalid}"
+
+    def test_experimental_bash_blocks_parseable(self, exp_content):
+        """Bash code blocks in experiments/README.md must parse"""
+        validator = ReadmeCodeBlockValidator(exp_content)
+        blocks = validator.extract_code_blocks()
+        bash_blocks = [
+            b for b in blocks if b['language'].lower() in ('bash', 'shell', 'sh')
+        ]
+        code_validator = CodeValidator(Path('.'))
+        invalid = []
+        for block in bash_blocks:
+            code = block['code'].strip()
+            if code and not code.startswith('#'):
+                ok, err = code_validator.validate_bash_syntax(
+                    block['code'],
+                    f"experiments/README.md:{block['start_line']}-{block['end_line']}"
+                )
+                if not ok:
+                    invalid.append({
+                        'lines': f"{block['start_line']}-{block['end_line']}",
+                        'error': err,
+                        'preview': block['code'][:200]
+                    })
+        assert not invalid, f"Invalid Bash in experiments/README.md: {invalid}"
+
+    def test_experimental_yaml_blocks_parseable(self, exp_content):
+        """YAML code blocks in experiments/README.md must parse"""
+        validator = ReadmeCodeBlockValidator(exp_content)
+        blocks = validator.extract_code_blocks()
+        yaml_blocks = [
+            b for b in blocks if b['language'].lower() in ('yaml', 'yml')
+        ]
+        code_validator = CodeValidator(Path('.'))
+        invalid = []
+        for block in yaml_blocks:
+            if block['code'].strip():
+                ok, err = code_validator.validate_yaml_syntax(
+                    block['code'],
+                    f"experiments/README.md:{block['start_line']}-{block['end_line']}"
+                )
+                if not ok:
+                    invalid.append({
+                        'lines': f"{block['start_line']}-{block['end_line']}",
+                        'error': err,
+                        'preview': block['code'][:200]
+                    })
+        assert not invalid, f"Invalid YAML in experiments/README.md: {invalid}"
+
+    def test_experimental_example_directories_have_readmes(self, repo_root):
+        """All experiment example directories must have README.md"""
+        missing = []
+        for d in git_tracked_child_dirs(repo_root, "experiments/examples"):
+            if not (d / "README.md").exists():
+                missing.append(str(d.relative_to(repo_root)))
+        assert not missing, \
+            f"Experiment example directories missing README.md: {missing}"
+
+    def test_experimental_python_files_valid(self, repo_root):
+        """Python files in experiments/examples must be syntactically valid"""
+        code_validator = CodeValidator(repo_root)
+        invalid = []
+        for rel_path in git_ls_files(repo_root, "experiments/examples"):
+            if not rel_path.endswith(".py"):
+                continue
+            py_file = repo_root / rel_path
+            try:
+                with open(py_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                ok, err = code_validator.validate_python_syntax(content, rel_path)
+                if not ok:
+                    invalid.append({'file': rel_path, 'error': err})
+            except Exception as e:
+                invalid.append({'file': rel_path, 'error': str(e)})
+        assert not invalid, f"Invalid Python in experiments/examples: {invalid}"
+
+    def test_experimental_shell_scripts_valid(self, repo_root):
+        """Shell scripts in experiments/examples must pass bash -n"""
+        code_validator = CodeValidator(repo_root)
+        invalid = []
+        for rel_path in git_ls_files(repo_root, "experiments/examples"):
+            if not rel_path.endswith(".sh"):
+                continue
+            sh_file = repo_root / rel_path
+            try:
+                with open(sh_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                ok, err = code_validator.validate_bash_syntax(content, rel_path)
+                if not ok:
+                    invalid.append({'file': rel_path, 'error': err})
+            except Exception as e:
+                invalid.append({'file': rel_path, 'error': str(e)})
+        assert not invalid, f"Invalid shell scripts in experiments/examples: {invalid}"

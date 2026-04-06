@@ -3,7 +3,6 @@ Tests for pattern dependency validation and dependency graph analysis
 """
 
 import pytest
-from typing import Dict, List, Set, Tuple
 from utils.pattern_parser import PatternParser, ReferenceTableParser
 from conftest import PATTERN_CATEGORIES, EXPECTED_PATTERNS
 
@@ -11,11 +10,11 @@ from conftest import PATTERN_CATEGORIES, EXPECTED_PATTERNS
 class DependencyGraphAnalyzer:
     """Analyzer for pattern dependency relationships"""
     
-    def __init__(self, patterns_data: Dict[str, Dict[str, str]]):
+    def __init__(self, patterns_data: dict[str, dict[str, str]]):
         self.patterns_data = patterns_data
         self.dependency_graph = self._build_dependency_graph()
-    
-    def _build_dependency_graph(self) -> Dict[str, List[str]]:
+
+    def _build_dependency_graph(self) -> dict[str, list[str]]:
         """Build dependency graph from pattern data"""
         graph = {}
         
@@ -39,7 +38,7 @@ class DependencyGraphAnalyzer:
         
         return graph
     
-    def find_circular_dependencies(self) -> List[List[str]]:
+    def find_circular_dependencies(self) -> list[list[str]]:
         """Find circular dependencies in the graph"""
         visited = set()
         rec_stack = set()
@@ -71,7 +70,7 @@ class DependencyGraphAnalyzer:
         
         return cycles
     
-    def validate_dependency_existence(self) -> List[Dict[str, str]]:
+    def validate_dependency_existence(self) -> list[dict[str, str]]:
         """Validate all dependencies refer to existing patterns"""
         invalid_deps = []
         
@@ -93,7 +92,7 @@ class DependencyGraphAnalyzer:
         matches = get_close_matches(target, pattern_names, n=1, cutoff=0.6)
         return matches[0] if matches else "No similar pattern found"
     
-    def analyze_dependency_depth(self) -> Dict[str, int]:
+    def analyze_dependency_depth(self) -> dict[str, int]:
         """Calculate dependency depth for each pattern"""
         depths = {}
         
@@ -128,7 +127,7 @@ class DependencyGraphAnalyzer:
         
         return depths
     
-    def validate_maturity_level_progression(self) -> List[Dict[str, str]]:
+    def validate_maturity_level_progression(self) -> list[dict[str, str]]:
         """Validate that dependencies follow logical maturity progression"""
         maturity_order = {'Beginner': 0, 'Intermediate': 1, 'Advanced': 2}
         violations = []

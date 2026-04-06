@@ -10,14 +10,14 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any
 
 class QualityMetrics:
     def __init__(self, source_dir: str = "src"):
         self.source_dir = source_dir
         self.metrics_file = Path("quality_metrics.json")
     
-    def measure_complexity(self) -> Dict[str, Any]:
+    def measure_complexity(self) -> dict[str, Any]:
         """Measure cyclomatic complexity using radon."""
         try:
             result = subprocess.run(
@@ -50,7 +50,7 @@ class QualityMetrics:
         except (subprocess.CalledProcessError, FileNotFoundError):
             return {"error": "radon not available"}
     
-    def measure_coverage(self) -> Dict[str, Any]:
+    def measure_coverage(self) -> dict[str, Any]:
         """Measure test coverage using coverage.py."""
         try:
             # Run tests with coverage
@@ -76,7 +76,7 @@ class QualityMetrics:
         except (subprocess.CalledProcessError, FileNotFoundError):
             return {"error": "coverage not available"}
     
-    def measure_duplication(self) -> Dict[str, Any]:
+    def measure_duplication(self) -> dict[str, Any]:
         """Measure code duplication using pylint."""
         try:
             result = subprocess.run(
@@ -99,7 +99,7 @@ class QualityMetrics:
         except (subprocess.CalledProcessError, FileNotFoundError, json.JSONDecodeError):
             return {"error": "pylint not available"}
     
-    def measure_maintainability(self) -> Dict[str, Any]:
+    def measure_maintainability(self) -> dict[str, Any]:
         """Measure maintainability index using radon."""
         try:
             result = subprocess.run(
@@ -136,7 +136,7 @@ class QualityMetrics:
         elif mi_score >= 25: return "D"
         else: return "F"
     
-    def collect_all_metrics(self) -> Dict[str, Any]:
+    def collect_all_metrics(self) -> dict[str, Any]:
         """Collect all quality metrics."""
         return {
             "timestamp": datetime.now().isoformat(),
@@ -201,7 +201,7 @@ class QualityMetrics:
         # Calculate and display improvements
         self._display_improvements(baseline, current)
     
-    def _display_improvements(self, baseline: Dict, current: Dict):
+    def _display_improvements(self, baseline: dict, current: dict):
         """Display improvement comparison."""
         print("\n📊 Refactoring Impact Analysis")
         print("=" * 50)
@@ -246,7 +246,7 @@ class QualityMetrics:
         print(f"\n✅ Metrics collected at: {current['timestamp']}")
         print(f"📁 Data saved to: {self.metrics_file}")
     
-    def _print_metrics_summary(self, metrics: Dict):
+    def _print_metrics_summary(self, metrics: dict):
         """Print a summary of current metrics."""
         print("\n📊 Current Quality Metrics")
         print("=" * 30)

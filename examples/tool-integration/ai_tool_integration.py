@@ -17,7 +17,7 @@ import sqlite3
 import requests
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Any, Tuple, Optional
+from typing import Any
 
 
 class ToolAugmentedAI:
@@ -33,7 +33,7 @@ class ToolAugmentedAI:
             "system_info": self._system_info
         }
     
-    def _load_tool_config(self, config_path: str) -> Dict[str, Any]:
+    def _load_tool_config(self, config_path: str) -> dict[str, Any]:
         """Load tool configuration securely"""
         config_file = Path(config_path)
         if config_file.exists():
@@ -51,7 +51,7 @@ class ToolAugmentedAI:
         conn.row_factory = sqlite3.Row  # Enable column access by name
         return conn
     
-    def _query_database(self, query: str, params: Tuple = ()) -> List[Dict[str, Any]]:
+    def _query_database(self, query: str, params: tuple = ()) -> list[dict[str, Any]]:
         """Execute database queries safely"""
         # Whitelist allowed operations (read-only)
         allowed_operations = ["SELECT", "WITH"]
@@ -65,7 +65,7 @@ class ToolAugmentedAI:
         results = cursor.fetchmany(self.config["max_query_results"])
         return [dict(row) for row in results]
     
-    def _file_operations(self, operation: str, path: str, content: Optional[str] = None) -> Dict[str, Any]:
+    def _file_operations(self, operation: str, path: str, content: str | None = None) -> dict[str, Any]:
         """Safe file operations within allowed paths"""
         file_path = Path(path)
         
@@ -96,7 +96,7 @@ class ToolAugmentedAI:
         else:
             return {"error": f"Unknown operation: {operation}"}
     
-    def _api_requests(self, url: str, method: str = "GET", data: Optional[Dict] = None) -> Dict[str, Any]:
+    def _api_requests(self, url: str, method: str = "GET", data: dict | None = None) -> dict[str, Any]:
         """Make HTTP requests to allowed APIs"""
         from urllib.parse import urlparse
         
@@ -121,7 +121,7 @@ class ToolAugmentedAI:
         except requests.RequestException as e:
             return {"error": str(e), "status": "failed"}
     
-    def _system_info(self) -> Dict[str, Any]:
+    def _system_info(self) -> dict[str, Any]:
         """Get safe system information"""
         return {
             "timestamp": datetime.now().isoformat(),
@@ -131,7 +131,7 @@ class ToolAugmentedAI:
             "available_tools": list(self.available_tools.keys())
         }
     
-    def execute_with_tools(self, ai_request: str, tool_calls: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def execute_with_tools(self, ai_request: str, tool_calls: list[dict[str, Any]]) -> dict[str, Any]:
         """Execute AI request with tool augmentation"""
         results = {
             "request": ai_request,

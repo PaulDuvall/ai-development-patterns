@@ -16,7 +16,7 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
-    read_only: false
+    read_only: true
 
     # Volume mounts - read-only source, read/write for AI outputs and logs
     volumes:

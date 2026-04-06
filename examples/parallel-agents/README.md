@@ -129,6 +129,7 @@ import json
 import asyncio
 from pathlib import Path
 from datetime import datetime
+from typing import Any
 import click
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
@@ -272,7 +273,7 @@ enum Status {
         shared_data = await self.read_shared_memory()
         console.print(f"[cyan]Test agent found {len(shared_data.get('discoveries', {}))} items to test[/cyan]")
     
-    async def update_shared_memory(self, key: str, value: any):
+    async def update_shared_memory(self, key: str, value: Any):
         """Update shared memory with discoveries"""
         # This would use the shared_memory.py module in production
         console.print(f"[dim]Agent {self.agent_id} sharing: {key}[/dim]")
@@ -317,7 +318,7 @@ import os
 import json
 import time
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from rich.console import Console
 from rich.table import Table
 from rich.live import Live

@@ -8,7 +8,7 @@ import subprocess
 import tempfile
 import yaml
 import json
-from typing import List, Dict, Tuple, Optional
+from typing import Any
 from pathlib import Path
 from utils.git_utils import git_ls_files, git_tracked_child_dirs
 
@@ -21,7 +21,7 @@ class CodeValidator:
         self.examples_dir = self.repo_root / "examples"
         self.experiments_dir = self.repo_root / "experiments"
     
-    def validate_python_syntax(self, code: str, filename: str = "<string>") -> Tuple[bool, str]:
+    def validate_python_syntax(self, code: str, filename: str = "<string>") -> tuple[bool, str]:
         """Validate Python code syntax"""
         try:
             ast.parse(code)
@@ -31,7 +31,7 @@ class CodeValidator:
         except Exception as e:
             return False, f"Error parsing {filename}: {e}"
     
-    def validate_bash_syntax(self, code: str, filename: str = "<string>") -> Tuple[bool, str]:
+    def validate_bash_syntax(self, code: str, filename: str = "<string>") -> tuple[bool, str]:
         """Validate bash script syntax using bash -n"""
         try:
             with tempfile.NamedTemporaryFile(mode='w', suffix='.sh', delete=False) as f:
@@ -58,7 +58,7 @@ class CodeValidator:
         except Exception as e:
             return False, f"Error validating bash syntax in {filename}: {e}"
     
-    def validate_yaml_syntax(self, code: str, filename: str = "<string>") -> Tuple[bool, str]:
+    def validate_yaml_syntax(self, code: str, filename: str = "<string>") -> tuple[bool, str]:
         """Validate YAML syntax with support for CloudFormation and template formats"""
         try:
             # First try with safe_load for standard YAML
@@ -108,7 +108,7 @@ class CodeValidator:
         except Exception as e:
             return False, f"Error parsing YAML in {filename}: {e}"
     
-    def validate_json_syntax(self, code: str, filename: str = "<string>") -> Tuple[bool, str]:
+    def validate_json_syntax(self, code: str, filename: str = "<string>") -> tuple[bool, str]:
         """Validate JSON syntax"""
         try:
             json.loads(code)
@@ -118,7 +118,7 @@ class CodeValidator:
         except Exception as e:
             return False, f"Error parsing JSON in {filename}: {e}"
     
-    def validate_dockerfile_syntax(self, code: str, filename: str = "<string>") -> Tuple[bool, str]:
+    def validate_dockerfile_syntax(self, code: str, filename: str = "<string>") -> tuple[bool, str]:
         """Basic Dockerfile syntax validation"""
         lines = code.strip().split('\n')
         errors = []
@@ -177,7 +177,7 @@ class ExampleDirectoryValidator:
         self.experiments_dir = self.repo_root / "experiments"
         self.code_validator = CodeValidator(repo_root)
     
-    def validate_example_directory(self, dir_path: Path) -> Dict[str, any]:
+    def validate_example_directory(self, dir_path: Path) -> dict[str, Any]:
         """Validate a complete example directory"""
         if not dir_path.exists() or not dir_path.is_dir():
             return {
@@ -290,7 +290,7 @@ class ExampleDirectoryValidator:
             'code_files': len([p for p in tracked_paths if p.suffix.lower() in code_file_extensions])
         }
     
-    def validate_all_examples(self) -> Dict[str, Dict[str, any]]:
+    def validate_all_examples(self) -> dict[str, dict[str, Any]]:
         """Validate all example directories"""
         results = {}
         
@@ -311,7 +311,7 @@ class ExampleDirectoryValidator:
         
         return results
     
-    def check_example_completeness(self, pattern_name: str) -> Dict[str, any]:
+    def check_example_completeness(self, pattern_name: str) -> dict[str, Any]:
         """Check if a pattern has a complete example implementation"""
         # Convert pattern name to directory name
         dir_name = pattern_name.lower().replace(' ', '-').replace('&', '').replace(',', '')
@@ -346,7 +346,7 @@ class ReadmeCodeBlockValidator:
         self.readme_content = readme_content
         self.code_validator = CodeValidator(Path('.'))
     
-    def extract_code_blocks(self) -> List[Dict[str, any]]:
+    def extract_code_blocks(self) -> list[dict[str, Any]]:
         """Extract all code blocks from README with their languages"""
         lines = self.readme_content.split('\n')
         code_blocks = []
@@ -377,7 +377,7 @@ class ReadmeCodeBlockValidator:
         
         return code_blocks
     
-    def validate_all_code_blocks(self) -> List[Dict[str, any]]:
+    def validate_all_code_blocks(self) -> list[dict[str, Any]]:
         """Validate all code blocks in README"""
         code_blocks = self.extract_code_blocks()
         validation_results = []

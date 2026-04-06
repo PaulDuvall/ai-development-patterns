@@ -7,7 +7,8 @@ import os
 from utils.link_checker import LinkChecker
 from utils.markdown_link_validator import MarkdownLinkValidator
 from utils.pattern_parser import PatternParser, ReferenceTableParser
-from conftest import EXPECTED_PATTERNS
+from utils.experimental_pattern_parser import ExperimentalPatternParser
+from conftest import EXPECTED_PATTERNS, EXPERIMENTS_DIR
 
 
 class TestHyperlinkIntegrity:
@@ -284,6 +285,45 @@ class TestLinkQuality:
         # This is a quality check - warn but don't fail
         if poor_link_text:
             print(f"Quality issue: Non-descriptive link text found: {poor_link_text}")
+
+
+class TestExperimentalLinkIntegrity:
+    """Validate internal anchor links within experiments/README.md"""
+
+    @pytest.fixture
+    def exp_content(self):
+        readme_path = EXPERIMENTS_DIR / "README.md"
+        with open(readme_path, 'r', encoding='utf-8') as f:
+            return f.read()
+
+    def test_experimental_internal_anchors_valid(self, exp_content):
+        """All internal #anchor links in experiments/README.md must resolve"""
+        checker = LinkChecker(exp_content)
+        invalid = checker.validate_internal_links()
+        assert not invalid, \
+            f"Broken internal anchors in experiments/README.md: {invalid}"
+
+    def test_experimental_reference_table_anchors_valid(self, exp_content):
+        """Reference table anchor links must point to existing sections"""
+        parser = ExperimentalPatternParser(exp_content)
+        table = parser.extract_reference_table()
+        checker = LinkChecker(exp_content)
+        anchors = checker.extract_anchors()
+
+        broken = []
+        for name, data in table.items():
+            anchor = data.get('anchor_link', '')
+            if anchor and anchor not in anchors:
+                broken.append({'pattern': name, 'anchor': anchor})
+        assert not broken, \
+            f"Broken reference table anchors in experiments/README.md: {broken}"
+
+    def test_experimental_relative_links_exist(self, exp_content):
+        """Relative file links in experiments/README.md must exist on disk"""
+        checker = LinkChecker(exp_content)
+        invalid = checker.validate_relative_links(str(EXPERIMENTS_DIR))
+        assert not invalid, \
+            f"Broken relative links in experiments/README.md: {invalid}"
 
 
 class TestRepositoryMarkdownLinks:

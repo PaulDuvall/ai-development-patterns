@@ -9,7 +9,7 @@ import subprocess
 
 def check_python():
     """Check Python is working"""
-    return sys.version_info >= (3, 8)
+    return sys.version_info >= (3, 11)
 
 def check_workspace():
     """Check workspace directory exists and is accessible"""

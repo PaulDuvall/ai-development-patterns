@@ -17,7 +17,6 @@ import re
 import os
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple, Set
 import ast
 
 
@@ -29,7 +28,7 @@ class SpecificationValidator:
         self.test_dir = Path(test_dir)
         self.authority_levels = {"system": 3, "platform": 2, "feature": 1}
         
-    def extract_specifications(self) -> Dict[str, Dict]:
+    def extract_specifications(self) -> dict[str, dict]:
         """Extract specifications with authority levels and test references"""
         if not self.spec_file.exists():
             print(f"❌ Specification file not found: {self.spec_file}")
@@ -84,7 +83,7 @@ class SpecificationValidator:
         
         return specifications
     
-    def find_test_files(self) -> Set[str]:
+    def find_test_files(self) -> set[str]:
         """Find all test files in the test directory"""
         test_files = set()
         if self.test_dir.exists():
@@ -93,7 +92,7 @@ class SpecificationValidator:
                     test_files.add(str(test_file))
         return test_files
     
-    def validate_test_references(self, specifications: Dict[str, Dict]) -> Dict[str, List[str]]:
+    def validate_test_references(self, specifications: dict[str, dict]) -> dict[str, list[str]]:
         """Validate that referenced test files and functions exist"""
         validation_results = {}
         test_files = self.find_test_files()
@@ -129,7 +128,7 @@ class SpecificationValidator:
         
         return validation_results
     
-    def check_authority_conflicts(self, specifications: Dict[str, Dict]) -> List[str]:
+    def check_authority_conflicts(self, specifications: dict[str, dict]) -> list[str]:
         """Check for potential authority conflicts"""
         conflicts = []
         
@@ -170,8 +169,8 @@ class SpecificationValidator:
         
         return conflicts
     
-    def generate_coverage_report(self, specifications: Dict[str, Dict], 
-                               validation_results: Dict[str, List[str]]) -> str:
+    def generate_coverage_report(self, specifications: dict[str, dict],
+                               validation_results: dict[str, list[str]]) -> str:
         """Generate specification coverage report"""
         total_specs = len(specifications)
         total_tests = sum(len(spec["test_references"]) for spec in specifications.values())
@@ -202,7 +201,7 @@ class SpecificationValidator:
         
         return "\n".join(report)
     
-    def validate_syntax(self) -> List[str]:
+    def validate_syntax(self) -> list[str]:
         """Validate specification syntax and structure"""
         errors = []
         

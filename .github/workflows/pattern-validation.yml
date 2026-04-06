@@ -316,12 +316,14 @@ jobs:
   notify-failure:
     runs-on: ubuntu-latest
     name: Notify on Failure
+    permissions:
+      issues: write
     needs: [pattern-compliance, readme-accuracy, link-validation, example-validation, dependency-validation, diagram-validation, yaml-readme-sync]
     if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
+
     steps:
     - name: Create Issue on Failure
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         script: |
           const title = `Pattern Validation Failed - ${new Date().toISOString().split('T')[0]}`;

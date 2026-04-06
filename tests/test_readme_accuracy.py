@@ -2,10 +2,12 @@
 Tests for README.md accuracy and consistency validation
 """
 
+import os
 import pytest
 import re
 from utils.pattern_parser import PatternParser, ReferenceTableParser
-from conftest import PATTERN_CATEGORIES, EXPECTED_PATTERNS
+from utils.experimental_pattern_parser import ExperimentalPatternParser
+from conftest import PATTERN_CATEGORIES, EXPECTED_PATTERNS, EXPERIMENTS_DIR
 
 
 class TestReadmeAccuracy:
@@ -257,3 +259,126 @@ class TestReadmeAccuracy:
         from difflib import SequenceMatcher
         ratio = SequenceMatcher(None, s1.lower(), s2.lower()).ratio()
         return 0.7 <= ratio < 1.0  # Similar but not identical
+
+
+class TestExperimentalReadmeAccuracy:
+    """Validate experiments/README.md accuracy and internal consistency"""
+
+    @pytest.fixture
+    def exp_content(self):
+        readme_path = EXPERIMENTS_DIR / "README.md"
+        with open(readme_path, 'r', encoding='utf-8') as f:
+            return f.read()
+
+    @pytest.fixture
+    def exp_parser(self, exp_content):
+        return ExperimentalPatternParser(exp_content)
+
+    def test_examples_index_matches_disk(self):
+        """experiments/examples/README.md index must match actual subdirectories"""
+        examples_dir = EXPERIMENTS_DIR / "examples"
+        index_path = examples_dir / "README.md"
+        if not index_path.exists():
+            pytest.skip("experiments/examples/README.md not found")
+
+        with open(index_path, 'r', encoding='utf-8') as f:
+            index_content = f.read()
+
+        # Extract directory names from the table links
+        linked_dirs = set(re.findall(r'\[`([^`]+)/`\]', index_content))
+
+        # Get git-tracked subdirectories (excludes empty/untracked placeholders)
+        from utils.git_utils import git_tracked_child_dirs
+        repo_root = EXPERIMENTS_DIR.parent
+        actual_dirs = {
+            d.name for d in git_tracked_child_dirs(repo_root, "experiments/examples")
+        }
+
+        in_index_not_on_disk = linked_dirs - actual_dirs
+        on_disk_not_in_index = actual_dirs - linked_dirs
+
+        issues = []
+        if in_index_not_on_disk:
+            issues.append(f"Listed in index but missing on disk: {sorted(in_index_not_on_disk)}")
+        if on_disk_not_in_index:
+            issues.append(f"On disk but missing from index: {sorted(on_disk_not_in_index)}")
+
+        assert not issues, f"experiments/examples index mismatch: {issues}"
+
+    def test_experimental_file_references_exist(self, exp_content):
+        """File paths referenced outside code blocks must exist on disk"""
+        lines = exp_content.split('\n')
+        in_code_block = False
+        refs = set()
+
+        for line in lines:
+            if line.strip().startswith('```'):
+                in_code_block = not in_code_block
+                continue
+            if in_code_block:
+                continue
+            # Match markdown links and prose references to examples/ paths
+            found = re.findall(
+                r'(?:examples|scripts)/[a-zA-Z0-9_-]+(?:/[a-zA-Z0-9_.-]+)*/?',
+                line
+            )
+            refs.update(found)
+
+        missing = []
+        for ref in sorted(refs):
+            full = EXPERIMENTS_DIR / ref
+            if not full.exists():
+                missing.append(ref)
+
+        assert not missing, \
+            f"File references in experiments/README.md point to missing paths: {missing}"
+
+    def test_experimental_mermaid_diagrams_syntax(self, exp_content):
+        """Mermaid diagrams in experiments/README.md must have valid type keywords"""
+        lines = exp_content.split('\n')
+        errors = []
+        in_mermaid = False
+        start = 0
+
+        valid_types = [
+            'graph', 'flowchart', 'sequenceDiagram', 'classDiagram',
+            'stateDiagram', 'gitGraph', 'gantt', 'pie', 'erDiagram',
+            'journey', 'timeline'
+        ]
+
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            if stripped == '```mermaid':
+                in_mermaid = True
+                start = i + 1
+            elif stripped == '```' and in_mermaid:
+                in_mermaid = False
+                diagram_lines = lines[start:i]
+                if diagram_lines:
+                    first = diagram_lines[0].strip()
+                    if not any(first.startswith(t) for t in valid_types):
+                        errors.append({
+                            'line': start + 1,
+                            'first_line': first,
+                            'error': 'Unknown Mermaid diagram type'
+                        })
+
+        assert not errors, f"Mermaid syntax errors in experiments/README.md: {errors}"
+
+    def test_experimental_code_block_languages(self, exp_content):
+        """Code blocks should use recognized language tags"""
+        lines = exp_content.split('\n')
+        valid_langs = {
+            'bash', 'shell', 'sh', 'python', 'py', 'yaml', 'yml',
+            'json', 'javascript', 'js', 'markdown', 'md', 'mermaid',
+            'dockerfile', 'docker', 'xml', 'html', 'css', 'sql', ''
+        }
+        issues = []
+        for i, line in enumerate(lines):
+            if line.strip().startswith('```'):
+                lang = line.strip()[3:].strip()
+                if lang.lower() not in valid_langs:
+                    issues.append({'line': i + 1, 'language': lang})
+
+        if issues:
+            print(f"Warning: Non-standard language tags in experiments/README.md: {issues}")

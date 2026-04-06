@@ -1268,6 +1268,8 @@ git worktree remove ../agent-tests
 **Shared Memory & Coordination**
 
 ```python
+import fcntl
+
 # Agent coordination with shared knowledge
 class AgentMemory:
     def record_learning(self, agent_id, key, value):
@@ -1760,15 +1762,15 @@ Combine with [Event Automation](#event-automation) to auto-load the right rules 
 FILE_PATH="$TOOL_INPUT_FILE_PATH"
 LOADED_RULES=""
 
-if echo "$FILE_PATH" | rg -q "(\\.env|credentials|secrets|auth/)"; then
+if echo "$FILE_PATH" | grep -Eq "(\\.env|credentials|secrets|auth/)"; then
   LOADED_RULES="$LOADED_RULES .ai/rules/security/"
 fi
 
-if echo "$FILE_PATH" | rg -q "(api/|routes/|controllers/)"; then
+if echo "$FILE_PATH" | grep -Eq "(api/|routes/|controllers/)"; then
   LOADED_RULES="$LOADED_RULES .ai/rules/development/api-design.md"
 fi
 
-if echo "$FILE_PATH" | rg -q "(tests?/|spec/|\\.test\\.|\\.spec\\.)"; then
+if echo "$FILE_PATH" | grep -Eq "(tests?/|spec/|\\.test\\.|\\.spec\\.)"; then
   LOADED_RULES="$LOADED_RULES .ai/rules/development/testing.md"
 fi
 

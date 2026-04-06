@@ -4,7 +4,7 @@ Link validation utilities for checking internal and external hyperlinks
 
 import re
 import requests
-from typing import List, Dict, Tuple, Set
+from typing import Any
 from urllib.parse import urlparse
 import time
 
@@ -18,7 +18,7 @@ class LinkChecker:
         self.timeout = timeout
         self._external_cache = {}  # Cache for external link checks
         
-    def find_all_links(self) -> Dict[str, List[Tuple[str, int]]]:
+    def find_all_links(self) -> dict[str, list[tuple[str, int]]]:
         """Find all links in the README categorized by type"""
         links = {
             'internal': [],      # Links to #anchors
@@ -45,7 +45,7 @@ class LinkChecker:
         
         return links
     
-    def extract_anchors(self) -> Set[str]:
+    def extract_anchors(self) -> set[str]:
         """Extract all valid anchor targets from headers in README"""
         anchors = set()
         
@@ -60,7 +60,7 @@ class LinkChecker:
         
         return anchors
     
-    def validate_internal_links(self) -> List[Dict[str, any]]:
+    def validate_internal_links(self) -> list[dict[str, Any]]:
         """Validate all internal anchor links"""
         links = self.find_all_links()
         anchors = self.extract_anchors()
@@ -77,7 +77,7 @@ class LinkChecker:
         
         return invalid_links
     
-    def validate_external_links(self, check_live: bool = True) -> List[Dict[str, any]]:
+    def validate_external_links(self, check_live: bool = True) -> list[dict[str, Any]]:
         """Validate external HTTP/HTTPS links"""
         if not check_live:
             return []
@@ -105,7 +105,7 @@ class LinkChecker:
         
         return invalid_links
     
-    def validate_relative_links(self, repo_root_path: str) -> List[Dict[str, any]]:
+    def validate_relative_links(self, repo_root_path: str) -> list[dict[str, Any]]:
         """Validate relative file path links"""
         import os
         
@@ -142,13 +142,13 @@ class LinkChecker:
         
         # Convert to lowercase and replace spaces with hyphens
         anchor = text.lower()
-        anchor = re.sub(r'[^a-z0-9\s-]', '', anchor)      # Remove special chars
-        anchor = re.sub(r'\s+', '-', anchor)              # Spaces to hyphens
+        anchor = re.sub(r'[^a-z0-9 -]', '', anchor)        # Remove special chars (keep spaces)
+        anchor = anchor.replace(' ', '-')                  # Each space becomes a hyphen (matches GitHub)
         anchor = anchor.strip('-')                         # Remove leading/trailing hyphens
         
         return anchor
     
-    def _check_external_url(self, url: str) -> Tuple[bool, str]:
+    def _check_external_url(self, url: str) -> tuple[bool, str]:
         """Check if external URL is accessible"""
         try:
             # Use HEAD request for efficiency
@@ -171,7 +171,7 @@ class LinkChecker:
         except Exception as e:
             return False, f"Unexpected error: {str(e)}"
     
-    def validate_pattern_references(self, patterns: List[str]) -> List[Dict[str, any]]:
+    def validate_pattern_references(self, patterns: list[str]) -> list[dict[str, Any]]:
         """Validate that all pattern references are properly linked"""
         invalid_references = []
         in_code_block = False
@@ -234,7 +234,7 @@ class LinkChecker:
         
         return invalid_references
     
-    def generate_link_report(self, check_external: bool = True) -> Dict[str, any]:
+    def generate_link_report(self, check_external: bool = True) -> dict[str, Any]:
         """Generate comprehensive link validation report"""
         report = {
             'total_links': 0,

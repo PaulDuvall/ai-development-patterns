@@ -16,8 +16,6 @@ Exit codes:
 import re
 import sys
 from pathlib import Path
-from typing import List, Tuple, Dict, Set
-
 
 # Negative prefixes and modifiers for antipatterns
 NEGATIVE_PREFIXES = {
@@ -48,10 +46,10 @@ class ValidationError:
 
 class PatternValidator:
     def __init__(self):
-        self.errors: List[ValidationError] = []
-        self.warnings: List[str] = []
-        self.patterns_found: Set[str] = set()
-        self.antipatterns_found: Set[str] = set()
+        self.errors: list[ValidationError] = []
+        self.warnings: list[str] = []
+        self.patterns_found: set[str] = set()
+        self.antipatterns_found: set[str] = set()
 
     def count_words(self, name: str) -> int:
         """Count words in a pattern name. Hyphenated words count as one word."""
@@ -80,7 +78,7 @@ class PatternValidator:
 
         return False
 
-    def has_avoid_words(self, name: str) -> List[str]:
+    def has_avoid_words(self, name: str) -> list[str]:
         """Check if pattern name contains words to avoid."""
         words = [w.lower().replace('-', '') for w in name.split()]
         found_avoid = []
@@ -174,7 +172,7 @@ class PatternValidator:
 
         return valid
 
-    def extract_patterns_from_reference_table(self, content: str, start_marker: str, end_marker: str) -> List[Tuple[str, int]]:
+    def extract_patterns_from_reference_table(self, content: str, start_marker: str, end_marker: str) -> list[tuple[str, int]]:
         """Extract pattern names from reference table in markdown."""
         patterns = []
         lines = content.split('\n')
@@ -200,7 +198,7 @@ class PatternValidator:
 
         return patterns
 
-    def extract_patterns_from_headers(self, content: str, header_level: str = '##') -> List[Tuple[str, int]]:
+    def extract_patterns_from_headers(self, content: str, header_level: str = '##') -> list[tuple[str, int]]:
         """Extract pattern names from section headers."""
         patterns = []
         lines = content.split('\n')
@@ -296,7 +294,7 @@ class PatternValidator:
 
         return len(self.errors) == 0
 
-    def check_for_old_names(self, repo_root: Path) -> List[Tuple[str, str, int]]:
+    def check_for_old_names(self, repo_root: Path) -> list[tuple[str, str, int]]:
         """Search for old pattern names that should have been renamed."""
         old_names = [
             "AI Readiness Assessment", "Rules as Code", "AI Security Sandbox",

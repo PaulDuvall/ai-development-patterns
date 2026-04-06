@@ -10,7 +10,7 @@ import os
 import time
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import Dict, Any, List, Optional
+from typing import Any
 from dataclasses import dataclass, asdict
 import hashlib
 
@@ -23,7 +23,7 @@ class AgentDiscovery:
     value: Any
     timestamp: str
     confidence: float = 1.0
-    tags: List[str] = None
+    tags: list[str] = None
     
     def __post_init__(self):
         if self.tags is None:
@@ -105,7 +105,7 @@ class AgentMemory:
         finally:
             self._release_lock(lock_file)
     
-    def get_shared_knowledge(self, agent_id: Optional[str] = None) -> Dict[str, Any]:
+    def get_shared_knowledge(self, agent_id: str | None = None) -> dict[str, Any]:
         """Retrieve shared knowledge, optionally filtered by agent"""
         lock_file = self._acquire_lock(exclusive=False)
         try:
@@ -119,7 +119,7 @@ class AgentMemory:
         finally:
             self._release_lock(lock_file)
     
-    def get_conflicts(self) -> List[Dict[str, Any]]:
+    def get_conflicts(self) -> list[dict[str, Any]]:
         """Get all recorded conflicts between agents"""
         lock_file = self._acquire_lock(exclusive=False)
         try:
@@ -130,7 +130,7 @@ class AgentMemory:
         finally:
             self._release_lock(lock_file)
     
-    def record_decision(self, key: str, decision: Dict[str, Any], decided_by: str):
+    def record_decision(self, key: str, decision: dict[str, Any], decided_by: str):
         """Record a decision made to resolve conflicts or choose implementations"""
         lock_file = self._acquire_lock()
         try:
@@ -149,7 +149,7 @@ class AgentMemory:
         finally:
             self._release_lock(lock_file)
     
-    def get_agent_summary(self) -> Dict[str, Any]:
+    def get_agent_summary(self) -> dict[str, Any]:
         """Get summary statistics about agent activities"""
         lock_file = self._acquire_lock(exclusive=False)
         try:

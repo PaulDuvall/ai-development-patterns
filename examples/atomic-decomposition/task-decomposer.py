@@ -10,7 +10,7 @@ import json
 import argparse
 import sys
 from datetime import datetime
-from typing import List, Dict, Any, Set
+from typing import Any
 from dataclasses import dataclass, asdict
 from pathlib import Path
 
@@ -20,15 +20,15 @@ class TaskContract:
     id: str
     name: str
     description: str
-    inputs: Dict[str, str]
-    outputs: Dict[str, str]
-    side_effects: List[str]
+    inputs: dict[str, str]
+    outputs: dict[str, str]
+    side_effects: list[str]
     estimated_hours: float
-    dependencies: List[str]
-    acceptance_criteria: List[str]
-    agent_requirements: List[str]
+    dependencies: list[str]
+    acceptance_criteria: list[str]
+    agent_requirements: list[str]
     
-    def validate_atomic(self) -> List[str]:
+    def validate_atomic(self) -> list[str]:
         """Validate that task meets atomic criteria."""
         violations = []
         
@@ -62,7 +62,7 @@ class AtomicTaskDecomposer:
         self.min_hours = 0.5
         self.task_counter = 0
         
-    def decompose_feature(self, feature_description: str) -> List[TaskContract]:
+    def decompose_feature(self, feature_description: str) -> list[TaskContract]:
         """
         Decompose a feature into atomic tasks.
         
@@ -84,7 +84,7 @@ class AtomicTaskDecomposer:
         else:
             return self._decompose_generic(feature_description)
     
-    def _decompose_authentication(self, description: str) -> List[TaskContract]:
+    def _decompose_authentication(self, description: str) -> list[TaskContract]:
         """Decompose authentication system into atomic tasks."""
         tasks = []
         
@@ -204,7 +204,7 @@ class AtomicTaskDecomposer:
         
         return tasks
     
-    def _decompose_payment(self, description: str) -> List[TaskContract]:
+    def _decompose_payment(self, description: str) -> list[TaskContract]:
         """Decompose payment processing into atomic tasks."""
         tasks = []
         
@@ -263,7 +263,7 @@ class AtomicTaskDecomposer:
         
         return tasks
     
-    def _decompose_dashboard(self, description: str) -> List[TaskContract]:
+    def _decompose_dashboard(self, description: str) -> list[TaskContract]:
         """Decompose dashboard feature into atomic tasks."""
         tasks = []
         
@@ -296,7 +296,7 @@ class AtomicTaskDecomposer:
         
         return tasks
     
-    def _decompose_generic(self, description: str) -> List[TaskContract]:
+    def _decompose_generic(self, description: str) -> list[TaskContract]:
         """Generic decomposition for unknown features."""
         tasks = []
         
@@ -326,7 +326,7 @@ class AtomicTaskDecomposer:
         self.task_counter += 1
         return f"task-{self.task_counter:03d}"
     
-    def validate_decomposition(self, tasks: List[TaskContract]) -> Dict[str, Any]:
+    def validate_decomposition(self, tasks: list[TaskContract]) -> dict[str, Any]:
         """Validate entire task decomposition for atomicity."""
         validation_report = {
             "total_tasks": len(tasks),
@@ -366,7 +366,7 @@ class AtomicTaskDecomposer:
         
         return validation_report
     
-    def optimize_for_parallelization(self, tasks: List[TaskContract]) -> List[TaskContract]:
+    def optimize_for_parallelization(self, tasks: list[TaskContract]) -> list[TaskContract]:
         """Analyze and suggest optimizations for better parallelization."""
         optimized_tasks = []
         
@@ -384,7 +384,7 @@ class AtomicTaskDecomposer:
         
         return optimized_tasks
     
-    def generate_execution_plan(self, tasks: List[TaskContract], num_agents: int = 3) -> Dict[str, Any]:
+    def generate_execution_plan(self, tasks: list[TaskContract], num_agents: int = 3) -> dict[str, Any]:
         """Generate execution plan for parallel agents."""
         # Simple topological sort for dependency ordering
         dependencies = {task.id: task.dependencies for task in tasks}

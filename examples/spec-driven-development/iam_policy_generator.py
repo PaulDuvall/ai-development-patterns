@@ -16,7 +16,6 @@ import json
 import re
 import sys
 import time
-from typing import Dict, List, Optional, Tuple
 import logging
 
 
@@ -73,7 +72,7 @@ class IAMPolicyGenerator:
         )
         self.logger = logging.getLogger(__name__)
     
-    def validate_policy_type(self, policy_type: str) -> Tuple[bool, Optional[str]]:
+    def validate_policy_type(self, policy_type: str) -> tuple[bool, str | None]:
         """Validate policy type against supported templates"""
         if not policy_type:
             return False, "Policy type cannot be empty"
@@ -84,7 +83,7 @@ class IAMPolicyGenerator:
         
         return True, None
     
-    def validate_arn_format(self, arn: str) -> Tuple[bool, Optional[str]]:
+    def validate_arn_format(self, arn: str) -> tuple[bool, str | None]:
         """Validate ARN format according to AWS ARN syntax"""
         if not arn:
             return False, "Resource ARN cannot be empty"
@@ -106,7 +105,7 @@ class IAMPolicyGenerator:
         
         return True, None
     
-    def check_resource_policy_compatibility(self, policy_type: str, resource_arn: str) -> Tuple[bool, Optional[str]]:
+    def check_resource_policy_compatibility(self, policy_type: str, resource_arn: str) -> tuple[bool, str | None]:
         """Check if resource ARN is compatible with policy type"""
         arn_parts = resource_arn.split(':')
         service = arn_parts[2] if len(arn_parts) > 2 else ""
@@ -145,7 +144,7 @@ class IAMPolicyGenerator:
         escaped = arn.replace('\\', '\\\\').replace('"', '\\"')
         return escaped
     
-    def generate_policy(self, policy_type: str, resource_arn: str, compact: bool = False) -> Dict:
+    def generate_policy(self, policy_type: str, resource_arn: str, compact: bool = False) -> dict:
         """Generate IAM policy JSON based on policy type and resource"""
         start_time = time.time()
         
@@ -189,7 +188,7 @@ class IAMPolicyGenerator:
         
         return policy
     
-    def format_output(self, policy: Dict, compact: bool = False, include_validation: bool = True) -> str:
+    def format_output(self, policy: dict, compact: bool = False, include_validation: bool = True) -> str:
         """Format policy output as JSON with optional validation status"""
         if compact:
             json_output = json.dumps(policy, separators=(',', ':'))
@@ -216,7 +215,7 @@ class IAMPolicyGenerator:
         
         return json_output
     
-    def handle_error(self, error: Exception, error_code: int = 1) -> Dict:
+    def handle_error(self, error: Exception, error_code: int = 1) -> dict:
         """Handle errors with structured error response"""
         error_response = {
             "error": {

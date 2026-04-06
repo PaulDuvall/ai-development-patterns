@@ -5,10 +5,12 @@ Tests for pattern specification compliance against pattern-spec.md requirements
 import pytest
 import re
 from utils.pattern_parser import PatternParser, ReferenceTableParser
+from utils.experimental_pattern_parser import ExperimentalPatternParser
 from conftest import (
-    REQUIRED_MATURITY_LEVELS, 
+    REQUIRED_MATURITY_LEVELS,
     REQUIRED_PATTERN_SECTIONS,
-    EXPECTED_PATTERNS
+    EXPECTED_PATTERNS,
+    EXPERIMENTS_DIR
 )
 
 
@@ -225,19 +227,113 @@ class TestPatternSpecCompliance:
         """Verify reference table includes all implemented patterns"""
         parser = ReferenceTableParser(readme_content)
         table_patterns = parser.extract_reference_table()
-        
+
         pattern_parser = PatternParser(readme_content)
         implemented_patterns = pattern_parser.extract_patterns()
-        
+
         # Check patterns in table but not implemented
         table_only = set(table_patterns.keys()) - set(implemented_patterns.keys())
         # Check patterns implemented but not in table
         implementation_only = set(implemented_patterns.keys()) - set(table_patterns.keys())
-        
+
         issues = []
         if table_only:
             issues.append(f"Patterns in table but not implemented: {list(table_only)}")
         if implementation_only:
             issues.append(f"Patterns implemented but not in table: {list(implementation_only)}")
-        
+
         assert not issues, f"Reference table completeness issues: {issues}"
+
+
+class TestExperimentalPatternCompliance:
+    """Validate experimental patterns in experiments/README.md against pattern-spec.md"""
+
+    @pytest.fixture
+    def exp_content(self):
+        readme_path = EXPERIMENTS_DIR / "README.md"
+        with open(readme_path, 'r', encoding='utf-8') as f:
+            return f.read()
+
+    @pytest.fixture
+    def exp_parser(self, exp_content):
+        return ExperimentalPatternParser(exp_content)
+
+    def test_all_experimental_patterns_have_headers(self, exp_parser):
+        """Each experimental pattern must have Maturity, Description, Related Patterns"""
+        patterns = exp_parser.extract_patterns()
+        assert patterns, "No experimental patterns found"
+
+        invalid = []
+        for name, pat in patterns.items():
+            errors = []
+            if not pat.maturity:
+                errors.append("Missing Maturity")
+            elif pat.maturity not in REQUIRED_MATURITY_LEVELS:
+                errors.append(f"Invalid maturity: {pat.maturity}")
+            if not pat.description:
+                errors.append("Missing Description")
+            if not pat.related_patterns:
+                errors.append("Missing Related Patterns")
+            if errors:
+                invalid.append({'pattern': name, 'errors': errors})
+
+        assert not invalid, f"Experimental patterns with header issues: {invalid}"
+
+    def test_all_experimental_patterns_have_anti_patterns(self, exp_parser):
+        """Each experimental pattern must include an anti-pattern section"""
+        patterns = exp_parser.extract_patterns()
+        missing = [
+            name for name, pat in patterns.items()
+            if len(pat.anti_pattern_content.strip()) < 20
+        ]
+        assert not missing, f"Experimental patterns missing anti-pattern sections: {missing}"
+
+    def test_experimental_patterns_have_implementation(self, exp_parser):
+        """Each experimental pattern must have implementation content"""
+        patterns = exp_parser.extract_patterns()
+        thin = [
+            {'pattern': name, 'length': len(pat.implementation_content.strip())}
+            for name, pat in patterns.items()
+            if len(pat.implementation_content.strip()) < 100
+        ]
+        assert not thin, f"Experimental patterns with insufficient implementation: {thin}"
+
+    def test_experimental_reference_table_matches_sections(self, exp_parser):
+        """Reference table entries must match implemented pattern sections"""
+        table = exp_parser.extract_reference_table()
+        sections = exp_parser.extract_patterns()
+
+        table_only = set(table.keys()) - set(sections.keys())
+        section_only = set(sections.keys()) - set(table.keys())
+
+        issues = []
+        if table_only:
+            issues.append(f"In table but no section: {sorted(table_only)}")
+        if section_only:
+            issues.append(f"Has section but not in table: {sorted(section_only)}")
+        assert not issues, f"Experimental reference table mismatch: {issues}"
+
+    def test_experimental_related_patterns_hyperlinked(self, exp_parser):
+        """Related Patterns must contain markdown hyperlinks"""
+        patterns = exp_parser.extract_patterns()
+        missing_links = []
+        for name, pat in patterns.items():
+            raw = pat.related_patterns_raw
+            if raw and '[' not in raw:
+                missing_links.append(name)
+        assert not missing_links, \
+            f"Experimental patterns with unhyperlinked Related Patterns: {missing_links}"
+
+    def test_experimental_pattern_naming(self, exp_parser):
+        """Pattern names should be two words in Title Case (hyphenated compounds = 1 word)"""
+        patterns = exp_parser.extract_patterns()
+        naming_issues = []
+        for name in patterns:
+            # Per pattern-spec.md: hyphenated compounds count as one word
+            # e.g. "Long-Running" = 1 word, "Spec-Driven" = 1 word
+            words = name.split()
+            if len(words) != 2:
+                naming_issues.append({'pattern': name, 'word_count': len(words)})
+            elif not all(w[0].isupper() for w in words):
+                naming_issues.append({'pattern': name, 'issue': 'not Title Case'})
+        assert not naming_issues, f"Experimental pattern naming issues: {naming_issues}"

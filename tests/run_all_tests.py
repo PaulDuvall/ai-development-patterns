@@ -9,7 +9,7 @@ import subprocess
 import json
 import time
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any
 from datetime import datetime
 
 
@@ -56,7 +56,7 @@ class PatternTestRunner:
             }
         }
     
-    def run_test_suite(self, suite_name: str, verbose: bool = True) -> Dict[str, Any]:
+    def run_test_suite(self, suite_name: str, verbose: bool = True) -> dict[str, Any]:
         """Run a specific test suite"""
         suite_config = self.test_suites[suite_name]
         
@@ -124,7 +124,7 @@ class PatternTestRunner:
                 'critical': suite_config['critical']
             }
     
-    def run_external_link_tests(self, verbose: bool = True) -> Dict[str, Any]:
+    def run_external_link_tests(self, verbose: bool = True) -> dict[str, Any]:
         """Run external link tests (slow tests)"""
         print(f"\\n{'='*60}")
         print("Running External Link Validation (Slow Tests)")
@@ -186,7 +186,7 @@ class PatternTestRunner:
                 'critical': False
             }
     
-    def generate_summary_report(self, results: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def generate_summary_report(self, results: list[dict[str, Any]]) -> dict[str, Any]:
         """Generate comprehensive summary report"""
         total_suites = len(results)
         passed_suites = len([r for r in results if r['success']])
@@ -215,7 +215,7 @@ class PatternTestRunner:
         
         return summary
     
-    def print_summary_report(self, summary: Dict[str, Any]):
+    def print_summary_report(self, summary: dict[str, Any]):
         """Print formatted summary report"""
         print(f"\\n{'='*80}")
         print("AI DEVELOPMENT PATTERNS VALIDATION SUMMARY")
@@ -288,7 +288,7 @@ class PatternTestRunner:
         
         print(f"{'='*80}")
     
-    def save_report(self, summary: Dict[str, Any]):
+    def save_report(self, summary: dict[str, Any]):
         """Save comprehensive report to files"""
         # Save JSON report
         json_report_path = self.results_dir / "comprehensive_report.json"
@@ -324,7 +324,7 @@ class PatternTestRunner:
         print(f"  JSON: {json_report_path}")
         print(f"  Markdown: {md_report_path}")
     
-    def run_all_tests(self, include_external_links: bool = False, verbose: bool = True) -> Dict[str, Any]:
+    def run_all_tests(self, include_external_links: bool = False, verbose: bool = True) -> dict[str, Any]:
         """Run all test suites and generate comprehensive report"""
         print("Starting AI Development Patterns Validation")
         print(f"Repository: {self.repo_root}")

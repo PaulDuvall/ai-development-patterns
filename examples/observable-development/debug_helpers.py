@@ -7,11 +7,11 @@ import json
 import argparse
 import re
 from datetime import datetime, timedelta, timezone
-from typing import List, Dict, Any, Optional
+from typing import Any
 from collections import defaultdict, Counter
 import sys
 
-def extract_log_entries(log_file: str, time_range: Optional[str] = None) -> List[Dict]:
+def extract_log_entries(log_file: str, time_range: str | None = None) -> list[dict]:
     """Extract structured log entries from log file"""
     entries = []
     
@@ -52,7 +52,7 @@ def is_within_time_range(timestamp_str: str, time_range: str) -> bool:
     except ValueError:
         return True
 
-def analyze_errors(entries: List[Dict]) -> Dict[str, Any]:
+def analyze_errors(entries: list[dict]) -> dict[str, Any]:
     """Analyze error patterns in log entries"""
     error_entries = [e for e in entries if 'error' in e.get('operation', '')]
     
@@ -85,7 +85,7 @@ def analyze_errors(entries: List[Dict]) -> Dict[str, Any]:
         "error_details": dict(error_contexts)
     }
 
-def analyze_performance(entries: List[Dict], threshold_ms: float = 500) -> Dict[str, Any]:
+def analyze_performance(entries: list[dict], threshold_ms: float = 500) -> dict[str, Any]:
     """Analyze performance issues in log entries"""
     perf_entries = [e for e in entries if 'performance' in e.get('operation', '')]
     
@@ -132,7 +132,7 @@ def analyze_performance(entries: List[Dict], threshold_ms: float = 500) -> Dict[
         }
     }
 
-def generate_ai_debugging_prompt(entries: List[Dict], error_type: Optional[str] = None) -> str:
+def generate_ai_debugging_prompt(entries: list[dict], error_type: str | None = None) -> str:
     """Generate AI-friendly debugging prompt from log entries"""
     
     if error_type:

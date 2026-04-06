@@ -3,7 +3,7 @@ Pattern parser utility for extracting and analyzing patterns from README.md
 """
 
 import re
-from typing import Dict, List, NamedTuple, Optional, Tuple
+from typing import NamedTuple
 from dataclasses import dataclass
 
 
@@ -12,9 +12,9 @@ class Pattern:
     """Represents a parsed pattern from README.md"""
     name: str
     line_number: int
-    maturity: Optional[str] = None
-    description: Optional[str] = None
-    related_patterns: List[str] = None
+    maturity: str | None = None
+    description: str | None = None
+    related_patterns: list[str] = None
     implementation_content: str = ""
     anti_pattern_content: str = ""
     category: str = ""
@@ -31,7 +31,7 @@ class PatternParser:
         self.content = readme_content
         self.lines = readme_content.split('\n')
         
-    def extract_patterns(self) -> Dict[str, Pattern]:
+    def extract_patterns(self) -> dict[str, Pattern]:
         """Extract all patterns from README.md content"""
         patterns = {}
         current_category = ""
@@ -60,7 +60,7 @@ class PatternParser:
             
         return patterns
     
-    def extract_reference_table_patterns(self) -> List[Tuple[str, str, str, str]]:
+    def extract_reference_table_patterns(self) -> list[tuple[str, str, str, str]]:
         """Extract patterns from the reference table"""
         patterns = []
         in_table = False
@@ -151,12 +151,12 @@ class PatternParser:
                 
         return True
     
-    def _extract_pattern_name(self, line: str) -> Optional[str]:
+    def _extract_pattern_name(self, line: str) -> str | None:
         """Extract pattern name from header line"""
         match = re.match(r'^### (.+)', line) or re.match(r'^## (.+)', line)
         return match.group(1).strip() if match else None
     
-    def _parse_pattern(self, start_line: int, pattern_name: str, category: str) -> Optional[Pattern]:
+    def _parse_pattern(self, start_line: int, pattern_name: str, category: str) -> Pattern | None:
         """Parse a complete pattern starting from the header line"""
         pattern = Pattern(name=pattern_name, line_number=start_line + 1, category=category)
         
@@ -215,7 +215,7 @@ class PatternParser:
         match = re.search(pattern, line)
         return match.group(1).strip() if match else ""
     
-    def _extract_related_patterns(self, text: str) -> List[str]:
+    def _extract_related_patterns(self, text: str) -> list[str]:
         """Extract pattern names from related patterns text (only internal references)"""
         # Find all markdown links [Pattern Name](url)
         all_links = re.findall(r'\[([^\]]+)\]\(([^)]+)\)', text)
@@ -238,7 +238,7 @@ class ReferenceTableParser:
         self.content = readme_content
         self.lines = readme_content.split('\n')
     
-    def extract_reference_table(self) -> Dict[str, Dict[str, str]]:
+    def extract_reference_table(self) -> dict[str, dict[str, str]]:
         """Extract complete reference table information"""
         table_data = {}
         in_table = False
