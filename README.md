@@ -945,7 +945,7 @@ Uploading many diagrams at once without hierarchy or a clear starting point over
 
 The most costly bugs come from building the wrong thing, not building it wrong. Before any plan, spec, or line of code, have AI act as an interviewer — asking structured questions to extract tacit knowledge, surface hidden constraints, and force decisions that would otherwise emerge mid-implementation.
 
-**Question Generation Workflow**
+**[Question Generation](#question-generation) Workflow**
 
 ```mermaid
 graph TD
@@ -978,21 +978,21 @@ Ask questions one category at a time. Wait for my answers before continuing."
 **Example AI interview output:**
 
 ```markdown
-## Scope & Requirements
+**Scope & Requirements**
 - What triggers a notification? (user action, system event, scheduled, external?)
 - Which channels? (in-app, email, SMS, push — or start with one?)
 - Do notifications need to be real-time or is batching acceptable?
 
-## Technical Constraints
+**Technical Constraints**
 - What's the expected volume? (10/day vs 10,000/hour changes the architecture)
 - Do you need delivery guarantees (at-least-once) or is best-effort OK?
 - Any existing message queue or event bus in the stack?
 
-## Users & Permissions
+**Users & Permissions**
 - Can users configure notification preferences?
 - Are there notification types that can't be disabled (security alerts)?
 
-## Edge Cases & Decisions
+**Edge Cases & Decisions**
 - What happens when a notification fails to deliver?
 - How long do you retain notification history?
 ```
@@ -1018,7 +1018,7 @@ Format as a structured document I can hand to a planning session."
 
 #### When to Use
 
-| Situation | Question Generation Helps Because |
+| Situation | [Question Generation](#question-generation) Helps Because |
 |-----------|----------------------------------|
 | Vague feature request | Surfaces what "notification system" actually means |
 | New domain | Exposes assumptions you don't know you're making |
@@ -1045,7 +1045,7 @@ requirements before writing anything."
 # Result: implementation matches actual needs
 ```
 
-Without Question Generation, you discover requirements through failed implementations instead of through conversation.
+Without [Question Generation](#question-generation), you discover requirements through failed implementations instead of through conversation.
 
 ---
 

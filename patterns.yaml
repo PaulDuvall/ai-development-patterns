@@ -73,6 +73,16 @@ patterns:
       Use executable specifications to guide AI code generation with clear acceptance criteria before implementation.
     related: [developer-lifecycle, custom-commands, image-spec, atomic-decomposition]
 
+  - id: question-generation
+    name: Question Generation
+    category: development
+    maturity: beginner
+    anchor: "#question-generation"
+    automatable: false
+    description: >
+      Have AI interview you with structured questions to surface requirements, constraints, and decisions before planning or coding.
+    related: [planned-implementation, spec-driven-development, choice-generation]
+
   - id: planned-implementation
     name: Planned Implementation
     category: development
@@ -81,7 +91,7 @@ patterns:
     automatable: true
     description: >
       Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration.
-    related: [progressive-enhancement]
+    related: [question-generation, progressive-enhancement]
 
   - id: progressive-enhancement
     name: Progressive Enhancement
