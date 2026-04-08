@@ -333,10 +333,11 @@ graph LR
 - Keep README examples concise and scannable (prioritize clarity and understanding)
 - Show the pattern's essence and core value proposition with practical detail
 - For complex patterns, create `examples/pattern-name/` directories with complete working code
-- When an `examples/pattern-name/` directory exists, reference it using non-clickable code formatting (so the spec itself never contains broken links), for example:
+- When an `examples/pattern-name/` directory exists, reference it as a clickable relative link so readers can navigate directly:
   ```markdown
-  Complete Example: See `examples/pattern-name/` for a full implementation.
+  Complete Example: See [examples/pattern-name/](examples/pattern-name/) for a full implementation.
   ```
+  **Note**: Within `pattern-spec.md` itself, use non-clickable code formatting (`` `examples/pattern-name/` ``) to avoid broken links from generic placeholder paths. In actual pattern documents where the directory exists, always use clickable links.
 - Prefer real-world scenarios over abstract examples
 - Use consistent naming conventions (e.g., "myapp" for applications)
 - Include the most important commands, code snippets, or configurations that demonstrate the pattern
@@ -447,7 +448,7 @@ Before adding a new pattern, verify:
 - [ ] Addresses specific, actionable problem
 - [ ] Dependencies are clearly stated
 - [ ] Examples show the pattern's essence with practical detail
-- [ ] References examples directory for detailed implementation (if directory exists)
+- [ ] References examples directory as a clickable relative link (if directory exists)
 - [ ] Considers whether a diagram would enhance understanding of the pattern
 - [ ] If diagram included, uses Mermaid syntax and follows diagram guidelines
 - [ ] Diagrams are placed where they best support understanding

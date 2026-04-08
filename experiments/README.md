@@ -763,7 +763,7 @@ Add validated rules to .ai/rules/"
 | Repeated corrections      | Signals rules not being captured           |
 | Rules added from retro    | Measures flywheel velocity                 |
 
-**Complete Implementation**: See `experiments/examples/feedback-flywheel/` for session log schema, analysis scripts, and a worked retrospective example.
+**Complete Implementation**: See [examples/feedback-flywheel/](examples/feedback-flywheel/) for session log schema, analysis scripts, and a worked retrospective example.
 
 #### Anti-pattern: Blind Iteration
 
