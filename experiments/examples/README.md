@@ -10,6 +10,7 @@ This directory contains working implementations of selected experimental pattern
 | [Debt Forecasting](../README.md#debt-forecasting) | [`debt-forecasting/`](debt-forecasting/) | Proactive technical debt analysis |
 | [Deployment Synthesis](../README.md#deployment-synthesis) | [`deployment-synthesis/`](deployment-synthesis/) | Generate validated deployment configurations |
 | [Drift Remediation](../README.md#drift-remediation) | [`drift-remediation/`](drift-remediation/) | Detect and correct infrastructure drift |
+| [Feedback Flywheel](../README.md#feedback-flywheel) | [`feedback-flywheel/`](feedback-flywheel/) | Retrospective-driven rule improvement |
 | [Handoff Protocols](../README.md#handoff-protocols) | [`handoff-protocols/`](handoff-protocols/) | Human ↔ AI handoff decisioning and procedures |
 | [Incident Automation](../README.md#incident-automation) | [`incident-automation/`](incident-automation/) | Generate incident response playbooks |
 | [Pipeline Synthesis](../README.md#pipeline-synthesis) | [`pipeline-synthesis/`](pipeline-synthesis/) | Convert build specs into pipeline configs |

@@ -1,0 +1,44 @@
+session:
+  date: "2026-04-01"
+  developer: "alice"
+  task_type: "feature"
+  duration_minutes: 60
+  tools_used:
+    - "claude-code"
+
+outcomes:
+  first_pass_accepted: 4
+  required_correction: 3
+  total_generations: 7
+  acceptance_rate: 0.57
+
+corrections:
+  - generation: "user registration endpoint"
+    issue: "returned 200 instead of 201 for resource creation"
+    correction: "changed status code to 201"
+    root_cause: "no HTTP status code convention in project rules"
+    proposed_rule: "Use 201 Created for POST endpoints that create resources, 204 No Content for DELETE"
+    severity: "moderate"
+
+  - generation: "database migration for user preferences table"
+    issue: "generated raw SQL ALTER TABLE instead of Django migration"
+    correction: "rewrote as Django migration using AddField"
+    root_cause: "missing framework migration preference in rules"
+    proposed_rule: "Always generate Django ORM migrations via makemigrations pattern, never raw SQL DDL"
+    severity: "major"
+
+  - generation: "pagination for user list endpoint"
+    issue: "used offset pagination instead of cursor pagination"
+    correction: "switched to cursor-based pagination for consistency"
+    root_cause: "pagination strategy not specified in API conventions"
+    proposed_rule: "Use cursor-based pagination for all list endpoints returning >100 items"
+    severity: "minor"
+
+insights:
+  worked_well:
+    - "test generation using existing pytest fixtures"
+    - "error handling followed project exception hierarchy"
+    - "docstrings matched Google style guide as configured"
+  worked_poorly:
+    - "API conventions (status codes, pagination) needed manual correction"
+  pattern_detected: "API design conventions are underspecified in current rules"

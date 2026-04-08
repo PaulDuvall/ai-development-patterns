@@ -37,6 +37,7 @@ These experimental patterns extend the core AI development patterns with advance
 | **[Evidence Automation](#evidence-automation)** | Advanced | Operations | Generate audit evidence matrices from logs and configuration changes automatically | Security Orchestration |
 | **[Context Optimization](#context-optimization)** | Advanced | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive Enhancement |
 | **[Asynchronous Research](#asynchronous-research)** | Intermediate | Development | Use fire-and-forget coding agents in dedicated repositories to conduct autonomous code investigations that prove technical feasibility through executable experiments | Parallel Agents, Context Persistence, Choice Generation |
+| **[Feedback Flywheel](#feedback-flywheel)** | Intermediate | Development | Systematically improve AI collaboration by analyzing session outcomes and feeding corrections back into team rules and commands | Codified Rules, Context Persistence, Progressive Disclosure |
 | **[Long-Running Orchestration](#long-running-orchestration)** | Advanced | Workflow | Coordinate agents working autonomously for hours or days, maintaining coherent state across sessions with strategic human checkpoints | Parallel Agents, Context Persistence, Workflow Orchestration |
 | **[Autonomous Defense](#autonomous-defense)** | Advanced | Operations | Deploy AI agents for real-time security threat detection and automated response at machine speed to match the pace of autonomous threats | Security Orchestration, Incident Automation |
 
@@ -699,6 +700,74 @@ Simon warns: *"A prompt injection attack of the lethal trifecta variety could ea
 Simon's caveat: *"They can't prove something is impossible—just because the coding agent couldn't find a way to do something doesn't mean it can't be done."*
 
 **Use for**: Proving feasibility, not impossibility.
+
+---
+
+### Feedback Flywheel
+
+**Maturity**: Intermediate
+**Description**: Systematically improve AI collaboration effectiveness by analyzing session outcomes and feeding corrections back into team rules and commands.
+
+**Related Patterns**: [Codified Rules](../README.md#codified-rules), [Context Persistence](../README.md#context-persistence), [Progressive Disclosure](../README.md#progressive-disclosure)
+
+**Source**: Rahul Garg, "[Patterns for Reducing Friction in AI-Assisted Development](https://martinfowler.com/articles/reduce-friction-ai/)" (martinfowler.com, Feb-Mar 2026)
+
+#### Core Concept
+
+Most teams treat AI-assisted sessions as isolated events. When the AI produces incorrect output, developers correct it manually and move on. The same correction happens again next week, often by a different developer. The Feedback Flywheel closes this loop: capture corrections in structured session logs, run periodic retrospectives to extract root causes, and feed validated rules back into the team's codified rules and custom commands.
+
+The primary metric is **first-pass acceptance rate** — the percentage of AI generations accepted without modification. A rising acceptance rate signals that rules and context are improving. A flat rate signals the flywheel isn't turning.
+
+#### Session Log Schema
+
+Capture structured outcomes after each AI-assisted session:
+
+```yaml
+# .ai/session-logs/2026-04-08.yaml
+session:
+  date: "2026-04-08"
+  developer: "alice"
+  task_type: "feature"
+
+outcomes:
+  first_pass_accepted: 4
+  required_correction: 3
+  total_generations: 7
+  acceptance_rate: 0.57
+
+corrections:
+  - generation: "user registration endpoint"
+    issue: "returned 200 instead of 201 for resource creation"
+    root_cause: "no HTTP status code convention in rules"
+    proposed_rule: "Use 201 for POST, 204 for DELETE"
+```
+
+#### Retrospective Analysis
+
+```bash
+# Weekly retro: extract patterns from session logs
+python retro-analysis.py --period 7d --output retro-report.md
+
+# Feed validated rules back into project configuration
+ai "Review proposed rules from our retrospective:
+$(cat retro-report.md)
+Add validated rules to .ai/rules/"
+```
+
+#### Metrics Tracking
+
+| Metric                    | Purpose                                    |
+|---------------------------|--------------------------------------------|
+| First-pass acceptance rate| Leading indicator of rule completeness     |
+| Corrections per session   | Measures remaining friction                |
+| Repeated corrections      | Signals rules not being captured           |
+| Rules added from retro    | Measures flywheel velocity                 |
+
+**Complete Implementation**: See `experiments/examples/feedback-flywheel/` for session log schema, analysis scripts, and a worked retrospective example.
+
+#### Anti-pattern: Blind Iteration
+
+Running AI-assisted sessions repeatedly without analyzing what went wrong or feeding corrections back into rules. Each session starts from scratch, repeating the same mistakes. Acceptance rate stays flat, developer frustration increases, and the team concludes "AI doesn't understand our codebase" — when the real problem is that no one captured the first correction as a rule.
 
 ---
 
