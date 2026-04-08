@@ -265,10 +265,32 @@ jobs:
         python3 -m pip install -r tests/requirements.txt
     
     - name: Run complete test suite
+      id: tests
+      continue-on-error: true
       run: |
         cd tests
-        python3 -m pytest -v --tb=short --html=report.html --self-contained-html --cov=utils --cov-report=html
-    
+        python3 -m pytest -v --tb=short \
+          --html=report.html --self-contained-html \
+          --cov=utils --cov-report=html \
+          --json-report --json-report-file=.report.json
+
+    - name: Generate Claude Code fix prompt
+      if: steps.tests.outcome == 'failure'
+      run: |
+        echo "## Claude Code Fix Instructions" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Paste the prompt below into Claude Code to fix these failures:" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo '````' >> $GITHUB_STEP_SUMMARY
+        python3 scripts/generate-audit-prompt.py tests/.report.json >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
+        echo '````' >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Or run locally: \`/xaudit\`" >> $GITHUB_STEP_SUMMARY
+
+    - name: Fail if tests failed
+      if: steps.tests.outcome == 'failure'
+      run: exit 1
+
     - name: Upload comprehensive test report
       uses: actions/upload-artifact@v4
       if: always()
@@ -278,6 +300,7 @@ jobs:
           tests/report.html
           tests/htmlcov/
           tests/test-results/
+          tests/.report.json
 
   quality-gates:
     runs-on: ubuntu-latest
@@ -329,13 +352,13 @@ jobs:
           const title = `Pattern Validation Failed - ${new Date().toISOString().split('T')[0]}`;
           const body = `
           ## Pattern Validation Failure
-          
+
           The automated pattern validation failed on the main branch.
-          
+
           **Build**: ${context.runId}
           **Commit**: ${context.sha}
           **Workflow**: ${context.workflow}
-          
+
           Please review the failed checks and fix any issues with:
           - Pattern specification compliance
           - README accuracy and consistency
@@ -343,10 +366,10 @@ jobs:
           - Example code validation
           - Pattern dependencies
           - Diagram accuracy
-          
+
           [View failed workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId})
           `;
-          
+
           github.rest.issues.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
@@ -354,3 +377,41 @@ jobs:
             body: body,
             labels: ['bug', 'automation', 'pattern-validation']
           });
+
+# Auto-close validation issues when all checks pass
+  close-resolved-issues:
+    runs-on: ubuntu-latest
+    name: Close Resolved Issues
+    permissions:
+      issues: write
+    needs: [pattern-compliance, readme-accuracy, link-validation, example-validation, dependency-validation, diagram-validation, yaml-readme-sync]
+    if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Close pattern-validation issues
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: issues } = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            labels: 'pattern-validation',
+            state: 'open'
+          });
+
+          for (const issue of issues) {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: `All pattern validation checks passed on commit ${context.sha}. Closing automatically.\n\n[View passing run](${context.payload.repository.html_url}/actions/runs/${context.runId})`
+            });
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              state: 'closed',
+              state_reason: 'completed'
+            });
+          }
