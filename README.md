@@ -167,7 +167,8 @@ graph TD
 | **[Issue Generation](#issue-generation)** | Intermediate | Foundation | Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies | Readiness Assessment |
 | **[Spec-Driven Development](#spec-driven-development)** | Intermediate | Development | Use executable specifications to guide AI code generation with clear acceptance criteria before implementation | Developer Lifecycle |
 | **[Image Spec](#image-spec)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Spec-Driven Development, Progressive Enhancement |
-| **[Planned Implementation](#planned-implementation)** | Beginner | Development | Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration | None |
+| **[Question Generation](#question-generation)** | Beginner | Development | Have AI interview you with structured questions to surface requirements, constraints, and decisions before planning or coding | None |
+| **[Planned Implementation](#planned-implementation)** | Beginner | Development | Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration | Question Generation |
 | **[Progressive Enhancement](#progressive-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | None |
 | **[Choice Generation](#choice-generation)** | Intermediate | Development | Generate multiple implementation options for exploration and comparison rather than accepting first AI solution | Progressive Enhancement |
 | **[Atomic Decomposition](#atomic-decomposition)** | Intermediate | Development | Break complex features into atomic, independently implementable tasks for parallel AI agent execution | Progressive Enhancement |
@@ -933,12 +934,127 @@ Uploading many diagrams at once without hierarchy or a clear starting point over
 
 ---
 
+## Question Generation
+
+**Maturity**: Beginner
+**Description**: Have AI interview you with structured questions to surface requirements, constraints, and decisions before planning or coding.
+
+**Related Patterns**: [Planned Implementation](#planned-implementation), [Spec-Driven Development](#spec-driven-development), [Choice Generation](#choice-generation)
+
+**Core Principle: Interview Before Implementation**
+
+The most costly bugs come from building the wrong thing, not building it wrong. Before any plan, spec, or line of code, have AI act as an interviewer — asking structured questions to extract tacit knowledge, surface hidden constraints, and force decisions that would otherwise emerge mid-implementation.
+
+**Question Generation Workflow**
+
+```mermaid
+graph TD
+    A[Idea or Request] --> B[AI Generates<br/>Clarifying Questions]
+    B --> C[Developer Answers]
+    C --> D{Gaps Remain?}
+    D -->|Yes| E[AI Asks<br/>Follow-up Questions]
+    E --> C
+    D -->|No| F[Structured Requirements<br/>Summary]
+    F --> G[Planned Implementation]
+    G --> H[Spec-Driven Development]
+```
+
+#### Core Implementation
+
+Prompt AI to interview you before accepting any task:
+
+```bash
+ai "I want to build a notification system for our app.
+
+Before writing any code or plan, interview me:
+1. Ask clarifying questions about requirements I haven't stated
+2. Identify constraints I should decide on upfront
+3. Surface assumptions that could cause rework later
+4. Group your questions by category (scope, technical, users, edge cases)
+
+Ask questions one category at a time. Wait for my answers before continuing."
+```
+
+**Example AI interview output:**
+
+```markdown
+## Scope & Requirements
+- What triggers a notification? (user action, system event, scheduled, external?)
+- Which channels? (in-app, email, SMS, push — or start with one?)
+- Do notifications need to be real-time or is batching acceptable?
+
+## Technical Constraints
+- What's the expected volume? (10/day vs 10,000/hour changes the architecture)
+- Do you need delivery guarantees (at-least-once) or is best-effort OK?
+- Any existing message queue or event bus in the stack?
+
+## Users & Permissions
+- Can users configure notification preferences?
+- Are there notification types that can't be disabled (security alerts)?
+
+## Edge Cases & Decisions
+- What happens when a notification fails to deliver?
+- How long do you retain notification history?
+```
+
+#### Turning Answers Into Artifacts
+
+After the interview, AI consolidates answers into a structured requirements summary that feeds directly into [Planned Implementation](#planned-implementation):
+
+```bash
+ai "Based on my answers, generate:
+1. A requirements summary with what we decided
+2. A list of explicit non-goals (what we're NOT building)
+3. Open questions we still need to resolve
+4. Suggested constraints for implementation
+
+Format as a structured document I can hand to a planning session."
+```
+
+**Output feeds the pipeline:**
+- **Requirements summary** → [Planned Implementation](#planned-implementation)
+- **Constraints list** → [Constrained Generation](#constrained-generation)
+- **Decision log** → [Context Persistence](#context-persistence)
+
+#### When to Use
+
+| Situation | Question Generation Helps Because |
+|-----------|----------------------------------|
+| Vague feature request | Surfaces what "notification system" actually means |
+| New domain | Exposes assumptions you don't know you're making |
+| Multiple stakeholders | Creates a shared record of decisions |
+| High-stakes change | Forces upfront decisions that prevent costly rework |
+| Onboarding to codebase | AI asks what you need to know, not what it assumes |
+
+#### Anti-pattern: Blind Generation
+
+Jumping straight from a vague idea to code generation without clarifying requirements. The AI fills in gaps with assumptions — often reasonable-sounding but wrong for your context.
+
+```bash
+# BAD: Vague request, AI assumes everything
+ai "Build a notification system"
+# AI assumes: email-only, no preferences, no retry logic,
+# simple database storage, synchronous delivery
+# Result: rework when requirements actually emerge
+
+# GOOD: Interview first, then build
+ai "I need a notification system. Interview me about
+requirements before writing anything."
+# AI asks about channels, volume, delivery guarantees,
+# user preferences, failure handling
+# Result: implementation matches actual needs
+```
+
+Without Question Generation, you discover requirements through failed implementations instead of through conversation.
+
+---
+
 ## Planned Implementation
 
 **Maturity**: Beginner
 **Description**: Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Progressive Enhancement](#progressive-enhancement), [Choice Generation](#choice-generation)
+**Related Patterns**: [Question Generation](#question-generation), [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Progressive Enhancement](#progressive-enhancement), [Choice Generation](#choice-generation)
 
 **Core Principle: Think Before You Code**
 
