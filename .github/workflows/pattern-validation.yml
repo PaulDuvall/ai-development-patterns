@@ -345,13 +345,31 @@ jobs:
     if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
-    - name: Create Issue on Failure
+    - name: Create Issue on Failure (skip if duplicate)
       uses: actions/github-script@v7
       with:
         script: |
+          const { data: existing } = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            labels: 'pattern-validation',
+            state: 'open'
+          });
+
+          if (existing.length > 0) {
+            const issue = existing[0];
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: `Still failing on commit ${context.sha}.\n\n[View failed run](${context.payload.repository.html_url}/actions/runs/${context.runId})`
+            });
+            core.info(`Skipped duplicate — added comment to #${issue.number}`);
+            return;
+          }
+
           const title = `Pattern Validation Failed - ${new Date().toISOString().split('T')[0]}`;
-          const body = `
-          ## Pattern Validation Failure
+          const body = `## Pattern Validation Failure
 
           The automated pattern validation failed on the main branch.
 
