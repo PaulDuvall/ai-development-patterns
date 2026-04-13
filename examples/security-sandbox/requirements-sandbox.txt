@@ -2,7 +2,7 @@
 black>=24.3.0
 flake8==6.1.0
 mypy==1.7.0
-pytest==7.4.3
+pytest==9.0.3
 pytest-cov==4.1.0
 requests>=2.32.4
 pydantic==2.5.0
