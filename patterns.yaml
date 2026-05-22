@@ -81,7 +81,7 @@ patterns:
     automatable: false
     description: >
       Have AI interview you with structured questions to surface requirements, constraints, and decisions before planning or coding.
-    related: [planned-implementation, spec-driven-development, choice-generation]
+    related: [planned-implementation, spec-driven-development, cross-model-validation]
 
   - id: planned-implementation
     name: Planned Implementation
@@ -101,7 +101,7 @@ patterns:
     automatable: true
     description: >
       Build complex features through small, deployable iterations rather than big-bang generation.
-    related: [planned-implementation, atomic-decomposition, image-spec, choice-generation]
+    related: [planned-implementation, atomic-decomposition, image-spec, cross-model-validation]
 
   - id: context-persistence
     name: Context Persistence
@@ -213,15 +213,15 @@ patterns:
       Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context.
     related: [spec-driven-development, progressive-enhancement]
 
-  - id: choice-generation
-    name: Choice Generation
+  - id: cross-model-validation
+    name: Cross-Model Validation
     category: development
     maturity: intermediate
-    anchor: "#choice-generation"
-    automatable: false
+    anchor: "#cross-model-validation"
+    automatable: true
     description: >
-      Generate multiple implementation options for exploration and comparison rather than accepting first AI solution.
-    related: [progressive-enhancement]
+      Run the same task across multiple frontier models and use their agreements, disagreements, and divergences as eval signal for high-stakes decisions.
+    related: [planned-implementation, progressive-enhancement, spec-driven-development]
 
   - id: parallel-agents
     name: Parallel Agents

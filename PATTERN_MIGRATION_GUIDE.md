@@ -47,6 +47,7 @@ This change aligns with established pattern naming conventions:
 | AI Plan-First Development | Planned Implementation | Removed "AI", clarified | Describes planned approach to implementation |
 | Progressive AI Enhancement | Progressive Enhancement | Removed "AI" prefix | Progressive enhancement is well-known pattern |
 | AI Choice Generation | Choice Generation | Removed "AI" prefix | Generation implies AI automation |
+| Choice Generation | Cross-Model Validation | Reframed | Original pattern reduced to "ask one model for N options" — table stakes in 2026. Reframed around running the same prompt across multiple frontier models, where disagreement is signal. |
 | Atomic Task Decomposition | Atomic Decomposition | Simplified | "Atomic" already implies task-level |
 | Parallelized AI Coding Agents | Parallel Agents | Simplified, removed "AI" | Agents are AI agents in this context |
 | AI Context Persistence | Context Persistence | Removed "AI" prefix | Context is AI-specific in this repository |
@@ -251,6 +252,7 @@ All GitHub markdown anchor links have changed. Update your hyperlinks:
 | `#ai-plan-first-development` | `#planned-implementation` |
 | `#progressive-ai-enhancement` | `#progressive-enhancement` |
 | `#ai-choice-generation` | `#choice-generation` |
+| `#choice-generation` | `#cross-model-validation` |
 | `#atomic-task-decomposition` | `#atomic-decomposition` |
 | `#parallelized-ai-coding-agents` | `#parallel-agents` |
 | `#ai-context-persistence` | `#context-persistence` |

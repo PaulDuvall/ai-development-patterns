@@ -47,7 +47,7 @@ graph TB
     PE --> IS
 
     %% ROW 5: Additional development patterns
-    PE --> CG([Choice<br/>Generation])
+    PE --> CMV([Cross-Model<br/>Validation])
     DL --> GA([Guided<br/>Architecture])
     CR --> GA
     DL --> ER([Error<br/>Resolution])
@@ -66,7 +66,7 @@ graph TB
     classDef operations fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,color:#78281f
 
     class RA,CR,SS,DL,TI,IG foundation
-    class PE,SD,AD,PA,OD,GR,AT,EA,CC,PD,IS,CP,CG,GA,ER,PI,CnG,AR development
+    class PE,SD,AD,PA,OD,GR,AT,EA,CC,PD,IS,CP,CMV,GA,ER,PI,CnG,AR development
     class PG,SO,BM,CZR operations
 
     %% CLICKABLE LINKS
@@ -92,7 +92,7 @@ graph TB
     click SO "https://github.com/PaulDuvall/ai-development-patterns#security-orchestration"
     click CZR "https://github.com/PaulDuvall/ai-development-patterns#centralized-rules"
     click PI "https://github.com/PaulDuvall/ai-development-patterns#planned-implementation"
-    click CG "https://github.com/PaulDuvall/ai-development-patterns#choice-generation"
+    click CMV "https://github.com/PaulDuvall/ai-development-patterns#cross-model-validation"
     click CnG "https://github.com/PaulDuvall/ai-development-patterns#constrained-generation"
     click ER "https://github.com/PaulDuvall/ai-development-patterns#error-resolution"
     click GA "https://github.com/PaulDuvall/ai-development-patterns#guided-architecture"
@@ -129,7 +129,7 @@ graph TD
         D --> G[Spec-Driven Development]
         H[Planned Implementation]
         I[Progressive Enhancement]
-        I --> J[Choice Generation]
+        I --> J[Cross-Model Validation]
         Q[Event Automation]
         R[Custom Commands]
         S[Progressive Disclosure]
@@ -178,7 +178,7 @@ graph TD
 | **[Question Generation](#question-generation)** | Beginner | Development | Have AI interview you with structured questions to surface requirements, constraints, and decisions before planning or coding | None |
 | **[Planned Implementation](#planned-implementation)** | Beginner | Development | Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration | Question Generation |
 | **[Progressive Enhancement](#progressive-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | None |
-| **[Choice Generation](#choice-generation)** | Intermediate | Development | Generate multiple implementation options for exploration and comparison rather than accepting first AI solution | Progressive Enhancement |
+| **[Cross-Model Validation](#cross-model-validation)** | Intermediate | Development | Run the same task across multiple frontier models and use their agreements, disagreements, and divergences as eval signal for high-stakes decisions | Progressive Enhancement |
 | **[Atomic Decomposition](#atomic-decomposition)** | Intermediate | Development | Break complex features into atomic, independently implementable tasks for parallel AI agent execution | Progressive Enhancement |
 | **[Parallel Agents](#parallel-agents)** | Advanced | Development | Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration | Atomic Decomposition |
 | **[Context Persistence](#context-persistence)** | Intermediate | Development | Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols | Codified Rules |
@@ -319,7 +319,7 @@ graph TD
 ### Project Type Recommendations
 
 **MVP/Startup Projects**:
-- **Primary**: [Progressive Enhancement](#progressive-enhancement), [Choice Generation](#choice-generation)
+- **Primary**: [Progressive Enhancement](#progressive-enhancement), [Cross-Model Validation](#cross-model-validation)
 - **Secondary**: [Security Sandbox](#security-sandbox), [Constrained Generation](#constrained-generation)  
 - **Avoid**: Complex orchestration patterns until scale demands
 
@@ -329,7 +329,7 @@ graph TD
 - **Essential**: All foundation patterns before development patterns
 
 **Research/Experimental Projects**:
-- **Primary**: [Choice Generation](#choice-generation), [Observable Development](#observable-development)
+- **Primary**: [Cross-Model Validation](#cross-model-validation), [Observable Development](#observable-development)
 - **Secondary**: [Context Persistence](#context-persistence), [Context Optimization](experiments/README.md#context-optimization)
 - **Focus**: Learning and exploration over production readiness
 
@@ -341,7 +341,7 @@ graph TD
 ### Team Size Considerations
 
 **Solo Teams**:
-- Focus on **[Progressive Enhancement](#progressive-enhancement)** and **[Choice Generation](#choice-generation)**
+- Focus on **[Progressive Enhancement](#progressive-enhancement)** and **[Cross-Model Validation](#cross-model-validation)**
 - Add **[Observable Development](#observable-development)** for debugging
 - Skip parallel orchestration patterns
 
@@ -950,7 +950,7 @@ Uploading many diagrams at once without hierarchy or a clear starting point over
 **Maturity**: Beginner
 **Description**: Have AI interview you with structured questions to surface requirements, constraints, and decisions before planning or coding.
 
-**Related Patterns**: [Planned Implementation](#planned-implementation), [Spec-Driven Development](#spec-driven-development), [Choice Generation](#choice-generation)
+**Related Patterns**: [Planned Implementation](#planned-implementation), [Spec-Driven Development](#spec-driven-development), [Cross-Model Validation](#cross-model-validation)
 
 **Core Principle: Interview Before Implementation**
 
@@ -1065,7 +1065,7 @@ Without [Question Generation](#question-generation), you discover requirements t
 **Maturity**: Beginner
 **Description**: Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration.
 
-**Related Patterns**: [Question Generation](#question-generation), [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Progressive Enhancement](#progressive-enhancement), [Choice Generation](#choice-generation)
+**Related Patterns**: [Question Generation](#question-generation), [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Progressive Enhancement](#progressive-enhancement), [Cross-Model Validation](#cross-model-validation)
 
 **Core Principle: Think Before You Code**
 
@@ -1202,7 +1202,7 @@ Spending excessive time refining plans without moving to implementation, missing
 **Maturity**: Beginner  
 **Description**: Build complex features through small, deployable iterations rather than big-bang generation.
 
-**Related Patterns**: [Planned Implementation](#planned-implementation), [Developer Lifecycle](#developer-lifecycle), [Image Spec](#image-spec), [Constrained Generation](#constrained-generation), [Choice Generation](#choice-generation), [Guided Architecture](#guided-architecture)
+**Related Patterns**: [Planned Implementation](#planned-implementation), [Developer Lifecycle](#developer-lifecycle), [Image Spec](#image-spec), [Constrained Generation](#constrained-generation), [Cross-Model Validation](#cross-model-validation), [Guided Architecture](#guided-architecture)
 
 **Examples**
 Building authentication progressively:
@@ -1239,48 +1239,98 @@ Asking AI to "create a complete user management system" results in 5000 lines of
 
 ---
 
-## Choice Generation
+## Cross-Model Validation
 
-**Maturity**: Intermediate  
-**Description**: Generate multiple implementation options for exploration and comparison rather than accepting the first AI solution.
+**Maturity**: Intermediate
+**Description**: Run the same task across multiple frontier models and use their agreements, disagreements, and divergences as eval signal for high-stakes decisions, risk-bearing prompts, and design reviews.
 
-**Related Patterns**: [Planned Implementation](#planned-implementation), [Progressive Enhancement](#progressive-enhancement), [Context Optimization](experiments/README.md#context-optimization)
+**Related Patterns**: [Planned Implementation](#planned-implementation), [Progressive Enhancement](#progressive-enhancement), [Spec-Driven Development](#spec-driven-development)
 
-**Multi-Option Implementation Comparison**
+**Core Loop**
 
-```bash
-# Generate and compare multiple implementation approaches
-ai "Generate 3 different authentication approaches for user management:
+```mermaid
+graph TD
+    A[High-Stakes Prompt] --> B[Fan Out to N Models]
+    B --> C1[Claude Opus]
+    B --> C2[GPT-5]
+    B --> C3[Gemini]
+    C1 --> D[Side-by-Side Outputs]
+    C2 --> D
+    C3 --> D
+    D --> E{Convergent?}
+    E -->|Yes| F[Stronger Prior<br/>Proceed With Confidence]
+    E -->|No| G[Investigate the Divergence<br/>Disagreement IS the Finding]
+    G --> H[Choose, Synthesize, or Re-Prompt]
 
-Option 1 (Performance-focused):
-- In-memory JWT with Redis caching
-- Sub-10ms token validation, horizontal scaling ready
-- Trade-off: Memory intensive, Redis dependency
-- Best for: High-traffic APIs (>10k req/sec)
-
-Option 2 (Security-focused):
-- Database-backed sessions with audit trail
-- Immediate revocation, multi-factor authentication
-- Trade-off: Higher latency, complex session management
-- Best for: Banking, healthcare, government
-
-Option 3 (Simplicity-focused):
-- Standard JWT with established libraries
-- Well-documented patterns, minimal custom code
-- Trade-off: Less optimization opportunities
-- Best for: Startups, MVPs, small teams
-
-For each option provide:
-- 30-minute working prototype
-- Performance benchmarks (response time, memory usage)
-- Implementation complexity assessment (LOC, dependencies)
-- Specific trade-offs and when to choose this approach
-
-Recommend best option based on project constraints and team experience."
+    style D fill:#a8d5ba,stroke:#2d5a3f,color:#1a3a25
+    style G fill:#f9e79f,stroke:#b7950b,color:#7d6608
+    style F fill:#f5b7b1,stroke:#c0392b,color:#78281f
 ```
 
-**Anti-pattern: Over-Analysis**
-Generating too many choices or spending more time evaluating options than implementing them.
+**When to Use**
+
+Cost grows linearly with the number of models, so don't fan out every prompt. Use this pattern when:
+
+- **Irreversible decisions**: schema migrations, public API contracts, security model changes
+- **High-stakes reviews**: pre-merge architecture review, threat modeling, incident post-mortems
+- **Eval-style spot-checks**: validating a single canonical prompt that drives downstream automation
+- **Onboarding a new model**: comparing a candidate model's output against your trusted baseline before adopting it
+
+For routine prompts, the single-model alternatives form (below) is sufficient and cheaper.
+
+**Core Implementation**
+
+```bash
+#!/usr/bin/env bash
+# fan-out.sh — run the same prompt across multiple models
+PROMPT_FILE="$1"
+mkdir -p .cross-model/$(date +%Y%m%d-%H%M%S)
+RUN_DIR=$(ls -td .cross-model/* | head -1)
+
+for model in \
+  "claude-opus-4-7" \
+  "gpt-5" \
+  "gemini-2.5-pro"; do
+    echo "→ $model"
+    llm -m "$model" < "$PROMPT_FILE" > "$RUN_DIR/${model}.md"
+done
+
+# Diff the outputs to surface divergence quickly
+diff -u "$RUN_DIR/claude-opus-4-7.md" "$RUN_DIR/gpt-5.md"     > "$RUN_DIR/claude-vs-gpt.diff"  || true
+diff -u "$RUN_DIR/gpt-5.md"           "$RUN_DIR/gemini-2.5-pro.md" > "$RUN_DIR/gpt-vs-gemini.diff" || true
+
+echo "Outputs in $RUN_DIR — review the .diff files first."
+```
+
+**Reading the Results**
+
+| Outcome | What it means | Action |
+|---|---|---|
+| All models agree | Stronger prior than any single model alone | Proceed |
+| 2 agree, 1 disagrees | The minority report may be catching something the majority missed | Read the dissent carefully before discarding |
+| All three disagree | The prompt is underspecified, the task is genuinely ambiguous, or you're at the frontier of model capability | Re-prompt with sharper constraints, or treat as a human-judgment call |
+
+**The disagreement IS the signal.** Don't reduce three rich outputs to a vote count — investigate *why* the models split. That investigation is the value the pattern delivers, not the "winning" answer.
+
+**Single-Model Alternatives (Degenerate Form)**
+
+When the cost of fanning out across providers isn't justified, ask one model for multiple options in a single call:
+
+```
+"Generate 3 different authentication approaches. For each: performance profile,
+security trade-offs, implementation complexity, and when to choose it.
+Then recommend one based on a typical SaaS startup's constraints."
+```
+
+This is cheaper but provides weaker signal — the alternatives share a single model's training biases. Modern IDE assistants offer this natively as "alternative completions"; named pattern status is unwarranted on its own, but it's worth knowing as the budget-friendly cousin of the full pattern.
+
+**Anti-pattern: Single-Model Bias**
+
+Committing irreversible decisions on a single model's output without ever checking whether another frontier model would have made the same call. The decision feels well-reasoned because the model's prose is confident — but confidence is not correctness, and one model's blind spots become the project's blind spots.
+
+**Anti-pattern: Voting Theater**
+
+Running three models and treating majority rule as truth. Frontier models are trained on overlapping data and exhibit correlated errors; 2-of-3 agreement on a wrong answer is common when the wrong answer is the most plausible-sounding one. Use the votes as a *prompt for investigation*, never as a verdict.
 
 ---
 
@@ -1579,7 +1629,7 @@ Loading entire codebases, documentation, or conversation history into context ra
 **Maturity**: Beginner  
 **Description**: Give AI specific constraints to prevent over-engineering and ensure focused solutions.
 
-**Related Patterns**: [Progressive Enhancement](#progressive-enhancement), [Handoff Protocols](experiments/README.md#handoff-protocols), [Choice Generation](#choice-generation)
+**Related Patterns**: [Progressive Enhancement](#progressive-enhancement), [Handoff Protocols](experiments/README.md#handoff-protocols), [Cross-Model Validation](#cross-model-validation)
 
 **Examples**
 ```
@@ -2890,7 +2940,7 @@ Manual thresholds quickly become stale, causing alert storms or blind spots.
 ### Phase 2: Development (Weeks 3-4)
 1. **[Spec-Driven Development](#spec-driven-development)** - Implement specification-first approach
 2. **[Progressive Enhancement](#progressive-enhancement)** - Practice iterative development
-3. **[Choice Generation](#choice-generation)** - Generate multiple implementation options
+3. **[Cross-Model Validation](#cross-model-validation)** - Stress-test high-stakes decisions across multiple frontier models
 4. **[Atomic Decomposition](#atomic-decomposition)** - Break down complex features
 
 ### Phase 3: Operations (Weeks 5-6)
