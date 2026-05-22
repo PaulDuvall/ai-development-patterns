@@ -1,0 +1,14 @@
+# Autonomous Remediation thresholds and suppression.
+# Adjust thresholds when a rule's default produces false positives for
+# legitimate code (state machines, external-API wrappers, etc).
+
+max_function_length: 20
+max_complexity: 10
+max_nesting: 3
+
+skip_directories:
+  - tests/
+  - generated/
+  - vendored/
+  - migrations/
+  - node_modules/

@@ -243,6 +243,16 @@ patterns:
       Automatically collect error context from logs, system state, and git history, then use AI to diagnose root causes and generate validated fixes.
     related: [developer-lifecycle, observable-development, tool-integration]
 
+  - id: autonomous-remediation
+    name: Autonomous Remediation
+    category: development
+    maturity: intermediate
+    anchor: "#autonomous-remediation"
+    automatable: true
+    description: >
+      Pair deterministic rule-based detectors with LLM remediators inside an event-driven loop so codified rule violations are caught and fixed automatically before the AI session continues.
+    related: [codified-rules, event-automation, guided-refactoring, error-resolution]
+
   # Operations (4 patterns)
   - id: security-orchestration
     name: Security Orchestration

@@ -89,6 +89,10 @@
 	    DL --> ER([Error<br/>Resolution])
 	    OD --> ER
 	    TI --> ER
+	    EA --> AR([Autonomous<br/>Remediation])
+	    CR --> AR
+	    GR --> AR
+	    ER --> AR
 	    PI([Planned<br/>Implementation])
 	    CnG([Constrained<br/>Generation])
 
@@ -98,7 +102,7 @@
 	    classDef operations fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,color:#78281f
 
 	    class RA,CR,SS,DL,TI,IG foundation
-	    class PE,SD,AD,PA,OD,GR,AT,EA,CC,PD,IS,CP,CG,GA,ER,PI,CnG development
+	    class PE,SD,AD,PA,OD,GR,AT,EA,CC,PD,IS,CP,CG,GA,ER,PI,CnG,AR development
 	    class PG,SO,BM,CZR operations
 
 	    %% CLICKABLE LINKS
@@ -129,6 +133,7 @@
 	    click ER "https://github.com/PaulDuvall/ai-development-patterns#error-resolution"
 	    click GA "https://github.com/PaulDuvall/ai-development-patterns#guided-architecture"
 	    click BM "https://github.com/PaulDuvall/ai-development-patterns#baseline-management"
+	    click AR "https://github.com/PaulDuvall/ai-development-patterns#autonomous-remediation"
 	    </div>
 
     <p class="legend"><strong>Legend</strong>: 🟢 Foundation | 🟡 Development | 🔴 Operations</p>

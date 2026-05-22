@@ -3,7 +3,7 @@
 [![Tests](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml/badge.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/docs-comprehensive-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns#ai-development-patterns)
-[![Patterns](https://img.shields.io/badge/patterns-28-blue.svg)](#complete-pattern-reference)
+[![Patterns](https://img.shields.io/badge/patterns-29-blue.svg)](#complete-pattern-reference)
 [![Quality Gate](https://img.shields.io/badge/quality%20gate-passing-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/tree/main/tests)
 [![Hyperlinks](https://img.shields.io/badge/hyperlinks-validated-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
 
@@ -53,6 +53,10 @@ graph TB
     DL --> ER([Error<br/>Resolution])
     OD --> ER
     TI --> ER
+    EA --> AR([Autonomous<br/>Remediation])
+    CR --> AR
+    GR --> AR
+    ER --> AR
     PI([Planned<br/>Implementation])
     CnG([Constrained<br/>Generation])
 
@@ -62,7 +66,7 @@ graph TB
     classDef operations fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,color:#78281f
 
     class RA,CR,SS,DL,TI,IG foundation
-    class PE,SD,AD,PA,OD,GR,AT,EA,CC,PD,IS,CP,CG,GA,ER,PI,CnG development
+    class PE,SD,AD,PA,OD,GR,AT,EA,CC,PD,IS,CP,CG,GA,ER,PI,CnG,AR development
     class PG,SO,BM,CZR operations
 
     %% CLICKABLE LINKS
@@ -93,6 +97,7 @@ graph TB
     click ER "https://github.com/PaulDuvall/ai-development-patterns#error-resolution"
     click GA "https://github.com/PaulDuvall/ai-development-patterns#guided-architecture"
     click BM "https://github.com/PaulDuvall/ai-development-patterns#baseline-management"
+    click AR "https://github.com/PaulDuvall/ai-development-patterns#autonomous-remediation"
 ```
 
 **Legend**: 🟢 Foundation | 🟡 Development | 🔴 Operations
@@ -129,6 +134,7 @@ graph TD
         R[Custom Commands]
         S[Progressive Disclosure]
         U[Image Spec]
+        V[Autonomous Remediation]
         I --> K[Atomic Decomposition]
         K --> L[Parallel Agents]
     end
@@ -151,6 +157,8 @@ graph TD
     S --> T
     G --> U
     I --> U
+    Q --> V
+    B --> V
 ```
 
 **Continuous Implementation Note**: Security patterns ([Security Sandbox](#security-sandbox), AI Security & Compliance) and deployment patterns should be implemented continuously throughout development, not delayed until specific phases. The dependencies shown represent learning prerequisites, not deployment gates.
@@ -183,6 +191,7 @@ graph TD
 | **[Guided Architecture](#guided-architecture)** | Intermediate | Development | Apply architectural frameworks (DDD, Well-Architected, 12-Factor) using AI to ensure sound system design | Developer Lifecycle, Codified Rules |
 | **[Automated Traceability](#automated-traceability)** | Intermediate | Development | Maintain automated links between requirements, specifications, tests, implementation, and documentation using AI | Developer Lifecycle |
 | **[Error Resolution](#error-resolution)** | Intermediate | Development | Automatically collect error context from logs, system state, and git history, then use AI to diagnose root causes and generate validated fixes | Developer Lifecycle, Observable Development, Tool Integration |
+| **[Autonomous Remediation](#autonomous-remediation)** | Intermediate | Development | Pair deterministic rule-based detectors with LLM remediators inside an event-driven loop so codified rule violations are caught and fixed automatically before the AI session continues | Codified Rules, Event Automation |
 | **Security & Compliance** | | Operations | *Category containing security and compliance patterns* | |
 | **[Policy Generation](#policy-generation)** | Advanced | Operations | Transform compliance requirements into executable Cedar/OPA policy files with AI assistance | Security Sandbox |
 | **[Security Orchestration](#security-orchestration)** | Intermediate | Workflow | Aggregate multiple security tools and use AI to summarize findings for actionable insights | Security Sandbox |
@@ -1595,7 +1604,7 @@ Adding too many constraints ("use exactly 50 lines, 2 methods, no dependencies, 
 **Maturity**: Intermediate
 **Description**: Execute custom commands automatically at assistant lifecycle events (pre/post tool use, session start, prompt submission) for workflow automation, validation, and policy enforcement.
 
-**Related Patterns**: [Codified Rules](#codified-rules), [Security Sandbox](#security-sandbox), [Custom Commands](#custom-commands)
+**Related Patterns**: [Codified Rules](#codified-rules), [Security Sandbox](#security-sandbox), [Custom Commands](#custom-commands), [Autonomous Remediation](#autonomous-remediation)
 
 **Core Concept**
 
@@ -2117,7 +2126,7 @@ def process_payment(amount):
 **Maturity**: Intermediate  
 **Description**: Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics, following established refactoring rules and maintaining test coverage throughout the process.
 
-**Related Patterns**: [Codified Rules](#codified-rules), [Testing Orchestration](experiments/README.md#testing-orchestration), [Debt Forecasting](experiments/README.md#debt-forecasting)
+**Related Patterns**: [Codified Rules](#codified-rules), [Autonomous Remediation](#autonomous-remediation), [Testing Orchestration](experiments/README.md#testing-orchestration), [Debt Forecasting](experiments/README.md#debt-forecasting)
 
 **Code Smell Detection Framework**
 
@@ -2306,7 +2315,7 @@ Maintaining requirement links in spreadsheets or manual documentation that becom
 **Maturity**: Intermediate
 **Description**: Automatically collect comprehensive error context from logs, system state, and git history, then use AI to diagnose root causes and generate validated fixes.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Observable Development](#observable-development), [Tool Integration](#tool-integration), [Testing Orchestration](experiments/README.md#testing-orchestration)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Observable Development](#observable-development), [Tool Integration](#tool-integration), [Autonomous Remediation](#autonomous-remediation), [Testing Orchestration](experiments/README.md#testing-orchestration)
 
 **[Error Resolution](#error-resolution) Workflow**
 
@@ -2540,6 +2549,144 @@ fi
 ```
 
 ---
+
+## Autonomous Remediation
+
+**Maturity**: Intermediate
+**Description**: Pair deterministic rule-based detectors with LLM remediators inside an event-driven loop so codified rule violations are caught and fixed automatically before the AI session continues.
+
+**Related Patterns**: [Codified Rules](#codified-rules), [Event Automation](#event-automation), [Guided Refactoring](#guided-refactoring), [Error Resolution](#error-resolution)
+
+**Source**: Paul Duvall, "[Code Quality Gates: Using Claude Code Hooks to Block Code Smells on Every Write](https://www.paulmduvall.com/claude-code-hooks-code-quality-guardrails/)", February 24, 2026
+
+**Core Loop**
+
+```mermaid
+graph TD
+    A[AI Writes or Edits File] --> B[PostToolUse Hook Fires]
+    B --> C[Deterministic Detector<br/>AST, Linter, Scanner, Policy Engine]
+    C --> D{Violations?}
+    D -->|No| E[AI Continues]
+    D -->|Yes| F[Structured Violation Report<br/>+ Prescribed Fix Hint]
+    F --> G[LLM Remediator<br/>Same Session Context]
+    G --> A
+    D -->|Retry Budget Exhausted| H[Escape Hatch<br/>Raise Threshold, Skip, or Suppress]
+
+    style C fill:#a8d5ba,stroke:#2d5a3f,color:#1a3a25
+    style G fill:#f9e79f,stroke:#b7950b,color:#7d6608
+    style H fill:#f5b7b1,stroke:#c0392b,color:#78281f
+```
+
+**Pattern Anatomy**
+
+Four components must be present for the loop to close:
+
+1. **Deterministic detector**. Codified rules executed by non-LLM logic (AST walker, linter, scanner, type checker, policy engine). Output is reproducible across runs.
+2. **Structured violation report**. Machine-parseable list of findings with file path, line number, rule ID, severity, and a prescribed fix hint.
+3. **LLM remediator**. The same model that produced the violation, fed the report as feedback. Runs in the same session so prior context carries forward.
+4. **Retry budget and escape hatch**. Bounded loop count, per-rule threshold override, or per-file suppression marker. Without this, the loop can run indefinitely on legitimate edge cases.
+
+**Core Implementation**
+
+PostToolUse hook (the mechanism comes from [Event Automation](#event-automation)):
+
+```python
+#!/usr/bin/env python3
+# ~/.claude/hooks/auto-remediate.py
+import json, os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from detectors import run_all_detectors
+from fixes import FIX_HINTS, format_report
+
+event = json.load(sys.stdin)
+file_path = event.get("tool_input", {}).get("file_path", "")
+if not file_path or not os.path.isfile(file_path):
+    sys.exit(0)
+
+violations = run_all_detectors(file_path)
+if not violations:
+    sys.exit(0)
+
+report = format_report(file_path, violations, FIX_HINTS)
+print(json.dumps({"decision": "block", "reason": report}))
+sys.exit(0)
+```
+
+Each detector emits both the finding AND the prescribed fix, so the LLM remediator gets a concrete starting point instead of guessing which technique to apply:
+
+```python
+# detectors/fixes.py
+FIX_HINTS = {
+    "complexity":      "Use extract-method, early returns, guard clauses, or lookup tables.",
+    "long_function":   "Extract helper functions for distinct logical steps.",
+    "deep_nesting":    "Use guard clauses and early returns to flatten control flow.",
+    "duplicate_block": "Extract repeated code into a shared helper function.",
+    "vuln_dependency": "Upgrade to the patched version listed in the advisory.",
+    "secret_leak":     "Move the value to a secret manager and reference via env var.",
+}
+```
+
+Loop semantics:
+
+| Condition | Behavior |
+|---|---|
+| Clean detector run | Exit 0, AI continues |
+| Violations found | Exit with `block` decision and structured report; LLM re-attempts |
+| Same file blocked more than 3 consecutive times | Surface to developer; suggest threshold raise or skip-list entry |
+| Hook itself crashes | Fail open (exit 0); never silently disable a rule without telling the developer |
+
+**When to Use**
+
+| Use Autonomous Remediation when... | Use plain [Event Automation](#event-automation) when... |
+|---|---|
+| Violation has a deterministic fix the LLM can apply | Violation is a hard policy ("never edit .env") with no fix path |
+| Rule is mechanical (complexity, nesting, dep version, secret pattern) | Rule requires human judgment (architecture, business logic, security tradeoff) |
+| Fix can be verified by re-running the same detector | Fix needs out-of-band verification (manual review, production test) |
+
+**Domain Instances**
+
+This pattern recurs across the catalog under domain-specific names. Each is a concrete instantiation of the same detect-fix-verify loop:
+
+| Domain | Detector | LLM Remediator Output | Existing Pattern |
+|---|---|---|---|
+| Code smells | AST or Lizard complexity rules | Refactored function | [Guided Refactoring](#guided-refactoring) |
+| Runtime errors | Stack trace + log scanner | Validated bug fix | [Error Resolution](#error-resolution) |
+| Infrastructure drift | Terraform plan diff | Corrective patch | [Drift Remediation](experiments/README.md#drift-remediation) |
+| Flaky tests | Build history analyzer | Stabilization patch | [Suite Health](experiments/README.md#suite-health) |
+| Stale or vulnerable deps | npm audit, pip-audit, dependabot | Staged upgrade PR | [Upgrade Advisor](experiments/README.md#upgrade-advisor) |
+| Security findings | Bandit, Semgrep, gitleaks | Patched code | New instance |
+
+**Complete Example**: See [examples/autonomous-remediation/](examples/autonomous-remediation/) for a working PostToolUse hook with code-smell detectors, fix-hint dictionary, retry budget, multi-language support via Lizard, and skip-list configuration.
+
+**Anti-pattern: Manual Remediation**
+
+Detecting violations with codified rules but leaving the fix to a human reviewer or a separate CI cycle. AI sessions write dozens of files between commits. Violations compound faster than humans can triage them. By the time a reviewer flags one issue, three more have been built on top of it. This converts AI write velocity from an asset into a liability.
+
+```bash
+# Bad: detect at commit time, human fixes later
+git commit  # pre-commit linter fails, dev manually fixes 12 files
+
+# Good: detect at write time, LLM fixes immediately
+# PostToolUse hook blocks, LLM remediates, next file starts clean
+```
+
+**Anti-pattern: Unbounded Loop**
+
+Configuring the loop without a retry budget or escape hatch. When the LLM and detector legitimately disagree (a 12-state machine that genuinely needs cyclomatic complexity 14, a wrapper function with 6 parameters mapping to an external API), they ping-pong indefinitely. Each retry costs roughly one model turn of tokens and wall-clock time.
+
+```yaml
+# Bad: no exit condition
+retry_budget: unlimited
+suppression: none
+
+# Good: bounded with explicit escape paths
+retry_budget: 3
+on_exhaustion: surface_to_developer
+suppression:
+  directory_skip_list: [tests/, generated/, vendored/]
+  threshold_override: .ai/thresholds.yml  # per-file or per-rule
+  inline_marker: "# rule: ignore"          # per-call-site
+```
 
 ---
 
