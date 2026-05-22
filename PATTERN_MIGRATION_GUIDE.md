@@ -48,6 +48,11 @@ This change aligns with established pattern naming conventions:
 | Progressive AI Enhancement | Progressive Enhancement | Removed "AI" prefix | Progressive enhancement is well-known pattern |
 | AI Choice Generation | Choice Generation | Removed "AI" prefix | Generation implies AI automation |
 | Choice Generation | Cross-Model Validation | Reframed | Original pattern reduced to "ask one model for N options" — table stakes in 2026. Reframed around running the same prompt across multiple frontier models, where disagreement is signal. |
+| Question Generation | (merged) | Folded into Planned Implementation | The interview phase belongs as the opening of Planned Implementation rather than a separate pattern. |
+| Constrained Generation | (merged) | Folded into Planned Implementation | Constraint examples now appear as the "Constrain" phase between interview and plan; standalone pattern was a 25-line stub. |
+| Automated Traceability | (merged) | Folded into Spec-Driven Development | Traceability is the link layer implied by Spec-Driven's anchor/footnote system; the standalone 35-line entry duplicated coverage. |
+| Guided Architecture | (demoted) | Moved to `experiments/README.md` | Pattern is broad enough that its concrete value depends heavily on the specific framework; remains in experiments pending tighter framing. |
+| Baseline Management | (archived) | Removed | 20-line stub on AI-set CloudWatch thresholds; orphan with no incoming dependents and no plan to develop further. |
 | Atomic Task Decomposition | Atomic Decomposition | Simplified | "Atomic" already implies task-level |
 | Parallelized AI Coding Agents | Parallel Agents | Simplified, removed "AI" | Agents are AI agents in this context |
 | AI Context Persistence | Context Persistence | Removed "AI" prefix | Context is AI-specific in this repository |
@@ -253,6 +258,11 @@ All GitHub markdown anchor links have changed. Update your hyperlinks:
 | `#progressive-ai-enhancement` | `#progressive-enhancement` |
 | `#ai-choice-generation` | `#choice-generation` |
 | `#choice-generation` | `#cross-model-validation` |
+| `#question-generation` | `#planned-implementation` (merged) |
+| `#constrained-generation` | `#planned-implementation` (merged) |
+| `#automated-traceability` | `#spec-driven-development` (merged) |
+| `#guided-architecture` | `experiments/README.md#guided-architecture` (demoted) |
+| `#baseline-management` | (archived, no replacement) |
 | `#atomic-task-decomposition` | `#atomic-decomposition` |
 | `#parallelized-ai-coding-agents` | `#parallel-agents` |
 | `#ai-context-persistence` | `#context-persistence` |

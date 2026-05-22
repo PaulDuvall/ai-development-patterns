@@ -59,37 +59,18 @@ class TestMermaidDiagram:
         pattern = r'click\s+(\w+)\s+"([^"]+)"'
         return dict(re.findall(pattern, mermaid_diagram))
 
+    REQUIRED_DIAGRAM_PATTERNS = [
+        "Readiness Assessment", "Codified Rules", "Security Sandbox",
+        "Developer Lifecycle", "Tool Integration", "Issue Generation",
+        "Context Persistence", "Progressive Enhancement", "Spec-Driven Development",
+        "Atomic Decomposition", "Parallel Agents", "Observable Development",
+        "Guided Refactoring", "Policy Generation", "Security Orchestration",
+    ]
+
     def test_diagram_includes_all_patterns(self, diagram_patterns):
         """Verify all expected patterns appear in the diagram"""
-        # Map of expected pattern names to their diagram representations
-        pattern_mapping = {
-            "Readiness Assessment": "Readiness Assessment",
-            "Codified Rules": "Codified Rules",
-            "Security Sandbox": "Security Sandbox",
-            "Developer Lifecycle": "Developer Lifecycle",
-            "Tool Integration": "Tool Integration",
-            "Issue Generation": "Issue Generation",
-            "Context Persistence": "Context Persistence",
-            "Progressive Enhancement": "Progressive Enhancement",
-            "Spec-Driven Development": "Spec-Driven Development",
-            "Atomic Decomposition": "Atomic Decomposition",
-            "Parallel Agents": "Parallel Agents",
-            "Observable Development": "Observable Development",
-            "Guided Refactoring": "Guided Refactoring",
-            "Automated Traceability": "Automated Traceability",
-            "Policy Generation": "Policy Generation",
-            "Security Orchestration": "Security Orchestration",
-            "Baseline Management": "Baseline Management",
-        }
-
-        missing_patterns = []
-        for expected in pattern_mapping.keys():
-            diagram_name = pattern_mapping[expected]
-            if diagram_name not in diagram_patterns:
-                missing_patterns.append(expected)
-
-        assert not missing_patterns, \
-            f"Patterns missing from diagram: {missing_patterns}"
+        missing = [p for p in self.REQUIRED_DIAGRAM_PATTERNS if p not in diagram_patterns]
+        assert not missing, f"Patterns missing from diagram: {missing}"
 
     def test_diagram_click_links_exist(self, diagram_click_links):
         """Verify diagram has clickable links for patterns"""

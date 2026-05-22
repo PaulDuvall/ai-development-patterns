@@ -40,7 +40,7 @@ patterns:
     automatable: false
     description: >
       Structured 9-stage process from problem definition through deployment with AI assistance.
-    related: [codified-rules, security-sandbox, spec-driven-development, observable-development, automated-traceability, tool-integration]
+    related: [codified-rules, security-sandbox, spec-driven-development, observable-development, tool-integration]
 
   - id: tool-integration
     name: Tool Integration
@@ -73,16 +73,6 @@ patterns:
       Use executable specifications to guide AI code generation with clear acceptance criteria before implementation.
     related: [developer-lifecycle, custom-commands, image-spec, atomic-decomposition]
 
-  - id: question-generation
-    name: Question Generation
-    category: development
-    maturity: beginner
-    anchor: "#question-generation"
-    automatable: false
-    description: >
-      Have AI interview you with structured questions to surface requirements, constraints, and decisions before planning or coding.
-    related: [planned-implementation, spec-driven-development, cross-model-validation]
-
   - id: planned-implementation
     name: Planned Implementation
     category: development
@@ -90,8 +80,8 @@ patterns:
     anchor: "#planned-implementation"
     automatable: true
     description: >
-      Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration.
-    related: [question-generation, progressive-enhancement]
+      Interview, constrain, and plan before writing code so AI implementation matches actual requirements instead of confident-sounding assumptions.
+    related: [progressive-enhancement, spec-driven-development, cross-model-validation]
 
   - id: progressive-enhancement
     name: Progressive Enhancement
@@ -143,16 +133,6 @@ patterns:
       Load AI assistant rules incrementally based on task context to prevent instruction saturation and context bloat.
     related: [codified-rules, context-persistence, centralized-rules]
 
-  - id: constrained-generation
-    name: Constrained Generation
-    category: development
-    maturity: beginner
-    anchor: "#constrained-generation"
-    automatable: true
-    description: >
-      Give AI specific constraints to prevent over-engineering and ensure focused solutions.
-    related: []
-
   - id: atomic-decomposition
     name: Atomic Decomposition
     category: development
@@ -162,26 +142,6 @@ patterns:
     description: >
       Break complex features into atomic, independently implementable tasks for parallel AI agent execution.
     related: [progressive-enhancement, parallel-agents]
-
-  - id: automated-traceability
-    name: Automated Traceability
-    category: development
-    maturity: intermediate
-    anchor: "#automated-traceability"
-    automatable: true
-    description: >
-      Maintain automated links between requirements, specifications, tests, implementation, and documentation using AI.
-    related: [developer-lifecycle]
-
-  - id: guided-architecture
-    name: Guided Architecture
-    category: development
-    maturity: intermediate
-    anchor: "#guided-architecture"
-    automatable: true
-    description: >
-      Apply architectural frameworks (DDD, Well-Architected, 12-Factor) using AI to ensure sound system design.
-    related: [developer-lifecycle, codified-rules]
 
   - id: guided-refactoring
     name: Guided Refactoring
@@ -284,12 +244,3 @@ patterns:
       Transform compliance requirements into executable Cedar/OPA policy files with AI assistance.
     related: [security-sandbox]
 
-  - id: baseline-management
-    name: Baseline Management
-    category: operations
-    maturity: advanced
-    anchor: "#baseline-management"
-    automatable: false
-    description: >
-      Establish intelligent performance baselines and configure monitoring thresholds automatically.
-    related: [tool-integration]

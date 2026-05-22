@@ -51,7 +51,7 @@ Daily practice patterns for AI-assisted coding workflows:
 CI/CD, security, and production management with AI:
 - **[Policy Generation](../README.md#policy-generation)**: Transforming compliance requirements into executable policy files
 - **[Security Orchestration](../README.md#security-orchestration)**: Aggregating security tools and summarizing findings for actionable insights
-- **[Baseline Management](../README.md#baseline-management)**: Establishing intelligent performance baselines and monitoring thresholds
+- **[Observable Development](../README.md#observable-development)**: Establishing intelligent performance baselines and monitoring thresholds
 
 For advanced and in-progress ideas, see the experimental catalog in [experiments/](../experiments/), including patterns like **[Pipeline Synthesis](../experiments/README.md#pipeline-synthesis)**, **[Debt Forecasting](../experiments/README.md#debt-forecasting)**, and **[Context Optimization](../experiments/README.md#context-optimization)**.
 

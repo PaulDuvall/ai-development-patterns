@@ -30,7 +30,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 11. **Testing Orchestration**: Generate complete test suites (unit, integration, performance, security) automatically from specifications using [Testing Orchestration](../experiments/README.md#testing-orchestration).
 
-12. **Maintain Test-to-Specification Traceability**: Link every specification element to automated tests with anchored references and coverage tracking using [Automated Traceability](../README.md#automated-traceability).
+12. **Maintain Test-to-Specification Traceability**: Link every specification element to automated tests with anchored references and coverage tracking using [Spec-Driven Development](../README.md#spec-driven-development).
 
 13. **Structured Observability**: Implement comprehensive logging with operation context, correlation IDs, and specific error details in standardized formats (JSON/structured) for AI analysis and debugging using [Observable Development](../README.md#observable-development).
 
@@ -82,7 +82,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 33. **Security Orchestration**: Aggregate multiple security tools and use AI to summarize findings, reducing alert fatigue while maintaining rigor with [Security Orchestration](../README.md#security-orchestration).
 
-34. **Baseline Management**: Use AI to analyze historical data and establish intelligent monitoring thresholds that minimize false positives using [Baseline Management](../README.md#baseline-management).
+34. **Baseline Management**: Use AI to analyze historical data and establish intelligent monitoring thresholds that minimize false positives using [Observable Development](../README.md#observable-development).
 
 35. **Incident Automation**: Generate actionable playbooks from historical incident data and continuously improve operational procedures using [Incident Automation](../experiments/README.md#incident-automation).
 

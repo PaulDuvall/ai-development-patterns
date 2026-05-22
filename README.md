@@ -3,7 +3,7 @@
 [![Tests](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml/badge.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/docs-comprehensive-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns#ai-development-patterns)
-[![Patterns](https://img.shields.io/badge/patterns-29-blue.svg)](#complete-pattern-reference)
+[![Patterns](https://img.shields.io/badge/patterns-24-blue.svg)](#complete-pattern-reference)
 [![Quality Gate](https://img.shields.io/badge/quality%20gate-passing-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/tree/main/tests)
 [![Hyperlinks](https://img.shields.io/badge/hyperlinks-validated-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
 
@@ -20,7 +20,6 @@ graph TB
     DL --> TI([Tool<br/>Integration])
 
     %% ROW 2: Operations & branches (loops back)
-    TI --> BM([Baseline<br/>Management])
     SS --> SO([Security<br/>Orchestration])
     SS --> PG([Policy<br/>Generation])
     SO --> CZR([Centralized<br/>Rules])
@@ -28,7 +27,6 @@ graph TB
     %% ROW 3: Development patterns (flows forward again)
     DL --> OD([Observable<br/>Development])
     DL --> SD([Spec-Driven<br/>Development])
-    DL --> AT([Automated<br/>Traceability])
     CR --> GR([Guided<br/>Refactoring])
     CR --> CP([Context<br/>Persistence])
     RA --> IG([Issue<br/>Generation])
@@ -48,8 +46,6 @@ graph TB
 
     %% ROW 5: Additional development patterns
     PE --> CMV([Cross-Model<br/>Validation])
-    DL --> GA([Guided<br/>Architecture])
-    CR --> GA
     DL --> ER([Error<br/>Resolution])
     OD --> ER
     TI --> ER
@@ -58,7 +54,6 @@ graph TB
     GR --> AR
     ER --> AR
     PI([Planned<br/>Implementation])
-    CnG([Constrained<br/>Generation])
 
     %% STYLING
     classDef foundation fill:#a8d5ba,stroke:#2d5a3f,stroke-width:2px,color:#1a3a25
@@ -66,8 +61,8 @@ graph TB
     classDef operations fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,color:#78281f
 
     class RA,CR,SS,DL,TI,IG foundation
-    class PE,SD,AD,PA,OD,GR,AT,EA,CC,PD,IS,CP,CMV,GA,ER,PI,CnG,AR development
-    class PG,SO,BM,CZR operations
+    class PE,SD,AD,PA,OD,GR,EA,CC,PD,IS,CP,CMV,ER,PI,AR development
+    class PG,SO,CZR operations
 
     %% CLICKABLE LINKS
     click RA "https://github.com/PaulDuvall/ai-development-patterns#readiness-assessment"
@@ -83,7 +78,6 @@ graph TB
     click PA "https://github.com/PaulDuvall/ai-development-patterns#parallel-agents"
     click OD "https://github.com/PaulDuvall/ai-development-patterns#observable-development"
     click GR "https://github.com/PaulDuvall/ai-development-patterns#guided-refactoring"
-    click AT "https://github.com/PaulDuvall/ai-development-patterns#automated-traceability"
     click EA "https://github.com/PaulDuvall/ai-development-patterns#event-automation"
     click CC "https://github.com/PaulDuvall/ai-development-patterns#custom-commands"
     click PD "https://github.com/PaulDuvall/ai-development-patterns#progressive-disclosure"
@@ -93,10 +87,7 @@ graph TB
     click CZR "https://github.com/PaulDuvall/ai-development-patterns#centralized-rules"
     click PI "https://github.com/PaulDuvall/ai-development-patterns#planned-implementation"
     click CMV "https://github.com/PaulDuvall/ai-development-patterns#cross-model-validation"
-    click CnG "https://github.com/PaulDuvall/ai-development-patterns#constrained-generation"
     click ER "https://github.com/PaulDuvall/ai-development-patterns#error-resolution"
-    click GA "https://github.com/PaulDuvall/ai-development-patterns#guided-architecture"
-    click BM "https://github.com/PaulDuvall/ai-development-patterns#baseline-management"
     click AR "https://github.com/PaulDuvall/ai-development-patterns#autonomous-remediation"
 ```
 
@@ -143,8 +134,6 @@ graph TD
         C --> M[Policy Generation]
         M --> N[Security Orchestration]
         N --> T[Centralized Rules]
-        F --> O[Baseline Management]
-        D --> P[Automated Traceability]
     end
 
     B --> Q
@@ -175,21 +164,17 @@ graph TD
 | **[Issue Generation](#issue-generation)** | Intermediate | Foundation | Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies | Readiness Assessment |
 | **[Spec-Driven Development](#spec-driven-development)** | Intermediate | Development | Use executable specifications to guide AI code generation with clear acceptance criteria before implementation | Developer Lifecycle |
 | **[Image Spec](#image-spec)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Spec-Driven Development, Progressive Enhancement |
-| **[Question Generation](#question-generation)** | Beginner | Development | Have AI interview you with structured questions to surface requirements, constraints, and decisions before planning or coding | None |
-| **[Planned Implementation](#planned-implementation)** | Beginner | Development | Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration | Question Generation |
+| **[Planned Implementation](#planned-implementation)** | Beginner | Development | Interview, constrain, and plan before writing code so AI implementation matches actual requirements instead of confident-sounding assumptions | None |
 | **[Progressive Enhancement](#progressive-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | None |
 | **[Cross-Model Validation](#cross-model-validation)** | Intermediate | Development | Run the same task across multiple frontier models and use their agreements, disagreements, and divergences as eval signal for high-stakes decisions | Progressive Enhancement |
 | **[Atomic Decomposition](#atomic-decomposition)** | Intermediate | Development | Break complex features into atomic, independently implementable tasks for parallel AI agent execution | Progressive Enhancement |
 | **[Parallel Agents](#parallel-agents)** | Advanced | Development | Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration | Atomic Decomposition |
 | **[Context Persistence](#context-persistence)** | Intermediate | Development | Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols | Codified Rules |
-| **[Constrained Generation](#constrained-generation)** | Beginner | Development | Give AI specific constraints to prevent over-engineering and ensure focused solutions | None |
 | **[Event Automation](#event-automation)** | Intermediate | Development | Execute custom commands automatically at assistant lifecycle events to enforce policies and automate workflows | Codified Rules, Security Sandbox |
 | **[Custom Commands](#custom-commands)** | Intermediate | Development | Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and sophisticated workflows | Event Automation, Spec-Driven Development, Codified Rules |
 | **[Progressive Disclosure](#progressive-disclosure)** | Intermediate | Development | Load AI assistant rules incrementally based on task context to prevent instruction saturation and context bloat | Codified Rules, Context Persistence |
 | **[Observable Development](#observable-development)** | Intermediate | Development | Strategic logging and debugging that makes system behavior visible to AI | Developer Lifecycle |
 | **[Guided Refactoring](#guided-refactoring)** | Intermediate | Development | Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics | Codified Rules |
-| **[Guided Architecture](#guided-architecture)** | Intermediate | Development | Apply architectural frameworks (DDD, Well-Architected, 12-Factor) using AI to ensure sound system design | Developer Lifecycle, Codified Rules |
-| **[Automated Traceability](#automated-traceability)** | Intermediate | Development | Maintain automated links between requirements, specifications, tests, implementation, and documentation using AI | Developer Lifecycle |
 | **[Error Resolution](#error-resolution)** | Intermediate | Development | Automatically collect error context from logs, system state, and git history, then use AI to diagnose root causes and generate validated fixes | Developer Lifecycle, Observable Development, Tool Integration |
 | **[Autonomous Remediation](#autonomous-remediation)** | Intermediate | Development | Pair deterministic rule-based detectors with LLM remediators inside an event-driven loop so codified rule violations are caught and fixed automatically before the AI session continues | Codified Rules, Event Automation |
 | **Security & Compliance** | | Operations | *Category containing security and compliance patterns* | |
@@ -197,8 +182,6 @@ graph TD
 | **[Security Orchestration](#security-orchestration)** | Intermediate | Workflow | Aggregate multiple security tools and use AI to summarize findings for actionable insights | Security Sandbox |
 | **[Centralized Rules](#centralized-rules)** | Advanced | Operations | Enforce organization-wide AI rules through a central Git repository that syncs to standard AI assistant configuration files with automatic language and framework detection | Codified Rules, Progressive Disclosure, Security Orchestration |
 | **Deployment Automation** | | Operations | *Category containing deployment and pipeline patterns* | |
-| **Monitoring & Maintenance** | | Operations | *Category containing monitoring and maintenance patterns* | |
-| **[Baseline Management](#baseline-management)** | Advanced | Operations | Establish intelligent performance baselines and configure monitoring thresholds automatically | Tool Integration |
 
 ---
 
@@ -281,11 +264,10 @@ graph TD
     M -->|Yes| N[Parallel Agents]
     M -->|No| O[Spec-Driven Development]
     N --> P[Atomic Decomposition]
-    O --> Q[Automated Traceability]
 
     E --> R{Enterprise Requirements?}
     R -->|Compliance| S[Policy Generation]
-    R -->|Scale| T[Baseline Management]
+    R -->|Scale| T[Centralized Rules]
     R -->|Quality| U[Debt Forecasting]
 ```
 
@@ -313,19 +295,19 @@ graph TD
 **For Enterprise/Production (Month 2+)**:
 1. **[Policy Generation](#policy-generation)** - Compliance automation
 2. **[Security Orchestration](#security-orchestration)** - Integrated security
-3. **[Baseline Management](#baseline-management)** - Production monitoring
+3. **[Centralized Rules](#centralized-rules)** - Organization-wide AI standards
 4. **[Debt Forecasting](experiments/README.md#debt-forecasting)** - Proactive maintenance
 
 ### Project Type Recommendations
 
 **MVP/Startup Projects**:
-- **Primary**: [Progressive Enhancement](#progressive-enhancement), [Cross-Model Validation](#cross-model-validation)
-- **Secondary**: [Security Sandbox](#security-sandbox), [Constrained Generation](#constrained-generation)  
+- **Primary**: [Progressive Enhancement](#progressive-enhancement), [Planned Implementation](#planned-implementation)
+- **Secondary**: [Security Sandbox](#security-sandbox), [Cross-Model Validation](#cross-model-validation)
 - **Avoid**: Complex orchestration patterns until scale demands
 
 **Enterprise Applications**:
 - **Primary**: [Developer Lifecycle](#developer-lifecycle), [Policy Generation](#policy-generation)
-- **Secondary**: [Automated Traceability](#automated-traceability), [Security Orchestration](#security-orchestration)
+- **Secondary**: [Spec-Driven Development](#spec-driven-development), [Security Orchestration](#security-orchestration)
 - **Essential**: All foundation patterns before development patterns
 
 **Research/Experimental Projects**:
@@ -334,7 +316,7 @@ graph TD
 - **Focus**: Learning and exploration over production readiness
 
 **High-Scale Production**:
-- **Primary**: [Parallel Agents](#parallel-agents), [Baseline Management](#baseline-management)
+- **Primary**: [Parallel Agents](#parallel-agents), [Observable Development](#observable-development)
 - **Secondary**: Chaos Engineering, Incident Automation
 - **Critical**: All security and monitoring patterns
 
@@ -351,11 +333,11 @@ graph TD
 - Consider **[Tool Integration](#tool-integration)** for role clarity
 - Full **[Developer Lifecycle](#developer-lifecycle)** implementation
 - **[Parallel Agents](#parallel-agents)** for complex features
-- **[Automated Traceability](#automated-traceability)** for quality gates
+- **[Spec-Driven Development](#spec-driven-development)** for quality gates and traceability
 
 **Multi Two-Pizza Team Organizations**:
 - **[Atomic Decomposition](#atomic-decomposition)** for parallel work across teams
-- **[Automated Traceability](#automated-traceability)** for coordination at scale
+- **[Spec-Driven Development](#spec-driven-development)** for coordination at scale via shared specifications
 - All **Operations Patterns** for organizational management
 
 ### Technology Stack Considerations
@@ -373,12 +355,12 @@ graph TD
 **Microservices Architecture**:
 - **[Parallel Agents](#parallel-agents)** for service coordination
 - **[Observable Development](#observable-development)** across service boundaries
-- **[Baseline Management](#baseline-management)** for distributed monitoring
+- **[Autonomous Remediation](#autonomous-remediation)** for cross-service code-quality consistency
 
 **Monolithic Applications**:
 - **[Progressive Enhancement](#progressive-enhancement)** for gradual modernization
 - **[Guided Refactoring](#guided-refactoring)** for code quality improvement
-- **[Constrained Generation](#constrained-generation)** to prevent over-engineering
+- **[Planned Implementation](#planned-implementation)** to prevent over-engineering through its constraint phase
 
 ---
 
@@ -887,6 +869,24 @@ Coverage: 94% (31/33 spec requirements covered)"
 - **Precise traceability** from specification anchors to test implementations
 - **Living documentation** that evolves with the system
 
+**Automated Traceability**
+
+Specification anchors (`{#cli_requirements}`) and test footnotes (`[^test_iam_syntax]`) are the link layer that ties requirements to tests to code to docs. Maintain those links automatically on every change instead of in a spreadsheet:
+
+```bash
+# After each commit, validate anchor coverage and flag drift
+git diff --name-only HEAD~1 | while read file; do
+    ai "For $file: confirm referenced spec anchors still exist, propose new
+        anchor links for any uncovered behavior, and emit an impact list of
+        which downstream tests and docs need updating."
+done
+```
+
+When a spec section moves or a test is renamed, the same loop surfaces the broken link before it ships. The result is a living traceability graph that stays accurate without manual upkeep — the alternative (traceability in a spreadsheet) is stale within a week.
+
+**Anti-pattern: Broken Traceability**
+Maintaining requirement-to-test links in spreadsheets or manual documentation that becomes stale and inaccurate within days of being written.
+
 **Complete Implementation**
 
 See [examples/spec-driven-development/](examples/spec-driven-development/) for:
@@ -945,34 +945,49 @@ Uploading many diagrams at once without hierarchy or a clear starting point over
 
 ---
 
-## Question Generation
+## Planned Implementation
 
 **Maturity**: Beginner
-**Description**: Have AI interview you with structured questions to surface requirements, constraints, and decisions before planning or coding.
+**Description**: Interview, constrain, and plan before writing code so AI implementation matches actual requirements instead of confident-sounding assumptions.
 
-**Related Patterns**: [Planned Implementation](#planned-implementation), [Spec-Driven Development](#spec-driven-development), [Cross-Model Validation](#cross-model-validation)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Progressive Enhancement](#progressive-enhancement), [Cross-Model Validation](#cross-model-validation)
 
-**Core Principle: Interview Before Implementation**
+**Core Principle: Think Before You Code**
 
-The most costly bugs come from building the wrong thing, not building it wrong. Before any plan, spec, or line of code, have AI act as an interviewer — asking structured questions to extract tacit knowledge, surface hidden constraints, and force decisions that would otherwise emerge mid-implementation.
+The costliest bugs come from building the wrong thing, not building it wrong. This pattern front-loads three activities before any code is written:
 
-**[Question Generation](#question-generation) Workflow**
+1. **Interview** — have AI ask structured questions to surface tacit knowledge, hidden constraints, and decisions that would otherwise emerge mid-implementation.
+2. **Constrain** — translate the interview answers into explicit boundaries the AI must respect (line counts, dependencies, performance budgets, prohibited approaches).
+3. **Plan** — generate an explicit step-by-step implementation plan, review it, and iterate before any code is generated.
+
+**Planning Workflow**
 
 ```mermaid
 graph TD
-    A[Idea or Request] --> B[AI Generates<br/>Clarifying Questions]
-    B --> C[Developer Answers]
-    C --> D{Gaps Remain?}
-    D -->|Yes| E[AI Asks<br/>Follow-up Questions]
-    E --> C
-    D -->|No| F[Structured Requirements<br/>Summary]
-    F --> G[Planned Implementation]
-    G --> H[Spec-Driven Development]
+    A[Idea or Request] --> B[AI Interviews You<br/>Clarifying Questions]
+    B --> C{Gaps Remain?}
+    C -->|Yes| B
+    C -->|No| D[Define Explicit Constraints<br/>Line count, deps, perf budget]
+    D --> E[Generate Initial Plan]
+    E --> F[Review & Refine Plan]
+    F --> G{Plan Approved?}
+    G -->|No| E
+    G -->|Yes| H[Execute Implementation]
+    H --> I[Validate Against Plan]
+    I --> J{Meets Plan?}
+    J -->|No| H
+    J -->|Yes| K[Complete]
+
+    style B fill:#e1f5e1
+    style D fill:#e1f5e1
+    style F fill:#e1f5e1
+    style H fill:#ffe6e6
+    style K fill:#e1f5e1
 ```
 
-#### Core Implementation
+**Interview Phase**
 
-Prompt AI to interview you before accepting any task:
+Before writing any plan, have AI act as an interviewer:
 
 ```bash
 ai "I want to build a notification system for our app.
@@ -983,119 +998,27 @@ Before writing any code or plan, interview me:
 3. Surface assumptions that could cause rework later
 4. Group your questions by category (scope, technical, users, edge cases)
 
-Ask questions one category at a time. Wait for my answers before continuing."
+Ask one category at a time. Wait for my answers before continuing."
 ```
 
-**Example AI interview output:**
+Typical interview output groups questions by category — scope ("Which channels? In-app, email, SMS?"), technical ("Expected volume — 10/day vs 10,000/hour changes architecture"), users ("Can users configure preferences?"), edge cases ("What happens when delivery fails?"). After answers are collected, ask AI to consolidate them into a requirements summary, an explicit non-goals list, and remaining open questions — that document becomes the input to the planning phase.
 
-```markdown
-**Scope & Requirements**
-- What triggers a notification? (user action, system event, scheduled, external?)
-- Which channels? (in-app, email, SMS, push — or start with one?)
-- Do notifications need to be real-time or is batching acceptable?
+**Constraint Phase**
 
-**Technical Constraints**
-- What's the expected volume? (10/day vs 10,000/hour changes the architecture)
-- Do you need delivery guarantees (at-least-once) or is best-effort OK?
-- Any existing message queue or event bus in the stack?
+Translate the interview answers into the boundaries the AI must respect. Constraints prevent over-engineering more reliably than instructions to "keep it simple":
 
-**Users & Permissions**
-- Can users configure notification preferences?
-- Are there notification types that can't be disabled (security alerts)?
+```
+Bad:  "Create user service"
+Good: "Create user service: <100 lines, 3 methods max, only bcrypt dependency"
 
-**Edge Cases & Decisions**
-- What happens when a notification fails to deliver?
-- How long do you retain notification history?
+Bad:  "Add caching"
+Good: "Add caching using Map, max 1000 entries, LRU eviction"
+
+Bad:  "Improve performance"
+Good: "Reduce p99 latency to <50ms without new dependencies"
 ```
 
-#### Turning Answers Into Artifacts
-
-After the interview, AI consolidates answers into a structured requirements summary that feeds directly into [Planned Implementation](#planned-implementation):
-
-```bash
-ai "Based on my answers, generate:
-1. A requirements summary with what we decided
-2. A list of explicit non-goals (what we're NOT building)
-3. Open questions we still need to resolve
-4. Suggested constraints for implementation
-
-Format as a structured document I can hand to a planning session."
-```
-
-**Output feeds the pipeline:**
-- **Requirements summary** → [Planned Implementation](#planned-implementation)
-- **Constraints list** → [Constrained Generation](#constrained-generation)
-- **Decision log** → [Context Persistence](#context-persistence)
-
-#### When to Use
-
-| Situation | [Question Generation](#question-generation) Helps Because |
-|-----------|----------------------------------|
-| Vague feature request | Surfaces what "notification system" actually means |
-| New domain | Exposes assumptions you don't know you're making |
-| Multiple stakeholders | Creates a shared record of decisions |
-| High-stakes change | Forces upfront decisions that prevent costly rework |
-| Onboarding to codebase | AI asks what you need to know, not what it assumes |
-
-#### Anti-pattern: Blind Generation
-
-Jumping straight from a vague idea to code generation without clarifying requirements. The AI fills in gaps with assumptions — often reasonable-sounding but wrong for your context.
-
-```bash
-# BAD: Vague request, AI assumes everything
-ai "Build a notification system"
-# AI assumes: email-only, no preferences, no retry logic,
-# simple database storage, synchronous delivery
-# Result: rework when requirements actually emerge
-
-# GOOD: Interview first, then build
-ai "I need a notification system. Interview me about
-requirements before writing anything."
-# AI asks about channels, volume, delivery guarantees,
-# user preferences, failure handling
-# Result: implementation matches actual needs
-```
-
-Without [Question Generation](#question-generation), you discover requirements through failed implementations instead of through conversation.
-
----
-
-## Planned Implementation
-
-**Maturity**: Beginner
-**Description**: Generate explicit implementation plans before writing code to improve quality, reduce iterations, and enable better collaboration.
-
-**Related Patterns**: [Question Generation](#question-generation), [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Progressive Enhancement](#progressive-enhancement), [Cross-Model Validation](#cross-model-validation)
-
-**Core Principle: Think Before You Code**
-
-Modern AI coding tools provide planning capabilities that allow developers to iterate on implementation approaches before writing any code. This pattern leverages these planning features to:
-- **Reduce implementation iterations** by validating approach upfront
-- **Improve code quality** through structured thinking
-- **Enable better collaboration** via shareable plans
-- **Minimize context switching** between planning and execution
-
-**Planning Workflow**
-
-```mermaid
-graph TD
-    A[Problem Statement] --> B[Generate Initial Plan]
-    B --> C[Review & Refine Plan]
-    C --> D{Plan Approved?}
-    D -->|No| E[Iterate on Plan]
-    E --> C
-    D -->|Yes| F[Execute Implementation]
-    F --> G[Validate Against Plan]
-    G --> H{Meets Plan?}
-    H -->|No| I[Adjust Implementation]
-    I --> F
-    H -->|Yes| J[Complete]
-
-    style A fill:#e1f5e1
-    style C fill:#e1f5e1
-    style F fill:#ffe6e6
-    style J fill:#e1f5e1
-```
+Carry these constraints into every subsequent prompt — they're the steering, not the suggestion.
 
 **Core Implementation**
 
@@ -1189,7 +1112,13 @@ See [examples/planned-implementation/](examples/planned-implementation/) for:
 - Plan validation and iteration strategies
 
 **Anti-pattern: Blind Generation**
-Immediately jumping to code generation without understanding the problem scope, constraints, or implementation options, leading to over-engineered or incorrect solutions.
+Jumping straight from a vague idea to code generation without interviewing for requirements or setting constraints. AI fills the gaps with assumptions — often reasonable-sounding but wrong for your context — and you discover requirements through failed implementations instead of conversation.
+
+**Anti-pattern: Unconstrained Generation**
+Skipping the constraint phase. Telling AI to "make it good" or "add features" without explicit boundaries produces over-engineered solutions that are hard to review.
+
+**Anti-pattern: Over-Constrained**
+Stacking so many constraints ("exactly 50 lines, 2 methods, no dependencies, 100% test coverage, sub-10ms response time") that AI can't find a coherent solution. Constraints are budgets, not handcuffs — pick the ones that matter for this task.
 
 **Anti-pattern: Over-Analysis**
 Spending excessive time refining plans without moving to implementation, missing opportunities for rapid feedback and iterative improvement.
@@ -1202,7 +1131,7 @@ Spending excessive time refining plans without moving to implementation, missing
 **Maturity**: Beginner  
 **Description**: Build complex features through small, deployable iterations rather than big-bang generation.
 
-**Related Patterns**: [Planned Implementation](#planned-implementation), [Developer Lifecycle](#developer-lifecycle), [Image Spec](#image-spec), [Constrained Generation](#constrained-generation), [Cross-Model Validation](#cross-model-validation), [Guided Architecture](#guided-architecture)
+**Related Patterns**: [Planned Implementation](#planned-implementation), [Developer Lifecycle](#developer-lifecycle), [Image Spec](#image-spec), [Cross-Model Validation](#cross-model-validation)
 
 **Examples**
 Building authentication progressively:
@@ -1501,7 +1430,7 @@ Running multiple agents without isolation, shared memory, or conflict resolution
 **Maturity**: Intermediate
 **Description**: Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols for efficient multi-session development.
 
-**Related Patterns**: [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure), [Automated Traceability](#automated-traceability), [Parallel Agents](#parallel-agents)
+**Related Patterns**: [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure), [Spec-Driven Development](#spec-driven-development), [Parallel Agents](#parallel-agents)
 
 **Core Principles**
 
@@ -1621,33 +1550,6 @@ Loading entire codebases, documentation, or conversation history into context ra
 - Load context progressively as needed
 - Externalize detailed information to memory schemas
 - Prefer 3-5 high-quality examples over exhaustive documentation
-
----
-
-## Constrained Generation
-
-**Maturity**: Beginner  
-**Description**: Give AI specific constraints to prevent over-engineering and ensure focused solutions.
-
-**Related Patterns**: [Progressive Enhancement](#progressive-enhancement), [Handoff Protocols](experiments/README.md#handoff-protocols), [Cross-Model Validation](#cross-model-validation)
-
-**Examples**
-```
-Bad: "Create user service"
-Good: "Create user service: <100 lines, 3 methods max, only bcrypt dependency"
-
-Bad: "Add caching"
-Good: "Add caching using Map, max 1000 entries, LRU eviction"
-
-Bad: "Improve performance"
-Good: "Reduce p99 latency to <50ms without new dependencies"
-```
-
-**Anti-pattern: Unconstrained Generation**
-Giving AI vague instructions like "make it better" or "add features" leads to over-engineered solutions that are hard to maintain and review.
-
-**Anti-pattern: Over-Constrained**
-Adding too many constraints ("use exactly 50 lines, 2 methods, no dependencies, 100% test coverage, sub-10ms response time") paralyzes AI decision-making and produces suboptimal solutions.
 
 ---
 
@@ -2109,7 +2011,7 @@ Breaking tasks so small that coordination overhead exceeds the benefits of paral
 **Maturity**: Intermediate  
 **Description**: Design systems with comprehensive logging, tracing, and debugging capabilities that enable AI to understand system behavior and diagnose issues effectively.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Tool Integration](#tool-integration), [Testing Orchestration](experiments/README.md#testing-orchestration), [Automated Traceability](#automated-traceability)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Tool Integration](#tool-integration), [Testing Orchestration](experiments/README.md#testing-orchestration), [Spec-Driven Development](#spec-driven-development)
 
 **Core Implementation**
 
@@ -2258,109 +2160,6 @@ Making widespread changes without systematic analysis leads to introduced bugs a
 Refactoring code for hypothetical future requirements rather than addressing current code smells and quality issues.
 
 ----
-
-## Guided Architecture
-
-**Maturity**: Intermediate  
-**Description**: Apply architectural frameworks (DDD, Well-Architected, 12-Factor) using AI to ensure sound system design and maintainable code structure.
-
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Codified Rules](#codified-rules), [Guided Refactoring](#guided-refactoring)
-
-**Example Frameworks**
-- **Domain-Driven Design (DDD)**: Bounded contexts, entities, value objects
-- **AWS Well-Architected**: 6 pillars compliance assessment  
-- **12-Factor App**: Cloud-native application principles
-- **Event-Driven Architecture**: Event sourcing and saga patterns
-- **ADRs**: Architecture Decision Records generation
-
-**Core Implementation: Domain-Driven Design Analysis**
-
-```bash
-# Create DDD analysis prompt
-cat > .ai/prompts/ddd-analysis.md << 'EOF'
-# Domain-Driven Design Analysis
-
-Analyze user stories and generate:
-1. Bounded context boundaries
-2. Core entities and value objects  
-3. Domain services and repositories
-4. Integration patterns between contexts
-
-Return bounded context map and suggested code structure.
-EOF
-
-# Run domain analysis
-ai-assistant analyze-domain \
-  --input requirements/user-stories.md \
-  --framework ddd \
-  --output architecture/domain-model.md
-```
-
-**Example Output: E-commerce Domain Model**
-```
-Bounded Contexts:
-- Order Management: Order, OrderItem, OrderStatus
-- Payment: Payment, PaymentMethod, Transaction  
-- Inventory: Product, Stock, Warehouse
-- Customer: Customer, Address, Preferences
-
-Integration:
-- Order → Payment (via PaymentRequested event)
-- Order → Inventory (via StockReservation command)
-```
-
-**Anti-pattern: Over-Architecting**
-
-Letting AI generate over-engineered solutions with complex patterns and frameworks without considering business constraints, team capabilities, or actual requirements.
-
-**Why it's problematic:** AI creates over-complex solutions (microservices + CQRS + event sourcing) when simple CRUD would suffice.
-
-```bash
-# Good: Constrained architecture
-ai-assistant design-architecture \
-  --requirements requirements/user-stories.md \
-  --constraints "team_size=5,experience=intermediate,timeline=3months"
-
-# Bad: Unconstrained  
-ai-assistant design-architecture \
-  --requirements requirements/user-stories.md \
-  --generate "enterprise_patterns,microservices,event_sourcing,cqrs"
-```
-
-----
-
-## Automated Traceability
-
-**Maturity**: Intermediate  
-**Description**: Maintain automated links between requirements, specifications, tests, implementation, and documentation using AI.
-
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Testing Orchestration](experiments/README.md#testing-orchestration)
-
-**Core Implementation**
-
-```bash
-# Automated traceability maintenance
-./maintain_traceability.sh
-
-# Check new code for requirement links and validate existing ones
-git diff --name-only HEAD~1 | while read file; do
-    ai "Analyze $file and suggest requirement traceability links"
-done
-
-# Generate impact analysis for recent changes
-ai "Map recent changes to affected requirements and tests"
-```
-
-**Complete Implementation**: See [examples/automated-traceability/](examples/automated-traceability/) for:
-- Complete traceability maintenance automation system
-- Link validation and gap analysis tools
-- Impact analysis and reporting scripts
-- Integration with project management tools (GitHub, JIRA)
-
-**Anti-pattern: Broken Traceability**
-Maintaining requirement links in spreadsheets or manual documentation that becomes stale and inaccurate over time.
-
----
 
 ## Error Resolution
 
@@ -2859,44 +2658,6 @@ Copying AI rules into every repository without a central source causes drift, in
 
 
 
-## Deployment Automation Patterns
-
-
-
-
-
-## Monitoring & Maintenance Patterns
-
-### Baseline Management
-
-**Maturity**: Advanced  
-**Description**: Establish intelligent performance baselines and configure monitoring thresholds automatically, minimizing false positives while catching real performance issues.
-
-**Related Patterns**: [Observable Development](#observable-development)
-
-```bash
-# Collect performance metrics and generate intelligent baselines
-aws cloudwatch get-metric-statistics --period 86400 > perf.csv
-ai "From perf.csv, recommend latency thresholds and autoscale policies" > perf-policy.json
-deploy-tool apply perf-policy.json
-```
-
-**Complete Implementation**: See [examples/baseline-management/](examples/baseline-management/) for:
-- Complete performance monitoring setup with baseline establishment
-- AI-powered threshold calculation and alert configuration
-- Autoscaling policy generation and deployment automation
-- Integration with multiple monitoring platforms (CloudWatch, Prometheus, etc.)
-
-**Anti-pattern: Static Thresholds**
-Manual thresholds quickly become stale, causing alert storms or blind spots.
-
----
-
-
-
-
-
-
 
 # Anti-Patterns Reference
 
@@ -2944,11 +2705,11 @@ Manual thresholds quickly become stale, causing alert storms or blind spots.
 4. **[Atomic Decomposition](#atomic-decomposition)** - Break down complex features
 
 ### Phase 3: Operations (Weeks 5-6)
-1. **[Security & Compliance Patterns](#security--compliance-patterns)** - Implement unified security framework
-2. **[Deployment Automation Patterns](#deployment-automation-patterns)** - Establish AI-powered CI/CD
-3. **[Monitoring & Maintenance Patterns](#monitoring--maintenance-patterns)** - Deploy proactive system management
+1. **[Policy Generation](#policy-generation)** - Codify compliance into executable policy files
+2. **[Security Orchestration](#security-orchestration)** - Aggregate scanner findings into actionable summaries
+3. **[Centralized Rules](#centralized-rules)** - Sync organization-wide AI standards from a central Git repo
 
-**Note**: For teams practicing continuous delivery, implement security ([Security Sandbox](#security-sandbox), AI Security & Compliance) and deployment patterns (Deployment Automation) from week 1 alongside foundation patterns. The phases represent learning dependencies, not deployment sequences.
+**Note**: For teams practicing continuous delivery, implement security ([Security Sandbox](#security-sandbox), Security Orchestration, Policy Generation) from week 1 alongside foundation patterns. The phases represent learning dependencies, not deployment sequences.
 
 ## Success Metrics
 

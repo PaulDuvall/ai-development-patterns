@@ -286,7 +286,7 @@ This example demonstrates:
 - **[Codified Rules](../../README.md#codified-rules)** - Machine-readable development standards
 - **[Spec-Driven Development](../../README.md#spec-driven-development)** - Test-first with traceability
 - **[Observable Development](../../README.md#observable-development)** - Structured logging requirements
-- **[Automated Traceability](../../README.md#automated-traceability)** - Spec-test-code linking
+- **[Spec-Driven Development](../../README.md#spec-driven-development)** - Spec-test-code linking
 
 ## Related Patterns
 

@@ -140,7 +140,7 @@ This pattern enables and enhances:
 - [Spec-Driven Development](../../README.md#spec-driven-development) - AI can validate against actual system state
 - [Observable Development](../../README.md#observable-development) - AI can read logs and monitoring data
 - [Workflow Orchestration](../../experiments/README.md#workflow-orchestration) - Enables data-driven workflow decisions
-- [Baseline Management](../../README.md#baseline-management) - AI can analyze actual performance metrics
+- [Observable Development](../../README.md#observable-development) - AI can analyze actual performance metrics
 
 ## Further Reading
 

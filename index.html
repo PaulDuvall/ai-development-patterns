@@ -41,7 +41,7 @@
             <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
         </a>
         <a href="https://github.com/PaulDuvall/ai-development-patterns#complete-pattern-reference">
-            <img src="https://img.shields.io/badge/patterns-29-blue.svg" alt="Patterns">
+            <img src="https://img.shields.io/badge/patterns-24-blue.svg" alt="Patterns">
         </a>
     </div>
 
@@ -56,7 +56,6 @@
 	    DL --> TI([Tool<br/>Integration])
 
 	    %% ROW 2: Operations & branches (loops back)
-	    TI --> BM([Baseline<br/>Management])
 	    SS --> SO([Security<br/>Orchestration])
 	    SS --> PG([Policy<br/>Generation])
 	    SO --> CZR([Centralized<br/>Rules])
@@ -64,7 +63,6 @@
 	    %% ROW 3: Development patterns (flows forward again)
 	    DL --> OD([Observable<br/>Development])
 	    DL --> SD([Spec-Driven<br/>Development])
-	    DL --> AT([Automated<br/>Traceability])
 	    CR --> GR([Guided<br/>Refactoring])
 	    CR --> CP([Context<br/>Persistence])
 	    RA --> IG([Issue<br/>Generation])
@@ -84,8 +82,6 @@
 
 	    %% ROW 5: Additional development patterns
 	    PE --> CMV([Cross-Model<br/>Validation])
-	    DL --> GA([Guided<br/>Architecture])
-	    CR --> GA
 	    DL --> ER([Error<br/>Resolution])
 	    OD --> ER
 	    TI --> ER
@@ -94,7 +90,6 @@
 	    GR --> AR
 	    ER --> AR
 	    PI([Planned<br/>Implementation])
-	    CnG([Constrained<br/>Generation])
 
 	    %% STYLING
 	    classDef foundation fill:#a8d5ba,stroke:#2d5a3f,stroke-width:2px,color:#1a3a25
@@ -102,8 +97,8 @@
 	    classDef operations fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,color:#78281f
 
 	    class RA,CR,SS,DL,TI,IG foundation
-	    class PE,SD,AD,PA,OD,GR,AT,EA,CC,PD,IS,CP,CMV,GA,ER,PI,CnG,AR development
-	    class PG,SO,BM,CZR operations
+	    class PE,SD,AD,PA,OD,GR,EA,CC,PD,IS,CP,CMV,ER,PI,AR development
+	    class PG,SO,CZR operations
 
 	    %% CLICKABLE LINKS
 	    click RA "https://github.com/PaulDuvall/ai-development-patterns#readiness-assessment"
@@ -119,7 +114,6 @@
 	    click PA "https://github.com/PaulDuvall/ai-development-patterns#parallel-agents"
 	    click OD "https://github.com/PaulDuvall/ai-development-patterns#observable-development"
 	    click GR "https://github.com/PaulDuvall/ai-development-patterns#guided-refactoring"
-	    click AT "https://github.com/PaulDuvall/ai-development-patterns#automated-traceability"
 	    click EA "https://github.com/PaulDuvall/ai-development-patterns#event-automation"
 	    click CC "https://github.com/PaulDuvall/ai-development-patterns#custom-commands"
 	    click PD "https://github.com/PaulDuvall/ai-development-patterns#progressive-disclosure"
@@ -129,10 +123,7 @@
 	    click CZR "https://github.com/PaulDuvall/ai-development-patterns#centralized-rules"
 	    click PI "https://github.com/PaulDuvall/ai-development-patterns#planned-implementation"
 	    click CMV "https://github.com/PaulDuvall/ai-development-patterns#cross-model-validation"
-	    click CnG "https://github.com/PaulDuvall/ai-development-patterns#constrained-generation"
 	    click ER "https://github.com/PaulDuvall/ai-development-patterns#error-resolution"
-	    click GA "https://github.com/PaulDuvall/ai-development-patterns#guided-architecture"
-	    click BM "https://github.com/PaulDuvall/ai-development-patterns#baseline-management"
 	    click AR "https://github.com/PaulDuvall/ai-development-patterns#autonomous-remediation"
 	    </div>
 
@@ -169,12 +160,10 @@
         <li><a href="https://github.com/PaulDuvall/ai-development-patterns#atomic-decomposition">Atomic Decomposition</a> - Task breakdown strategies</li>
         <li><a href="https://github.com/PaulDuvall/ai-development-patterns#parallel-agents">Parallel Agents</a> - Concurrent AI execution</li>
         <li><a href="https://github.com/PaulDuvall/ai-development-patterns#context-persistence">Context Persistence</a> - Session state management</li>
-        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#constrained-generation">Constrained Generation</a> - Stay focused and safe</li>
         <li><a href="https://github.com/PaulDuvall/ai-development-patterns#observable-development">Observable Development</a> - Development monitoring</li>
         <li><a href="https://github.com/PaulDuvall/ai-development-patterns#guided-refactoring">Guided Refactoring</a> - AI-assisted code improvement</li>
-        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#guided-architecture">Guided Architecture</a> - Architecture frameworks and guidance</li>
-        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#automated-traceability">Automated Traceability</a> - Requirement tracking</li>
         <li><a href="https://github.com/PaulDuvall/ai-development-patterns#error-resolution">Error Resolution</a> - Diagnose and fix errors with context</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#autonomous-remediation">Autonomous Remediation</a> - Detector + LLM loop on every edit</li>
     </ul>
 
     <h3>🔴 Operations Patterns</h3>
@@ -182,7 +171,7 @@
     <ul>
         <li><a href="https://github.com/PaulDuvall/ai-development-patterns#policy-generation">Policy Generation</a> - Automated policy creation</li>
         <li><a href="https://github.com/PaulDuvall/ai-development-patterns#security-orchestration">Security Orchestration</a> - Security automation</li>
-        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#baseline-management">Baseline Management</a> - Configuration standards</li>
+        <li><a href="https://github.com/PaulDuvall/ai-development-patterns#centralized-rules">Centralized Rules</a> - Organization-wide AI rule sync</li>
     </ul>
 
     <div class="cta">

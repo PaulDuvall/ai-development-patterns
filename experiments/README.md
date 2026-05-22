@@ -39,6 +39,7 @@ These experimental patterns extend the core AI development patterns with advance
 | **[Asynchronous Research](#asynchronous-research)** | Intermediate | Development | Use fire-and-forget coding agents in dedicated repositories to conduct autonomous code investigations that prove technical feasibility through executable experiments | Parallel Agents, Context Persistence, Cross-Model Validation |
 | **[Feedback Flywheel](#feedback-flywheel)** | Intermediate | Development | Systematically improve AI collaboration by analyzing session outcomes and feeding corrections back into team rules and commands | Codified Rules, Context Persistence, Progressive Disclosure |
 | **[Long-Running Orchestration](#long-running-orchestration)** | Advanced | Workflow | Coordinate agents working autonomously for hours or days, maintaining coherent state across sessions with strategic human checkpoints | Parallel Agents, Context Persistence, Workflow Orchestration |
+| **[Guided Architecture](#guided-architecture)** | Intermediate | Development | Apply architectural frameworks (DDD, Well-Architected, 12-Factor) using AI to ensure sound system design | Developer Lifecycle, Codified Rules |
 | **[Autonomous Defense](#autonomous-defense)** | Advanced | Operations | Deploy AI agents for real-time security threat detection and automated response at machine speed to match the pace of autonomous threats | Security Orchestration, Incident Automation |
 
 ---
@@ -992,6 +993,78 @@ Relying on a single context window for multi-day work without external state per
 
 ---
 
+### Guided Architecture
+
+**Maturity**: Intermediate
+**Description**: Apply architectural frameworks (DDD, Well-Architected, 12-Factor) using AI to ensure sound system design and maintainable code structure.
+
+**Related Patterns**: [Developer Lifecycle](../README.md#developer-lifecycle), [Codified Rules](../README.md#codified-rules), [Guided Refactoring](../README.md#guided-refactoring)
+
+**Note**: This pattern is in `experiments/` because it remains broad enough that its concrete value depends heavily on the specific framework being applied. Promotion to the main catalog requires a tighter, more opinionated framing — e.g., "DDD bounded-context discovery with AI" as its own pattern rather than a generic "apply frameworks with AI" umbrella.
+
+**Example Frameworks**
+- **Domain-Driven Design (DDD)**: Bounded contexts, entities, value objects
+- **AWS Well-Architected**: 6 pillars compliance assessment
+- **12-Factor App**: Cloud-native application principles
+- **Event-Driven Architecture**: Event sourcing and saga patterns
+- **ADRs**: Architecture Decision Records generation
+
+**Core Implementation: Domain-Driven Design Analysis**
+
+```bash
+# Create DDD analysis prompt
+cat > .ai/prompts/ddd-analysis.md << 'EOF'
+# Domain-Driven Design Analysis
+
+Analyze user stories and generate:
+1. Bounded context boundaries
+2. Core entities and value objects
+3. Domain services and repositories
+4. Integration patterns between contexts
+
+Return bounded context map and suggested code structure.
+EOF
+
+# Run domain analysis
+ai-assistant analyze-domain \
+  --input requirements/user-stories.md \
+  --framework ddd \
+  --output architecture/domain-model.md
+```
+
+**Example Output: E-commerce Domain Model**
+```
+Bounded Contexts:
+- Order Management: Order, OrderItem, OrderStatus
+- Payment: Payment, PaymentMethod, Transaction
+- Inventory: Product, Stock, Warehouse
+- Customer: Customer, Address, Preferences
+
+Integration:
+- Order → Payment (via PaymentRequested event)
+- Order → Inventory (via StockReservation command)
+```
+
+**Anti-pattern: Over-Architecting**
+
+Letting AI generate over-engineered solutions with complex patterns and frameworks without considering business constraints, team capabilities, or actual requirements.
+
+**Why it's problematic:** AI creates over-complex solutions (microservices + CQRS + event sourcing) when simple CRUD would suffice.
+
+```bash
+# Good: Constrained architecture
+ai-assistant design-architecture \
+  --requirements requirements/user-stories.md \
+  --constraints "team_size=5,experience=intermediate,timeline=3months"
+
+# Bad: Unconstrained
+ai-assistant design-architecture \
+  --requirements requirements/user-stories.md \
+  --generate "enterprise_patterns,microservices,event_sourcing,cqrs"
+```
+
+---
+
 ## Operations Automation
 
 ### Review Automation
@@ -1092,7 +1165,7 @@ Relying entirely on human reviewers for parallel agent outputs creates bottlenec
 **Maturity**: Intermediate  
 **Description**: Proactively identify and prioritize technical debt using AI-powered code analysis.
 
-**Related Patterns**: [Guided Refactoring](../README.md#guided-refactoring), [Guided Architecture](../README.md#guided-architecture), [Tool Integration](../README.md#tool-integration)
+**Related Patterns**: [Guided Refactoring](../README.md#guided-refactoring), [Guided Architecture](#guided-architecture), [Tool Integration](../README.md#tool-integration)
 
 ```bash
 ai "Analyze codebase for technical debt indicators and forecast maintenance burden:
@@ -1215,7 +1288,7 @@ Writing release notes manually from memory instead of systematically analyzing c
 **Maturity**: Advanced  
 **Description**: Generate actionable incident response playbooks from historical incident data.
 
-**Related Patterns**: [Baseline Management](../README.md#baseline-management)
+**Related Patterns**: [Observable Development](../README.md#observable-development)
 
 ```bash
 ai "Analyze last 50 incidents in PagerDuty/AWS CloudWatch to:
@@ -1430,7 +1503,7 @@ Relying on informal verbal communication for critical system state transfer inst
 **Maturity**: Advanced  
 **Description**: Generate targeted chaos experiments based on system architecture and dependencies.
 
-**Related Patterns**: [Baseline Management](../README.md#baseline-management)
+**Related Patterns**: [Observable Development](../README.md#observable-development)
 
 ```bash
 ai "Design chaos experiments for microservices architecture:
