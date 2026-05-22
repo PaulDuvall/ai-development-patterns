@@ -60,7 +60,7 @@ The hook tracks consecutive blocks per file in `/tmp/.auto-remediate-state.json`
 2. Add the file or directory to the skip list
 3. Add an inline `# rule: ignore` marker
 
-This is the escape hatch from the [Unbounded Loop](../../README.md#anti-pattern-unbounded-loop) anti-pattern.
+This is the escape hatch from the "Unbounded Loop" anti-pattern documented in [Autonomous Remediation](../../README.md#autonomous-remediation).
 
 ## Skip list
 

@@ -393,6 +393,8 @@ Foundation patterns establish the essential infrastructure and team readiness re
 
 **Related Patterns**: [Codified Rules](#codified-rules), [Issue Generation](#issue-generation)
 
+> 📋 **Quick start**: Use the free [AI Development Readiness Scorecard](https://www.redactedventures.com/scorecard) to score your team against this framework in about 10 minutes and get a tailored pattern adoption sequence.
+
 **Assessment Framework**
 
 ```mermaid
