@@ -102,6 +102,36 @@ This repository provides a structured approach to AI-assisted development throug
 - **[Operations Patterns](#operations-patterns)** - CI/CD, security, and production management with AI
 - **[Experimental Patterns](experiments/)** - Advanced and experimental patterns under active development and/or consideration.
 
+## Harness Engineering Lens
+
+Birgitta Böckeler's framing — **`Agent = Model + Harness`** — describes the controls built *around* a coding agent (separate from the model) to make its output trustworthy. This is not a pattern to adopt; it is a lens that explains *why* the patterns below work together. Every control is one of two kinds and runs in one of two ways:
+
+- **Feedforward (guides)** steer the agent *before* it acts.
+- **Feedback (sensors)** observe *after* it acts so it can self-correct.
+- **Computational** controls are deterministic, fast, and reliable — linters, type checks, tests, fitness functions.
+- **Inferential** controls are semantic, slower, and probabilistic — AI review, LLM-as-judge.
+
+A healthy harness balances all four: feedforward-only agents never learn whether the rules worked; feedback-only agents repeat the same mistakes. The catalog maps onto the lens as follows.
+
+| Pattern | Direction | Execution | Regulates |
+|---------|-----------|-----------|-----------|
+| [Codified Rules](#codified-rules) / [Centralized Rules](#centralized-rules) | Feedforward | — | Conventions |
+| [Spec-Driven Development](#spec-driven-development) | Feedforward | — | Behaviour |
+| [Planned Implementation](#planned-implementation) | Feedforward | — | Approach |
+| [Custom Commands](#custom-commands) | Feedforward | — | Workflow |
+| [Observable Development](#observable-development) | Feedforward + Feedback | Computational + Inferential | Architecture fitness |
+| [Guided Refactoring](#guided-refactoring) | Feedback | Computational + Inferential | Maintainability |
+| [Adversarial Evaluator](#adversarial-evaluator) | Feedback | Inferential | Behaviour |
+| [Error Resolution](#error-resolution) | Feedback | Computational | Runtime |
+| [Autonomous Remediation](#autonomous-remediation) | Feedback | Computational + Inferential | Runtime |
+
+Two principles from the source are worth stating directly:
+
+- **Keep Quality Left** — run cheap, fast controls early (linters, basic review pre-commit) and reserve expensive ones (mutation testing, deep AI review) for later, so issues are caught where they cost least.
+- **Steer, don't automate** — when the agent repeats a mistake, improve the harness (the guides and sensors), not just the prompt. The human's job is to iterate on the harness.
+
+**Source**: Birgitta Böckeler, "[Harness Engineering](https://martinfowler.com/articles/harness-engineering.html)", martinfowler.com.
+
 ## Pattern Dependencies & Implementation Order
 
 **Important**: These phases represent a **learning progression** for teams new to AI development, not a waterfall approach. Teams with existing DevOps/security expertise should implement patterns continuously across all phases from day one, following a "continuous everything" model.

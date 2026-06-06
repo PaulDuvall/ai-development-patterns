@@ -130,7 +130,7 @@ class PatternParser:
             
         # Exclude organizational sections that aren't actual patterns
         excluded_sections = [
-            'Pattern Organization', 'Pattern Dependencies & Implementation Order',
+            'Pattern Organization', 'Harness Engineering Lens', 'Pattern Dependencies & Implementation Order',
             'Complete Pattern Reference', 'Pattern Maturity Levels', 'Task Sizing Framework',
             'Pattern Selection Decision Framework', 'Decision Tree', 'Context-Based Pattern Selection',
             'Project Type Recommendations', 'Team Size Considerations', 'Technology Stack Considerations',
