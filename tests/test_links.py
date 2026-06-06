@@ -91,22 +91,31 @@ class TestHyperlinkIntegrity:
     @pytest.mark.slow
     def test_external_links_accessible(self, readme_content):
         """Verify external HTTP/HTTPS links are accessible (slow test)"""
-        checker = LinkChecker(readme_content, timeout=5)
+        checker = LinkChecker(readme_content, timeout=10)
         invalid_external_links = checker.validate_external_links(check_live=True)
-        
-        # Filter out common acceptable errors (like 403 for some sites)
+
+        # A real broken link returns a definitive HTTP error (e.g. 404). Treat
+        # those as critical. Transient failures (timeouts, connection errors,
+        # already retried in the checker) and anti-bot responses (403/429) are
+        # NOT proof a link is dead, so they only produce a warning.
         critical_errors = []
+        transient_errors = []
         for link_error in invalid_external_links:
-            error = link_error['error']
-            if 'timeout' in error.lower() or 'connection error' in error.lower():
-                critical_errors.append(link_error)
-        
+            error = link_error['error'].lower()
+            is_transient = (
+                'timeout' in error
+                or 'connection error' in error
+                or 'http 403' in error
+                or 'http 429' in error
+            )
+            (transient_errors if is_transient else critical_errors).append(link_error)
+
         assert not critical_errors, f"Critical external link errors: {critical_errors}"
-        
-        # Warn about other errors but don't fail
-        non_critical = len(invalid_external_links) - len(critical_errors)
-        if non_critical > 0:
-            print(f"Warning: {non_critical} external links returned non-critical errors")
+
+        # Warn about transient/anti-bot errors but don't fail the build on them
+        if transient_errors:
+            print(f"Warning: {len(transient_errors)} external links returned "
+                  f"transient/non-critical errors: {transient_errors}")
     
     def test_relative_file_links_exist(self, readme_content, repo_root):
         """Verify relative file path links point to existing files"""

@@ -148,28 +148,54 @@ class LinkChecker:
         
         return anchor
     
-    def _check_external_url(self, url: str) -> tuple[bool, str]:
-        """Check if external URL is accessible"""
-        try:
-            # Use HEAD request for efficiency
-            response = requests.head(url, timeout=self.timeout, allow_redirects=True)
-            
-            if response.status_code == 405:  # Method not allowed, try GET
-                response = requests.get(url, timeout=self.timeout, allow_redirects=True)
-            
-            if response.status_code < 400:
-                return True, ""
-            else:
+    def _check_external_url(self, url: str, retries: int = 2) -> tuple[bool, str]:
+        """Check if external URL is accessible.
+
+        Sends a browser-like User-Agent (some sites reject default agents) and
+        retries transient failures (timeouts, connection errors) with backoff so
+        slow-but-healthy pages don't cause flaky failures.
+        """
+        # Browser-like UA: some CDNs/WAFs return 403 or stall on default agents.
+        headers = {
+            'User-Agent': (
+                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
+                'AppleWebKit/537.36 (KHTML, like Gecko) '
+                'Chrome/120.0 Safari/537.36'
+            )
+        }
+
+        last_error = "Unknown error"
+        for attempt in range(retries + 1):
+            try:
+                # Use HEAD request for efficiency
+                response = requests.head(
+                    url, timeout=self.timeout, allow_redirects=True, headers=headers
+                )
+
+                # Some servers reject HEAD (405) or mishandle it (403); retry as GET
+                if response.status_code in (403, 405):
+                    response = requests.get(
+                        url, timeout=self.timeout, allow_redirects=True, headers=headers
+                    )
+
+                if response.status_code < 400:
+                    return True, ""
                 return False, f"HTTP {response.status_code}"
-                
-        except requests.exceptions.Timeout:
-            return False, "Request timeout"
-        except requests.exceptions.ConnectionError:
-            return False, "Connection error"
-        except requests.exceptions.RequestException as e:
-            return False, f"Request error: {str(e)}"
-        except Exception as e:
-            return False, f"Unexpected error: {str(e)}"
+
+            except requests.exceptions.Timeout:
+                last_error = "Request timeout"
+            except requests.exceptions.ConnectionError:
+                last_error = "Connection error"
+            except requests.exceptions.RequestException as e:
+                return False, f"Request error: {str(e)}"
+            except Exception as e:
+                return False, f"Unexpected error: {str(e)}"
+
+            # Transient failure: back off before retrying
+            if attempt < retries:
+                time.sleep(1.0 * (attempt + 1))
+
+        return False, last_error
     
     def validate_pattern_references(self, patterns: list[str]) -> list[dict[str, Any]]:
         """Validate that all pattern references are properly linked"""
