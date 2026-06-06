@@ -173,7 +173,7 @@ graph TD
 | **[Event Automation](#event-automation)** | Intermediate | Development | Execute custom commands automatically at assistant lifecycle events to enforce policies and automate workflows | Codified Rules, Security Sandbox |
 | **[Custom Commands](#custom-commands)** | Intermediate | Development | Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and sophisticated workflows | Event Automation, Spec-Driven Development, Codified Rules |
 | **[Progressive Disclosure](#progressive-disclosure)** | Intermediate | Development | Load AI assistant rules incrementally based on task context to prevent instruction saturation and context bloat | Codified Rules, Context Persistence |
-| **[Observable Development](#observable-development)** | Intermediate | Development | Strategic logging and debugging that makes system behavior visible to AI | Developer Lifecycle |
+| **[Observable Development](#observable-development)** | Intermediate | Development | Logging and tracing as a bidirectional control: feeds forward to steer the agent, feeds back as a sensor it reads to self-correct | Developer Lifecycle |
 | **[Guided Refactoring](#guided-refactoring)** | Intermediate | Development | Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics | Codified Rules |
 | **[Error Resolution](#error-resolution)** | Intermediate | Development | Automatically collect error context from logs, system state, and git history, then use AI to diagnose root causes and generate validated fixes | Developer Lifecycle, Observable Development, Tool Integration |
 | **[Autonomous Remediation](#autonomous-remediation)** | Intermediate | Development | Pair deterministic rule-based detectors with LLM remediators inside an event-driven loop so codified rule violations are caught and fixed automatically before the AI session continues | Codified Rules, Event Automation |
@@ -2062,18 +2062,21 @@ Breaking tasks so small that coordination overhead exceeds the benefits of paral
 ## Observable Development
 
 **Maturity**: Intermediate  
-**Description**: Design systems with comprehensive logging, tracing, and debugging capabilities that enable AI to understand system behavior and diagnose issues effectively.
+**Description**: Design systems with logging and tracing that make behavior visible to AI as a bidirectional control — observability feeds forward as a standard that steers the agent while it writes code, and feeds back as a sensor the agent reads (and grades) to self-correct.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Tool Integration](#tool-integration), [Testing Orchestration](experiments/README.md#testing-orchestration), [Spec-Driven Development](#spec-driven-development)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Tool Integration](#tool-integration), [Codified Rules](#codified-rules), [Autonomous Remediation](#autonomous-remediation), [Testing Orchestration](experiments/README.md#testing-orchestration), [Spec-Driven Development](#spec-driven-development)
 
-**Core Implementation**
+**Observability as feedforward (a guide that steers)**
+
+Codify logging and tracing conventions as a [Codified Rule](#codified-rules) so the agent emits AI-legible, structured context *as it writes code* — before any failure occurs.
 
 ```python
-# AI-friendly structured logging
+# AI-friendly structured logging (the standard the agent writes against)
 def log_operation(operation, **context):
     logging.info(json.dumps({
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "operation": operation,
+        "correlation_id": current_correlation_id(),
         "context": context
     }))
 
@@ -2091,11 +2094,49 @@ def process_order(order):
         raise
 ```
 
+**Observability as feedback (a sensor the agent reads back)**
+
+Logs and traces are not write-only. They are a feedback signal the agent consumes to diagnose issues — and, critically, a signal the agent should **grade and improve**. After the agent resolves a failure, have it reflect on whether the logs it had were sufficient, then feed that judgment back into the logging standard:
+
+```bash
+ai "You just diagnosed this failure. Rate the logs you actually had to work with.
+What context was missing that would have made the root cause obvious in one pass?
+Emit the structured-logging changes that close that gap, and propose the update
+to .ai/rules/observability.md so the next operation is logged the same way."
+```
+
+This turns a feedback signal into a feedforward improvement — the harness gets better each time it is used, rather than the agent repeating the same blind spots. The human's job is to **steer by iterating on the standard**, not to hand-write every log line.
+
+**Enforce observability as a fitness function (computational sensor)**
+
+A standard that lives only in a doc is aspirational. Make it an enforced gate that runs on every change, alongside the agent, so black-box code fails fast ([Keep Quality Left](#guided-refactoring)):
+
+```python
+# Fitness function: every public operation must emit structured context
+def test_operations_are_observable():
+    for fn in public_operations(module):
+        assert emits_structured_log(fn), f"{fn.__name__} is a black box"
+        assert propagates_correlation_id(fn), f"{fn.__name__} drops correlation_id"
+```
+
+Pair the deterministic check with a probabilistic one. The two answer different questions:
+
+| Check | Type | Cost / reliability | Answers |
+|-------|------|--------------------|---------|
+| Structured log present, correlation ID propagates | Computational | ms, reliable | *Is it logged?* |
+| Are these logs actually useful for diagnosis? | Inferential (LLM-as-judge) | slow, probabilistic | *Is it useful?* |
+
+**Runtime feedback beyond the change lifecycle**
+
+Observability as a sensor does not stop at debug time. Extend it into production so the agent acts on drift: AI judges continuously sampling response quality and flagging log anomalies, and degrading SLOs that prompt the agent to suggest remediations (see [Autonomous Remediation](#autonomous-remediation)).
+
 **Complete Implementation**: See [examples/observable-development/](examples/observable-development/) for:
 - Full structured logging framework with correlation IDs
 - Performance monitoring decorators and utilities  
 - AI-friendly debug tools and log analysis scripts
 - Integration examples for e-commerce and authentication systems
+
+**Source**: Birgitta Böckeler, "[Harness Engineering](https://martinfowler.com/articles/harness-engineering.html)", martinfowler.com — for the feedforward/feedback (guides vs. sensors) and computational/inferential control framing.
 
 **Anti-pattern: Blind Development**
 
@@ -2125,6 +2166,10 @@ def process_payment(amount):
         log_operation("payment_error", error=str(e), amount=amount)
         raise
 ```
+
+**Anti-pattern: Write-Only Observability**
+
+Rich, structured logs exist, but nothing closes the loop. No agent reads them back to self-correct, no fitness function enforces the standard, and no runtime sensor watches them drift. Observability becomes a checkbox instead of a sensor — the logs feed forward but never feed back, so the harness never improves and the same blind spots recur.
 
 ---
 
