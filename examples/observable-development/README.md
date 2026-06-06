@@ -12,12 +12,17 @@ Observable Development ensures that:
 
 ## Files in this Implementation
 
+**Feedforward (guides that steer the agent):**
+- `.ai/rules/observability.md` - The logging standard the agent writes against
 - `observable_logging.py` - Core structured logging framework
 - `performance_monitoring.py` - Performance monitoring decorators and utilities
+
+**Feedback (sensors the agent reads back to self-correct):**
+- `observability_fitness.py` - Computational sensor: statically verifies every public operation is observable ("is it logged?")
+- `log_quality_judge.py` - Inferential sensor: rates whether logs are useful for diagnosis ("is it useful?")
 - `debug_helpers.py` - AI-friendly debugging and log analysis tools
-- `examples/` - Working examples of observable business logic
-- `config/logging_config.json` - Logging configuration for different environments
-- `tests/` - Test suite for observability features
+- `sample_operations.py` - A good and a black-box operation the fitness function passes/flags
+- `tests/` - Test suite for the observability features above
 
 ## Quick Start
 
@@ -65,6 +70,35 @@ def expensive_database_operation(query_params):
 # Extract AI-friendly debug information
 python debug_helpers.py --analyze-errors --last-hour
 python debug_helpers.py --performance-issues --threshold 500ms
+```
+
+### Closing the Loop (Feedback Sensors)
+
+The feedforward standard is only aspirational until something enforces it. The two
+sensors turn observability into a feedback control the agent reads back.
+
+```python
+import sample_operations
+from observability_fitness import audit_module
+from log_quality_judge import rate_log_quality, heuristic_judge
+
+# Computational sensor: fail CI when an operation is a black box ("is it logged?")
+violations = audit_module(sample_operations)
+assert not [v for v in violations if v["operation"] != "charge_payment_blackbox"]
+
+# Inferential sensor: rate whether logs are useful to diagnose ("is it useful?")
+entries = [{"operation": "payment_error", "correlation_id": "req_1", "context": {}}]
+verdict = rate_log_quality(entries, judge=heuristic_judge)
+print(verdict.missing)  # -> ['error_type', 'error_message']
+```
+
+When the inferential sensor (or the agent's own reflection) finds logs that came up
+short, apply the fix to `.ai/rules/observability.md` so the next operation is logged
+the same way — the harness improves each cycle instead of repeating the blind spot.
+Swap `heuristic_judge` for `anthropic_judge()` to use an LLM-as-judge where available.
+
+```bash
+python -m pytest tests/ -v   # exercises both sensors
 ```
 
 ## Core Features
