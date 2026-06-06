@@ -48,6 +48,7 @@ This change aligns with established pattern naming conventions:
 | Progressive AI Enhancement | Progressive Enhancement | Removed "AI" prefix | Progressive enhancement is well-known pattern |
 | AI Choice Generation | Choice Generation | Removed "AI" prefix | Generation implies AI automation |
 | Choice Generation | Cross-Model Validation | Reframed | Original pattern reduced to "ask one model for N options" — table stakes in 2026. Reframed around running the same prompt across multiple frontier models, where disagreement is signal. |
+| Cross-Model Validation | Adversarial Evaluator | Renamed + expanded | Broadened to the GAN-style principle of separating the generating agent from an independent judging agent. Cross-model fan-out becomes one of two topologies (the other: an adversarial judge that attacks a single candidate). Old `#cross-model-validation` anchor preserved as an alias on the new section. |
 | Question Generation | (merged) | Folded into Planned Implementation | The interview phase belongs as the opening of Planned Implementation rather than a separate pattern. |
 | Constrained Generation | (merged) | Folded into Planned Implementation | Constraint examples now appear as the "Constrain" phase between interview and plan; standalone pattern was a 25-line stub. |
 | Automated Traceability | (merged) | Folded into Spec-Driven Development | Traceability is the link layer implied by Spec-Driven's anchor/footnote system; the standalone 35-line entry duplicated coverage. |

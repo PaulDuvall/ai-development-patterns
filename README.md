@@ -45,7 +45,7 @@ graph TB
     PE --> IS
 
     %% ROW 5: Additional development patterns
-    PE --> CMV([Cross-Model<br/>Validation])
+    PE --> AE([Adversarial<br/>Evaluator])
     DL --> ER([Error<br/>Resolution])
     OD --> ER
     TI --> ER
@@ -61,7 +61,7 @@ graph TB
     classDef operations fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,color:#78281f
 
     class RA,CR,SS,DL,TI,IG foundation
-    class PE,SD,AD,PA,OD,GR,EA,CC,PD,IS,CP,CMV,ER,PI,AR development
+    class PE,SD,AD,PA,OD,GR,EA,CC,PD,IS,CP,AE,ER,PI,AR development
     class PG,SO,CZR operations
 
     %% CLICKABLE LINKS
@@ -86,7 +86,7 @@ graph TB
     click SO "https://github.com/PaulDuvall/ai-development-patterns#security-orchestration"
     click CZR "https://github.com/PaulDuvall/ai-development-patterns#centralized-rules"
     click PI "https://github.com/PaulDuvall/ai-development-patterns#planned-implementation"
-    click CMV "https://github.com/PaulDuvall/ai-development-patterns#cross-model-validation"
+    click AE "https://github.com/PaulDuvall/ai-development-patterns#adversarial-evaluator"
     click ER "https://github.com/PaulDuvall/ai-development-patterns#error-resolution"
     click AR "https://github.com/PaulDuvall/ai-development-patterns#autonomous-remediation"
 ```
@@ -120,7 +120,7 @@ graph TD
         D --> G[Spec-Driven Development]
         H[Planned Implementation]
         I[Progressive Enhancement]
-        I --> J[Cross-Model Validation]
+        I --> J[Adversarial Evaluator]
         Q[Event Automation]
         R[Custom Commands]
         S[Progressive Disclosure]
@@ -166,7 +166,7 @@ graph TD
 | **[Image Spec](#image-spec)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Spec-Driven Development, Progressive Enhancement |
 | **[Planned Implementation](#planned-implementation)** | Beginner | Development | Interview, constrain, and plan before writing code so AI implementation matches actual requirements instead of confident-sounding assumptions | None |
 | **[Progressive Enhancement](#progressive-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | None |
-| **[Cross-Model Validation](#cross-model-validation)** | Intermediate | Development | Run the same task across multiple frontier models and use their agreements, disagreements, and divergences as eval signal for high-stakes decisions | Progressive Enhancement |
+| **[Adversarial Evaluator](#adversarial-evaluator)** | Intermediate | Development | Separate the generating agent from an independent judging agent (ideally a different model) and use adversarial pressure or cross-model divergence as eval signal for high-stakes decisions | Progressive Enhancement |
 | **[Atomic Decomposition](#atomic-decomposition)** | Intermediate | Development | Break complex features into atomic, independently implementable tasks for parallel AI agent execution | Progressive Enhancement |
 | **[Parallel Agents](#parallel-agents)** | Advanced | Development | Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration | Atomic Decomposition |
 | **[Context Persistence](#context-persistence)** | Intermediate | Development | Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols | Codified Rules |
@@ -302,7 +302,7 @@ graph TD
 
 **MVP/Startup Projects**:
 - **Primary**: [Progressive Enhancement](#progressive-enhancement), [Planned Implementation](#planned-implementation)
-- **Secondary**: [Security Sandbox](#security-sandbox), [Cross-Model Validation](#cross-model-validation)
+- **Secondary**: [Security Sandbox](#security-sandbox), [Adversarial Evaluator](#adversarial-evaluator)
 - **Avoid**: Complex orchestration patterns until scale demands
 
 **Enterprise Applications**:
@@ -311,7 +311,7 @@ graph TD
 - **Essential**: All foundation patterns before development patterns
 
 **Research/Experimental Projects**:
-- **Primary**: [Cross-Model Validation](#cross-model-validation), [Observable Development](#observable-development)
+- **Primary**: [Adversarial Evaluator](#adversarial-evaluator), [Observable Development](#observable-development)
 - **Secondary**: [Context Persistence](#context-persistence), [Context Optimization](experiments/README.md#context-optimization)
 - **Focus**: Learning and exploration over production readiness
 
@@ -323,7 +323,7 @@ graph TD
 ### Team Size Considerations
 
 **Solo Teams**:
-- Focus on **[Progressive Enhancement](#progressive-enhancement)** and **[Cross-Model Validation](#cross-model-validation)**
+- Focus on **[Progressive Enhancement](#progressive-enhancement)** and **[Adversarial Evaluator](#adversarial-evaluator)**
 - Add **[Observable Development](#observable-development)** for debugging
 - Skip parallel orchestration patterns
 
@@ -950,7 +950,7 @@ Uploading many diagrams at once without hierarchy or a clear starting point over
 **Maturity**: Beginner
 **Description**: Interview, constrain, and plan before writing code so AI implementation matches actual requirements instead of confident-sounding assumptions.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Progressive Enhancement](#progressive-enhancement), [Cross-Model Validation](#cross-model-validation)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Progressive Enhancement](#progressive-enhancement), [Adversarial Evaluator](#adversarial-evaluator)
 
 **Core Principle: Think Before You Code**
 
@@ -1131,7 +1131,7 @@ Spending excessive time refining plans without moving to implementation, missing
 **Maturity**: Beginner  
 **Description**: Build complex features through small, deployable iterations rather than big-bang generation.
 
-**Related Patterns**: [Planned Implementation](#planned-implementation), [Developer Lifecycle](#developer-lifecycle), [Image Spec](#image-spec), [Cross-Model Validation](#cross-model-validation)
+**Related Patterns**: [Planned Implementation](#planned-implementation), [Developer Lifecycle](#developer-lifecycle), [Image Spec](#image-spec), [Adversarial Evaluator](#adversarial-evaluator)
 
 **Examples**
 Building authentication progressively:
@@ -1168,14 +1168,65 @@ Asking AI to "create a complete user management system" results in 5000 lines of
 
 ---
 
-## Cross-Model Validation
+<a id="cross-model-validation"></a>
+## Adversarial Evaluator
 
 **Maturity**: Intermediate
-**Description**: Run the same task across multiple frontier models and use their agreements, disagreements, and divergences as eval signal for high-stakes decisions, risk-bearing prompts, and design reviews.
+**Description**: Separate the agent that generates work from an independent agent that judges it — ideally a different model — so adversarial pressure and cross-model divergence, not a model grading its own output, become the eval signal for high-stakes decisions.
 
-**Related Patterns**: [Planned Implementation](#planned-implementation), [Progressive Enhancement](#progressive-enhancement), [Spec-Driven Development](#spec-driven-development)
+**Related Patterns**: [Planned Implementation](#planned-implementation), [Progressive Enhancement](#progressive-enhancement), [Spec-Driven Development](#spec-driven-development), [Autonomous Acceptance](experiments/README.md#autonomous-acceptance)
 
-**Core Loop**
+**Core Principle: Separate the Producer from the Judge**
+
+Borrowed from GANs (Generative Adversarial Networks): two networks compete — one generates, one judges — and that adversarial tension forces quality up. The same dynamic applies to multi-agent systems. A model asked to grade its own output shares its own blind spots; the confident reasoning that produced a flawed answer also produces a confident review of it. The fix is to separate the generator from the evaluator completely, and to make the evaluator as *independent* as the stakes require.
+
+Independence is a spectrum, not a switch:
+
+| Independence level | How | Strength |
+|---|---|---|
+| Same model, different prompt/role | "Now critique the above as a skeptical reviewer" | Weak — shared training priors, correlated blind spots |
+| Different model as judge | Claude generates, GPT-5 or Gemini judges | Strong — independent training data and failure modes |
+| Different identity + signing key | Judge owned by a separate party, attestation signed | Strongest — see [Autonomous Acceptance](experiments/README.md#autonomous-acceptance) |
+
+The pattern has two topologies. Pick the one that matches the decision: an **adversarial judge** when you have one candidate and need to know whether it holds up, or **cross-model divergence** when there is no single right answer and you want to surface the space of reasonable ones.
+
+**Topology 1: Adversarial Judge (generate → attack)**
+
+Sequential and asymmetric. One agent produces; a second, independent agent is told to *find fault* — not to summarize, not to agree, but to refute. Surviving that pressure is the quality signal.
+
+```mermaid
+graph LR
+    G[Generator Agent<br/>Claude] -->|candidate| J[Judge Agent<br/>different model]
+    J -->|attack + grade| V{Survives?}
+    V -->|Yes| A[Accept]
+    V -->|No| R[Return with findings]
+    R --> G
+    style G fill:#a8d5ba,stroke:#2d5a3f,color:#1a3a25
+    style J fill:#f9e79f,stroke:#b7950b,color:#7d6608
+```
+
+```bash
+# adversarial-judge.sh — generate with one model, attack with another
+GENERATOR="claude-opus-4-8"
+JUDGE="gpt-5"
+
+llm -m "$GENERATOR" < task.md > candidate.md
+
+llm -m "$JUDGE" <<EOF
+You are an adversarial reviewer. Your goal is to REFUTE the work below, not
+to praise it. Find every correctness bug, security hole, unhandled edge case,
+and unstated assumption. If you cannot break it, say so explicitly.
+
+TASK: $(cat task.md)
+CANDIDATE: $(cat candidate.md)
+EOF
+```
+
+The judge must run on a *different* model than the generator. A Claude-generated answer reviewed by Claude inherits Claude's blind spots; the same answer attacked by GPT-5 or Gemini meets a different set of priors. That diversity of training data is what makes the adversary's findings real rather than confirmatory.
+
+**Topology 2: Cross-Model Divergence (fan out → compare)**
+
+Parallel and symmetric. Instead of one judge attacking one output, run the *same* task across several frontier models at once and treat their disagreement as the signal. No model is cast as the judge — the divergence between independent peers is the verdict.
 
 ```mermaid
 graph TD
@@ -1196,19 +1247,6 @@ graph TD
     style F fill:#f5b7b1,stroke:#c0392b,color:#78281f
 ```
 
-**When to Use**
-
-Cost grows linearly with the number of models, so don't fan out every prompt. Use this pattern when:
-
-- **Irreversible decisions**: schema migrations, public API contracts, security model changes
-- **High-stakes reviews**: pre-merge architecture review, threat modeling, incident post-mortems
-- **Eval-style spot-checks**: validating a single canonical prompt that drives downstream automation
-- **Onboarding a new model**: comparing a candidate model's output against your trusted baseline before adopting it
-
-For routine prompts, the single-model alternatives form (below) is sufficient and cheaper.
-
-**Core Implementation**
-
 ```bash
 #!/usr/bin/env bash
 # fan-out.sh — run the same prompt across multiple models
@@ -1217,7 +1255,7 @@ mkdir -p .cross-model/$(date +%Y%m%d-%H%M%S)
 RUN_DIR=$(ls -td .cross-model/* | head -1)
 
 for model in \
-  "claude-opus-4-7" \
+  "claude-opus-4-8" \
   "gpt-5" \
   "gemini-2.5-pro"; do
     echo "→ $model"
@@ -1225,13 +1263,13 @@ for model in \
 done
 
 # Diff the outputs to surface divergence quickly
-diff -u "$RUN_DIR/claude-opus-4-7.md" "$RUN_DIR/gpt-5.md"     > "$RUN_DIR/claude-vs-gpt.diff"  || true
+diff -u "$RUN_DIR/claude-opus-4-8.md" "$RUN_DIR/gpt-5.md"     > "$RUN_DIR/claude-vs-gpt.diff"  || true
 diff -u "$RUN_DIR/gpt-5.md"           "$RUN_DIR/gemini-2.5-pro.md" > "$RUN_DIR/gpt-vs-gemini.diff" || true
 
 echo "Outputs in $RUN_DIR — review the .diff files first."
 ```
 
-**Reading the Results**
+Reading the divergence:
 
 | Outcome | What it means | Action |
 |---|---|---|
@@ -1241,9 +1279,20 @@ echo "Outputs in $RUN_DIR — review the .diff files first."
 
 **The disagreement IS the signal.** Don't reduce three rich outputs to a vote count — investigate *why* the models split. That investigation is the value the pattern delivers, not the "winning" answer.
 
-**Single-Model Alternatives (Degenerate Form)**
+**When to Use**
 
-When the cost of fanning out across providers isn't justified, ask one model for multiple options in a single call:
+Independent evaluation costs more than a single pass — an extra model call per judgment, or N parallel calls — so don't apply it to every prompt. Reach for it when:
+
+- **Irreversible decisions**: schema migrations, public API contracts, security model changes
+- **High-stakes reviews**: pre-merge architecture review, threat modeling, incident post-mortems
+- **Eval-style spot-checks**: validating a single canonical prompt that drives downstream automation
+- **Onboarding a new model**: comparing a candidate model's output against your trusted baseline before adopting it
+
+For routine prompts, the single-model degenerate form (below) is sufficient and cheaper.
+
+**Single-Model Degenerate Form**
+
+When the cost of a second model isn't justified, ask one model to generate and then critique its own work, or to produce multiple options in a single call:
 
 ```
 "Generate 3 different authentication approaches. For each: performance profile,
@@ -1251,7 +1300,11 @@ security trade-offs, implementation complexity, and when to choose it.
 Then recommend one based on a typical SaaS startup's constraints."
 ```
 
-This is cheaper but provides weaker signal — the alternatives share a single model's training biases. Modern IDE assistants offer this natively as "alternative completions"; named pattern status is unwarranted on its own, but it's worth knowing as the budget-friendly cousin of the full pattern.
+This is cheaper but provides weaker signal — the critique shares the generator's training biases. Modern IDE assistants offer this natively as "alternative completions." It's the budget-friendly cousin of the full pattern, not a substitute for genuine independence on high-stakes calls.
+
+**Anti-pattern: Self-Grading**
+
+Letting the model that produced the work also certify it — a satisfaction score, a "looks good to me," a self-review — and treating that as independent verification. The reviewer shares every blind spot of the author because it *is* the author: the confident reasoning that generated a subtly wrong answer generates an equally confident approval of it. Taken to its institutional extreme — a self-signed acceptance score gating a merge — this becomes the [Autonomous Acceptance](experiments/README.md#autonomous-acceptance) anti-pattern, where the rubber stamp simply moves from a human to a number.
 
 **Anti-pattern: Single-Model Bias**
 
@@ -2701,7 +2754,7 @@ Copying AI rules into every repository without a central source causes drift, in
 ### Phase 2: Development (Weeks 3-4)
 1. **[Spec-Driven Development](#spec-driven-development)** - Implement specification-first approach
 2. **[Progressive Enhancement](#progressive-enhancement)** - Practice iterative development
-3. **[Cross-Model Validation](#cross-model-validation)** - Stress-test high-stakes decisions across multiple frontier models
+3. **[Adversarial Evaluator](#adversarial-evaluator)** - Stress-test high-stakes decisions with an independent judge or across multiple frontier models
 4. **[Atomic Decomposition](#atomic-decomposition)** - Break down complex features
 
 ### Phase 3: Operations (Weeks 5-6)

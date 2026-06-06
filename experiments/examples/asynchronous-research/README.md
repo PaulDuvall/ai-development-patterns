@@ -275,7 +275,7 @@ See [setup/platform-comparison.md](setup/platform-comparison.md) for detailed co
 
 ## Integration with Development Workflow
 
-### Before Cross-Model Validation
+### Before Adversarial Evaluator
 
 Research validates which options are technically feasible:
 
@@ -429,7 +429,7 @@ python automation/result-parser.py research-folder/
 - **Related Patterns**:
   - [Parallel Agents](../../../README.md#parallel-agents)
   - [Context Persistence](../../../README.md#context-persistence)
-  - [Cross-Model Validation](../../../README.md#cross-model-validation)
+  - [Adversarial Evaluator](../../../README.md#adversarial-evaluator)
 
 ## License
 

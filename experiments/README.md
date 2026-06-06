@@ -37,7 +37,7 @@ These experimental patterns extend the core AI development patterns with advance
 | **[ChatOps Security](#chatops-security)** | Beginner | Operations | Deploy security scanning capabilities through chat commands for immediate feedback | Security Orchestration |
 | **[Evidence Automation](#evidence-automation)** | Advanced | Operations | Generate audit evidence matrices from logs and configuration changes automatically | Security Orchestration |
 | **[Context Optimization](#context-optimization)** | Advanced | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive Enhancement |
-| **[Asynchronous Research](#asynchronous-research)** | Intermediate | Development | Use fire-and-forget coding agents in dedicated repositories to conduct autonomous code investigations that prove technical feasibility through executable experiments | Parallel Agents, Context Persistence, Cross-Model Validation |
+| **[Asynchronous Research](#asynchronous-research)** | Intermediate | Development | Use fire-and-forget coding agents in dedicated repositories to conduct autonomous code investigations that prove technical feasibility through executable experiments | Parallel Agents, Context Persistence, Adversarial Evaluator |
 | **[Feedback Flywheel](#feedback-flywheel)** | Intermediate | Development | Systematically improve AI collaboration by analyzing session outcomes and feeding corrections back into team rules and commands | Codified Rules, Context Persistence, Progressive Disclosure |
 | **[Long-Running Orchestration](#long-running-orchestration)** | Advanced | Workflow | Coordinate agents working autonomously for hours or days, maintaining coherent state across sessions with strategic human checkpoints | Parallel Agents, Context Persistence, Workflow Orchestration |
 | **[Guided Architecture](#guided-architecture)** | Intermediate | Development | Apply architectural frameworks (DDD, Well-Architected, 12-Factor) using AI to ensure sound system design | Developer Lifecycle, Codified Rules |
@@ -389,7 +389,7 @@ Running parallel agents without proper isolation, conflict detection, or sync po
 **Maturity**: Advanced  
 **Description**: Match AI tool selection to task complexity and optimize cost/performance trade-offs by understanding different AI models' context window capabilities and computational costs.
 
-**Related Patterns**: [Progressive Enhancement](../README.md#progressive-enhancement), [Cross-Model Validation](../README.md#cross-model-validation)
+**Related Patterns**: [Progressive Enhancement](../README.md#progressive-enhancement), [Adversarial Evaluator](../README.md#adversarial-evaluator)
 
 **Tool Selection Decision Matrix**
 
@@ -409,7 +409,7 @@ Always using the most powerful (expensive) AI model for simple tasks wastes reso
 **Maturity**: Intermediate
 **Description**: Use fire-and-forget coding agents in dedicated repositories to conduct autonomous code investigations that prove technical feasibility through executable experiments.
 
-**Related Patterns**: [Parallel Agents](../README.md#parallel-agents), [Context Persistence](../README.md#context-persistence), [Cross-Model Validation](../README.md#cross-model-validation)
+**Related Patterns**: [Parallel Agents](../README.md#parallel-agents), [Context Persistence](../README.md#context-persistence), [Adversarial Evaluator](../README.md#adversarial-evaluator)
 
 **Source**: Simon Willison, "[Code research projects with async coding agents](https://simonwillison.net/2025/Nov/6/async-code-research/)", November 6, 2025
 
@@ -636,14 +636,14 @@ Working Code + Findings
   ↓
 Informed Decision
   ↓
-Cross-Model Validation / Planned Implementation
+Adversarial Evaluator / Planned Implementation
   ↓
 Production Code
 ```
 
 **How it complements other patterns:**
 
-- **Before Cross-Model Validation**: Validate which options are technically feasible
+- **Before Adversarial Evaluator**: Validate which options are technically feasible
 - **Before Planned Implementation**: Provide real performance data for planning
 - **With Context Persistence**: Archive research for future sessions
 - **With Parallel Agents**: Run multiple research questions simultaneously

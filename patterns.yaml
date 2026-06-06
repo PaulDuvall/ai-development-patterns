@@ -81,7 +81,7 @@ patterns:
     automatable: true
     description: >
       Interview, constrain, and plan before writing code so AI implementation matches actual requirements instead of confident-sounding assumptions.
-    related: [progressive-enhancement, spec-driven-development, cross-model-validation]
+    related: [progressive-enhancement, spec-driven-development, adversarial-evaluator]
 
   - id: progressive-enhancement
     name: Progressive Enhancement
@@ -91,7 +91,7 @@ patterns:
     automatable: true
     description: >
       Build complex features through small, deployable iterations rather than big-bang generation.
-    related: [planned-implementation, atomic-decomposition, image-spec, cross-model-validation]
+    related: [planned-implementation, atomic-decomposition, image-spec, adversarial-evaluator]
 
   - id: context-persistence
     name: Context Persistence
@@ -173,14 +173,14 @@ patterns:
       Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context.
     related: [spec-driven-development, progressive-enhancement]
 
-  - id: cross-model-validation
-    name: Cross-Model Validation
+  - id: adversarial-evaluator
+    name: Adversarial Evaluator
     category: development
     maturity: intermediate
-    anchor: "#cross-model-validation"
+    anchor: "#adversarial-evaluator"
     automatable: true
     description: >
-      Run the same task across multiple frontier models and use their agreements, disagreements, and divergences as eval signal for high-stakes decisions.
+      Separate the generating agent from an independent judging agent (ideally a different model) and use adversarial pressure or cross-model divergence as eval signal for high-stakes decisions.
     related: [planned-implementation, progressive-enhancement, spec-driven-development]
 
   - id: parallel-agents
