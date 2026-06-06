@@ -22,6 +22,7 @@ These experimental patterns extend the core AI development patterns with advance
 | **[Testing Orchestration](#testing-orchestration)** | Intermediate | Workflow | Unified approach to test-first development, automated generation, and quality assurance | Spec-Driven Development |
 | **[Workflow Orchestration](#workflow-orchestration)** | Advanced | Workflow | Coordinate sequential pipelines, parallel workflows, and hybrid human-AI processes | Testing Orchestration, Tool Integration |
 | **[Review Automation](#review-automation)** | Intermediate | Operations | Automate review process for parallel agent outputs using AI to detect conflicts and coordinate integration | Workflow Orchestration, Atomic Decomposition |
+| **[Autonomous Acceptance](#autonomous-acceptance)** | Advanced | Operations | Replace per-diff human review with a separately-owned, executable acceptance policy enforced by continuous machine checks and signed per-merge attestations | Review Automation, Evidence Automation, Test Promotion |
 | **[Debt Forecasting](#debt-forecasting)** | Intermediate | Operations | Proactively identify and prioritize technical debt using AI-powered code analysis | Guided Refactoring, Guided Architecture, Tool Integration |
 | **[Pipeline Synthesis](#pipeline-synthesis)** | Intermediate | Workflow | Convert plain-English build specifications into CI/CD pipeline configurations | Workflow Orchestration, Tool Integration |
 | **[Deployment Synthesis](#deployment-synthesis)** | Advanced | Operations | Generate blue-green deployment scripts with validation to prevent AI misconceptions | Pipeline Synthesis |
@@ -1157,6 +1158,87 @@ fi
 
 **Anti-pattern: Manual Reviews**
 Relying entirely on human reviewers for parallel agent outputs creates bottlenecks and misses systematic integration issues that automated tools can catch.
+
+---
+
+### Autonomous Acceptance
+
+**Maturity**: Advanced
+**Description**: Replace per-diff human review with a separately-owned, executable acceptance policy that agents must satisfy, enforced by continuous machine checks and a signed per-merge attestation binding a named control, a specific commit, and a signing identity.
+
+**Related Patterns**: [Review Automation](#review-automation), [Evidence Automation](#evidence-automation), [Test Promotion](#test-promotion), [Spec-Driven Development](../README.md#spec-driven-development)
+
+**Source**: StrongDM, "[Software Factory](https://factory.strongdm.ai/)" manifesto (February 2026); Simon Willison, "[How StrongDM's AI team build serious software without even looking at the code](https://simonwillison.net/2026/Feb/7/software-factory/)" (February 7, 2026). The "Autonomous Acceptance" framing below is a synthesis being explored, not a description of any one shipped system.
+
+**Note**: This pattern is in `experiments/` because its load-bearing mechanisms — cryptographic separation of duties, signed evidence bundles, release-time gating against live telemetry — are early and partly unvalidated. Open questions (does the evaluator stay honest, do verifier perspectives stay diverse, does release-time signal arrive in time to matter) are unresolved. Treat it as a direction, not a prescription.
+
+#### Core Concept
+
+AI pushed code generation 2–5x faster while review stayed human-paced, so the bottleneck moved from writing to reviewing (DORA/Faros 2026: median PR review time up sharply, a meaningful share of PRs merging with no review at all). The two reflexive responses both fail: review everything and the speed gain evaporates; skim and approve and oversight becomes theater.
+
+The key reframing: **reviewing every diff was always a weak proxy for the real control.** The actual control is two things held together — *whoever writes a change cannot unilaterally authorize it*, and *the work is continuously checked against what it is supposed to do*. AI didn't break this control; it raised volume high enough to expose that per-diff review never enforced it well. So the fix is not more reviewers. It is to:
+
+1. Make the checking **machine-run and constant**, with every result stamped to the exact commit it ran against, so anyone can rerun it rather than take a reviewer's word.
+2. Shift the accountable human from **approving diffs** to **owning the acceptance policy** — the executable set of expectations agents must satisfy.
+3. Enforce **segregation of duties cryptographically**: the engineer writing code against the policy can't amend it in the same motion, and the code author's signing key cannot produce the policy owner's attestation.
+
+#### Where the Gate Lives
+
+```mermaid
+graph TD
+    P[Policy Owner: authors executable acceptance policy] -->|reviewed, four-eyes change| POL[(Acceptance Policy)]
+    A[Code Author / Agent: writes change] --> C[Continuous machine checks]
+    POL -. enforced by .-> G
+    C --> EB[Signed evidence bundle<br/>tests + SCA + SBOM + scans + transcripts]
+    EB --> G{Deterministic policy gate}
+    G -->|satisfied| TR[Commit behind dark flag in trunk]
+    G -->|judgment call policy can't encode| H[Escalate to human]
+    TR --> REL{Release-time gate<br/>evidence + live cohort telemetry}
+    REL -->|exposure decision| EXP[Progressive rollout]
+    REL --> ATT[/Signed attestation:<br/>control + commit + identity/]
+
+    style POL fill:#e1f5e1
+    style ATT fill:#e1f5e1
+    style H fill:#ffe6e6
+```
+
+The author and the policy owner are different identities with different keys; changing the policy is its own reviewed, attributable change. The gate runs deterministically against the policy, and every merge (or release) emits a signed attestation that an auditor can verify and re-run — verifiable proof instead of a rubber-stamped PR.
+
+#### Mechanisms Being Explored
+
+| Mechanism | What it replaces | Why it matters |
+|-----------|------------------|----------------|
+| **Executable acceptance policy** | The reviewer's judgment, held in their head | Expectations become machine-checkable and owned by someone other than the author |
+| **Continuous, commit-pinned checks** | One-time review of a diff | Any result can be re-run against the exact commit; trust is verifiable, not social |
+| **Signed evidence bundle** | A single pass/fail or satisfaction score | Tests, persona checks, SCA, SBOM, secret scans, telemetry, and transcripts travel as one auditable, signed package |
+| **Cryptographic segregation of duties** | Procedural "don't approve your own PR" | The code author's key structurally cannot mint the policy owner's attestation |
+| **Release-time gating behind flags** | Merge-time as the authoritative decision | The authoritative signal (real cohort telemetry) only exists after exposure; rollback collapses to a flag flip |
+| **Regulated / non-regulated split** | One pipeline for all work | Regulated scope layers pre-trunk attestation, sensitivity-map checks, and four-eyes on policy; non-regulated optimizes for velocity |
+
+#### What This Does Not Replace
+
+Code review is also where engineers learn the codebase, catch design drift, and align on how the system evolves. Machine-checked evidence optimizes for verification and loses that social and learning function. Signed bundles and persona transcripts give humans something to read, but neither is the same as a human noticing "we now have three caching strategies and one will page us in six months." Whether that trade is acceptable depends on the organization and time horizon.
+
+#### Anti-pattern: Blind Acceptance
+
+Treating a single model-produced satisfaction score as the acceptance decision — with no independent evidence, no segregation of duties, and no signed attestation.
+
+```yaml
+# Bad: one number, scored by a model trained on the same priors as the agent
+acceptance:
+  gate: satisfaction_score >= 0.92   # author and evaluator share blind spots
+  signed_by: agent                   # author authorizes its own change
+
+# Good: independent, signed evidence evaluated by a separately-owned policy
+acceptance:
+  evidence_bundle: [acceptance_tests, persona_checks, sca, sbom, secret_scan, telemetry]
+  evaluated_against: policy@v7        # owned by policy owner, four-eyes to change
+  attestation:
+    binds: [control_id, commit_sha, signer_identity]
+    signer: policy_owner_key          # author key cannot produce this
+```
+
+**Why it's problematic:** a satisfaction score evaluated by a model with the same priors as the code-writing agent shares its blind spots; without separation of duties the author effectively authorizes their own work; and without a signed, commit-pinned attestation auditors get assurance theater instead of verifiable proof — the rubber-stamp problem moved from a human to a number.
 
 ---
 
