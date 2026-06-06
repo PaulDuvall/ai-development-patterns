@@ -444,7 +444,7 @@ Starting AI adoption without proper assessment leads to inconsistent practices, 
 **Maturity**: Beginner
 **Description**: Version and maintain AI coding standards as explicit configuration files that persist across sessions and team members.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Context Persistence](#context-persistence), [Progressive Disclosure](#progressive-disclosure), [Event Automation](#event-automation), [Custom Commands](#custom-commands), [Centralized Rules](#centralized-rules)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Context Persistence](#context-persistence), [Progressive Disclosure](#progressive-disclosure), [Event Automation](#event-automation), [Custom Commands](#custom-commands), [Centralized Rules](#centralized-rules), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Standardized Project Structure**
 ```bash
@@ -811,7 +811,7 @@ Specifications use authority levels to resolve conflicts and establish precedenc
 
 When requirements conflict, higher authority levels take precedence, enabling clear decision-making for AI implementation.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Tool Integration](#tool-integration), [Custom Commands](#custom-commands), [Image Spec](#image-spec), [Testing Orchestration](experiments/README.md#testing-orchestration), [Observable Development](#observable-development)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Tool Integration](#tool-integration), [Custom Commands](#custom-commands), [Image Spec](#image-spec), [Testing Orchestration](experiments/README.md#testing-orchestration), [Observable Development](#observable-development), [Harness Engineering Lens](#harness-engineering-lens)
 
 **SpecDriven AI Workflow**
 
@@ -980,7 +980,7 @@ Uploading many diagrams at once without hierarchy or a clear starting point over
 **Maturity**: Beginner
 **Description**: Interview, constrain, and plan before writing code so AI implementation matches actual requirements instead of confident-sounding assumptions.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Progressive Enhancement](#progressive-enhancement), [Adversarial Evaluator](#adversarial-evaluator)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Progressive Enhancement](#progressive-enhancement), [Adversarial Evaluator](#adversarial-evaluator), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Core Principle: Think Before You Code**
 
@@ -1204,7 +1204,7 @@ Asking AI to "create a complete user management system" results in 5000 lines of
 **Maturity**: Intermediate
 **Description**: Separate the agent that generates work from an independent agent that judges it — ideally a different model — so adversarial pressure and cross-model divergence, not a model grading its own output, become the eval signal for high-stakes decisions.
 
-**Related Patterns**: [Planned Implementation](#planned-implementation), [Progressive Enhancement](#progressive-enhancement), [Spec-Driven Development](#spec-driven-development), [Autonomous Acceptance](experiments/README.md#autonomous-acceptance)
+**Related Patterns**: [Planned Implementation](#planned-implementation), [Progressive Enhancement](#progressive-enhancement), [Spec-Driven Development](#spec-driven-development), [Autonomous Acceptance](experiments/README.md#autonomous-acceptance), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Core Principle: Separate the Producer from the Judge**
 
@@ -1747,7 +1747,7 @@ Running automation from untrusted sources without review exposes your system to 
 **Maturity**: Intermediate
 **Description**: Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and sophisticated workflows.
 
-**Related Patterns**: [Event Automation](#event-automation), [Spec-Driven Development](#spec-driven-development), [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure)
+**Related Patterns**: [Event Automation](#event-automation), [Spec-Driven Development](#spec-driven-development), [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Core Concept**
 
@@ -2094,7 +2094,7 @@ Breaking tasks so small that coordination overhead exceeds the benefits of paral
 **Maturity**: Intermediate  
 **Description**: Design systems with logging and tracing that make behavior visible to AI as a bidirectional control — observability feeds forward as a standard that steers the agent while it writes code, and feeds back as a sensor the agent reads (and grades) to self-correct.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Tool Integration](#tool-integration), [Codified Rules](#codified-rules), [Autonomous Remediation](#autonomous-remediation), [Testing Orchestration](experiments/README.md#testing-orchestration), [Spec-Driven Development](#spec-driven-development)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Tool Integration](#tool-integration), [Codified Rules](#codified-rules), [Autonomous Remediation](#autonomous-remediation), [Testing Orchestration](experiments/README.md#testing-orchestration), [Spec-Driven Development](#spec-driven-development), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Observability as feedforward (a guide that steers)**
 
@@ -2208,7 +2208,7 @@ Rich, structured logs exist, but nothing closes the loop. No agent reads them ba
 **Maturity**: Intermediate  
 **Description**: Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics, following established refactoring rules and maintaining test coverage throughout the process.
 
-**Related Patterns**: [Codified Rules](#codified-rules), [Autonomous Remediation](#autonomous-remediation), [Testing Orchestration](experiments/README.md#testing-orchestration), [Debt Forecasting](experiments/README.md#debt-forecasting)
+**Related Patterns**: [Codified Rules](#codified-rules), [Autonomous Remediation](#autonomous-remediation), [Testing Orchestration](experiments/README.md#testing-orchestration), [Debt Forecasting](experiments/README.md#debt-forecasting), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Code Smell Detection Framework**
 
@@ -2294,7 +2294,7 @@ Refactoring code for hypothetical future requirements rather than addressing cur
 **Maturity**: Intermediate
 **Description**: Automatically collect comprehensive error context from logs, system state, and git history, then use AI to diagnose root causes and generate validated fixes.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Observable Development](#observable-development), [Tool Integration](#tool-integration), [Autonomous Remediation](#autonomous-remediation), [Testing Orchestration](experiments/README.md#testing-orchestration)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Observable Development](#observable-development), [Tool Integration](#tool-integration), [Autonomous Remediation](#autonomous-remediation), [Testing Orchestration](experiments/README.md#testing-orchestration), [Harness Engineering Lens](#harness-engineering-lens)
 
 **[Error Resolution](#error-resolution) Workflow**
 
@@ -2534,7 +2534,7 @@ fi
 **Maturity**: Intermediate
 **Description**: Pair deterministic rule-based detectors with LLM remediators inside an event-driven loop so codified rule violations are caught and fixed automatically before the AI session continues.
 
-**Related Patterns**: [Codified Rules](#codified-rules), [Event Automation](#event-automation), [Guided Refactoring](#guided-refactoring), [Error Resolution](#error-resolution)
+**Related Patterns**: [Codified Rules](#codified-rules), [Event Automation](#event-automation), [Guided Refactoring](#guided-refactoring), [Error Resolution](#error-resolution), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Source**: Paul Duvall, "[Code Quality Gates: Using Claude Code Hooks to Block Code Smells on Every Write](https://www.paulmduvall.com/claude-code-hooks-code-quality-guardrails/)", February 24, 2026
 
@@ -2736,7 +2736,7 @@ Posting every low-severity finding buries real issues and frustrates developers.
 **Maturity**: Advanced
 **Description**: Enforce organization-wide AI rules through a central Git repository that syncs language- and framework-specific guidance into standard assistant configuration files.
 
-**Related Patterns**: [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure), [Security Orchestration](#security-orchestration)
+**Related Patterns**: [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure), [Security Orchestration](#security-orchestration), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Core Implementation**
 
