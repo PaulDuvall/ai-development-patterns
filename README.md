@@ -104,7 +104,7 @@ This repository provides a structured approach to AI-assisted development throug
 
 ## Harness Engineering Lens
 
-Birgitta Böckeler's framing — **`Agent = Model + Harness`** — describes the controls built *around* a coding agent (separate from the model) to make its output trustworthy. This is not a pattern to adopt; it is a lens that explains *why* the patterns below work together. Every control is one of two kinds and runs in one of two ways:
+Birgitta Böckeler's [Harness Engineering](https://martinfowler.com/articles/harness-engineering.html) framing — **`Agent = Model + Harness`** — describes the controls built *around* a coding agent (separate from the model) to make its output trustworthy. This is not a pattern to adopt; it is a lens that explains *why* the patterns below work together. Every control is one of two kinds and runs in one of two ways:
 
 - **Feedforward (guides)** steer the agent *before* it acts.
 - **Feedback (sensors)** observe *after* it acts so it can self-correct.
