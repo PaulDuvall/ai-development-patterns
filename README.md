@@ -148,7 +148,7 @@ Three principles set the lens's dimensions:
 | The test arbitrates, not the model | Tight scope, an independent verifier, and checks wired to fire on every change | [Atomic Decomposition](#atomic-decomposition), [Adversarial Evaluator](#adversarial-evaluator), [Test Promotion](experiments/README.md#test-promotion), [Autonomous Remediation](#autonomous-remediation), [Event Automation](#event-automation), [Autonomous Acceptance](experiments/README.md#autonomous-acceptance) |
 | Verification reach sets the autonomy ceiling | Hard bounds, state in git, and human-owned edges | [Bounded Autonomy](experiments/README.md#bounded-autonomy), [Context Persistence](#context-persistence), [Long-Running Orchestration](experiments/README.md#long-running-orchestration), [Centralized Rules](#centralized-rules), [Handoff Protocols](experiments/README.md#handoff-protocols) |
 
-The one part of Principle 3 the catalog did not previously cover — bounding the loop (turn caps, spend caps, stall/divergence detection) and capturing an in-loop diagnostic trail — is exactly what the new [Bounded Autonomy](experiments/README.md#bounded-autonomy) experimental pattern adds.
+The one part of Principle 3 that no other catalog pattern covers — bounding the loop (turn caps, spend caps, stall/divergence detection) and capturing an in-loop diagnostic trail — is what the [Bounded Autonomy](experiments/README.md#bounded-autonomy) experimental pattern adds.
 
 Two principles from the source are worth stating directly:
 
