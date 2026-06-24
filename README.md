@@ -132,6 +132,33 @@ Two principles from the source are worth stating directly:
 
 **Source**: Birgitta Böckeler, "[Harness Engineering](https://martinfowler.com/articles/harness-engineering.html)", martinfowler.com.
 
+## Loop Engineering Lens
+
+Most of this catalog treats a single AI task as the unit of work: write a prompt, get an output, review it. The **Loop Engineering Lens** zooms out. When you remove a human from the inner loop and let an agent iterate — read tool output, act, re-check, repeat — the *loop* becomes the thing you design, bound, and verify, not the task. Like the [Harness Engineering Lens](#harness-engineering-lens), this is a lens over the catalog, not a pattern to adopt. The two are complementary: Harness Engineering asks how *good* the controls around an agent are (the quality of its guides and sensors); Loop Engineering asks how much *autonomy* that control quality earns you, and how to bound the blast radius once no human inspects each iteration. Better verification reach buys more autonomy; weak verification caps it — no matter how capable the model.
+
+Three principles set the lens's dimensions:
+
+- **No executable done-check, no loop** — gate before you start. If "done" isn't a state a command can check (exit 0 or 1), and failure isn't cheaply reversible, run it interactively instead of looping.
+- **The test arbitrates, not the model** — one task per loop, deterministic verification, and the agent never certifies its own work. Producer ≠ grader: the thing that writes the code is never the thing that decides it's correct.
+- **Your verification reach sets the autonomy ceiling** — bound the loop with turn, spend, and stall/divergence limits; keep state in git; let humans own the upstream policy and the downstream merge.
+
+| Principle | What the loop must have | Catalog patterns that satisfy it |
+|-----------|-------------------------|----------------------------------|
+| No executable done-check, no loop | An observable goal, acceptance criteria written first, and cheap reversal | [Spec-Driven Development](#spec-driven-development), [Planned Implementation](#planned-implementation), [Observable Development](#observable-development); reversible failure via [Parallel Agents](#parallel-agents) worktrees |
+| The test arbitrates, not the model | Tight scope, an independent verifier, and checks wired to fire on every change | [Atomic Decomposition](#atomic-decomposition), [Adversarial Evaluator](#adversarial-evaluator), [Test Promotion](experiments/README.md#test-promotion), [Autonomous Remediation](#autonomous-remediation), [Event Automation](#event-automation), [Autonomous Acceptance](experiments/README.md#autonomous-acceptance) |
+| Verification reach sets the autonomy ceiling | Hard bounds, state in git, and human-owned edges | [Bounded Autonomy](experiments/README.md#bounded-autonomy), [Context Persistence](#context-persistence), [Long-Running Orchestration](experiments/README.md#long-running-orchestration), [Centralized Rules](#centralized-rules), [Handoff Protocols](experiments/README.md#handoff-protocols) |
+
+The one part of Principle 3 the catalog did not previously cover — bounding the loop (turn caps, spend caps, stall/divergence detection) and capturing an in-loop diagnostic trail — is exactly what the new [Bounded Autonomy](experiments/README.md#bounded-autonomy) experimental pattern adds.
+
+Two principles from the source are worth stating directly:
+
+- **The unit of work is the loop, not the task** — design, bound, and verify the loop as a whole. A single task is just one iteration of it; optimizing the task while leaving the loop unbounded is how runaway cost and silent drift happen.
+- **One writer per resource** — when loops fan out, canonicalize work-item keys *before* grouping so two agents never write the same file. Parallel loops corrupt state at the seams (collisions over a shared resource), not because any individual agent reasoned badly.
+
+The detailed, tool-specific field checklist for gating, scoping, and bounding loops lives at [Loop Engineering Checklist](docs/loop-engineering-checklist.md).
+
+**Source**: Synthesis of the "verification reach sets the autonomy ceiling" idea with field practice for running autonomous coding loops; see the companion [Loop Engineering Checklist](docs/loop-engineering-checklist.md) for the operational form. Conceptually complementary to Birgitta Böckeler's Harness Engineering (cited in the [Harness Engineering Lens](#harness-engineering-lens) above), which addresses the quality of the controls this lens treats as the autonomy-setting constraint.
+
 ## Pattern Dependencies & Implementation Order
 
 **Important**: These phases represent a **learning progression** for teams new to AI development, not a waterfall approach. Teams with existing DevOps/security expertise should implement patterns continuously across all phases from day one, following a "continuous everything" model.

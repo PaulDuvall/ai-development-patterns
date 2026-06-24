@@ -7,6 +7,7 @@ This directory contains working implementations of selected experimental pattern
 | Experimental Pattern | Example Directory | Notes |
 |----------------------|------------------|-------|
 | [Asynchronous Research](../README.md#asynchronous-research) | [`asynchronous-research/`](asynchronous-research/) | Fire-and-forget research workflows |
+| [Bounded Autonomy](../README.md#bounded-autonomy) | [`bounded-autonomy/`](bounded-autonomy/) | Bounded autonomous-loop wrapper with caps and evidence |
 | [Debt Forecasting](../README.md#debt-forecasting) | [`debt-forecasting/`](debt-forecasting/) | Proactive technical debt analysis |
 | [Deployment Synthesis](../README.md#deployment-synthesis) | [`deployment-synthesis/`](deployment-synthesis/) | Generate validated deployment configurations |
 | [Drift Remediation](../README.md#drift-remediation) | [`drift-remediation/`](drift-remediation/) | Detect and correct infrastructure drift |

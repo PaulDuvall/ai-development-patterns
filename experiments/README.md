@@ -42,6 +42,7 @@ These experimental patterns extend the core AI development patterns with advance
 | **[Long-Running Orchestration](#long-running-orchestration)** | Advanced | Workflow | Coordinate agents working autonomously for hours or days, maintaining coherent state across sessions with strategic human checkpoints | Parallel Agents, Context Persistence, Workflow Orchestration |
 | **[Guided Architecture](#guided-architecture)** | Intermediate | Development | Apply architectural frameworks (DDD, Well-Architected, 12-Factor) using AI to ensure sound system design | Developer Lifecycle, Codified Rules |
 | **[Autonomous Defense](#autonomous-defense)** | Advanced | Operations | Deploy AI agents for real-time security threat detection and automated response at machine speed to match the pace of autonomous threats | Security Orchestration, Incident Automation |
+| **[Bounded Autonomy](#bounded-autonomy)** | Advanced | Workflow | Cap a loop's turns, spend, and time, detect stalls and divergence, and emit a machine-readable evidence trail so autonomy never exceeds verification reach | Long-Running Orchestration, Parallel Agents, Workflow Orchestration |
 
 ---
 
@@ -991,6 +992,128 @@ Relying on a single context window for multi-day work without external state per
 # Good: Externalize state to files that survive restarts
 # session-state.md, DECISIONS.log, TODO.md, checkpoints/
 ```
+
+---
+
+### Bounded Autonomy
+
+**Maturity**: Advanced
+**Description**: Cap an autonomous loop's turns, spend, and wall-clock time, detect stalls and divergence, and emit a machine-readable evidence trail so the loop's blast radius never exceeds what its verification can catch.
+
+**Related Patterns**: [Long-Running Orchestration](#long-running-orchestration), [Autonomous Acceptance](#autonomous-acceptance), [Parallel Agents](../README.md#parallel-agents)
+
+**Source**: [Loop Engineering Lens](../README.md#loop-engineering-lens); [Loop Engineering Checklist](../docs/loop-engineering-checklist.md)
+
+#### The Gap This Fills
+
+[Long-Running Orchestration](#long-running-orchestration) coordinates agents across sessions and [Autonomous Acceptance](#autonomous-acceptance) decides when a diff is mergeable, but neither bounds a single running loop or captures what happened inside it. This pattern is the missing control layer: it puts hard limits around the loop, watches for the agent getting stuck or wandering off-goal, and records enough to diagnose a failed run. The governing principle is verification reach — autonomy is only safe up to the point your checks can catch a mistake. Set the bounds at that ceiling, not above it.
+
+#### Bound the Loop
+
+- **Cap turns, spend, and wall-clock.** Pick limits per context — tight pre-commit, looser in CI, loosest overnight. When any cap trips, the run aborts rather than asking for more.
+- **Detect stalls and divergence.** Track progress between turns (a new commit on the working tree is the cheapest signal). N consecutive no-progress turns means stuck; a failing divergence check means the agent has drifted from the goal. Either one stops the loop.
+- **Retry only recoverable errors.** Whitelist the exit codes worth retrying in the wrapper. Everything else fails closed instead of looping on an error the agent cannot fix.
+
+#### State and Evidence
+
+- **State lives in git and files.** The working tree is the state; commit at every phase boundary so each milestone is a recovery point.
+- **Isolated worktree per agent.** One writer per resource — give each agent its own git worktree so parallel loops never collide.
+- **Emit a machine-readable run summary.** Capture cost, turns, session id, and outcome as structured output the orchestrator can read without parsing logs.
+- **Keep a diagnosable failure trail.** Persist the execution transcript plus check logs so a failed run can be reconstructed after the fact.
+
+#### Humans Own the Edges
+
+- **Upstream:** humans author a versioned allow/deny policy where deny wins over allow.
+- **Mid-loop:** an interactive escape hatch lets a human interrupt and redirect a running loop.
+- **Downstream:** a CI gate must clear and a human approves the merge — the loop never auto-merges to the trunk.
+
+#### Configuration
+
+```yaml
+# bounded-loop.yml - caps and stop conditions for an autonomous loop
+caps:
+  max_turns: 40              # agent-turn cap (e.g. 5 pre-commit, 40 CI, 120 overnight)
+  max_budget_usd: 5.00       # hard spend cap; run aborts when exceeded
+  max_wall_secs: 3600        # wall-clock ceiling for the whole loop
+
+stop_conditions:
+  stall_window: 3            # consecutive no-progress turns before abort
+  divergence_check: make verify   # done-check command; non-zero drift halts the loop
+  recoverable_exit_codes: [2, 124]  # retry only these; anything else stops the run
+
+state:
+  per_agent_worktree: true   # isolated git worktree per agent, no cross-agent collisions
+  commit_on_phase_boundary: true
+
+evidence:
+  run_summary: run-summary.json   # cost, turns, session id, outcome
+  failure_trail: logs/            # transcript + check logs for diagnosis
+
+edges:
+  upstream_policy: policy.yml     # versioned allow/deny, deny wins over allow
+  human_escape_hatch: true        # interactive interrupt mid-loop
+  downstream_merge: ci_gate_then_human
+```
+
+The wrapper script enforces those caps deterministically — the agent runner never decides its own limits:
+
+```bash
+#!/usr/bin/env bash
+# bounded-loop.sh - cap a loop and emit an evidence trail
+set -euo pipefail
+
+MAX_TURNS=40
+MAX_WALL_SECS=3600
+MAX_BUDGET_USD=5.00
+STALL_WINDOW=3                      # consecutive no-progress turns before abort
+RECOVERABLE_EXIT_CODES="2 124"     # retry only these; anything else stops
+DONE_CHECK="make verify"           # exits 0 = converged, non-zero = keep going
+
+# Isolated worktree per agent: one writer per resource.
+WORKTREE="../run-$(date +%s)"
+git worktree add -q "$WORKTREE" HEAD
+
+start=$(date +%s)
+turns=0
+stall=0
+last_sha=$(git -C "$WORKTREE" rev-parse HEAD)
+
+while :; do
+  turns=$((turns + 1))
+  [ "$turns" -gt "$MAX_TURNS" ] && { outcome="turn_cap"; break; }
+  [ $(( $(date +%s) - start )) -gt "$MAX_WALL_SECS" ] && { outcome="wall_cap"; break; }
+
+  # One agent turn, scoped to the worktree, with a spend ceiling.
+  rc=0
+  run_one_turn "$WORKTREE" "$MAX_BUDGET_USD" || rc=$?
+
+  # Executable done-check arbitrates completion, not the model.
+  if ( cd "$WORKTREE" && $DONE_CHECK ); then outcome="converged"; break; fi
+
+  # Stall + divergence detection: no new commit means no progress.
+  sha=$(git -C "$WORKTREE" rev-parse HEAD)
+  if [ "$sha" = "$last_sha" ]; then stall=$((stall + 1)); else stall=0; fi
+  last_sha=$sha
+  [ "$stall" -ge "$STALL_WINDOW" ] && { outcome="stalled"; break; }
+
+  # Retry only recoverable errors; fail closed on everything else.
+  if [ "$rc" -ne 0 ] && ! grep -qw "$rc" <<<"$RECOVERABLE_EXIT_CODES"; then
+    outcome="unrecoverable"; break
+  fi
+done
+
+# Machine-readable run summary + diagnosable failure trail.
+printf '{"outcome":"%s","turns":%d,"elapsed_s":%d,"head":"%s"}\n' \
+  "$outcome" "$turns" "$(( $(date +%s) - start ))" "$last_sha" > run-summary.json
+```
+
+> **Example (Claude Code):** map the neutral caps to runner flags — `max_turns` → `--max-turns`, `max_budget_usd` → `--max-budget-usd`, isolated worktree → `--worktree`, machine-readable run summary → `--output-format json`, versioned allow/deny policy → `.claude/settings.json`.
+
+**Complete Example**: See [examples/bounded-autonomy/](examples/bounded-autonomy/) for a runnable bounded-loop wrapper.
+
+**Anti-pattern: Unbounded Autonomy**
+
+A loop with no turn cap, no spend cap, and no stall detection that self-certifies its own completion. It runs until it exhausts the budget or the context window, drifting further from the goal with every turn because nothing checks whether it is still making progress. Worst of all, the agent both writes the change and approves it, so there is no independent verifier to catch corruption of shared state — the same model that introduced the defect signs off on it. Without bounds and an external arbiter, autonomy quietly exceeds verification reach and the blast radius becomes whatever the agent happened to touch.
 
 ---
 
