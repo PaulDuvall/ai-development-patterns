@@ -39,8 +39,8 @@ patterns:
     anchor: "#developer-lifecycle"
     automatable: false
     description: >
-      Structured 9-stage process from problem definition through deployment with AI assistance.
-    related: [codified-rules, security-sandbox, spec-driven-development, observable-development, tool-integration]
+      A staged, plan-first discipline for taking a single feature from problem to production with AI assistance.
+    related: [planned-implementation, spec-driven-development, atomic-decomposition, observable-development]
 
   - id: tool-integration
     name: Tool Integration

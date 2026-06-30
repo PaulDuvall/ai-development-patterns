@@ -130,7 +130,7 @@ class PatternParser:
             
         # Exclude organizational sections that aren't actual patterns
         excluded_sections = [
-            'Pattern Organization', 'Harness Engineering Lens', 'Loop Engineering Lens',
+            'Pattern Organization',
             'Pattern Dependencies & Implementation Order',
             'Complete Pattern Reference', 'Pattern Maturity Levels', 'Task Sizing Framework',
             'Pattern Selection Decision Framework', 'Decision Tree', 'Context-Based Pattern Selection',
@@ -146,10 +146,16 @@ class PatternParser:
         ]
         
         header_text = line.strip().replace('#', '').strip()
+
+        # Any "... Lens" section is a framing perspective over the catalog,
+        # not a pattern (mirrors parse_lenses in scripts/generate-patterns-data.py).
+        if header_text.lower().endswith('lens'):
+            return False
+
         for excluded in excluded_sections:
             if excluded in header_text:
                 return False
-                
+
         return True
     
     def _extract_pattern_name(self, line: str) -> str | None:

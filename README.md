@@ -159,6 +159,24 @@ The detailed, tool-specific field checklist for gating, scoping, and bounding lo
 
 **Source**: Synthesis of the "verification reach sets the autonomy ceiling" idea with field practice for running autonomous coding loops; see the companion [Loop Engineering Checklist](docs/loop-engineering-checklist.md) for the operational form. Conceptually complementary to the [Harness Engineering Lens](#harness-engineering-lens) above, which addresses the quality of the controls this lens treats as the autonomy-setting constraint.
 
+## Lifecycle Lens
+
+Most of this catalog reads like a menu: pick the patterns you need. The **Lifecycle Lens** instead orders them along one feature's path from problem to production, so you can see which pattern does the work at each stage and where the handoffs happen. Like the [Harness Engineering Lens](#harness-engineering-lens) and [Loop Engineering Lens](#loop-engineering-lens), this is a lens over the catalog, not a pattern to adopt. The adoptable discipline — run the stages in order, don't skip ahead to code — lives in the [Developer Lifecycle](#developer-lifecycle) pattern; this lens is the map of which patterns carry each stage.
+
+| Stage | What it produces | Catalog patterns |
+|-------|------------------|------------------|
+| 1. Problem definition | A scoped problem statement and a readiness check | [Readiness Assessment](#readiness-assessment) |
+| 2-3. Plan & requirements | Architecture, tasks, and API specs | [Planned Implementation](#planned-implementation), [Issue Generation](#issue-generation) |
+| 4-5. Specifications & tests | Acceptance criteria written before any code | [Spec-Driven Development](#spec-driven-development) |
+| 6. Implementation | Working code in small, verifiable increments | [Atomic Decomposition](#atomic-decomposition), [Progressive Enhancement](#progressive-enhancement) |
+| 7. Testing & review | Test results, security scan, independent review | [Observable Development](#observable-development), [Adversarial Evaluator](#adversarial-evaluator) |
+| 8. Deployment | A shipped change | [Custom Commands](#custom-commands), [Event Automation](#event-automation) |
+| 9. Monitoring & correction | Runtime signals and validated fixes | [Observable Development](#observable-development), [Autonomous Remediation](#autonomous-remediation), [Error Resolution](#error-resolution) |
+
+Read top to bottom it is a feedforward chain: each stage's output is the next stage's input. The catalog's three categories ([Foundation](#foundation-patterns) -> [Development](#development-patterns) -> [Operations](#operations-patterns)) are the same arc at coarser grain; this lens is the per-feature zoom of it.
+
+**Source**: The nine-stage workflow from the [Developer Lifecycle](#developer-lifecycle) pattern, generalized into a mapping over the catalog. See [examples/developer-lifecycle/](examples/developer-lifecycle/) for a runnable end-to-end implementation.
+
 ## Pattern Dependencies & Implementation Order
 
 **Important**: These phases represent a **learning progression** for teams new to AI development, not a waterfall approach. Teams with existing DevOps/security expertise should implement patterns continuously across all phases from day one, following a "continuous everything" model.
@@ -216,7 +234,7 @@ graph TD
 | **[Readiness Assessment](#readiness-assessment)** | Beginner | Foundation | Systematic evaluation of codebase and team readiness for AI integration | None |
 | **[Codified Rules](#codified-rules)** | Beginner | Foundation | Version and maintain AI coding standards as explicit configuration files | Readiness Assessment |
 | **[Security Sandbox](#security-sandbox)** | Beginner | Foundation | Run AI tools in isolated environments without access to secrets or sensitive data | Codified Rules |
-| **[Developer Lifecycle](#developer-lifecycle)** | Intermediate | Workflow | Structured 9-stage process from problem definition through deployment with AI assistance | Codified Rules, Security Sandbox |
+| **[Developer Lifecycle](#developer-lifecycle)** | Intermediate | Workflow | A staged, plan-first discipline for taking a single feature from problem to production with AI assistance | Codified Rules, Security Sandbox |
 | **[Tool Integration](#tool-integration)** | Intermediate | Foundation | Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions | Security Sandbox, Developer Lifecycle |
 | **[Issue Generation](#issue-generation)** | Intermediate | Foundation | Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies | Readiness Assessment |
 | **[Spec-Driven Development](#spec-driven-development)** | Intermediate | Development | Use executable specifications to guide AI code generation with clear acceptance criteria before implementation | Developer Lifecycle |
@@ -569,9 +587,11 @@ Allowing multiple parallel agents to write to the same directories creates race 
 ## Developer Lifecycle
 
 **Maturity**: Intermediate
-**Description**: Structured 9-stage process from problem definition through deployment with AI assistance.
+**Description**: A staged, plan-first discipline for taking a single feature from problem to production with AI assistance.
 
-**Related Patterns**: [Codified Rules](#codified-rules), [Spec-Driven Development](#spec-driven-development), [Planned Implementation](#planned-implementation), [Atomic Decomposition](#atomic-decomposition), [Observable Development](#observable-development)
+**Related Patterns**: [Lifecycle Lens](#lifecycle-lens), [Planned Implementation](#planned-implementation), [Spec-Driven Development](#spec-driven-development), [Atomic Decomposition](#atomic-decomposition), [Observable Development](#observable-development)
+
+This pattern is the per-feature discipline: plan before you generate, and stop retrying a failing approach after a few tries instead of looping on it. For how each stage maps onto the rest of the catalog, see the [Lifecycle Lens](#lifecycle-lens).
 
 **Workflow Interaction Sequence**
 
@@ -614,22 +634,6 @@ sequenceDiagram
     
     Note over D,M: Continuous Monitoring
     M->>D: Performance Alerts + Security Events
-```
-
-**Core Workflow Implementation**
-
-```bash
-# Stage 1-3: Problem → Plan → Requirements
-ai "Analyze request → Generate architecture, tasks, API specs"
-
-# Stage 4-5: Issues → Specifications  
-ai "Generate executable tests → Gherkin scenarios, API tests, security tests"
-
-# Stage 6: Implementation
-ai "Implement following specifications → Use tests as guide, security best practices"
-
-# Stage 7-9: Testing → Deployment → Monitoring  
-ai "Complete QA → Run tests, security scan, deploy, monitor"
 ```
 
 **Complete Implementation**: See [examples/developer-lifecycle/](examples/developer-lifecycle/) for full 9-stage workflow scripts, detailed prompts for each stage, enhanced implementation techniques ([Five-Try Rule](https://www.linkedin.com/posts/jessicakerr_the-implementation-is-a-test-of-the-design-activity-7367649800193761281-LzCu/), markdown iteration, function decomposition), and integration with CI/CD pipelines.

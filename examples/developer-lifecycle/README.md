@@ -2,6 +2,8 @@
 
 This directory contains a working bash script that implements the 9-stage Developer Lifecycle, enhanced implementation techniques including the Five-Try Rule and systematic retry strategies, and a comprehensive workflow example showing how to apply these techniques in practice.
 
+It serves two roles in the catalog: the runnable implementation of the [Developer Lifecycle](../../README.md#developer-lifecycle) pattern (the per-feature discipline), and the worked end-to-end example behind the [Lifecycle Lens](../../README.md#lifecycle-lens) (which maps each stage onto the rest of the catalog).
+
 ## Current Structure
 
 ```
