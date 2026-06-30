@@ -1,0 +1,887 @@
+// AUTO-GENERATED FROM README.md - DO NOT EDIT BY HAND.
+// Regenerate with: python3 scripts/generate-patterns-data.py
+// README.md is the single source of record for all pattern content.
+window.PATTERNS_DATA = {
+  "repoUrl": "https://github.com/PaulDuvall/ai-development-patterns",
+  "patternCount": 24,
+  "categories": [
+    {
+      "id": "foundation",
+      "name": "Foundation",
+      "blurb": "Establish team readiness, security, and the basics of AI integration.",
+      "accent": "#2d5a3f",
+      "icon": "🟢",
+      "count": 6
+    },
+    {
+      "id": "development",
+      "name": "Development",
+      "blurb": "Daily workflows for AI-assisted coding, planning, and review.",
+      "accent": "#b7950b",
+      "icon": "🟡",
+      "count": 15
+    },
+    {
+      "id": "operations",
+      "name": "Operations",
+      "blurb": "CI/CD, security, compliance, and production management with AI.",
+      "accent": "#c0392b",
+      "icon": "🔴",
+      "count": 3
+    }
+  ],
+  "maturities": [
+    "Beginner",
+    "Intermediate",
+    "Advanced"
+  ],
+  "dependencyDiagram": "graph TB\n    %% ROW 1: Foundation start (left to right)\n    RA([Readiness<br/>Assessment]) --> CR([Codified<br/>Rules])\n    CR --> SS([Security<br/>Sandbox])\n    SS --> DL([Developer<br/>Lifecycle])\n    DL --> TI([Tool<br/>Integration])\n\n    %% ROW 2: Operations & branches (loops back)\n    SS --> SO([Security<br/>Orchestration])\n    SS --> PG([Policy<br/>Generation])\n    SO --> CZR([Centralized<br/>Rules])\n\n    %% ROW 3: Development patterns (flows forward again)\n    DL --> OD([Observable<br/>Development])\n    DL --> SD([Spec-Driven<br/>Development])\n    CR --> GR([Guided<br/>Refactoring])\n    CR --> CP([Context<br/>Persistence])\n    RA --> IG([Issue<br/>Generation])\n    CR --> EA([Event<br/>Automation])\n    SS --> EA\n    EA --> CC([Custom<br/>Commands])\n    SD --> CC\n    CP --> PD([Progressive<br/>Disclosure])\n    CR --> PD\n    SD --> IS([Image<br/>Spec])\n    PD --> CZR\n\n    %% ROW 4: Development chain\n    PE([Progressive<br/>Enhancement]) --> AD([Atomic<br/>Decomposition])\n    AD --> PA([Parallel<br/>Agents])\n    PE --> IS\n\n    %% ROW 5: Additional development patterns\n    PE --> AE([Adversarial<br/>Evaluator])\n    DL --> ER([Error<br/>Resolution])\n    OD --> ER\n    TI --> ER\n    EA --> AR([Autonomous<br/>Remediation])\n    CR --> AR\n    GR --> AR\n    ER --> AR\n    PI([Planned<br/>Implementation])\n\n    %% STYLING\n    classDef foundation fill:#a8d5ba,stroke:#2d5a3f,stroke-width:2px,color:#1a3a25\n    classDef development fill:#f9e79f,stroke:#b7950b,stroke-width:2px,color:#7d6608\n    classDef operations fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,color:#78281f\n\n    class RA,CR,SS,DL,TI,IG foundation\n    class PE,SD,AD,PA,OD,GR,EA,CC,PD,IS,CP,AE,ER,PI,AR development\n    class PG,SO,CZR operations\n\n    %% CLICKABLE LINKS\n    click RA \"https://github.com/PaulDuvall/ai-development-patterns#readiness-assessment\"\n    click CR \"https://github.com/PaulDuvall/ai-development-patterns#codified-rules\"\n    click SS \"https://github.com/PaulDuvall/ai-development-patterns#security-sandbox\"\n    click DL \"https://github.com/PaulDuvall/ai-development-patterns#developer-lifecycle\"\n    click TI \"https://github.com/PaulDuvall/ai-development-patterns#tool-integration\"\n    click IG \"https://github.com/PaulDuvall/ai-development-patterns#issue-generation\"\n    click CP \"https://github.com/PaulDuvall/ai-development-patterns#context-persistence\"\n    click PE \"https://github.com/PaulDuvall/ai-development-patterns#progressive-enhancement\"\n    click SD \"https://github.com/PaulDuvall/ai-development-patterns#spec-driven-development\"\n    click AD \"https://github.com/PaulDuvall/ai-development-patterns#atomic-decomposition\"\n    click PA \"https://github.com/PaulDuvall/ai-development-patterns#parallel-agents\"\n    click OD \"https://github.com/PaulDuvall/ai-development-patterns#observable-development\"\n    click GR \"https://github.com/PaulDuvall/ai-development-patterns#guided-refactoring\"\n    click EA \"https://github.com/PaulDuvall/ai-development-patterns#event-automation\"\n    click CC \"https://github.com/PaulDuvall/ai-development-patterns#custom-commands\"\n    click PD \"https://github.com/PaulDuvall/ai-development-patterns#progressive-disclosure\"\n    click IS \"https://github.com/PaulDuvall/ai-development-patterns#image-spec\"\n    click PG \"https://github.com/PaulDuvall/ai-development-patterns#policy-generation\"\n    click SO \"https://github.com/PaulDuvall/ai-development-patterns#security-orchestration\"\n    click CZR \"https://github.com/PaulDuvall/ai-development-patterns#centralized-rules\"\n    click PI \"https://github.com/PaulDuvall/ai-development-patterns#planned-implementation\"\n    click AE \"https://github.com/PaulDuvall/ai-development-patterns#adversarial-evaluator\"\n    click ER \"https://github.com/PaulDuvall/ai-development-patterns#error-resolution\"\n    click AR \"https://github.com/PaulDuvall/ai-development-patterns#autonomous-remediation\"",
+  "siteDiagram": "graph LR\n  subgraph sg_foundation[\"Foundation\"]\n    direction TB\n    readiness_assessment[\"Readiness Assessment\"]\n    codified_rules[\"Codified Rules\"]\n    security_sandbox[\"Security Sandbox\"]\n    developer_lifecycle[\"Developer Lifecycle\"]\n    tool_integration[\"Tool Integration\"]\n    issue_generation[\"Issue Generation\"]\n  end\n  subgraph sg_development[\"Development\"]\n    direction TB\n    spec_driven_development[\"Spec-Driven Development\"]\n    image_spec[\"Image Spec\"]\n    planned_implementation[\"Planned Implementation\"]\n    progressive_enhancement[\"Progressive Enhancement\"]\n    adversarial_evaluator[\"Adversarial Evaluator\"]\n    atomic_decomposition[\"Atomic Decomposition\"]\n    parallel_agents[\"Parallel Agents\"]\n    context_persistence[\"Context Persistence\"]\n    event_automation[\"Event Automation\"]\n    custom_commands[\"Custom Commands\"]\n    progressive_disclosure[\"Progressive Disclosure\"]\n    observable_development[\"Observable Development\"]\n    guided_refactoring[\"Guided Refactoring\"]\n    error_resolution[\"Error Resolution\"]\n    autonomous_remediation[\"Autonomous Remediation\"]\n  end\n  subgraph sg_operations[\"Operations\"]\n    direction TB\n    policy_generation[\"Policy Generation\"]\n    security_orchestration[\"Security Orchestration\"]\n    centralized_rules[\"Centralized Rules\"]\n  end\n  readiness_assessment --> codified_rules\n  codified_rules --> security_sandbox\n  codified_rules --> developer_lifecycle\n  security_sandbox --> developer_lifecycle\n  security_sandbox --> tool_integration\n  developer_lifecycle --> tool_integration\n  readiness_assessment --> issue_generation\n  developer_lifecycle --> spec_driven_development\n  spec_driven_development --> image_spec\n  progressive_enhancement --> image_spec\n  progressive_enhancement --> adversarial_evaluator\n  progressive_enhancement --> atomic_decomposition\n  atomic_decomposition --> parallel_agents\n  codified_rules --> context_persistence\n  codified_rules --> event_automation\n  security_sandbox --> event_automation\n  event_automation --> custom_commands\n  spec_driven_development --> custom_commands\n  codified_rules --> custom_commands\n  codified_rules --> progressive_disclosure\n  context_persistence --> progressive_disclosure\n  developer_lifecycle --> observable_development\n  codified_rules --> guided_refactoring\n  developer_lifecycle --> error_resolution\n  observable_development --> error_resolution\n  tool_integration --> error_resolution\n  codified_rules --> autonomous_remediation\n  event_automation --> autonomous_remediation\n  security_sandbox --> policy_generation\n  security_sandbox --> security_orchestration\n  codified_rules --> centralized_rules\n  progressive_disclosure --> centralized_rules\n  security_orchestration --> centralized_rules\n  classDef foundation fill:#e4f0e8,stroke:#2d5a3f,stroke-width:1.5px,color:#1a3a25,rx:4,ry:4;\n  classDef development fill:#f7efcf,stroke:#b7950b,stroke-width:1.5px,color:#5c4a00,rx:4,ry:4;\n  classDef operations fill:#f7e2df,stroke:#c0392b,stroke-width:1.5px,color:#78281f,rx:4,ry:4;\n  class readiness_assessment,codified_rules,security_sandbox,developer_lifecycle,tool_integration,issue_generation foundation;\n  class spec_driven_development,image_spec,planned_implementation,progressive_enhancement,adversarial_evaluator,atomic_decomposition,parallel_agents,context_persistence,event_automation,custom_commands,progressive_disclosure,observable_development,guided_refactoring,error_resolution,autonomous_remediation development;\n  class policy_generation,security_orchestration,centralized_rules operations;\n  click readiness_assessment openPatternFromDiagram \"Open Readiness Assessment\"\n  click codified_rules openPatternFromDiagram \"Open Codified Rules\"\n  click security_sandbox openPatternFromDiagram \"Open Security Sandbox\"\n  click developer_lifecycle openPatternFromDiagram \"Open Developer Lifecycle\"\n  click tool_integration openPatternFromDiagram \"Open Tool Integration\"\n  click issue_generation openPatternFromDiagram \"Open Issue Generation\"\n  click spec_driven_development openPatternFromDiagram \"Open Spec-Driven Development\"\n  click image_spec openPatternFromDiagram \"Open Image Spec\"\n  click planned_implementation openPatternFromDiagram \"Open Planned Implementation\"\n  click progressive_enhancement openPatternFromDiagram \"Open Progressive Enhancement\"\n  click adversarial_evaluator openPatternFromDiagram \"Open Adversarial Evaluator\"\n  click atomic_decomposition openPatternFromDiagram \"Open Atomic Decomposition\"\n  click parallel_agents openPatternFromDiagram \"Open Parallel Agents\"\n  click context_persistence openPatternFromDiagram \"Open Context Persistence\"\n  click event_automation openPatternFromDiagram \"Open Event Automation\"\n  click custom_commands openPatternFromDiagram \"Open Custom Commands\"\n  click progressive_disclosure openPatternFromDiagram \"Open Progressive Disclosure\"\n  click observable_development openPatternFromDiagram \"Open Observable Development\"\n  click guided_refactoring openPatternFromDiagram \"Open Guided Refactoring\"\n  click error_resolution openPatternFromDiagram \"Open Error Resolution\"\n  click autonomous_remediation openPatternFromDiagram \"Open Autonomous Remediation\"\n  click policy_generation openPatternFromDiagram \"Open Policy Generation\"\n  click security_orchestration openPatternFromDiagram \"Open Security Orchestration\"\n  click centralized_rules openPatternFromDiagram \"Open Centralized Rules\"",
+  "patterns": [
+    {
+      "id": "readiness-assessment",
+      "name": "Readiness Assessment",
+      "maturity": "Beginner",
+      "type": "Foundation",
+      "category": "foundation",
+      "shortDescription": "Systematic evaluation of codebase and team readiness for AI integration",
+      "dependencies": [],
+      "related": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Issue Generation",
+          "id": "issue-generation"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Systematic evaluation of codebase and team readiness for AI-assisted development before implementing AI patterns.\n\n\n> 📋 **Quick start**: Use the free [AI Development Readiness Scorecard](https://www.redactedventures.com/scorecard) to score your team against this framework in about 10 minutes and get a tailored pattern adoption sequence.\n\n**Assessment Framework**\n\n```mermaid\ngraph TD\n    A[Codebase Assessment] --> B[Team Assessment]\n    B --> C[Infrastructure Assessment]\n    C --> D[Readiness Score]\n    D --> E[Implementation Plan]\n```\n\n**Codebase Readiness Checklist**\n```markdown\n## Code Quality Prerequisites\n□ Consistent code formatting and style guide\n□ Comprehensive test coverage (>80% for critical paths)\n□ Clear separation of concerns and modular architecture\n□ Documented APIs and interfaces\n□ Version-controlled configuration and secrets management\n\n## Documentation Standards\n□ README with setup and development instructions\n□ API documentation (OpenAPI/Swagger)\n□ Architecture decision records (ADRs)\n□ Coding standards and conventions documented\n□ Deployment and operational procedures\n```\n\n**Anti-pattern: Premature Adoption**\nStarting AI adoption without proper assessment leads to inconsistent practices, security vulnerabilities, and team frustration.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#readiness-assessment"
+    },
+    {
+      "id": "codified-rules",
+      "name": "Codified Rules",
+      "maturity": "Beginner",
+      "type": "Foundation",
+      "category": "foundation",
+      "shortDescription": "Version and maintain AI coding standards as explicit configuration files",
+      "dependencies": [
+        {
+          "name": "Readiness Assessment",
+          "id": "readiness-assessment"
+        }
+      ],
+      "related": [
+        {
+          "name": "Developer Lifecycle",
+          "id": "developer-lifecycle"
+        },
+        {
+          "name": "Context Persistence",
+          "id": "context-persistence"
+        },
+        {
+          "name": "Progressive Disclosure",
+          "id": "progressive-disclosure"
+        },
+        {
+          "name": "Event Automation",
+          "id": "event-automation"
+        },
+        {
+          "name": "Custom Commands",
+          "id": "custom-commands"
+        },
+        {
+          "name": "Centralized Rules",
+          "id": "centralized-rules"
+        },
+        {
+          "name": "Harness Engineering Lens",
+          "id": "harness-engineering-lens"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Version and maintain AI coding standards as explicit configuration files that persist across sessions and team members.\n\n\n**Standardized Project Structure**\n```bash\nproject/\n├── .ai/                          # AI configuration directory\n│   ├── rules/                    # Modular rule sets\n│   │   ├── security.md          # Security standards\n│   │   ├── testing.md           # Testing requirements\n│   │   ├── style.md             # Code style guide\n│   │   └── architecture.md      # Architectural patterns\n│   ├── prompts/                 # Reusable prompt templates\n│   │   ├── implementation.md    # Implementation prompts\n│   │   ├── review.md            # Code review prompts\n│   │   └── testing.md           # Test generation prompts\n│   └── knowledge/               # Captured patterns and gotchas\n│       ├── successful.md        # Proven successful patterns\n│       └── failures.md          # Known failure patterns\n├── .cursorrules                 # Cursor IDE configuration\n├── CLAUDE.md                    # Claude Code session context\n└── .windsurf/                   # Windsurf configuration\n    └── rules.md\n```\n\n**Complete Example**: See [examples/codified-rules/](examples/codified-rules/) for:\n- Comprehensive development workflow rules and standards\n- Pipeline automation and CI/CD rules\n- Code quality standards and enforcement guidelines\n- Claude Code configuration for rules-as-code implementation\n\n**Anti-pattern: Broken Context**\nEach developer maintains their own prompts and preferences, leading to inconsistent code across the team.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#codified-rules"
+    },
+    {
+      "id": "security-sandbox",
+      "name": "Security Sandbox",
+      "maturity": "Beginner",
+      "type": "Foundation",
+      "category": "foundation",
+      "shortDescription": "Run AI tools in isolated environments without access to secrets or sensitive data",
+      "dependencies": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        }
+      ],
+      "related": [
+        {
+          "name": "Security & Compliance Patterns",
+          "id": "security--compliance-patterns"
+        },
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Event Automation",
+          "id": "event-automation"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Run AI tools in isolated environments without access to secrets or sensitive data to prevent credential leaks and maintain security compliance.\n\n\n**Core Security Implementation**\n\n**Claude Code Users**: Use the `/sandbox` command to instantly create isolated environments without manual Docker configuration:\n```bash\n/sandbox\n# Creates a secure, isolated environment with:\n# - No access to credentials or sensitive files\n# - Restricted network access\n# - Controlled file system permissions\n```\n\n**Docker-Based Implementation**: For custom isolation or multi-agent scenarios:\n```yaml\n# Basic AI isolation with complete network isolation\nservices:\n  ai-development:\n    network_mode: none                    # Zero network access\n    cap_drop: [ALL]                       # No system privileges\n    volumes:\n      - ./src:/workspace/src:ro           # Read-only source code\n      # DO NOT mount ~/.aws, .env, secrets/, etc.\n```\n\n**Complete Example**: See [examples/security-sandbox/](examples/security-sandbox/) for:\n- Complete Docker isolation configurations for single and multi-agent setups\n- Resource locking and emergency shutdown procedures\n- Security monitoring and violation detection\n- Multi-agent coordination with conflict resolution\n\n**Production Implementations**\n\nModern AI development platforms provide enterprise-grade implementations of these security controls:\n\n**Cloud-Based Sandboxes**:\n- **[Claude Code for the web](https://www.claude.ai/code)**: Sandboxed AI coding with isolated execution environments\n- **[Google Jules](https://jules.google/)**: Google's AI coding assistant with secure development environments\n- **[OpenAI Codex](https://chatgpt.com/codex)**: Cloud-based AI coding with secure execution environments\n- **[Google Vertex AI Agent Engine Code Execution](https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/code-execution)**: Managed secure runtimes for AI agent code execution\n- **[GitHub Codespaces](https://docs.github.com/en/codespaces/overview)**: Isolated cloud development VMs with configurable security policies\n- **[E2B](https://e2b.dev)**: Specialized AI agent sandboxes with microVM isolation\n\n**Cloud & Self-Hosted Options**:\n- **[Daytona](https://www.daytona.io)**: microVM-based isolation for development environments (available as cloud service or self-hosted)\n- **[Coder](https://coder.com)**: Cloud development environments with enterprise security controls (available as cloud service or self-hosted)\n\n**Anti-pattern: Unrestricted Access**\nAllowing AI tools full system access risks credential leaks, data breaches, and security compliance violations.\n\n**Anti-pattern: Conflicting Workspaces**\nAllowing multiple parallel agents to write to the same directories creates race conditions, file conflicts, and unpredictable behavior that can corrupt the development environment.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#security-sandbox"
+    },
+    {
+      "id": "developer-lifecycle",
+      "name": "Developer Lifecycle",
+      "maturity": "Intermediate",
+      "type": "Workflow",
+      "category": "foundation",
+      "shortDescription": "Structured 9-stage process from problem definition through deployment with AI assistance",
+      "dependencies": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Security Sandbox",
+          "id": "security-sandbox"
+        }
+      ],
+      "related": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Spec-Driven Development",
+          "id": "spec-driven-development"
+        },
+        {
+          "name": "Planned Implementation",
+          "id": "planned-implementation"
+        },
+        {
+          "name": "Atomic Decomposition",
+          "id": "atomic-decomposition"
+        },
+        {
+          "name": "Observable Development",
+          "id": "observable-development"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Structured 9-stage process from problem definition through deployment with AI assistance.\n\n\n**Workflow Interaction Sequence**\n\n```mermaid\nsequenceDiagram\n    participant D as Developer\n    participant AI as AI Assistant\n    participant S as System/CI\n    participant T as Tests\n    participant M as Monitoring\n    \n    Note over D,M: Stage 1-3: Problem → Plan → Requirements\n    D->>AI: Problem Definition (e.g., JWT Authentication)\n    AI->>D: Technical Architecture Plan\n    D->>AI: Requirements Clarification\n    AI->>D: API Specs + Kanban Tasks + Security Requirements\n    \n    Note over D,M: Stage 4-5: Issues → Specifications\n    D->>AI: Generate Executable Tests\n    AI->>T: Gherkin Scenarios + API Tests + Security Tests\n    T->>D: Test Suite Ready (Performance Criteria: <200ms)\n    \n    Note over D,M: Stage 6: Implementation\n    D->>AI: Implement Following Specifications\n    AI->>S: Code + Tests + Error Handling + Logging\n    S->>D: Implementation Results\n    \n    Note over D,M: Stage 7-9: Testing → Deployment → Monitoring\n    D->>S: Run All Tests\n    S->>D: Test Results + Security Scan + Performance Benchmark\n    alt Tests Pass\n        S->>S: Deploy to Production\n        S->>M: Setup Monitoring Alerts\n        M->>D: Deployment Complete + Monitoring Active\n    else Tests Fail\n        S->>D: Failure Report\n        D->>AI: Fix Issues\n        AI->>S: Updated Implementation\n    end\n    \n    Note over D,M: Continuous Monitoring\n    M->>D: Performance Alerts + Security Events\n```\n\n**Core Workflow Implementation**\n\n```bash\n# Stage 1-3: Problem → Plan → Requirements\nai \"Analyze request → Generate architecture, tasks, API specs\"\n\n# Stage 4-5: Issues → Specifications  \nai \"Generate executable tests → Gherkin scenarios, API tests, security tests\"\n\n# Stage 6: Implementation\nai \"Implement following specifications → Use tests as guide, security best practices\"\n\n# Stage 7-9: Testing → Deployment → Monitoring  \nai \"Complete QA → Run tests, security scan, deploy, monitor\"\n```\n\n**Complete Implementation**: See [examples/developer-lifecycle/](examples/developer-lifecycle/) for full 9-stage workflow scripts, detailed prompts for each stage, enhanced implementation techniques ([Five-Try Rule](https://www.linkedin.com/posts/jessicakerr_the-implementation-is-a-test-of-the-design-activity-7367649800193761281-LzCu/), markdown iteration, function decomposition), and integration with CI/CD pipelines.\n\n**Anti-pattern: Unplanned Development**\nJumping straight to coding with AI without proper planning, requirements, or testing strategy. Also avoid continuing with the same AI approach after 3-4 failures without decomposing the problem or changing strategy.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#developer-lifecycle"
+    },
+    {
+      "id": "tool-integration",
+      "name": "Tool Integration",
+      "maturity": "Intermediate",
+      "type": "Foundation",
+      "category": "foundation",
+      "shortDescription": "Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions",
+      "dependencies": [
+        {
+          "name": "Security Sandbox",
+          "id": "security-sandbox"
+        },
+        {
+          "name": "Developer Lifecycle",
+          "id": "developer-lifecycle"
+        }
+      ],
+      "related": [
+        {
+          "name": "Security Sandbox",
+          "id": "security-sandbox"
+        },
+        {
+          "name": "Developer Lifecycle",
+          "id": "developer-lifecycle"
+        },
+        {
+          "name": "Observable Development",
+          "id": "observable-development"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions.\n\n\n**Core Concept**\n\nModern AI development requires more than chat-based interactions. AI systems become significantly more capable when connected to real-world data sources and tools. This pattern demonstrates the architectural shift from isolated prompt-only AI to tool-augmented AI systems.\n\n**Implementation Overview**\n\n```python\n# Core tool-augmented AI system with security controls\nclass ToolAugmentedAI:\n    def __init__(self, config_path: str = \".ai/tools.json\"):\n        self.available_tools = {\n            \"database_query\": self._query_database,     # Read-only SQL queries\n            \"file_operations\": self._file_operations,   # Controlled file access\n            \"api_requests\": self._api_requests,         # Allowlisted HTTP requests\n            \"system_info\": self._system_info            # Safe system information\n        }\n    \n    def execute_with_tools(self, ai_request: str, tool_calls: list) -> dict:\n        \"\"\"Execute AI request with secure tool access\"\"\"\n        # Process tool calls with security validation\n        # Return structured results with error handling\n```\n\n**Tool Categories & Security**\n\n- **Database Access**: Read-only queries with operation whitelisting (`SELECT`, `WITH` only)\n- **File Operations**: Path-restricted read/write within configured directories\n- **API Integration**: HTTP requests limited to allowlisted domains with timeouts\n- **System Information**: Safe environment data without sensitive details\n\n**Configuration Example**\n```json\n{\n  \"allowed_apis\": [\"api.github.com\", \"api.openweathermap.org\"],\n  \"file_access_paths\": [\"./data/\", \"./logs/\", \"./generated/\"],\n  \"max_query_results\": 100,\n  \"security\": {\n    \"read_only_database\": true,\n    \"api_rate_limits\": true,\n    \"file_size_limits\": \"10MB\"\n  }\n}\n```\n\n**Model Context Protocol (MCP) Integration**\n\nThis pattern can be implemented using [Anthropic's Model Context Protocol (MCP)](https://www.anthropic.com/news/model-context-protocol) for standardized tool integration across AI systems:\n\n```json\n{\n  \"mcp_servers\": {\n    \"filesystem\": {\n      \"command\": \"npx\",\n      \"args\": [\"@modelcontextprotocol/server-filesystem\", \"./data\"]\n    },\n    \"sqlite\": {\n      \"command\": \"npx\",\n      \"args\": [\"@modelcontextprotocol/server-sqlite\", \"app_data.db\"]\n    }\n  }\n}\n```\n\n**What [Tool Integration](#tool-integration) Enables**\n\n- **Real-time data access**: AI queries current database state, not training data\n- **File system interaction**: Read logs, write generated code, manage project files\n- **API integration**: Fetch live data from external services and APIs\n- **System awareness**: Access to current environment state and configuration\n- **Enhanced context**: AI decisions based on actual system state, not assumptions\n\n**Complete Implementation**\n\nSee [examples/tool-integration/](examples/tool-integration/) for:\n- Full Python implementation with security controls\n- Configuration examples and MCP integration\n- Usage patterns and deployment guidelines\n- Integration with [Security Sandbox](#security-sandbox)\n\n**Anti-pattern: Disconnected Prompting**\nAttempting to solve complex data analysis, system integration, or real-time problems using only natural language prompts without providing AI access to actual data sources, APIs, or system tools. This leads to hallucinated responses, outdated information, and inability to interact with real systems.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#tool-integration"
+    },
+    {
+      "id": "issue-generation",
+      "name": "Issue Generation",
+      "maturity": "Intermediate",
+      "type": "Foundation",
+      "category": "foundation",
+      "shortDescription": "Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies",
+      "dependencies": [
+        {
+          "name": "Readiness Assessment",
+          "id": "readiness-assessment"
+        }
+      ],
+      "related": [
+        {
+          "name": "Readiness Assessment",
+          "id": "readiness-assessment"
+        },
+        {
+          "name": "Spec-Driven Development",
+          "id": "spec-driven-development"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Generate small, deployable work items (<1 hour with AI assistance) from requirements using AI to ensure continuous delivery with clear acceptance criteria and dependency tracking.\n\n**Methodology Note**: This pattern aligns well with Kanban principles (continuous flow, small batches) but works with any development methodology including Scrum, Scrumban, or ad-hoc workflows.\n\n\n**[Issue Generation](#issue-generation) Framework**\n\n```mermaid\ngraph TD\n    A[Requirements Document] --> B[AI Feature Analysis]\n    B --> C[Work Item Splitting]\n    C --> D{<1 hour?}\n    D -->|No| E[Split Further]\n    E --> C\n    D -->|Yes| F[Story Generation]\n    F --> G[Acceptance Criteria]\n    G --> H[Cycle Time Target]\n    H --> I[Dependency Mapping]\n    I --> J[Work Item Creation]\n```\n\n**Core Principles**\n\n- **Small Batch Sizing**: Each work item sized for 4-8 hours max to enable continuous delivery and rapid feedback\n- **AI-Assisted Decomposition**: Use AI to break down requirements into implementable tasks\n- **Traceability Integration**: Connect issues to implementation files and CI workflows\n- **Dependency Mapping**: Establish clear relationships between work items and epics\n- **Acceptance-Driven**: Each task includes specific, testable acceptance criteria\n\n**Work Item Attributes**\n\nGenerated issues must include:\n- **Title**: Specific, actionable description of the work\n- **Cycle Time Target**: Estimated completion time (<1 hour with AI assistance)\n- **Acceptance Criteria**: Testable conditions for completion\n- **File Scope**: Which files will be added, updated, or removed\n- **CI Requirements**: Test coverage, pipeline steps, quality gates\n- **Dependencies**: Blocking and enabling relationships with other issues\n\n**Epic Relationship Management**\n\n- **Bidirectional Linking**: Parent-child references maintained automatically\n- **Progress Tracking**: Epic completion calculated from subissue status\n- **Dependency Validation**: Automated checking for circular dependencies\n- **Status Propagation**: Subissue changes update epic progress\n\n**Implementation Examples**: See [examples/issue-generation/](examples/issue-generation/) for detailed AI prompts, epic breakdown workflows, CI integration patterns, and traceability implementations. For AI-first workflows, see [Beads guide](examples/issue-generation/beads-guide.md) - a git-native issue tracker with CLI access and persistent agent memory.\n\n> \"Small, frequent deliveries expose issues early and keep teams aligned.\"\n> – Agile Alliance\n\n**Kanban Context**: This pattern embodies Kanban principles of continuous flow and small batch sizes. If using Kanban: \"If a task takes more than one day, split it.\" (Kanban Guide, Lean Kanban University). However, the pattern works equally well with Scrum sprints, continuous delivery, or any methodology that values incremental progress.\n\n**Anti-pattern: Under-Specified Issues**\nCreating generic tasks without specific acceptance criteria, proper sizing, or clear dependencies leads to scope creep and estimation errors.\n\n**Anti-pattern: Broken Integration**\nCreating issues without CI workflow integration, file tracking, or traceability requirements leads to disconnected development cycles and poor visibility into implementation progress.\n\n**Anti-pattern Examples:**\n```markdown\n❌ \"Fix the login page\"\n❌ \"Make the dashboard better\"\n❌ \"Add some tests\"\n❌ \"AUTH-002: Implement password validation\" (no file tracking or CI requirements)\n\n✅ \"Add OAuth 2.0 token validation endpoint (<1 hour with AI)\"\n✅ \"Implement dashboard metric WebSocket connection (45 minutes)\"\n✅ \"Write unit tests for user service login method (30 minutes)\"\n✅ \"AUTH-002: Password validation service with CI integration\"\n   - Files: src/auth/validators.py, tests/test_validators.py\n   - Coverage: 95%, unit + integration tests\n   - CI: lint, test, security-scan must pass\n   - AI-assisted: Use AI for implementation and test generation\n```",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#issue-generation"
+    },
+    {
+      "id": "spec-driven-development",
+      "name": "Spec-Driven Development",
+      "maturity": "Intermediate",
+      "type": "Development",
+      "category": "development",
+      "shortDescription": "Use executable specifications to guide AI code generation with clear acceptance criteria before implementation",
+      "dependencies": [
+        {
+          "name": "Developer Lifecycle",
+          "id": "developer-lifecycle"
+        }
+      ],
+      "related": [
+        {
+          "name": "Developer Lifecycle",
+          "id": "developer-lifecycle"
+        },
+        {
+          "name": "Tool Integration",
+          "id": "tool-integration"
+        },
+        {
+          "name": "Custom Commands",
+          "id": "custom-commands"
+        },
+        {
+          "name": "Image Spec",
+          "id": "image-spec"
+        },
+        {
+          "name": "Observable Development",
+          "id": "observable-development"
+        },
+        {
+          "name": "Harness Engineering Lens",
+          "id": "harness-engineering-lens"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Use executable specifications to guide AI code generation with clear acceptance criteria before implementation.\n\n**Core Principle: Precision Enables Productivity**\n\nSpecDriven AI combines three key elements:\n- **Machine-readable specifications** with unique identifiers and authority levels\n- **Rigorous Test-Driven Development** with coverage tracking and automated validation\n- **AI-powered implementation** with persistent context through structured specifications\n\n**Key Innovation: Authority Level System**\n\nSpecifications use authority levels to resolve conflicts and establish precedence:\n- **`authority=system`**: Core business logic and security requirements (highest precedence)\n- **`authority=platform`**: Infrastructure and technical architecture decisions  \n- **`authority=feature`**: User interface and experience requirements (lowest precedence)\n\nWhen requirements conflict, higher authority levels take precedence, enabling clear decision-making for AI implementation.\n\n\n**SpecDriven AI Workflow**\n\n```mermaid\ngraph TD\n    A[Machine-Readable Specifications<br/>with Authority Levels] --> B[Coverage Tracking<br/>& Validation]\n    B --> C[AI Implementation<br/>with Ephemeral Prompts]\n    C --> D[Automated Testing<br/>& Compliance Check]\n    D --> E{Specs Pass?}\n    E -->|No| F[Refine Prompts<br/>Not Specs]\n    F --> C\n    E -->|Yes| G[Coverage Report<br/>& Deployment]\n    G --> H[Specification Persistence<br/>for Regression]\n    \n    style A fill:#e1f5e1\n    style B fill:#e1f5e1\n    style H fill:#e1f5e1\n    style C fill:#ffe6e6\n    style F fill:#ffe6e6\n```\n\n**Core Implementation**\n\n**Machine-Readable Specification with Authority Levels**\n```markdown\n# IAM Policy Generator Specification {#iam_policy_gen}\n\n## CLI Requirements {#cli_requirements authority=system}\nThe system MUST provide a command-line interface that:\n- Accepts policy type via `--policy-type` flag\n- Validates input parameters against AWS IAM constraints\n- Generates syntactically correct IAM policy JSON [^test_iam_syntax]\n- Returns exit code 0 for success, 1 for validation errors\n\n## Input Validation {#input_validation authority=platform}  \nThe system MUST:\n- Reject invalid AWS service names with clear error messages\n- Validate resource ARN format before policy generation\n- Implement rate limiting for API calls [^test_rate_limit]\n\n[^test_iam_syntax]: tests/test_iam_policy_syntax.py\n[^test_rate_limit]: tests/test_rate_limiting.py\n```\n\n**Automated Coverage Tracking**\n```bash\n# Run specification compliance validation\npytest --cov=src --cov-report=html --spec-coverage\npython spec_validator.py --check-coverage --authority-conflicts\n\n# Output shows specification coverage\n# Specification Coverage Report:\n# ✅ cli_requirements: 100% (3/3 tests linked)\n# ✅ input_validation: 85% (6/7 tests linked) \n# ⚠️  Missing test: [^test_malformed_arn] in line 23\n```\n\n**Tooling Integration**\n\n```bash\n# Pre-commit hook validates specification compliance\n# .pre-commit-config.yaml\nrepos:\n  - repo: local\n    hooks:\n      - id: spec-coverage\n        name: Specification Coverage Check\n        entry: python spec_validator.py --check-coverage\n        language: python\n        pass_filenames: false\n\n# Git workflow with specification traceability  \ngit commit -m \"feat: implement rate limiting [spec:rl2c]\n  \nImplements rate limiting requirement from input_validation\nsection. Closes specification anchor #failed_auth.\n\nCoverage: 94% (31/33 spec requirements covered)\"\n```\n\n**Key Benefits**\n- **Authority-based conflict resolution** prevents requirement ambiguity\n- **Automated coverage tracking** ensures no specifications are missed\n- **AI tool independence** through persistent, machine-readable requirements\n- **Precise traceability** from specification anchors to test implementations\n- **Living documentation** that evolves with the system\n\n**Automated Traceability**\n\nSpecification anchors (`{#cli_requirements}`) and test footnotes (`[^test_iam_syntax]`) are the link layer that ties requirements to tests to code to docs. Maintain those links automatically on every change instead of in a spreadsheet:\n\n```bash\n# After each commit, validate anchor coverage and flag drift\ngit diff --name-only HEAD~1 | while read file; do\n    ai \"For $file: confirm referenced spec anchors still exist, propose new\n        anchor links for any uncovered behavior, and emit an impact list of\n        which downstream tests and docs need updating.\"\ndone\n```\n\nWhen a spec section moves or a test is renamed, the same loop surfaces the broken link before it ships. The result is a living traceability graph that stays accurate without manual upkeep — the alternative (traceability in a spreadsheet) is stale within a week.\n\n**Anti-pattern: Broken Traceability**\nMaintaining requirement-to-test links in spreadsheets or manual documentation that becomes stale and inaccurate within days of being written.\n\n**Complete Implementation**\n\nSee [examples/spec-driven-development/](examples/spec-driven-development/) for:\n- Complete IAM Policy Generator implementation\n- spec_validator.py tool for automated compliance checking\n- Pre-commit hooks and Git workflow integration\n- Full specification examples with authority levels\n- Coverage tracking and reporting tools\n\n**Anti-pattern: Spec-Ignored**\nWriting code with AI first, then trying to retrofit tests, resulting in tests that mirror implementation rather than specify behavior.\n\n**Anti-pattern: Over-Prompting**\nSaving collections of prompts as if they were specifications. Prompts are implementation details; specifications are behavioral contracts.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#spec-driven-development"
+    },
+    {
+      "id": "image-spec",
+      "name": "Image Spec",
+      "maturity": "Intermediate",
+      "type": "Development",
+      "category": "development",
+      "shortDescription": "Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context",
+      "dependencies": [
+        {
+          "name": "Spec-Driven Development",
+          "id": "spec-driven-development"
+        },
+        {
+          "name": "Progressive Enhancement",
+          "id": "progressive-enhancement"
+        }
+      ],
+      "related": [
+        {
+          "name": "Spec-Driven Development",
+          "id": "spec-driven-development"
+        },
+        {
+          "name": "Progressive Enhancement",
+          "id": "progressive-enhancement"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context.\n\n\n**Core Implementation**\n\nUse images as the source of truth for structure and intent, then supplement with minimal text constraints:\n\n```bash\n# 1. Prepare visual specifications\n# - architecture.png (components + labeled ports)\n# - data-model.png (fields + relationships)\n# - ui-mock.png (layout + key interactions)\n\n# 2. Attach images and provide a minimal build request\ncat > build-request.txt << 'EOF'\nBuild the system from the attached diagrams.\nTech stack: Node.js + Express + PostgreSQL\nStart with the User Service exactly as shown.\nInclude /health endpoints for every service.\nEOF\n\n# 3. Iterate with visual feedback\n# - Screenshot the running output\n# - Annotate with required changes\n# - Re-attach and request the next iteration\n```\n\n**Complete Implementation**\n\nSee [examples/image-spec/](examples/image-spec/) for prompt templates, diagram checklists, and a repeatable image-first iteration loop.\n\n**Anti-pattern: Overwhelming Visuals**\n\nUploading many diagrams at once without hierarchy or a clear starting point overwhelms context, increases contradictions, and reduces accuracy. Start with one high-level diagram, implement one slice, then add more visuals progressively.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#image-spec"
+    },
+    {
+      "id": "planned-implementation",
+      "name": "Planned Implementation",
+      "maturity": "Beginner",
+      "type": "Development",
+      "category": "development",
+      "shortDescription": "Interview, constrain, and plan before writing code so AI implementation matches actual requirements instead of confident-sounding assumptions",
+      "dependencies": [],
+      "related": [
+        {
+          "name": "Developer Lifecycle",
+          "id": "developer-lifecycle"
+        },
+        {
+          "name": "Spec-Driven Development",
+          "id": "spec-driven-development"
+        },
+        {
+          "name": "Progressive Enhancement",
+          "id": "progressive-enhancement"
+        },
+        {
+          "name": "Adversarial Evaluator",
+          "id": "adversarial-evaluator"
+        },
+        {
+          "name": "Harness Engineering Lens",
+          "id": "harness-engineering-lens"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Interview, constrain, and plan before writing code so AI implementation matches actual requirements instead of confident-sounding assumptions.\n\n\n**Core Principle: Think Before You Code**\n\nThe costliest bugs come from building the wrong thing, not building it wrong. This pattern front-loads three activities before any code is written:\n\n1. **Interview** — have AI ask structured questions to surface tacit knowledge, hidden constraints, and decisions that would otherwise emerge mid-implementation.\n2. **Constrain** — translate the interview answers into explicit boundaries the AI must respect (line counts, dependencies, performance budgets, prohibited approaches).\n3. **Plan** — generate an explicit step-by-step implementation plan, review it, and iterate before any code is generated.\n\n**Planning Workflow**\n\n```mermaid\ngraph TD\n    A[Idea or Request] --> B[AI Interviews You<br/>Clarifying Questions]\n    B --> C{Gaps Remain?}\n    C -->|Yes| B\n    C -->|No| D[Define Explicit Constraints<br/>Line count, deps, perf budget]\n    D --> E[Generate Initial Plan]\n    E --> F[Review & Refine Plan]\n    F --> G{Plan Approved?}\n    G -->|No| E\n    G -->|Yes| H[Execute Implementation]\n    H --> I[Validate Against Plan]\n    I --> J{Meets Plan?}\n    J -->|No| H\n    J -->|Yes| K[Complete]\n\n    style B fill:#e1f5e1\n    style D fill:#e1f5e1\n    style F fill:#e1f5e1\n    style H fill:#ffe6e6\n    style K fill:#e1f5e1\n```\n\n**Interview Phase**\n\nBefore writing any plan, have AI act as an interviewer:\n\n```bash\nai \"I want to build a notification system for our app.\n\nBefore writing any code or plan, interview me:\n1. Ask clarifying questions about requirements I haven't stated\n2. Identify constraints I should decide on upfront\n3. Surface assumptions that could cause rework later\n4. Group your questions by category (scope, technical, users, edge cases)\n\nAsk one category at a time. Wait for my answers before continuing.\"\n```\n\nTypical interview output groups questions by category — scope (\"Which channels? In-app, email, SMS?\"), technical (\"Expected volume — 10/day vs 10,000/hour changes architecture\"), users (\"Can users configure preferences?\"), edge cases (\"What happens when delivery fails?\"). After answers are collected, ask AI to consolidate them into a requirements summary, an explicit non-goals list, and remaining open questions — that document becomes the input to the planning phase.\n\n**Constraint Phase**\n\nTranslate the interview answers into the boundaries the AI must respect. Constraints prevent over-engineering more reliably than instructions to \"keep it simple\":\n\n```\nBad:  \"Create user service\"\nGood: \"Create user service: <100 lines, 3 methods max, only bcrypt dependency\"\n\nBad:  \"Add caching\"\nGood: \"Add caching using Map, max 1000 entries, LRU eviction\"\n\nBad:  \"Improve performance\"\nGood: \"Reduce p99 latency to <50ms without new dependencies\"\n```\n\nCarry these constraints into every subsequent prompt — they're the steering, not the suggestion.\n\n**Core Implementation**\n\n**1. Plan Generation Phase**\n```bash\n# Example planning prompt structure\nCONTEXT: \"Building user authentication for SaaS application\"\nREQUIREMENTS: \"JWT tokens, password reset, rate limiting\"\nCONSTRAINTS: \"Must integrate with existing user table, 2-hour time limit\"\n\nREQUEST: \"Generate step-by-step implementation plan with:\n- Database changes needed\n- API endpoints to create/modify\n- Security considerations\n- Testing approach\n- Rollback strategy\"\n```\n\n**2. Plan Review and Iteration**\n```markdown\n# Generated Plan Review Checklist\n\n### Technical Approach\n- [ ] Database schema changes are backwards compatible\n- [ ] API design follows existing conventions\n- [ ] Security measures address OWASP top 10\n- [ ] Performance impact is minimal\n\n### Implementation Strategy\n- [ ] Tasks are broken into deployable increments\n- [ ] Dependencies are clearly identified\n- [ ] Rollback plan is feasible\n- [ ] Testing strategy covers edge cases\n\n### Resource Requirements\n- [ ] Time estimate is realistic\n- [ ] Required permissions are available\n- [ ] External dependencies are identified\n```\n\n**3. Execution with Plan Validation**\n```bash\n# During implementation, validate against plan\necho \"✓ Step 1: Created user_sessions table (matches plan)\"\necho \"✓ Step 2: Added JWT service (matches plan)\"\necho \"⚠ Step 3: Rate limiting - using Redis instead of in-memory (plan deviation documented)\"\n```\n\n**Tool-Agnostic Planning Approach**\n\n**Planning Session Structure**\n```markdown\n## 1. Problem Definition (2-3 sentences)\nClear statement of what needs to be built and why\n\n## 2. Constraints & Requirements\n- Technical constraints (existing systems, performance, security)\n- Business requirements (timeline, user experience, compliance)\n- Resource constraints (team size, expertise, budget)\n\n## 3. Implementation Options\n- Option A: [Brief description, pros/cons, time estimate]\n- Option B: [Brief description, pros/cons, time estimate]\n- Recommended: [Choice with justification]\n\n## 4. Detailed Plan\n- [ ] Step 1: [Concrete action with acceptance criteria]\n- [ ] Step 2: [Concrete action with acceptance criteria]\n- [ ] Step 3: [Concrete action with acceptance criteria]\n\n## 5. Validation Strategy\nHow to verify each step works and overall solution meets requirements\n```\n\n\n**When to Use Plan-First Development**\n\n- **Complex Features**: Multi-step implementations requiring coordination\n- **Unknown Domains**: Working in unfamiliar technologies or business areas\n- **Team Collaboration**: When multiple developers need to understand the approach\n- **High-Stakes Changes**: Security, performance, or business-critical modifications\n- **Learning Contexts**: When using AI to explore new implementation approaches\n\n**Complete Implementation**\n\nSee [examples/planned-implementation/](examples/planned-implementation/) for:\n- Tool-specific planning examples (Claude Code, Cursor)\n- Planning templates and checklists\n- Markdown iteration techniques and stakeholder review cycles\n- Integration with existing development workflows\n- Plan validation and iteration strategies\n\n**Anti-pattern: Blind Generation**\nJumping straight from a vague idea to code generation without interviewing for requirements or setting constraints. AI fills the gaps with assumptions — often reasonable-sounding but wrong for your context — and you discover requirements through failed implementations instead of conversation.\n\n**Anti-pattern: Unconstrained Generation**\nSkipping the constraint phase. Telling AI to \"make it good\" or \"add features\" without explicit boundaries produces over-engineered solutions that are hard to review.\n\n**Anti-pattern: Over-Constrained**\nStacking so many constraints (\"exactly 50 lines, 2 methods, no dependencies, 100% test coverage, sub-10ms response time\") that AI can't find a coherent solution. Constraints are budgets, not handcuffs — pick the ones that matter for this task.\n\n**Anti-pattern: Over-Analysis**\nSpending excessive time refining plans without moving to implementation, missing opportunities for rapid feedback and iterative improvement.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#planned-implementation"
+    },
+    {
+      "id": "progressive-enhancement",
+      "name": "Progressive Enhancement",
+      "maturity": "Beginner",
+      "type": "Development",
+      "category": "development",
+      "shortDescription": "Build complex features through small, deployable iterations rather than big-bang generation",
+      "dependencies": [],
+      "related": [
+        {
+          "name": "Planned Implementation",
+          "id": "planned-implementation"
+        },
+        {
+          "name": "Developer Lifecycle",
+          "id": "developer-lifecycle"
+        },
+        {
+          "name": "Image Spec",
+          "id": "image-spec"
+        },
+        {
+          "name": "Adversarial Evaluator",
+          "id": "adversarial-evaluator"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Build complex features through small, deployable iterations rather than big-bang generation.\n\n\n**Examples**\nBuilding authentication progressively:\n```bash\n# Day 1: Minimal login\n\"Create POST /login that returns 200 for admin/admin, 401 otherwise\"\n→ Deploy\n\n# Day 2: Real password check\n\"Modify login to check passwords against users table. Keep existing API.\"\n→ Deploy\n\n# Day 3: Add security\n\"Add bcrypt hashing to login. Support both hashed and plain passwords temporarily.\"\n→ Deploy\n\n# Day 4: Modern tokens\n\"Replace session with JWT. Keep session endpoint for backward compatibility.\"\n→ Deploy\n```\n\n**Developer Review Required**: Each iteration requires developer review and testing of AI-generated code before deployment.\n\n**When to Use [Progressive Enhancement](#progressive-enhancement)**\n\n- **MVP Development**: When you need to get to market quickly with minimal features\n- **Uncertain Requirements**: When requirements are likely to change based on user feedback  \n- **Risk Mitigation**: When you want to reduce the risk of large, complex implementations\n- **Continuous Delivery**: When you have automated deployment and want rapid iterations\n- **Learning Projects**: When the team is learning new technologies or domains\n\n**Anti-pattern: Monolithic Generation**\nAsking AI to \"create a complete user management system\" results in 5000 lines of coupled, untested code that takes days to review and debug.\n\n---\n\n<a id=\"cross-model-validation\"></a>",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#progressive-enhancement"
+    },
+    {
+      "id": "adversarial-evaluator",
+      "name": "Adversarial Evaluator",
+      "maturity": "Intermediate",
+      "type": "Development",
+      "category": "development",
+      "shortDescription": "Separate the generating agent from an independent judging agent (ideally a different model) and use adversarial pressure or cross-model divergence as eval signal for high-stakes decisions",
+      "dependencies": [
+        {
+          "name": "Progressive Enhancement",
+          "id": "progressive-enhancement"
+        }
+      ],
+      "related": [
+        {
+          "name": "Planned Implementation",
+          "id": "planned-implementation"
+        },
+        {
+          "name": "Progressive Enhancement",
+          "id": "progressive-enhancement"
+        },
+        {
+          "name": "Spec-Driven Development",
+          "id": "spec-driven-development"
+        },
+        {
+          "name": "Harness Engineering Lens",
+          "id": "harness-engineering-lens"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Separate the agent that generates work from an independent agent that judges it — ideally a different model — so adversarial pressure and cross-model divergence, not a model grading its own output, become the eval signal for high-stakes decisions.\n\n\n**Core Principle: Separate the Producer from the Judge**\n\nBorrowed from GANs (Generative Adversarial Networks): two networks compete — one generates, one judges — and that adversarial tension forces quality up. The same dynamic applies to multi-agent systems. A model asked to grade its own output shares its own blind spots; the confident reasoning that produced a flawed answer also produces a confident review of it. The fix is to separate the generator from the evaluator completely, and to make the evaluator as *independent* as the stakes require.\n\nIndependence is a spectrum, not a switch:\n\n| Independence level | How | Strength |\n|---|---|---|\n| Same model, different prompt/role | \"Now critique the above as a skeptical reviewer\" | Weak — shared training priors, correlated blind spots |\n| Different model as judge | Claude generates, GPT-5 or Gemini judges | Strong — independent training data and failure modes |\n| Different identity + signing key | Judge owned by a separate party, attestation signed | Strongest — see [Autonomous Acceptance](experiments/README.md#autonomous-acceptance) |\n\nThe pattern has two topologies. Pick the one that matches the decision: an **adversarial judge** when you have one candidate and need to know whether it holds up, or **cross-model divergence** when there is no single right answer and you want to surface the space of reasonable ones.\n\n**Topology 1: Adversarial Judge (generate → attack)**\n\nSequential and asymmetric. One agent produces; a second, independent agent is told to *find fault* — not to summarize, not to agree, but to refute. Surviving that pressure is the quality signal.\n\n```mermaid\ngraph LR\n    G[Generator Agent<br/>Claude] -->|candidate| J[Judge Agent<br/>different model]\n    J -->|attack + grade| V{Survives?}\n    V -->|Yes| A[Accept]\n    V -->|No| R[Return with findings]\n    R --> G\n    style G fill:#a8d5ba,stroke:#2d5a3f,color:#1a3a25\n    style J fill:#f9e79f,stroke:#b7950b,color:#7d6608\n```\n\n```bash\n# adversarial-judge.sh — generate with one model, attack with another\nGENERATOR=\"claude-opus-4-8\"\nJUDGE=\"gpt-5\"\n\nllm -m \"$GENERATOR\" < task.md > candidate.md\n\nllm -m \"$JUDGE\" <<EOF\nYou are an adversarial reviewer. Your goal is to REFUTE the work below, not\nto praise it. Find every correctness bug, security hole, unhandled edge case,\nand unstated assumption. If you cannot break it, say so explicitly.\n\nTASK: $(cat task.md)\nCANDIDATE: $(cat candidate.md)\nEOF\n```\n\nThe judge must run on a *different* model than the generator. A Claude-generated answer reviewed by Claude inherits Claude's blind spots; the same answer attacked by GPT-5 or Gemini meets a different set of priors. That diversity of training data is what makes the adversary's findings real rather than confirmatory.\n\n**Topology 2: Cross-Model Divergence (fan out → compare)**\n\nParallel and symmetric. Instead of one judge attacking one output, run the *same* task across several frontier models at once and treat their disagreement as the signal. No model is cast as the judge — the divergence between independent peers is the verdict.\n\n```mermaid\ngraph TD\n    A[High-Stakes Prompt] --> B[Fan Out to N Models]\n    B --> C1[Claude Opus]\n    B --> C2[GPT-5]\n    B --> C3[Gemini]\n    C1 --> D[Side-by-Side Outputs]\n    C2 --> D\n    C3 --> D\n    D --> E{Convergent?}\n    E -->|Yes| F[Stronger Prior<br/>Proceed With Confidence]\n    E -->|No| G[Investigate the Divergence<br/>Disagreement IS the Finding]\n    G --> H[Choose, Synthesize, or Re-Prompt]\n\n    style D fill:#a8d5ba,stroke:#2d5a3f,color:#1a3a25\n    style G fill:#f9e79f,stroke:#b7950b,color:#7d6608\n    style F fill:#f5b7b1,stroke:#c0392b,color:#78281f\n```\n\n```bash\n#!/usr/bin/env bash\n# fan-out.sh — run the same prompt across multiple models\nPROMPT_FILE=\"$1\"\nmkdir -p .cross-model/$(date +%Y%m%d-%H%M%S)\nRUN_DIR=$(ls -td .cross-model/* | head -1)\n\nfor model in \\\n  \"claude-opus-4-8\" \\\n  \"gpt-5\" \\\n  \"gemini-2.5-pro\"; do\n    echo \"→ $model\"\n    llm -m \"$model\" < \"$PROMPT_FILE\" > \"$RUN_DIR/${model}.md\"\ndone\n\n# Diff the outputs to surface divergence quickly\ndiff -u \"$RUN_DIR/claude-opus-4-8.md\" \"$RUN_DIR/gpt-5.md\"     > \"$RUN_DIR/claude-vs-gpt.diff\"  || true\ndiff -u \"$RUN_DIR/gpt-5.md\"           \"$RUN_DIR/gemini-2.5-pro.md\" > \"$RUN_DIR/gpt-vs-gemini.diff\" || true\n\necho \"Outputs in $RUN_DIR — review the .diff files first.\"\n```\n\nReading the divergence:\n\n| Outcome | What it means | Action |\n|---|---|---|\n| All models agree | Stronger prior than any single model alone | Proceed |\n| 2 agree, 1 disagrees | The minority report may be catching something the majority missed | Read the dissent carefully before discarding |\n| All three disagree | The prompt is underspecified, the task is genuinely ambiguous, or you're at the frontier of model capability | Re-prompt with sharper constraints, or treat as a human-judgment call |\n\n**The disagreement IS the signal.** Don't reduce three rich outputs to a vote count — investigate *why* the models split. That investigation is the value the pattern delivers, not the \"winning\" answer.\n\n**When to Use**\n\nIndependent evaluation costs more than a single pass — an extra model call per judgment, or N parallel calls — so don't apply it to every prompt. Reach for it when:\n\n- **Irreversible decisions**: schema migrations, public API contracts, security model changes\n- **High-stakes reviews**: pre-merge architecture review, threat modeling, incident post-mortems\n- **Eval-style spot-checks**: validating a single canonical prompt that drives downstream automation\n- **Onboarding a new model**: comparing a candidate model's output against your trusted baseline before adopting it\n\nFor routine prompts, the single-model degenerate form (below) is sufficient and cheaper.\n\n**Single-Model Degenerate Form**\n\nWhen the cost of a second model isn't justified, ask one model to generate and then critique its own work, or to produce multiple options in a single call:\n\n```\n\"Generate 3 different authentication approaches. For each: performance profile,\nsecurity trade-offs, implementation complexity, and when to choose it.\nThen recommend one based on a typical SaaS startup's constraints.\"\n```\n\nThis is cheaper but provides weaker signal — the critique shares the generator's training biases. Modern IDE assistants offer this natively as \"alternative completions.\" It's the budget-friendly cousin of the full pattern, not a substitute for genuine independence on high-stakes calls.\n\n**Anti-pattern: Self-Grading**\n\nLetting the model that produced the work also certify it — a satisfaction score, a \"looks good to me,\" a self-review — and treating that as independent verification. The reviewer shares every blind spot of the author because it *is* the author: the confident reasoning that generated a subtly wrong answer generates an equally confident approval of it. Taken to its institutional extreme — a self-signed acceptance score gating a merge — this becomes the [Autonomous Acceptance](experiments/README.md#autonomous-acceptance) anti-pattern, where the rubber stamp simply moves from a human to a number.\n\n**Anti-pattern: Single-Model Bias**\n\nCommitting irreversible decisions on a single model's output without ever checking whether another frontier model would have made the same call. The decision feels well-reasoned because the model's prose is confident — but confidence is not correctness, and one model's blind spots become the project's blind spots.\n\n**Anti-pattern: Voting Theater**\n\nRunning three models and treating majority rule as truth. Frontier models are trained on overlapping data and exhibit correlated errors; 2-of-3 agreement on a wrong answer is common when the wrong answer is the most plausible-sounding one. Use the votes as a *prompt for investigation*, never as a verdict.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#adversarial-evaluator"
+    },
+    {
+      "id": "atomic-decomposition",
+      "name": "Atomic Decomposition",
+      "maturity": "Intermediate",
+      "type": "Development",
+      "category": "development",
+      "shortDescription": "Break complex features into atomic, independently implementable tasks for parallel AI agent execution",
+      "dependencies": [
+        {
+          "name": "Progressive Enhancement",
+          "id": "progressive-enhancement"
+        }
+      ],
+      "related": [
+        {
+          "name": "Developer Lifecycle",
+          "id": "developer-lifecycle"
+        },
+        {
+          "name": "Progressive Enhancement",
+          "id": "progressive-enhancement"
+        },
+        {
+          "name": "Issue Generation",
+          "id": "issue-generation"
+        },
+        {
+          "name": "Parallel Agents",
+          "id": "parallel-agents"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Break complex features into atomic, independently implementable tasks for parallel AI agent execution.\n\n\n**Atomic Task Criteria**\n\n```mermaid\ngraph TD\n    A[Feature Requirement] --> B[Task Analysis]\n    B --> C{Atomic Task Check}\n    C -->|✓ Independent| D[Can run in parallel]\n    C -->|✓ <2 hours| E[Rapid feedback cycle]\n    C -->|✓ Clear I/O| F[Testable interface]\n    C -->|✓ No shared state| G[Conflict-free]\n    C -->|✗ Fails check| H[Split Further]\n    H --> B\n    \n    D --> I[Ready for Agent]\n    E --> I\n    F --> I\n    G --> I\n```\n\n**Core Decomposition Process**\n\n```bash\n# Feature: User Authentication System\n# Bad: Monolithic task\n❌ \"Implement complete user authentication with JWT, password hashing, rate limiting, and email verification\"\n\n# Good: Atomic breakdown with AI validation\nai_decompose \"Break down user authentication into atomic tasks:\n\nTask 1: Password validation service (1.5h)\n- Input: plain text password, validation rules\n- Output: validation result object\n- Dependencies: None (pure function)\n\nTask 2: JWT token generation service (1h)  \n- Input: user ID, role, expiration config\n- Output: signed JWT token\n- Dependencies: None (crypto operations only)\n\nTask 3: Rate limiting middleware (2h)\n- Input: request metadata, rate limit config\n- Output: allow/deny decision\n- Dependencies: None (stateless logic)\n\nTask 4: Login endpoint integration (1h)\n- Input: credentials, services from tasks 1-3\n- Output: HTTP response with token/error\n- Dependencies: Tasks 1-3 (integration only)\"\n\n# Validate atomicity\nai_task_validator \"Check each task for:\n1. <2 hour completion time\n2. No shared mutable state\n3. Clear input/output contracts\n4. Testable in isolation\n5. No circular dependencies\"\n```\n\n\n**Agent Assignment & Coordination**\n\n```yaml\n# .ai/task-assignment.yml\nauthentication_feature:\n  parallel_tasks:\n    - id: \"auth-001\" # Password validation\n      agent: \"backend-specialist-1\"\n      estimated_hours: 1.5\n      dependencies: []\n      \n    - id: \"auth-002\" # JWT generation\n      agent: \"security-specialist\"\n      estimated_hours: 1\n      dependencies: []\n      \n    - id: \"auth-003\" # Rate limiting\n      agent: \"backend-specialist-2\"\n      estimated_hours: 2\n      dependencies: []\n      \n  integration_tasks:\n    - id: \"auth-004\" # Login endpoint\n      agent: \"integration-specialist\"\n      estimated_hours: 1\n      dependencies: [\"auth-001\", \"auth-002\", \"auth-003\"]\n```\n\n**Task Contract Validation**\n\n```python\n# Ensure tasks meet atomic criteria\nclass TaskContract:\n    def validate_atomic(self) -> bool:\n        return all([\n            len(self.side_effects) == 0,    # No side effects\n            self.estimated_hours <= 2,      # Rapid completion\n            self.has_clear_io_contract()    # Testable interface\n        ])\n\n# Example validation\ntask = TaskContract(\"auth-001\")\ntask.inputs = {\"password\": str, \"rules\": PasswordRules}  \ntask.outputs = {\"is_valid\": bool, \"errors\": List[str]}\nassert task.validate_atomic()  # ✓ Passes atomic criteria\n```\n\n**Complete Implementation**: See [examples/atomic-decomposition/](examples/atomic-decomposition/) for:\n- Contract validation system with automated checking\n- Function-level decomposition techniques and trigger indicators\n- Task dependency resolution and scheduling\n- Parallel execution coordination and monitoring\n- Agent assignment and resource management\n\n**When to Use [Atomic Decomposition](#atomic-decomposition)**\n- **Parallel Agent Implementation**: Multiple AI agents working simultaneously\n- **Complex Feature Development**: Large features benefiting from parallel work\n- **Time-Critical Projects**: Speed through parallelization essential\n- **Risk Mitigation**: Reduce blast radius of individual task failures\n\n**Anti-pattern: False Atomicity**\nCreating tasks that appear independent but secretly share state, require specific execution order, or have hidden dependencies on other concurrent work.\n\n**Anti-pattern: Over-Decomposition**  \nBreaking tasks so small that coordination overhead exceeds the benefits of parallelization, leading to more complexity than value.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#atomic-decomposition"
+    },
+    {
+      "id": "parallel-agents",
+      "name": "Parallel Agents",
+      "maturity": "Advanced",
+      "type": "Development",
+      "category": "development",
+      "shortDescription": "Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration",
+      "dependencies": [
+        {
+          "name": "Atomic Decomposition",
+          "id": "atomic-decomposition"
+        }
+      ],
+      "related": [
+        {
+          "name": "Atomic Decomposition",
+          "id": "atomic-decomposition"
+        },
+        {
+          "name": "Security Sandbox",
+          "id": "security-sandbox"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration.\n\n\n**Agent Coordination Lifecycle**\n\n```mermaid\nsequenceDiagram\n    participant M as Manager\n    participant A1 as Auth Agent\n    participant A2 as API Agent  \n    participant A3 as Test Agent\n    participant SM as Shared Memory\n    participant CS as Conflict Scanner\n    \n    M->>A1: Start (OAuth2 Task)\n    M->>A2: Start (REST API Task)\n    M->>A3: Start (Test Suite Task)\n    \n    par Parallel Development\n        A1->>A1: Implement OAuth2 Flow\n        A1->>SM: Record Learning\n    and\n        A2->>A2: Implement REST Endpoints\n        A2->>SM: Record API Patterns\n    and\n        A3->>A3: Generate Integration Tests\n        A3->>SM: Record Test Patterns\n    end\n    \n    SM->>CS: Trigger Conflict Analysis\n    CS->>M: Report Conflicts/All Clear\n    M->>M: Merge Components & Cleanup\n```\n\n**Core Implementation Approaches**\n\n```yaml\n# Container-based isolation\n# docker-compose.parallel-agents.yml\nservices:\n  agent-auth:\n    image: ai-dev-environment:latest\n    volumes:\n      - ./feature-auth:/workspace:rw\n      - shared-memory:/shared:ro\n    environment:\n      - AGENT_ID=auth-feature\n      - TASK_ID=implement-oauth2\n    networks:\n      - agent-network\n\n  agent-api:\n    image: ai-dev-environment:latest\n    volumes:\n      - ./feature-api:/workspace:rw\n      - shared-memory:/shared:ro\n    environment:\n      - AGENT_ID=api-feature\n      - TASK_ID=implement-rest-endpoints\n\nvolumes:\n  shared-memory:\n    driver: local\nnetworks:\n  agent-network:\n    driver: bridge\n    internal: true\n```\n\n**Git Worktree Parallelization**\n\n```bash\n# Create isolated branches for parallel work\ngit worktree add -b agent/auth ../agent-auth\ngit worktree add -b agent/api ../agent-api\ngit worktree add -b agent/tests ../agent-tests\n\n# Launch agents in parallel\nparallel --jobs 3 << EOF\ncd ../agent-auth && ai-agent implement-oauth2\ncd ../agent-api && ai-agent implement-rest-endpoints\ncd ../agent-tests && ai-agent generate-integration-tests\nEOF\n\n# Automated conflict detection and merge\nfor branch in $(git branch -r | grep 'agent/'); do\n  git checkout -b temp-merge main\n  if git merge --no-commit --no-ff $branch; then\n    echo \"✓ No conflicts in $branch\"\n    git merge --abort\n  else\n    echo \"⚠ Conflicts detected - using AI resolution\"\n    ai-agent resolve-conflicts --branch $branch\n  fi\n  git checkout main && git branch -D temp-merge\ndone\n\n# Cleanup\ngit worktree remove ../agent-auth\ngit worktree remove ../agent-api\ngit worktree remove ../agent-tests\n```\n\n**Shared Memory & Coordination**\n\n```python\nimport fcntl\n\n# Agent coordination with shared knowledge\nclass AgentMemory:\n    def record_learning(self, agent_id, key, value):\n        \"\"\"Thread-safe learning capture with file locking\"\"\"\n        with fcntl.flock(self.lock_file, fcntl.LOCK_EX):\n            self.memory[agent_id][key] = value\n        \n    def get_shared_knowledge(self):\n        \"\"\"Consolidated knowledge from all agents\"\"\"\n        return self.consolidated_memory\n\n# Task definition\ntasks = {\n    \"auth-service\": {\n        \"agent_count\": 1,\n        \"isolation\": \"container\", \n        \"dependencies\": [],\n        \"instructions\": \"Implement OAuth2 with JWT tokens\"\n    },\n    \"api-endpoints\": {\n        \"agent_count\": 2,\n        \"isolation\": \"worktree\",\n        \"dependencies\": [\"auth-service\"],\n        \"instructions\": \"REST endpoints: user mgmt + CRUD\"\n    }\n}\n```\n\n**Complete Implementation**: See [examples/parallel-agents/](examples/parallel-agents/) for:\n- Full Docker isolation and coordination setup\n- Git worktree management and conflict resolution\n- Shared memory system with file locking\n- Emergency shutdown and safety monitoring\n- Task distribution and dependency management\n\n**When to Use [Parallel Agents](#parallel-agents)**\n- **Complex features** requiring multiple specialized implementations\n- **Time-critical projects** where speed trumps coordination overhead\n- **Exploration phases** testing multiple approaches simultaneously\n- **Large teams** with strong DevOps and coordination processes\n\n**Source**: [AI Native Dev - How to Parallelize AI Coding Agents](https://ainativedev.io/news/how-to-parallelize-ai-coding-agents)\n\n**Anti-pattern: Uncoordinated Agents**\nRunning multiple agents without isolation, shared memory, or conflict resolution leads to race conditions, lost work, and system instability.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#parallel-agents"
+    },
+    {
+      "id": "context-persistence",
+      "name": "Context Persistence",
+      "maturity": "Intermediate",
+      "type": "Development",
+      "category": "development",
+      "shortDescription": "Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols",
+      "dependencies": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        }
+      ],
+      "related": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Progressive Disclosure",
+          "id": "progressive-disclosure"
+        },
+        {
+          "name": "Spec-Driven Development",
+          "id": "spec-driven-development"
+        },
+        {
+          "name": "Parallel Agents",
+          "id": "parallel-agents"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols for efficient multi-session development.\n\n\n**Core Principles**\n\nAI context is a finite resource with diminishing returns. Effective context engineering requires:\n- **Minimal High-Signal Tokens**: Find the smallest set of information that maximizes outcomes\n- **Just-in-Time Retrieval**: Load context dynamically rather than pre-loading everything\n- **[Progressive Disclosure](#progressive-disclosure)**: Explore and discover information as needed, not upfront\n\n**Structured Memory Schemas**\n\nPersist information outside the context window using standardized memory formats:\n\n```markdown\n# TODO.md - Task tracking across sessions\n- [ ] Implement JWT middleware (blocked: key rotation design)\n- [x] Add bcrypt password hashing (2024-01-15)\n- [ ] Rate limiting (next: research token bucket vs sliding window)\n\n# DECISIONS.log - Architectural decisions with timestamp\n2024-01-15 10:30: Use RS256 for JWT (not HS256)\nRationale: Asymmetric keys enable better key rotation\nAlternatives: HS256 (simpler but less flexible)\nImpact: auth-service, api-gateway\n\n# NOTES.md - Session continuity and discoveries\nSession 2024-01-15:\n  Context: Implementing authentication system\n  Discoveries: bcrypt has performance issues >100 req/s\n  Blockers: Need to decide on refresh token storage\n  Next: Benchmark argon2 as bcrypt alternative\n\n# scratchpad.md - Working memory (cleared after task)\nExploring JWT refresh token flow...\n- httpOnly cookies prevent XSS\n- Need CSRF protection for cookie-based auth\n```\n\n**Prompt Pattern Library**\n\nCapture successful prompts and failures with success rates for reuse:\n\n```bash\n# Initialize knowledge structure\n./knowledge-capture.sh --init\n\n# Capture successful pattern\n./knowledge-capture.sh --success \\\n  --domain \"auth\" \\\n  --pattern \"JWT Auth\" \\\n  --prompt \"JWT with RS256, 15min access, httpOnly cookie\" \\\n  --success-rate \"95%\"\n\n# Document failure to avoid repeating\n./knowledge-capture.sh --failure \\\n  --domain \"auth\" \\\n  --bad-prompt \"Make auth secure\" \\\n  --problem \"Too vague → AI over-engineers\" \\\n  --solution \"Specify exact JWT requirements\"\n```\n\n**Context Window Management**\n\n**Compaction Strategy** - When context approaches limits:\n1. Distill critical decisions to `DECISIONS.log`\n2. Summarize key discoveries in `NOTES.md`\n3. Update `TODO.md` with current state and blockers\n4. Create \"Previously on...\" recap for session continuity\n\n**Session Continuity Protocol** - Resume work across sessions:\n1. Read `NOTES.md` for previous session context\n2. Review `TODO.md` for current tasks and blockers\n3. Check `DECISIONS.log` for recent architectural choices\n4. Scan `scratchpad.md` for active explorations\n\n```bash\n# Compact context when nearing limits\n./context-compact.sh --summarize\n\n# Resume from previous session\n./session-resume.sh  # Displays TODO + recent decisions + notes recap\n```\n\n**Complete Implementation**: See [examples/context-persistence/](examples/context-persistence/) for:\n- Memory schema templates (TODO.md, DECISIONS.log, NOTES.md, scratchpad.md)\n- Context compaction and session resume automation scripts\n- Prompt pattern capture and maintenance tools\n- Working examples of memory schemas in use\n\n**Anti-pattern: Over-Documentation**\n\nCreating extensive knowledge bases that become maintenance burdens instead of accelerating development through selective, actionable knowledge capture.\n\n**Why it's problematic:**\n- Knowledge bases become outdated and misleading\n- Developers spend more time documenting than developing\n- Overly detailed entries are ignored in favor of quick experimentation\n- Knowledge becomes siloed and not easily discoverable\n\n**Instead, focus on:**\n- Capture only high-impact patterns (>80% success rate)\n- Document failures that wasted significant time (>30 minutes)\n- Keep entries concise and immediately actionable\n- Review and prune knowledge quarterly\n\n**Anti-pattern: Bloated Context**\n\nLoading entire codebases, documentation, or conversation history into context rather than using structured memory and just-in-time retrieval.\n\n**Why it's problematic:**\n- Wastes tokens on low-signal information\n- Degrades AI performance due to information overload\n- Slows interaction latency and increases costs\n- Misses the forest for the trees\n\n**Instead:**\n- Use lightweight identifiers (file paths, links) rather than full content\n- Load context progressively as needed\n- Externalize detailed information to memory schemas\n- Prefer 3-5 high-quality examples over exhaustive documentation",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#context-persistence"
+    },
+    {
+      "id": "event-automation",
+      "name": "Event Automation",
+      "maturity": "Intermediate",
+      "type": "Development",
+      "category": "development",
+      "shortDescription": "Execute custom commands automatically at assistant lifecycle events to enforce policies and automate workflows",
+      "dependencies": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Security Sandbox",
+          "id": "security-sandbox"
+        }
+      ],
+      "related": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Security Sandbox",
+          "id": "security-sandbox"
+        },
+        {
+          "name": "Custom Commands",
+          "id": "custom-commands"
+        },
+        {
+          "name": "Autonomous Remediation",
+          "id": "autonomous-remediation"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Execute custom commands automatically at assistant lifecycle events (pre/post tool use, session start, prompt submission) for workflow automation, validation, and policy enforcement.\n\n\n**Core Concept**\n\nAttach shell commands to AI assistant lifecycle events. Commands receive context via environment variables (file paths, tool names, user prompts) and return exit codes to allow/block/warn.\n\n**Event Flow Example**\n\n```mermaid\nsequenceDiagram\n    participant Dev as Developer\n    participant AI as AI Assistant\n    participant Pre as PreToolUse Hook\n    participant Post as PostToolUse Hook\n\n    Dev->>AI: Edit .env file\n    AI->>Pre: Run security-hook.sh\n    Pre->>Pre: Check if file is sensitive\n    Pre-->>AI: Exit 2 (BLOCK)\n    AI->>Dev: ❌ Blocked: Cannot edit sensitive file\n\n    Dev->>AI: Edit src/api.js\n    AI->>Pre: Run security-hook.sh\n    Pre->>Pre: Check if file is sensitive\n    Pre-->>AI: Exit 0 (Allow)\n    AI->>AI: Execute file edit\n    AI->>Post: Run security-hook.sh\n    Post->>Post: Scan for secrets with gitleaks\n    alt Secret Found\n        Post-->>AI: Exit 1 (Warning)\n        AI->>Dev: ⚠️ Secret detected! Review before committing\n    else No Secret\n        Post-->>AI: Exit 0 (Success)\n        AI->>Dev: ✅ Edit complete\n    end\n```\n\n**Simple Security Example**\n\nPrevent editing sensitive files and scan for secrets:\n\n```bash\n#!/bin/bash\n# security-hook.sh\n\nFILE=\"$TOOL_INPUT_FILE_PATH\"\n\n# Block .env and credentials files\nif echo \"$FILE\" | grep -E \"(\\\\.env|secrets\\\\.json|credentials)\" > /dev/null; then\n  echo \"❌ Blocked: Cannot edit sensitive file\"\n  exit 2\nfi\n\n# Scan for hardcoded secrets (requires gitleaks)\nif command -v gitleaks > /dev/null; then\n  if gitleaks detect --no-git --source=\"$FILE\" 2>&1 | grep -q \"leaks found\"; then\n    echo \"⚠️ Secret detected! Review before committing.\"\n    exit 1\n  fi\nfi\n\nexit 0\n```\n\n**Configuration Example (Claude Code)**\n\n```json\n{\n  \"hooks\": {\n    \"PreToolUse\": [{\n      \"matcher\": \"Edit\",\n      \"hooks\": [{\"type\": \"command\", \"command\": \"./security-hook.sh\"}]\n    }],\n    \"PostToolUse\": [{\n      \"matcher\": \"Edit\",\n      \"hooks\": [{\"type\": \"command\", \"command\": \"./security-hook.sh\"}]\n    }]\n  }\n}\n```\n\n**Common Use Cases**\n- Auto-format code after edits (`prettier`, `black`, `gofmt`)\n- Block sensitive file modifications\n- Log AI interactions for compliance\n- Run linters before commits\n\n**Security Warning**\n\nEvent commands run with full system access. Always review scripts before enabling. Test in isolated environments first.\n\n**Complete Implementation**\n\nSee [examples/event-automation/](examples/event-automation/) for a working implementation with security scanning and hooks.\n\n**Anti-pattern: Unchecked Events**\n\nRunning automation from untrusted sources without review exposes your system to malicious code execution and credential theft. Always audit event scripts before installation.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#event-automation"
+    },
+    {
+      "id": "custom-commands",
+      "name": "Custom Commands",
+      "maturity": "Intermediate",
+      "type": "Development",
+      "category": "development",
+      "shortDescription": "Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and sophisticated workflows",
+      "dependencies": [
+        {
+          "name": "Event Automation",
+          "id": "event-automation"
+        },
+        {
+          "name": "Spec-Driven Development",
+          "id": "spec-driven-development"
+        },
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        }
+      ],
+      "related": [
+        {
+          "name": "Event Automation",
+          "id": "event-automation"
+        },
+        {
+          "name": "Spec-Driven Development",
+          "id": "spec-driven-development"
+        },
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Progressive Disclosure",
+          "id": "progressive-disclosure"
+        },
+        {
+          "name": "Harness Engineering Lens",
+          "id": "harness-engineering-lens"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and sophisticated workflows.\n\n\n**Core Concept**\n\nAI coding tools provide built-in commands for common operations and support custom commands (markdown files with AI instructions) for project-specific workflows. Commands are manual/on-demand (invoked like `/refactor`), while events fire automatically (see [Event Automation](#event-automation)).\n\n**Command Discovery**\n\nDiscover built-in commands first:\n\n```bash\n# Claude Code\n/help /model /clear /review\n\n# Cursor IDE\nCmd+K /edit /chat\n\n# Gemini CLI\n/stats /memory /tools /clear\n```\n\n| Use Built-in Commands | Create [Custom Commands](#custom-commands) |\n|-----------------------|------------------------|\n| Generic operations (clear, help, model) | Domain expertise (refactoring, security analysis) |\n| Tool features (review, edit) | Project workflows (deploy, implement-spec) |\n| Universal commands | Team standards and conventions |\n\n**Example: Refactoring Assistant**\n\nEncode Martin Fowler's refactoring catalog for systematic code improvement:\n\n```markdown\n---\ndescription: Interactive refactoring assistant based on Martin Fowler's refactoring catalog\nargument-hint: Optional flags (--smell, --duplicates, --suggest)\n---\n\n# Refactoring Assistant\n\nYou are helping a developer improve code maintainability by identifying code smells and recommending specific refactoring techniques from Martin Fowler's catalog.\n\n# Usage\n/refactor              # Full analysis\n/refactor --smell      # Code smells only\n\n# Implementation\n\n### 1. Code Smell Detection\n- Long methods (>20 lines), duplicate code, complex conditionals\n- For each: location (file:line), severity, specific refactoring, effort estimate\n\n### 2. Bloater Detection\n- Excessive parameters (>4), data clumps, primitive obsession\n\n### 3. Refactoring Strategy\n1. Name the code smell\n2. Recommend technique from Fowler's catalog\n3. Show before/after example\n4. Estimate maintainability improvement\n\nGenerate step-by-step refactoring plan prioritized by impact.\n```\n\n**More Examples**\n\nAdditional command examples with detailed implementations:\n\n- **[Implement-Spec](examples/custom-commands/implement-spec-example.md)** - Spec-driven implementation with TDD and traceability\n- **[Security Review](examples/custom-commands/security-review-example.md)** - Multi-layer security analysis (secrets, vulnerabilities, config)\n- **[Safe-Refactor](examples/custom-commands/safe-refactor-example.md)** - Safe refactoring with automated testing and rollback\n- **[Test Runner](examples/custom-commands/test-example.md)** - Smart test selection with coverage and health monitoring\n\n**Tool Support**\n\n```bash\n# Claude Code: .claude/commands/*.md\nmkdir -p .claude/commands\ncp examples/custom-commands/commands/*.md .claude/commands/\n\n# Cursor IDE: .cursorrules\ncat examples/custom-commands/commands/refactor.md >> .cursorrules\n\n# Generic: .ai/commands/ (tool-agnostic)\nmkdir -p .ai/commands\ncp examples/custom-commands/commands/*.md .ai/commands/\n```\n\n**Complete Implementation**\n\nSee [examples/custom-commands/](examples/custom-commands/) for ready-to-use commands, configuration files, and setup guide.\n\n**Anti-pattern: Redundant Commands**\n\nCreating `/clear` when the tool already provides it. Always discover built-in commands first.\n\n**Anti-pattern: Shallow Commands**\n\n```markdown\n# Bad: Just wraps shell command\nRun: npm run deploy:staging\n\n# Good: Encodes expertise\n1. Verify staging environment health\n2. Check for active incidents\n3. Review recent commits for risk\n4. Run deployment with rollback plan\n```\n\n**Anti-pattern: Hardcoded Context**\n\n```markdown\n# Bad: Hardcoded values\nDeploy to prod-db-instance-1.us-east-1.rds.amazonaws.com\n\n# Good: Parameterized\nDeploy to database: $1 (default: $STAGING_DB)\n```",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#custom-commands"
+    },
+    {
+      "id": "progressive-disclosure",
+      "name": "Progressive Disclosure",
+      "maturity": "Intermediate",
+      "type": "Development",
+      "category": "development",
+      "shortDescription": "Load AI assistant rules incrementally based on task context to prevent instruction saturation and context bloat",
+      "dependencies": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Context Persistence",
+          "id": "context-persistence"
+        }
+      ],
+      "related": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Context Persistence",
+          "id": "context-persistence"
+        },
+        {
+          "name": "Custom Commands",
+          "id": "custom-commands"
+        },
+        {
+          "name": "Event Automation",
+          "id": "event-automation"
+        },
+        {
+          "name": "Centralized Rules",
+          "id": "centralized-rules"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Load AI assistant rules incrementally based on task context rather than bundling all instructions upfront, preventing context bloat and improving instruction-following consistency.\n\n\n**Core Problem**\n\nAI coding assistants already consume part of their context window with built-in system instructions. When a project loads a single, monolithic rules file (hundreds of lines) for every task, instruction-following accuracy drops and irrelevant guidance crowds out what the model needs right now.\n\n**Implementation Strategy: Three-Tier Rule Architecture**\n\nKeep a small universal rules file, and load specialized rules only when the task touches the relevant area:\n\n```\n.ai/\n├── CLAUDE.md                    # Universal rules only (<60 lines)\n├── rules/                       # Specialized rules loaded on-demand\n│   ├── security/                # secrets, auth, dependencies\n│   ├── development/             # api-design, database, testing\n│   ├── operations/              # deployment, monitoring, cicd\n│   └── architecture/            # patterns, performance\n└── prompts/                     # Reusable task templates\n```\n\n**Main Rules File = Router**\n\nThe main file should explicitly tell the assistant what to load based on context:\n\n```markdown\n# AI Development Rules\n\n# Universal Principles (Always Apply)\n- Follow existing patterns in the codebase\n- Never commit secrets or credentials\n- Run tests after code changes\n\n# Progressive Disclosure (Context Loading)\n- **Security work** (auth/, .env, credentials): Read `.ai/rules/security/`\n- **API development** (api/, routes/): Read `.ai/rules/development/api-design.md`\n- **Database changes** (migrations/, models/): Read `.ai/rules/development/database.md`\n- **Testing** (tests/, specs/): Read `.ai/rules/development/testing.md`\n- **CI/CD** (.github/workflows/): Read `.ai/rules/operations/cicd.md`\n```\n\n**Automatic Loading with Hooks**\n\nCombine with [Event Automation](#event-automation) to auto-load the right rules before tool use:\n\n```bash\n#!/bin/bash\n# .ai/hooks/auto-load-context.sh\n\nFILE_PATH=\"$TOOL_INPUT_FILE_PATH\"\nLOADED_RULES=\"\"\n\nif echo \"$FILE_PATH\" | grep -Eq \"(\\\\.env|credentials|secrets|auth/)\"; then\n  LOADED_RULES=\"$LOADED_RULES .ai/rules/security/\"\nfi\n\nif echo \"$FILE_PATH\" | grep -Eq \"(api/|routes/|controllers/)\"; then\n  LOADED_RULES=\"$LOADED_RULES .ai/rules/development/api-design.md\"\nfi\n\nif echo \"$FILE_PATH\" | grep -Eq \"(tests?/|spec/|\\\\.test\\\\.|\\\\.spec\\\\.)\"; then\n  LOADED_RULES=\"$LOADED_RULES .ai/rules/development/testing.md\"\nfi\n\nif [ -n \"$LOADED_RULES\" ]; then\n  echo \"AI: Before proceeding, read these files: $LOADED_RULES\"\nfi\n```\n\n**Complete Implementation**\n\nSee [examples/progressive-disclosure/](examples/progressive-disclosure/) for templates and a ready-to-adapt rules router + directory layout.\n\n**Anti-pattern: Bloated Configuration**\n\nLoading a single, massive rules file for every task wastes context and reduces instruction-following accuracy—especially for small edits that need only a handful of universal rules.\n\n**Anti-pattern: Missing Guidance**\n\nCreating specialized rule files but never documenting when/how to load them forces humans to remember the routing and prevents consistent, automated context loading.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#progressive-disclosure"
+    },
+    {
+      "id": "observable-development",
+      "name": "Observable Development",
+      "maturity": "Intermediate",
+      "type": "Development",
+      "category": "development",
+      "shortDescription": "Logging and tracing as a bidirectional control: feeds forward to steer the agent, feeds back as a sensor it reads to self-correct",
+      "dependencies": [
+        {
+          "name": "Developer Lifecycle",
+          "id": "developer-lifecycle"
+        }
+      ],
+      "related": [
+        {
+          "name": "Developer Lifecycle",
+          "id": "developer-lifecycle"
+        },
+        {
+          "name": "Tool Integration",
+          "id": "tool-integration"
+        },
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Autonomous Remediation",
+          "id": "autonomous-remediation"
+        },
+        {
+          "name": "Spec-Driven Development",
+          "id": "spec-driven-development"
+        },
+        {
+          "name": "Harness Engineering Lens",
+          "id": "harness-engineering-lens"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Design systems with logging and tracing that make behavior visible to AI as a bidirectional control — observability feeds forward as a standard that steers the agent while it writes code, and feeds back as a sensor the agent reads (and grades) to self-correct.\n\n\n**Observability as feedforward (a guide that steers)**\n\nCodify logging and tracing conventions as a [Codified Rule](#codified-rules) so the agent emits AI-legible, structured context *as it writes code* — before any failure occurs.\n\n```python\n# AI-friendly structured logging (the standard the agent writes against)\ndef log_operation(operation, **context):\n    logging.info(json.dumps({\n        \"timestamp\": datetime.now(timezone.utc).isoformat(),\n        \"operation\": operation,\n        \"correlation_id\": current_correlation_id(),\n        \"context\": context\n    }))\n\n# Observable business logic with comprehensive context\ndef process_order(order):\n    log_operation(\"order_start\", order_id=order.id, total=order.total)\n    try:\n        validate_order(order)\n        log_operation(\"validation_success\")\n        result = charge_payment(order)\n        log_operation(\"payment_success\", transaction_id=result.id)\n        return result\n    except PaymentError as e:\n        log_operation(\"payment_error\", error=str(e), code=e.code)\n        raise\n```\n\n**Observability as feedback (a sensor the agent reads back)**\n\nLogs and traces are not write-only. They are a feedback signal the agent consumes to diagnose issues — and, critically, a signal the agent should **grade and improve**. After the agent resolves a failure, have it reflect on whether the logs it had were sufficient, then feed that judgment back into the logging standard:\n\n```bash\nai \"You just diagnosed this failure. Rate the logs you actually had to work with.\nWhat context was missing that would have made the root cause obvious in one pass?\nEmit the structured-logging changes that close that gap, and propose the update\nto .ai/rules/observability.md so the next operation is logged the same way.\"\n```\n\nThis turns a feedback signal into a feedforward improvement — the harness gets better each time it is used, rather than the agent repeating the same blind spots. The human's job is to **steer by iterating on the standard**, not to hand-write every log line.\n\n**Enforce observability as a fitness function (computational sensor)**\n\nA standard that lives only in a doc is aspirational. Make it an enforced gate that runs on every change, alongside the agent, so black-box code fails fast ([Keep Quality Left](#guided-refactoring)):\n\n```python\n# Fitness function: every public operation must emit structured context\ndef test_operations_are_observable():\n    for fn in public_operations(module):\n        assert emits_structured_log(fn), f\"{fn.__name__} is a black box\"\n        assert propagates_correlation_id(fn), f\"{fn.__name__} drops correlation_id\"\n```\n\nPair the deterministic check with a probabilistic one. The two answer different questions:\n\n| Check | Type | Cost / reliability | Answers |\n|-------|------|--------------------|---------|\n| Structured log present, correlation ID propagates | Computational | ms, reliable | *Is it logged?* |\n| Are these logs actually useful for diagnosis? | Inferential (LLM-as-judge) | slow, probabilistic | *Is it useful?* |\n\n**Runtime feedback beyond the change lifecycle**\n\nObservability as a sensor does not stop at debug time. Extend it into production so the agent acts on drift: AI judges continuously sampling response quality and flagging log anomalies, and degrading SLOs that prompt the agent to suggest remediations (see [Autonomous Remediation](#autonomous-remediation)).\n\n**Complete Implementation**: See [examples/observable-development/](examples/observable-development/) for:\n- Full structured logging framework with correlation IDs\n- Performance monitoring decorators and utilities  \n- AI-friendly debug tools and log analysis scripts\n- Integration examples for e-commerce and authentication systems\n\n**Source**: Birgitta Böckeler, \"[Harness Engineering](https://martinfowler.com/articles/harness-engineering.html)\", martinfowler.com — for the feedforward/feedback (guides vs. sensors) and computational/inferential control framing.\n\n**Anti-pattern: Blind Development**\n\nBuilding systems with minimal observability that provide insufficient context for AI to understand system behavior, diagnose issues, or suggest improvements.\n\n**Why it's problematic:** AI cannot debug systems with generic logs like \"Payment failed\" or \"Something went wrong\" - it needs specific context, timing, and error details.\n\n```python\n# Bad: Black box logging\ndef process_payment(amount):\n    try:\n        result = payment_service.charge(amount)\n        logger.info(\"Payment processed\")\n        return result\n    except Exception:\n        logger.error(\"Payment failed\")\n        raise\n\n# Good: Observable implementation  \ndef process_payment(amount):\n    log_operation(\"payment_start\", amount=amount)\n    try:\n        result = payment_service.charge(amount)\n        log_operation(\"payment_success\", transaction_id=result.id)\n        return result\n    except Exception as e:\n        log_operation(\"payment_error\", error=str(e), amount=amount)\n        raise\n```\n\n**Anti-pattern: Write-Only Observability**\n\nRich, structured logs exist, but nothing closes the loop. No agent reads them back to self-correct, no fitness function enforces the standard, and no runtime sensor watches them drift. Observability becomes a checkbox instead of a sensor — the logs feed forward but never feed back, so the harness never improves and the same blind spots recur.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#observable-development"
+    },
+    {
+      "id": "guided-refactoring",
+      "name": "Guided Refactoring",
+      "maturity": "Intermediate",
+      "type": "Development",
+      "category": "development",
+      "shortDescription": "Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics",
+      "dependencies": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        }
+      ],
+      "related": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Autonomous Remediation",
+          "id": "autonomous-remediation"
+        },
+        {
+          "name": "Harness Engineering Lens",
+          "id": "harness-engineering-lens"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics, following established refactoring rules and maintaining test coverage throughout the process.\n\n\n**Code Smell Detection Framework**\n\n```mermaid\ngraph TD\n    A[Code Analysis] --> B[Smell Detection]\n    B --> C[Refactoring Strategy]\n    C --> D[AI Implementation]\n    D --> E[Test Validation]\n    E --> F[Quality Metrics]\n    F --> G{Improvement?}\n    G -->|Yes| H[Commit Changes]\n    G -->|No| I[Revert & Retry]\n    H --> J[Update Knowledge Base]\n    I --> C\n```\n\n**Core Workflow**\n\n```bash\n# 1. Define refactoring rules\ncat > .ai/rules/refactoring.md << 'EOF'\n## Long Method Smell\n- Max lines: 20 (excluding docstrings)\n- Max cyclomatic complexity: 10\n- Detection: flake8 C901, pylint R0915\n\n## Large Class Smell  \n- Max class lines: 250, Max methods: 20\n- Detection: pylint R0902, R0904\nEOF\n\n# 2. Detect code smells with AI\nflake8 --select=C901 src/ > smells.txt\npylint src/ --disable=all --enable=R0915,R0902,R0904 >> smells.txt\n\nai \"Analyze smells.txt using .ai/rules/refactoring.md:\n1. Prioritize by impact and complexity\n2. Suggest specific refactoring strategy for each smell\n3. Generate implementation plan with risk assessment\"\n\n# 3. Apply refactoring with test preservation\npytest --cov=src tests/  # Baseline coverage\n\nai \"Refactor process_user_data() method (35 lines, exceeds threshold):\n- Apply Extract Method pattern for validation, database, notifications\n- Maintain test coverage >90% and API contract\n- Create atomic commits for each extracted method\"\n\n# 4. Validate and track improvements\npytest --cov=src tests/\nflake8 src/ && pylint src/\n\nai \"Generate refactoring impact report:\nBefore: complexity=12, length=35 lines, coverage=85%\nAfter: complexity=4+2+2, length=8+6+7 lines, coverage=92%\nDocument lessons learned in .ai/knowledge/refactoring.md\"\n```\n\n**Common Refactoring Patterns**\n\n- **Extract Method**: Break down long methods (>20 lines)\n- **Extract Class**: Split large classes (>250 lines, >20 methods)  \n- **Replace Primitive**: Convert strings/dicts to value objects\n- **Consolidate Duplicates**: Merge similar code patterns\n\n**Complete Implementation**: See [examples/guided-refactoring/](examples/guided-refactoring/) for:\n- Automated refactoring pipeline with CI integration\n- Quality metrics tracking and reporting\n- Risk assessment guidelines and rollback procedures\n- Knowledge base templates for refactoring outcomes\n\n**Anti-pattern: Scattered Refactoring**\nMaking widespread changes without systematic analysis leads to introduced bugs and degraded code quality.\n\n**Anti-pattern: Premature Refactoring**\nRefactoring code for hypothetical future requirements rather than addressing current code smells and quality issues.\n\n----",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#guided-refactoring"
+    },
+    {
+      "id": "error-resolution",
+      "name": "Error Resolution",
+      "maturity": "Intermediate",
+      "type": "Development",
+      "category": "development",
+      "shortDescription": "Automatically collect error context from logs, system state, and git history, then use AI to diagnose root causes and generate validated fixes",
+      "dependencies": [
+        {
+          "name": "Developer Lifecycle",
+          "id": "developer-lifecycle"
+        },
+        {
+          "name": "Observable Development",
+          "id": "observable-development"
+        },
+        {
+          "name": "Tool Integration",
+          "id": "tool-integration"
+        }
+      ],
+      "related": [
+        {
+          "name": "Developer Lifecycle",
+          "id": "developer-lifecycle"
+        },
+        {
+          "name": "Observable Development",
+          "id": "observable-development"
+        },
+        {
+          "name": "Tool Integration",
+          "id": "tool-integration"
+        },
+        {
+          "name": "Autonomous Remediation",
+          "id": "autonomous-remediation"
+        },
+        {
+          "name": "Harness Engineering Lens",
+          "id": "harness-engineering-lens"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Automatically collect comprehensive error context from logs, system state, and git history, then use AI to diagnose root causes and generate validated fixes.\n\n\n**[Error Resolution](#error-resolution) Workflow**\n\n```mermaid\ngraph TD\n    A[Error Occurs] --> B[Collect Error Context]\n    B --> C[Enrich with Git History]\n    C --> D[AI Diagnosis]\n    D --> E[Generate Fix Proposals]\n    E --> F{Human Review}\n    F -->|Approved| G[Apply Fix]\n    F -->|Rejected| H[Refine Context]\n    G --> I[Run Tests]\n    I --> J{Tests Pass?}\n    J -->|Yes| K[Commit Fix]\n    J -->|No| L[Rollback]\n    H --> D\n    L --> D\n\n    style B fill:#e1f5e1\n    style D fill:#ffe6e6\n    style G fill:#ffe6e6\n    style K fill:#e1f5e1\n```\n\n**Core Implementation**\n\n**Step 1: Collect Error Context**\n\n```bash\n# Create comprehensive error context file\ncat > .error-context.md << EOF\n# Error Analysis\n\n**Error Output:**\n[Complete error message, stack trace, and exit codes]\n\n**Recent Changes:**\n$(git log --oneline -5)\n\n**Affected Files:**\n$(git diff --name-only HEAD~1)\n\n**File Contents:**\n$(cat path/to/affected/file.ext)\n\n**Environment:**\n- OS: $(uname -s)\n- Shell: $SHELL\n- Working Directory: $(pwd)\nEOF\n```\n\n**Step 2: AI-Powered Diagnosis**\n\n```bash\n# Send structured context to AI for analysis\nai \"Analyze this error and provide actionable fixes:\n\nCONTEXT:\n$(cat .error-context.md)\n\nREQUIRED OUTPUT:\n1. Root cause analysis\n2. Specific fix commands (copy-pasteable)\n3. Prevention strategy (pre-commit hooks, tests, etc.)\n\nFormat fixes as executable bash commands.\"\n```\n\n**Step 3: Validate and Apply Fixes**\n\n```bash\n# Create checkpoint before applying fixes\ngit stash push -m \"Pre-fix checkpoint\"\n\n# Review AI suggestions\ncat ai-suggestions.md\n\n# Apply fixes with validation\nbash fix-commands.sh\n\n# Verify with tests\n./run-tests.sh\n\n# Commit if successful, rollback if not\nif [ $? -eq 0 ]; then\n    git add .\n    git commit -m \"fix: [description based on AI analysis]\"\n    git stash drop\nelse\n    git stash pop\n    echo \"Fix failed validation, rolled back\"\nfi\n```\n\n**Practical Workflow Example**\n\n```bash\n# 1. Capture error from any source (CI, terminal, logs)\nERROR_LOG=\"path/to/error.log\"\n\n# 2. Enrich with context\ncat > error-analysis.md << EOF\n**Error:**\n$(cat $ERROR_LOG)\n\n**Recent Commits:**\n$(git log --oneline -3)\n\n**Changed Files:**\n$(git diff --name-only HEAD~1)\n\n**File Contents:**\n$(for file in $(git diff --name-only HEAD~1); do\n    echo \"**$file:**\"\n    cat $file\ndone)\nEOF\n\n# 3. AI diagnosis\nai \"Diagnose and fix:\n$(cat error-analysis.md)\n\nProvide:\n1. Root cause\n2. Exact fix commands\n3. How to prevent recurrence\"\n\n# 4. Apply and validate\n# [Review AI output]\n# [Execute suggested fixes]\n# [Run tests]\n# [Commit]\n```\n\n**When to Use [Error Resolution](#error-resolution)**\n\n- **CI/CD Failures**: Diagnose build, test, or deployment failures\n- **Local Development Errors**: Debug unexpected errors during development\n- **Configuration Issues**: Resolve environment or configuration problems\n- **Dependency Conflicts**: Analyze and resolve version conflicts\n- **Integration Failures**: Debug issues with external services or APIs\n\n**Complete Implementation**: See [examples/error-resolution/](examples/error-resolution/) for:\n- Reusable templates for error context collection and AI prompts\n- Common error scenarios (test failures, dependency conflicts, configuration errors)\n- GitHub Actions integration for CI/CD error diagnosis\n- Automated context extraction and diagnosis workflows\n\n**Anti-pattern: Blind Diagnosis**\n\nSending only the error message to AI without surrounding context.\n\n```bash\n# ❌ Bad: No context\nai \"Fix error: Process completed with exit code 1\"\n```\n\n**Why it's problematic**: AI cannot diagnose the issue without seeing:\n- What command failed\n- Recent changes that might have caused it\n- File contents or configuration\n- System environment\n\n**Instead, provide full context:**\n\n```bash\n# ✅ Good: Comprehensive context\nai \"Fix this error:\n\nError: Process completed with exit code 1\n\nCommand that failed: terraform fmt -check -recursive\nFiles affected: main.tf, outputs.tf\n\nRecent change:\n$(git log -1 --oneline)\n\nFile content:\n$(cat terraform/main.tf)\n\nEnvironment: Terraform v1.6.0\"\n```\n\n**Anti-pattern: Brittle Fixes**\n\nApplying AI-suggested fixes without validation or rollback strategy.\n\n```bash\n# ❌ Bad: Apply without review or rollback\nai \"Fix this error\" | bash\n```\n\n**Why it's problematic**:\n- AI suggestions may introduce new bugs\n- May break existing functionality\n- Could make security or data loss mistakes\n- No rollback strategy if fix fails\n\n**Instead, validate fixes before applying:**\n\n```bash\n# ✅ Good: Validate before applying with rollback\ngit stash push -m \"Pre-fix checkpoint\"\n\n# Generate fix\nai \"Fix this error\" > proposed-fix.sh\n\n# Review the proposed changes\ncat proposed-fix.sh\n\n# Apply fix\nbash proposed-fix.sh\n\n# Verify changes\ngit diff\n\n# Run tests to validate\n./run-tests.sh\n\n# Commit or rollback\nif [ $? -eq 0 ]; then\n    git add .\n    git commit -m \"fix: [description]\"\n    git stash drop\nelse\n    git stash pop\n    echo \"Fix failed validation, rolled back\"\nfi\n```",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#error-resolution"
+    },
+    {
+      "id": "autonomous-remediation",
+      "name": "Autonomous Remediation",
+      "maturity": "Intermediate",
+      "type": "Development",
+      "category": "development",
+      "shortDescription": "Pair deterministic rule-based detectors with LLM remediators inside an event-driven loop so codified rule violations are caught and fixed automatically before the AI session continues",
+      "dependencies": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Event Automation",
+          "id": "event-automation"
+        }
+      ],
+      "related": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Event Automation",
+          "id": "event-automation"
+        },
+        {
+          "name": "Guided Refactoring",
+          "id": "guided-refactoring"
+        },
+        {
+          "name": "Error Resolution",
+          "id": "error-resolution"
+        },
+        {
+          "name": "Harness Engineering Lens",
+          "id": "harness-engineering-lens"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Pair deterministic rule-based detectors with LLM remediators inside an event-driven loop so codified rule violations are caught and fixed automatically before the AI session continues.\n\n\n**Source**: Paul Duvall, \"[Code Quality Gates: Using Claude Code Hooks to Block Code Smells on Every Write](https://www.paulmduvall.com/claude-code-hooks-code-quality-guardrails/)\", February 24, 2026\n\n**Core Loop**\n\n```mermaid\ngraph TD\n    A[AI Writes or Edits File] --> B[PostToolUse Hook Fires]\n    B --> C[Deterministic Detector<br/>AST, Linter, Scanner, Policy Engine]\n    C --> D{Violations?}\n    D -->|No| E[AI Continues]\n    D -->|Yes| F[Structured Violation Report<br/>+ Prescribed Fix Hint]\n    F --> G[LLM Remediator<br/>Same Session Context]\n    G --> A\n    D -->|Retry Budget Exhausted| H[Escape Hatch<br/>Raise Threshold, Skip, or Suppress]\n\n    style C fill:#a8d5ba,stroke:#2d5a3f,color:#1a3a25\n    style G fill:#f9e79f,stroke:#b7950b,color:#7d6608\n    style H fill:#f5b7b1,stroke:#c0392b,color:#78281f\n```\n\n**Pattern Anatomy**\n\nFour components must be present for the loop to close:\n\n1. **Deterministic detector**. Codified rules executed by non-LLM logic (AST walker, linter, scanner, type checker, policy engine). Output is reproducible across runs.\n2. **Structured violation report**. Machine-parseable list of findings with file path, line number, rule ID, severity, and a prescribed fix hint.\n3. **LLM remediator**. The same model that produced the violation, fed the report as feedback. Runs in the same session so prior context carries forward.\n4. **Retry budget and escape hatch**. Bounded loop count, per-rule threshold override, or per-file suppression marker. Without this, the loop can run indefinitely on legitimate edge cases.\n\n**Core Implementation**\n\nPostToolUse hook (the mechanism comes from [Event Automation](#event-automation)):\n\n```python\n#!/usr/bin/env python3\n# ~/.claude/hooks/auto-remediate.py\nimport json, os, sys\nsys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))\nfrom detectors import run_all_detectors\nfrom fixes import FIX_HINTS, format_report\n\nevent = json.load(sys.stdin)\nfile_path = event.get(\"tool_input\", {}).get(\"file_path\", \"\")\nif not file_path or not os.path.isfile(file_path):\n    sys.exit(0)\n\nviolations = run_all_detectors(file_path)\nif not violations:\n    sys.exit(0)\n\nreport = format_report(file_path, violations, FIX_HINTS)\nprint(json.dumps({\"decision\": \"block\", \"reason\": report}))\nsys.exit(0)\n```\n\nEach detector emits both the finding AND the prescribed fix, so the LLM remediator gets a concrete starting point instead of guessing which technique to apply:\n\n```python\n# detectors/fixes.py\nFIX_HINTS = {\n    \"complexity\":      \"Use extract-method, early returns, guard clauses, or lookup tables.\",\n    \"long_function\":   \"Extract helper functions for distinct logical steps.\",\n    \"deep_nesting\":    \"Use guard clauses and early returns to flatten control flow.\",\n    \"duplicate_block\": \"Extract repeated code into a shared helper function.\",\n    \"vuln_dependency\": \"Upgrade to the patched version listed in the advisory.\",\n    \"secret_leak\":     \"Move the value to a secret manager and reference via env var.\",\n}\n```\n\nLoop semantics:\n\n| Condition | Behavior |\n|---|---|\n| Clean detector run | Exit 0, AI continues |\n| Violations found | Exit with `block` decision and structured report; LLM re-attempts |\n| Same file blocked more than 3 consecutive times | Surface to developer; suggest threshold raise or skip-list entry |\n| Hook itself crashes | Fail open (exit 0); never silently disable a rule without telling the developer |\n\n**When to Use**\n\n| Use Autonomous Remediation when... | Use plain [Event Automation](#event-automation) when... |\n|---|---|\n| Violation has a deterministic fix the LLM can apply | Violation is a hard policy (\"never edit .env\") with no fix path |\n| Rule is mechanical (complexity, nesting, dep version, secret pattern) | Rule requires human judgment (architecture, business logic, security tradeoff) |\n| Fix can be verified by re-running the same detector | Fix needs out-of-band verification (manual review, production test) |\n\n**Domain Instances**\n\nThis pattern recurs across the catalog under domain-specific names. Each is a concrete instantiation of the same detect-fix-verify loop:\n\n| Domain | Detector | LLM Remediator Output | Existing Pattern |\n|---|---|---|---|\n| Code smells | AST or Lizard complexity rules | Refactored function | [Guided Refactoring](#guided-refactoring) |\n| Runtime errors | Stack trace + log scanner | Validated bug fix | [Error Resolution](#error-resolution) |\n| Infrastructure drift | Terraform plan diff | Corrective patch | [Drift Remediation](experiments/README.md#drift-remediation) |\n| Flaky tests | Build history analyzer | Stabilization patch | [Suite Health](experiments/README.md#suite-health) |\n| Stale or vulnerable deps | npm audit, pip-audit, dependabot | Staged upgrade PR | [Upgrade Advisor](experiments/README.md#upgrade-advisor) |\n| Security findings | Bandit, Semgrep, gitleaks | Patched code | New instance |\n\n**Complete Example**: See [examples/autonomous-remediation/](examples/autonomous-remediation/) for a working PostToolUse hook with code-smell detectors, fix-hint dictionary, retry budget, multi-language support via Lizard, and skip-list configuration.\n\n**Anti-pattern: Manual Remediation**\n\nDetecting violations with codified rules but leaving the fix to a human reviewer or a separate CI cycle. AI sessions write dozens of files between commits. Violations compound faster than humans can triage them. By the time a reviewer flags one issue, three more have been built on top of it. This converts AI write velocity from an asset into a liability.\n\n```bash\n# Bad: detect at commit time, human fixes later\ngit commit  # pre-commit linter fails, dev manually fixes 12 files\n\n# Good: detect at write time, LLM fixes immediately\n# PostToolUse hook blocks, LLM remediates, next file starts clean\n```\n\n**Anti-pattern: Unbounded Loop**\n\nConfiguring the loop without a retry budget or escape hatch. When the LLM and detector legitimately disagree (a 12-state machine that genuinely needs cyclomatic complexity 14, a wrapper function with 6 parameters mapping to an external API), they ping-pong indefinitely. Each retry costs roughly one model turn of tokens and wall-clock time.\n\n```yaml\n# Bad: no exit condition\nretry_budget: unlimited\nsuppression: none\n\n# Good: bounded with explicit escape paths\nretry_budget: 3\non_exhaustion: surface_to_developer\nsuppression:\n  directory_skip_list: [tests/, generated/, vendored/]\n  threshold_override: .ai/thresholds.yml  # per-file or per-rule\n  inline_marker: \"# rule: ignore\"          # per-call-site\n```",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#autonomous-remediation"
+    },
+    {
+      "id": "policy-generation",
+      "name": "Policy Generation",
+      "maturity": "Advanced",
+      "type": "Operations",
+      "category": "operations",
+      "shortDescription": "Transform compliance requirements into executable Cedar/OPA policy files with AI assistance",
+      "dependencies": [
+        {
+          "name": "Security Sandbox",
+          "id": "security-sandbox"
+        }
+      ],
+      "related": [
+        {
+          "name": "Security Sandbox",
+          "id": "security-sandbox"
+        },
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Centralized Rules",
+          "id": "centralized-rules"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Transform compliance requirements into executable policy files with AI assistance, ensuring regulatory requirements become testable code.\n\n\n```bash\n# Transform compliance requirements into executable policies\nai \"Convert compliance requirements into Cedar policy code:\nSOC 2: Data at rest must be AES-256 encrypted\" > encryption.cedar\n\n# Validate generated Cedar policies\ncedar validate --schema schema.cedarschema encryption.cedar\n```\n\n**Complete Implementation**: See [examples/policy-generation/](examples/policy-generation/) for:\n- Complete policy generation pipeline with AI assistance\n- Cedar/OPA policy templates and compliance mapping\n- Policy testing and validation frameworks\n- CI/CD integration examples\n\n**Anti-pattern: Untested Policies**\nHand-coding policies from written requirements introduces inconsistencies and interpretation errors.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#policy-generation"
+    },
+    {
+      "id": "security-orchestration",
+      "name": "Security Orchestration",
+      "maturity": "Intermediate",
+      "type": "Workflow",
+      "category": "operations",
+      "shortDescription": "Aggregate multiple security tools and use AI to summarize findings for actionable insights",
+      "dependencies": [
+        {
+          "name": "Security Sandbox",
+          "id": "security-sandbox"
+        }
+      ],
+      "related": [
+        {
+          "name": "Policy Generation",
+          "id": "policy-generation"
+        },
+        {
+          "name": "Centralized Rules",
+          "id": "centralized-rules"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Aggregate multiple security tools and use AI to summarize findings for actionable insights, reducing alert fatigue while maintaining security rigor.\n\n\n```bash\n# Orchestrate multiple security tools\nsnyk test --json > snyk.json\nbandit -r src -f json > bandit.json\ntrivy fs --format json . > trivy.json\n\n# AI-powered summarization for actionable insights\nai \"Summarize security findings; focus on CRITICAL issues\" > pr-comment.txt\ngh pr comment --body-file pr-comment.txt\n```\n\n**Complete Implementation**: See [examples/security-orchestration/](examples/security-orchestration/) for:\n- Complete security scanning pipeline with tool orchestration\n- AI-powered report summarization and prioritization\n- CI/CD integration and automated PR commenting\n- Custom security tool configurations and reporting\n\n**Anti-pattern: Over-Alerting**\nPosting every low-severity finding buries real issues and frustrates developers.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#security-orchestration"
+    },
+    {
+      "id": "centralized-rules",
+      "name": "Centralized Rules",
+      "maturity": "Advanced",
+      "type": "Operations",
+      "category": "operations",
+      "shortDescription": "Enforce organization-wide AI rules through a central Git repository that syncs to standard AI assistant configuration files with automatic language and framework detection",
+      "dependencies": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Progressive Disclosure",
+          "id": "progressive-disclosure"
+        },
+        {
+          "name": "Security Orchestration",
+          "id": "security-orchestration"
+        }
+      ],
+      "related": [
+        {
+          "name": "Codified Rules",
+          "id": "codified-rules"
+        },
+        {
+          "name": "Progressive Disclosure",
+          "id": "progressive-disclosure"
+        },
+        {
+          "name": "Security Orchestration",
+          "id": "security-orchestration"
+        },
+        {
+          "name": "Harness Engineering Lens",
+          "id": "harness-engineering-lens"
+        }
+      ],
+      "bodyMarkdown": "**Description**: Enforce organization-wide AI rules through a central Git repository that syncs language- and framework-specific guidance into standard assistant configuration files.\n\n\n**Core Implementation**\n\n**Sync-based Architecture** (Recommended):\n\n```\nCentral Rules Repository (Git)\n  ├── base/universal-rules.md\n  ├── languages/ (python.md, typescript.md, go.md)\n  └── frameworks/ (react.md, django.md, fastapi.md)\n           ↓\n    [sync-ai-rules.sh]\n           ↓\n  Project Repository\n    ├── CLAUDE.md (auto-generated)\n    ├── AGENTS.md (auto-generated)\n    └── .cursorrules (auto-generated)\n```\n\n**How it works**:\n1. A central repository stores organization rules organized by language/framework.\n2. A sync script detects the project language/framework (from files and dependencies).\n3. The script generates standard configuration files that common assistants read automatically.\n\n**Key benefits**:\n- ✅ Works with existing AI tools (no gateway required)\n- ✅ Offline-friendly after initial sync\n- ✅ Version-controlled and auditable in Git\n- ✅ Language-aware via auto-detection\n\n**Alternative: Gateway Strategy** (advanced use cases)\n\nFor organizations needing request/response filtering, policy enforcement, or usage logging, use the gateway approach:\n- [Gateway Strategy](examples/centralized-rules/gateway-strategy/README-GATEWAY.md)\n\n**Complete Implementation**\n\n- [Sync Strategy](examples/centralized-rules/sync-strategy/) - Simple Git-based sync (recommended)\n- [Gateway Strategy](examples/centralized-rules/gateway-strategy/README-GATEWAY.md) - Central policy + logging + filters\n\n**Anti-pattern: Scattered Configuration**\n\nCopying AI rules into every repository without a central source causes drift, inconsistent enforcement, and manual update toil across teams.",
+      "githubUrl": "https://github.com/PaulDuvall/ai-development-patterns#centralized-rules"
+    }
+  ]
+};

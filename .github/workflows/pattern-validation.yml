@@ -72,6 +72,11 @@ jobs:
           exit 1
         fi
 
+    - name: Verify patterns dataset is in sync with README
+      run: |
+        python3 scripts/generate-patterns-data.py --check \
+          || { echo "::error::patterns-data.js/index.html are out of date. Run 'python3 scripts/generate-patterns-data.py' and commit."; exit 1; }
+
     - name: Run README accuracy tests
       run: |
         cd tests

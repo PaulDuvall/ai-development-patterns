@@ -4,6 +4,59 @@ This directory contains automation scripts for maintaining the AI Development Pa
 
 ## Available Scripts
 
+### Patterns Website Data
+
+#### `generate-patterns-data.py`
+**Purpose**: Generates the dataset that powers the interactive patterns website (the GitHub Pages `index.html`). README.md is the single source of record — this script parses it at build time so the site never drifts from the docs.
+
+**Usage**:
+```bash
+python3 scripts/generate-patterns-data.py          # write artifacts
+python3 scripts/generate-patterns-data.py --check   # verify in sync (CI/tests)
+```
+
+**What it does**:
+- Parses the **Complete Pattern Reference** table (card metadata: name, maturity, type, brief description, dependencies)
+- Extracts each pattern's full section (rendered as rich detail in the page's modal)
+- Generates a branded, in-page-clickable dependency diagram from the parsed data (`siteDiagram`)
+- Writes `assets/js/patterns-data.js` (`window.PATTERNS_DATA`)
+- Refreshes the generated diagram in `index.html` between the `<!-- PATTERNS:DIAGRAM:START/END -->` markers
+
+The standalone site is brand-matched to Redacted Ventures: it loads the vendored `assets/css/global.css` (brand tokens, fonts, editorial primitives, header/footer/marquee styles) plus the catalog-specific `assets/css/patterns.css`. The RV logo (`assets/logos/`) and favicon (`assets/icons/`) are vendored too. Keep `assets/css/global.css` in sync with the source in the `redactedventurescom` repo.
+
+#### `build.sh`
+**Purpose**: The canonical build entrypoint — rebuilds every generated artifact from README.md in one command (refreshes pattern-count badges, regenerates `patterns-data.js`, and re-injects the dependency diagram).
+
+```bash
+bash scripts/build.sh
+```
+
+Set this as the build command on any static host (Vercel/Netlify) and it will rebuild on every deploy.
+
+#### `pre-commit-patterns.sh`
+**Purpose**: Pre-commit hook that runs `build.sh` and re-stages the generated artifacts whenever README.md (or a site source) is part of a commit — so a stale site can never be committed.
+
+```bash
+cp scripts/pre-commit-patterns.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+```
+
+### How the site stays in sync with README.md
+
+README.md is the **single source of record**. Three layers guarantee the published site always reflects it:
+
+1. **Deploy rebuild (server)** — `.github/workflows/deploy-pages.yml` runs `scripts/build.sh` before every GitHub Pages publish (triggered on every push to `main`), so the live site is regenerated from README on each change — even if a committed artifact was stale.
+2. **Drift gate (CI)** — `.github/workflows/pattern-validation.yml` runs `generate-patterns-data.py --check` on pushes and PRs and **fails** if the committed artifacts are out of sync, so drift is caught before merge.
+3. **Pre-commit rebuild (local, optional)** — `pre-commit-patterns.sh` regenerates and stages artifacts at commit time.
+
+`tests/test_patterns_data.py::TestRefreshMechanism` guards this wiring so it cannot be silently removed.
+
+**Stdlib only** — no third-party dependencies.
+
+**Integration**:
+- `deploy-pages.yml` runs it (write mode) before publishing, so the deployed site always reflects README.md
+- `pattern-validation.yml` runs it with `--check` to fail PRs that change README without regenerating
+- `tests/test_patterns_data.py` validates the dataset is well-formed and in sync
+
 ### Pattern Count Management
 
 #### `update-pattern-count.py`
