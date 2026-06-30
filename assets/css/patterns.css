@@ -113,7 +113,11 @@ body.edi.modal-open { overflow: hidden; }
 
 /* ---------- Catalog + cards ---------- */
 .catalog { padding: 4.8rem 0 6.4rem; }
-.cat-section { margin-bottom: 5.6rem; scroll-margin-top: 9rem; }
+/* .cat-section is a <section>, so it picks up global.css's
+   `section { padding: 8rem 2rem }` and `section:nth-child(even)` band.
+   The .catalog wrap owns vertical rhythm; reset both here. */
+.cat-section { padding: 0; margin-bottom: 5.6rem; scroll-margin-top: 9rem; }
+.cat-section:nth-child(even) { background: transparent; }
 .cat-head {
     display: flex; align-items: baseline; gap: 1.6rem;
     padding-bottom: 1.6rem; border-bottom: 2px solid var(--color-ink);
