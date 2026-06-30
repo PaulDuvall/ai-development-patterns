@@ -189,6 +189,39 @@ body.edi.modal-open { overflow: hidden; }
     border: 0; border-radius: var(--radius-sharp); padding: 1rem 1.8rem;
 }
 
+/* ---------- Lenses ---------- */
+.lenses { padding: 6.4rem 0; border-bottom: 1px solid var(--color-rule); }
+.lenses .lenses-head { max-width: 70ch; margin-bottom: 3.2rem; }
+.lenses .lenses-head .eyebrow { display: block; margin-bottom: 1.4rem; }
+.lenses .lenses-head p { margin-top: 1.6rem; color: var(--color-ink-2); font-size: 1.6rem; }
+.lens-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--color-rule-strong); border-left: 1px solid var(--color-rule-strong);
+}
+@media (max-width: 720px) { .lens-grid { grid-template-columns: 1fr; } }
+.lens-card {
+    text-align: left; font: inherit; color: var(--color-ink); background: transparent; border: 0;
+    border-right: 1px solid var(--color-rule-strong); border-bottom: 1px solid var(--color-rule-strong);
+    border-top: 3px solid var(--color-ink);
+    padding: 3.2rem 2.8rem 2.8rem; display: flex; flex-direction: column; gap: 1.4rem;
+    cursor: pointer; transition: background .2s ease; min-height: 20rem;
+}
+.lens-card:hover { background: var(--color-paper-2); }
+.lens-card:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+.lens-card h3 {
+    font-family: var(--font-serif); font-weight: 400; font-size: 3rem; line-height: 1.02;
+    letter-spacing: -0.015em; color: var(--color-ink);
+}
+.lens-card .card-desc { font-size: 1.5rem; line-height: 1.6; color: var(--color-ink-2); }
+.lens-card .card-foot {
+    margin-top: auto; font-family: var(--font-mono); font-size: 1.15rem; letter-spacing: 0.04em;
+}
+.lens-card .card-foot .go { color: var(--color-ink); border-bottom: 1px solid var(--color-ink); padding-bottom: 0.2rem; }
+.lens-card:hover .card-foot .go { color: var(--color-accent); border-color: var(--color-accent); }
+.lens-card .card-foot .go .arrow { transition: transform .2s ease; display: inline-block; }
+.lens-card:hover .card-foot .go .arrow { transform: translateX(3px); }
+.modal-card[data-cat="lens"] { border-top-color: var(--color-ink); }
+
 /* ---------- Dependency diagram ---------- */
 .catalog-deps { padding: 8rem 0; border-top: 1px solid var(--color-rule); background: var(--color-paper-2); }
 .catalog-deps .deps-head { max-width: 70ch; margin-bottom: 3.2rem; }

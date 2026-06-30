@@ -15,6 +15,14 @@
   var patternsById = {};
   DATA.patterns.forEach(function (p) { patternsById[p.id] = p; });
 
+  var lensesById = {};
+  (DATA.lenses || []).forEach(function (l) { lensesById[l.id] = l; });
+
+  // Any openable detail entry — patterns or lenses — keyed by id.
+  var entriesById = {};
+  Object.keys(patternsById).forEach(function (k) { entriesById[k] = patternsById[k]; });
+  Object.keys(lensesById).forEach(function (k) { entriesById[k] = lensesById[k]; });
+
   var state = { query: "", category: "all", maturity: "all" };
   var cardEls = [];
   var lastFocused = null;
@@ -52,6 +60,7 @@
       return "\n\nMERMAIDPLACEHOLDER" + i + "\n\n";
     });
     var html = window.marked ? window.marked.parse(staged) : staged;
+    html = rewriteLinks(html);
     html = html.replace(/<p>\s*MERMAIDPLACEHOLDER(\d+)\s*<\/p>/g, function (_m, i) {
       return '<div class="mermaid">' + blocks[Number(i)] + "</div>";
     });
@@ -59,6 +68,27 @@
       return '<div class="mermaid">' + blocks[Number(i)] + "</div>";
     });
     return html;
+  }
+
+  // README links are repo-relative (#anchor, experiments/README.md#x, docs/…).
+  // Resolve them to absolute GitHub URLs so they work off the GitHub site.
+  // Runs before the mermaid swap so diagram source is never DOM-mangled.
+  function rewriteLinks(html) {
+    var repo = DATA.repoUrl || "https://github.com/PaulDuvall/ai-development-patterns";
+    var blob = repo + "/blob/main/";
+    var tmp = document.createElement("div");
+    tmp.innerHTML = html;
+    tmp.querySelectorAll("a[href]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href) return;
+      if (/^(https?:|mailto:)/i.test(href)) {
+        a.target = "_blank"; a.rel = "noopener";
+        return;
+      }
+      a.setAttribute("href", href.charAt(0) === "#" ? repo + href : blob + href.replace(/^\.?\//, ""));
+      a.target = "_blank"; a.rel = "noopener";
+    });
+    return tmp.innerHTML;
   }
 
   function runMermaid(scope) {
@@ -109,6 +139,31 @@
 
     card.addEventListener("click", function () { openPattern(p.id); });
     return card;
+  }
+
+  function buildLensCard(lens) {
+    var card = el("button", {
+      class: "lens-card", type: "button", "data-id": lens.id,
+      "aria-label": "View lens: " + lens.name
+    });
+    card.appendChild(el("span", { class: "card-eyebrow", text: "Engineering lens" }));
+    card.appendChild(el("h3", { text: lens.name }));
+    card.appendChild(el("p", { class: "card-desc", text: lens.shortDescription }));
+    card.appendChild(el("div", { class: "card-foot" }, [
+      el("span", { class: "go" }, ["Read the lens ", el("span", { class: "arrow", text: "→" })])
+    ]));
+    card.addEventListener("click", function () { openPattern(lens.id); });
+    return card;
+  }
+
+  function renderLenses() {
+    var grid = document.getElementById("lensGrid");
+    var section = document.getElementById("lenses");
+    if (!grid || !section) return;
+    var lenses = DATA.lenses || [];
+    if (!lenses.length) { section.style.display = "none"; return; }
+    grid.innerHTML = "";
+    lenses.forEach(function (l) { grid.appendChild(buildLensCard(l)); });
   }
 
   function renderCatalog() {
@@ -203,7 +258,7 @@
     if (!items || !items.length) return null;
     var chips = el("div", { class: "rel-chips" });
     items.forEach(function (item) {
-      var known = item.id && patternsById[item.id];
+      var known = item.id && entriesById[item.id];
       var chip = el("button", {
         class: "rel-chip", type: "button", text: item.name,
         "aria-label": item.name
@@ -221,25 +276,32 @@
   }
 
   function renderModal(id) {
-    var p = patternsById[id];
+    var p = entriesById[id];
     if (!p) return;
+    var isLens = !!lensesById[id];
     var card = document.getElementById("modalCard");
-    card.setAttribute("data-cat", p.category);
+    card.setAttribute("data-cat", isLens ? "lens" : p.category);
 
     var eyebrow = document.getElementById("modalEyebrow");
     eyebrow.innerHTML = "";
-    eyebrow.appendChild(el("span", { class: "eyebrow", text: categoryName(p.category) }));
-    eyebrow.appendChild(el("span", { class: "maturity-tag", "data-maturity": p.maturity, text: p.maturity }));
-    eyebrow.appendChild(el("span", { class: "maturity-tag", text: p.type }));
+    if (isLens) {
+      eyebrow.appendChild(el("span", { class: "eyebrow", text: "Engineering lens" }));
+    } else {
+      eyebrow.appendChild(el("span", { class: "eyebrow", text: categoryName(p.category) }));
+      eyebrow.appendChild(el("span", { class: "maturity-tag", "data-maturity": p.maturity, text: p.maturity }));
+      eyebrow.appendChild(el("span", { class: "maturity-tag", text: p.type }));
+    }
 
     document.getElementById("modalTitle").textContent = p.name;
 
     var relations = document.getElementById("modalRelations");
     relations.innerHTML = "";
-    var depBlock = relBlock("Builds on", p.dependencies);
-    var relatedBlock = relBlock("Related patterns", p.related);
-    if (depBlock) relations.appendChild(depBlock);
-    if (relatedBlock) relations.appendChild(relatedBlock);
+    if (!isLens) {
+      var depBlock = relBlock("Builds on", p.dependencies);
+      var relatedBlock = relBlock("Related patterns", p.related);
+      if (depBlock) relations.appendChild(depBlock);
+      if (relatedBlock) relations.appendChild(relatedBlock);
+    }
 
     var bodyEl = document.getElementById("modalMarkdown");
     bodyEl.innerHTML = renderMarkdown(p.bodyMarkdown);
@@ -295,7 +357,7 @@
   }
 
   function openPattern(id) {
-    if (!patternsById[id]) return;
+    if (!entriesById[id]) return;
     renderModal(id);
     openModalUI();
     history.pushState({ patternId: id }, "", "#" + id);
@@ -323,7 +385,7 @@
 
     window.addEventListener("popstate", function (e) {
       var id = (e.state && e.state.patternId) || hashId();
-      if (id && patternsById[id]) {
+      if (id && entriesById[id]) {
         renderModal(id);
         openModalUI();
         pushedModalState = true;
@@ -370,13 +432,14 @@
   /* ---------- init ---------- */
   function init() {
     renderStats();
+    renderLenses();
     renderCatalog();
     setupFilters();
     setupModal();
     applyFilters();
 
     var id = hashId();
-    if (id && patternsById[id]) {
+    if (id && entriesById[id]) {
       renderModal(id);
       openModalUI();
       history.replaceState({ patternId: id }, "", "#" + id);

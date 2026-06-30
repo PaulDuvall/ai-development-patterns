@@ -225,6 +225,52 @@ def parse_related(section_markdown):
     return related
 
 
+def lens_short_description(body, limit=220):
+    """Plain-text summary from a lens section's first paragraph."""
+    paragraph = []
+    for line in body.split("\n"):
+        if not line.strip():
+            if paragraph:
+                break
+            continue
+        if line.lstrip().startswith(("|", "#", "-", "*", ">")):
+            if paragraph:
+                break
+            continue
+        paragraph.append(line.strip())
+    text = " ".join(paragraph)
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)  # links -> text
+    text = text.replace("**", "").replace("`", "")
+    text = re.sub(r"(?<![\w*])\*(?!\s)([^*]+)\*", r"\1", text)  # italics -> text
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(text) > limit:
+        cut = text[:limit]
+        match = re.search(r"^(.*[.!?])\s", cut)
+        text = match.group(1) if match else cut.rsplit(" ", 1)[0] + "…"
+    return text
+
+
+def parse_lenses(lines, headings):
+    """Extract '## ... Lens' sections (framing perspectives over the catalog).
+
+    These are not patterns (absent from the reference table) but are first-class
+    content in the README; surface them as their own section on the site."""
+    lenses = []
+    for heading in headings:
+        if heading["level"] == 2 and heading["text"].strip().lower().endswith("lens"):
+            body = extract_section_markdown(lines, headings, heading)
+            lenses.append(
+                {
+                    "id": heading["slug"],
+                    "name": heading["text"].strip(),
+                    "shortDescription": lens_short_description(body),
+                    "bodyMarkdown": body,
+                    "githubUrl": f"{REPO_URL}#{heading['slug']}",
+                }
+            )
+    return lenses
+
+
 def parse_dependency_diagram(text):
     """Return the first ```mermaid block body (the dependency diagram)."""
     match = re.search(r"```mermaid\n(.*?)```", text, re.DOTALL)
@@ -379,6 +425,8 @@ def build_dataset():
         "patternCount": len(patterns),
         "categories": categories,
         "maturities": ["Beginner", "Intermediate", "Advanced"],
+        # Framing lenses (## ... Lens sections) - not patterns, shown separately
+        "lenses": parse_lenses(lines, headings),
         # README's hand-authored diagram (kept for reference / GitHub rendering)
         "dependencyDiagram": parse_dependency_diagram(text),
         # Branded diagram rendered on the standalone site (in-page clicks)

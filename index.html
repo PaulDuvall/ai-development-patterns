@@ -69,9 +69,9 @@
             <nav class="site-nav nav-edi" id="siteNav" aria-label="Main navigation">
                 <ul class="site-nav-list">
                     <li><a href="#catalog-top" class="site-nav-link">Patterns</a></li>
+                    <li><a href="#lenses" class="site-nav-link">Lenses</a></li>
                     <li><a href="#dependencies" class="site-nav-link">Dependencies</a></li>
                     <li><a href="https://github.com/PaulDuvall/ai-development-patterns" class="site-nav-link" target="_blank" rel="noopener">GitHub ↗</a></li>
-                    <li><a href="https://redactedventures.com/" class="site-nav-link" target="_blank" rel="noopener">Redacted Ventures ↗</a></li>
                     <li class="site-nav-cta"><a href="https://redactedventures.com/scorecard" class="site-nav-link cta-mini" target="_blank" rel="noopener">Scorecard ↗</a></li>
                 </ul>
             </nav>
@@ -94,6 +94,18 @@
                     <div class="stat"><div class="stat-value" id="statDevelopment">0</div><div class="stat-label">Development</div></div>
                     <div class="stat"><div class="stat-value" id="statOperations">0</div><div class="stat-label">Operations</div></div>
                 </div>
+            </div>
+        </section>
+
+        <!-- ================= Lenses ================= -->
+        <section class="lenses" id="lenses">
+            <div class="edi-wrap">
+                <div class="lenses-head">
+                    <span class="eyebrow"><span class="num">№ 02</span> Engineering lenses</span>
+                    <h2 class="edi-h2">Two ways to <span class="it">read</span> the catalog</h2>
+                    <p>Lenses aren&rsquo;t patterns — they&rsquo;re framing perspectives over the whole catalog: <em>why</em> you&rsquo;d combine these patterns, and how much autonomy your controls earn. Click a lens for the full write-up.</p>
+                </div>
+                <div class="lens-grid" id="lensGrid"><!-- lens cards injected by patterns-app.js --></div>
             </div>
         </section>
 
@@ -135,7 +147,7 @@
         <section class="catalog-deps" id="dependencies">
             <div class="edi-wrap">
                 <div class="deps-head">
-                    <span class="eyebrow"><span class="num">№ 02</span> Implementation order</span>
+                    <span class="eyebrow"><span class="num">№ 03</span> Implementation order</span>
                     <h2 class="edi-h2">How the patterns <span class="it">connect</span></h2>
                     <p>Foundation patterns enable Development patterns, which enable Operations. These edges are a learning progression, not a waterfall — teams with existing DevOps and security expertise implement continuously across all phases. Click any node to open its full detail.</p>
                 </div>

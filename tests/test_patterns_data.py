@@ -156,6 +156,42 @@ class TestPatternRecords:
         assert not offenders, "Section boundary leaks:\n" + "\n".join(offenders)
 
 
+class TestLenses:
+    def test_known_lenses_present(self, data_file_dataset):
+        ids = {l["id"] for l in data_file_dataset.get("lenses", [])}
+        for expected in ("harness-engineering-lens", "loop-engineering-lens"):
+            assert expected in ids, f"{expected} missing from dataset lenses"
+
+    def test_lens_count_matches_readme(self, data_file_dataset):
+        readme = README_PATH.read_text(encoding="utf-8")
+        in_fence = False
+        heading_lenses = 0
+        for line in readme.split("\n"):
+            stripped = line.strip()
+            if stripped.startswith("```"):
+                in_fence = not in_fence
+                continue
+            if in_fence:
+                continue
+            m = re.match(r"^##\s+(.+?)\s*$", line)
+            if m and m.group(1).strip().lower().endswith("lens"):
+                heading_lenses += 1
+        assert len(data_file_dataset.get("lenses", [])) == heading_lenses
+
+    def test_lenses_well_formed(self, data_file_dataset):
+        problems = []
+        for l in data_file_dataset.get("lenses", []):
+            if not l.get("name", "").lower().endswith("lens"):
+                problems.append(f"{l.get('id')}: name should end with 'Lens'")
+            if not (l.get("shortDescription") or "").strip():
+                problems.append(f"{l.get('id')}: empty shortDescription")
+            if len((l.get("bodyMarkdown") or "").strip()) < 40:
+                problems.append(f"{l.get('id')}: body too short")
+            if l.get("githubUrl") != f"{data_file_dataset['repoUrl']}#{l['id']}":
+                problems.append(f"{l.get('id')}: bad githubUrl")
+        assert not problems, "Malformed lenses:\n" + "\n".join(problems)
+
+
 class TestDependencyDiagram:
     def test_diagram_matches_readme_first_mermaid(self, data_file_dataset):
         readme = README_PATH.read_text(encoding="utf-8")
