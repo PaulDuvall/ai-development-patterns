@@ -330,7 +330,7 @@
   }
 
   function setBackgroundInert(on) {
-    document.querySelectorAll(".status-bar, .topbar-editorial, main, .site-foot").forEach(function (elm) {
+    document.querySelectorAll(".topbar-editorial, main, .site-foot").forEach(function (elm) {
       if (on) elm.setAttribute("inert", "");
       else elm.removeAttribute("inert");
     });
