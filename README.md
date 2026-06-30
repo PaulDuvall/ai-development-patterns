@@ -104,7 +104,7 @@ This repository provides a structured approach to AI-assisted development throug
 
 ## Harness Engineering Lens
 
-Birgitta Böckeler's [Harness Engineering](https://martinfowler.com/articles/harness-engineering.html) framing — **`Agent = Model + Harness`** — describes the controls built *around* a coding agent (separate from the model) to make its output trustworthy. Harness Engineering isn't one of the patterns in this catalog; it's a *lens* over them — a way of grouping the patterns below and understanding *why* you'd use them together. Every control is one of two kinds and runs in one of two ways:
+The [Harness Engineering](https://martinfowler.com/articles/harness-engineering.html) framing — **`Agent = Model + Harness`** — describes the controls built *around* a coding agent (separate from the model) to make its output trustworthy. Harness Engineering isn't one of the patterns in this catalog; it's a *lens* over them — a way of grouping the patterns below and understanding *why* you'd use them together. Every control is one of two kinds and runs in one of two ways:
 
 - **Feedforward (guides)** steer the agent *before* it acts.
 - **Feedback (sensors)** observe *after* it acts so it can self-correct.
@@ -157,7 +157,7 @@ Two principles from the source are worth stating directly:
 
 The detailed, tool-specific field checklist for gating, scoping, and bounding loops lives at [Loop Engineering Checklist](docs/loop-engineering-checklist.md).
 
-**Source**: Synthesis of the "verification reach sets the autonomy ceiling" idea with field practice for running autonomous coding loops; see the companion [Loop Engineering Checklist](docs/loop-engineering-checklist.md) for the operational form. Conceptually complementary to Birgitta Böckeler's Harness Engineering (cited in the [Harness Engineering Lens](#harness-engineering-lens) above), which addresses the quality of the controls this lens treats as the autonomy-setting constraint.
+**Source**: Synthesis of the "verification reach sets the autonomy ceiling" idea with field practice for running autonomous coding loops; see the companion [Loop Engineering Checklist](docs/loop-engineering-checklist.md) for the operational form. Conceptually complementary to the [Harness Engineering Lens](#harness-engineering-lens) above, which addresses the quality of the controls this lens treats as the autonomy-setting constraint.
 
 ## Pattern Dependencies & Implementation Order
 
@@ -2193,7 +2193,7 @@ Observability as a sensor does not stop at debug time. Extend it into production
 - AI-friendly debug tools and log analysis scripts
 - Integration examples for e-commerce and authentication systems
 
-**Source**: Birgitta Böckeler, "[Harness Engineering](https://martinfowler.com/articles/harness-engineering.html)", martinfowler.com — for the feedforward/feedback (guides vs. sensors) and computational/inferential control framing.
+**Source**: "[Harness Engineering](https://martinfowler.com/articles/harness-engineering.html)", martinfowler.com — for the feedforward/feedback (guides vs. sensors) and computational/inferential control framing.
 
 **Anti-pattern: Blind Development**
 
