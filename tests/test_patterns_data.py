@@ -253,3 +253,27 @@ class TestRefreshMechanism:
         hook = REPO_ROOT / "scripts" / "pre-commit-patterns.sh"
         assert hook.exists(), "scripts/pre-commit-patterns.sh is missing"
         assert "build.sh" in hook.read_text(encoding="utf-8")
+
+
+class TestSiteAssetsTracked:
+    """Guard against .gitignore silently dropping committed site assets.
+
+    The macOS 'Icon?' rule once matched the assets/icons/ directory
+    (case-insensitive on macOS), so favicons under it were never committed."""
+
+    @pytest.mark.parametrize("path", [
+        "assets/icons/example.svg",
+        "assets/img/example.svg",
+        "assets/css/example.css",
+        "assets/js/example.js",
+    ])
+    def test_asset_paths_are_not_gitignored(self, path):
+        result = subprocess.run(
+            ["git", "check-ignore", path],
+            cwd=str(REPO_ROOT), capture_output=True, text=True,
+        )
+        # git check-ignore: returncode 0 == ignored, 1 == NOT ignored.
+        assert result.returncode == 1, (
+            f"{path} is gitignored — committed site assets there would silently "
+            f"never ship. Offending rule: {result.stdout.strip()}"
+        )

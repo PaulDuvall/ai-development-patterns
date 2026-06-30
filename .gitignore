@@ -32,7 +32,9 @@ Thumbs.db
 *.pid.lock
 
 # OS Generated Files
-Icon?
+# Anchored to the repo root: the bare "Icon?" glob matched directories like
+# assets/icons/ (git is case-insensitive on macOS, so "?" also matched the "s").
+/Icon?
 .AppleDouble
 .LSOverride
 .DocumentRevisions-V100
