@@ -303,7 +303,7 @@ graph LR
                 </div>
             </div>
             <div class="foot-bottom">
-                <span>© Paul Duvall · Generated from README.md · MIT Licensed · Patterns subject to change as the field evolves.</span>
+                <deploy-footer api-url="build-info.json" copyright-holder="Paul Duvall" start-year="2025" locale="en-US"></deploy-footer>
                 <div class="right">
                     <a href="https://redactedventures.com/" target="_blank" rel="noopener">Redacted Ventures ↗</a>
                     <a href="https://redactedventures.com/scorecard" target="_blank" rel="noopener">Scorecard ↗</a>
@@ -358,6 +358,8 @@ graph LR
             crossorigin="anonymous"></script>
     <script src="assets/js/patterns-data.js"></script>
     <script src="assets/js/patterns-app.js"></script>
+    <!-- Dynamic deploy info (commit + build time) from build-info.json -->
+    <script defer src="assets/js/deploy-footer.min.js"></script>
     <script>
         // Mobile nav toggle (mirrors the Redacted Ventures site-header component)
         (function () {

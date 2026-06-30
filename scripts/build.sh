@@ -26,4 +26,11 @@ python3 scripts/update-pattern-count.py
 echo "[build] generating patterns dataset + diagram from README.md…"
 python3 scripts/generate-patterns-data.py
 
-echo "[build] done — site is in sync with README.md"
+# Deploy metadata for the <deploy-footer> component (commit + build time).
+# Volatile per build, so it's gitignored and regenerated here every deploy.
+echo "[build] writing deploy metadata (build-info.json)…"
+commit_sha="$(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
+timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+printf '{\n  "timestamp": "%s",\n  "commit_sha": "%s"\n}\n' "$timestamp" "$commit_sha" > build-info.json
+
+echo "[build] done — site is in sync with README.md (commit ${commit_sha})"

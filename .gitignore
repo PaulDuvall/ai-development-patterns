@@ -219,6 +219,9 @@ comprehensive_report.*
 docs/_build/
 site/
 
+# Deploy metadata — generated per build by scripts/build.sh for <deploy-footer>
+build-info.json
+
 # Local Configuration
 .local
 config.local.*

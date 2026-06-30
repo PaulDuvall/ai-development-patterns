@@ -291,6 +291,34 @@ class TestRefreshMechanism:
         assert "build.sh" in hook.read_text(encoding="utf-8")
 
 
+class TestDeployFooter:
+    """The footer shows dynamic deploy info (commit + build time) via the
+    <deploy-footer> component fed by a build-time build-info.json."""
+
+    def test_index_uses_deploy_footer(self):
+        index = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
+        assert "<deploy-footer" in index
+        assert 'api-url="build-info.json"' in index
+        assert "deploy-footer.min.js" in index
+
+    def test_component_is_vendored(self):
+        assert (REPO_ROOT / "assets" / "js" / "deploy-footer.min.js").exists()
+
+    def test_build_generates_build_info(self):
+        build = (REPO_ROOT / "scripts" / "build.sh").read_text(encoding="utf-8")
+        assert "build-info.json" in build
+        assert "rev-parse" in build  # commit sha
+        assert "date -u" in build    # timestamp
+
+    def test_build_info_is_gitignored(self):
+        # build-info.json is a per-build artifact and must not be committed.
+        result = subprocess.run(
+            ["git", "check-ignore", "build-info.json"],
+            cwd=str(REPO_ROOT), capture_output=True, text=True,
+        )
+        assert result.returncode == 0, "build-info.json should be gitignored"
+
+
 class TestSiteAssetsTracked:
     """Guard against .gitignore silently dropping committed site assets.
 

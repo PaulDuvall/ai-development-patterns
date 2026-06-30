@@ -349,3 +349,10 @@ body.edi.modal-open { overflow: hidden; }
 /* Patterns badge strip in the footer brand column */
 .site-foot .badges { margin-top: 1.6rem; display: flex; gap: 0.4rem; flex-wrap: wrap; }
 .site-foot .badges img { height: 2rem; }
+
+/* Dynamic deploy-info footer (commit + build time) on the dark footer */
+.site-foot deploy-footer {
+    display: block;
+    --deploy-footer-color: #8A8274;
+    --deploy-footer-font-size: 11px;
+}
