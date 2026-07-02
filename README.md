@@ -452,6 +452,10 @@ Foundation patterns establish the essential infrastructure and team readiness re
 
 **Related Patterns**: [Codified Rules](#codified-rules), [Issue Generation](#issue-generation)
 
+**Source**: Factory.ai, "[Agent Readiness](https://factory.ai/product/agent-readiness)"; Eno Reyes, "[Making Codebases Agent Ready](https://www.youtube.com/watch?v=ShuJ_CN6zr4)" (AI Engineer), December 22, 2025
+
+Industry tooling commonly calls this practice *agent readiness* (Factory.ai, Kodus) or an *AI readiness assessment* (Microsoft).
+
 > 📋 **Quick start**: Use the free [AI Development Readiness Scorecard](https://www.redactedventures.com/scorecard) to score your team against this framework in about 10 minutes and get a tailored pattern adoption sequence.
 
 **Assessment Framework**
@@ -493,6 +497,10 @@ Starting AI adoption without proper assessment leads to inconsistent practices, 
 
 **Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Context Persistence](#context-persistence), [Progressive Disclosure](#progressive-disclosure), [Event Automation](#event-automation), [Custom Commands](#custom-commands), [Centralized Rules](#centralized-rules), [Harness Engineering Lens](#harness-engineering-lens)
 
+**Source**: "[AGENTS.md](https://agents.md/)" open format specification (OpenAI, Google Jules, Cursor, Factory); Cursor, "[Rules](https://cursor.com/docs/rules)" documentation
+
+Industry tooling implements this pattern as `AGENTS.md` (open format stewarded under the Linux Foundation), *Rules* (Cursor), `CLAUDE.md` memory (Anthropic Claude Code), and *repository custom instructions* (GitHub Copilot).
+
 **Standardized Project Structure**
 ```bash
 project/
@@ -532,6 +540,8 @@ Each developer maintains their own prompts and preferences, leading to inconsist
 **Description**: Run AI tools in isolated environments without access to secrets or sensitive data to prevent credential leaks and maintain security compliance.
 
 **Related Patterns**: [Security & Compliance Patterns](#security--compliance-patterns), [Codified Rules](#codified-rules), [Event Automation](#event-automation)
+
+**Source**: Anthropic, "[sandbox-runtime](https://github.com/anthropic-experimental/sandbox-runtime)"; Anthropic, "[Sandboxing](https://code.claude.com/docs/en/sandboxing)" (Claude Code documentation)
 
 **Core Security Implementation**
 
@@ -593,6 +603,8 @@ Allowing multiple parallel agents to write to the same directories creates race 
 
 **Related Patterns**: [Lifecycle Lens](#lifecycle-lens), [Planned Implementation](#planned-implementation), [Spec-Driven Development](#spec-driven-development), [Atomic Decomposition](#atomic-decomposition), [Observable Development](#observable-development)
 
+**Source**: GitHub, "[Spec Kit](https://github.com/github/spec-kit)"; AWS DevOps & Developer Productivity Blog, "[AI-Driven Development Life Cycle: Reimagining Software Engineering](https://aws.amazon.com/blogs/devops/ai-driven-development-life-cycle/)", July 31, 2025
+
 This pattern is the per-feature discipline: plan before you generate, and stop retrying a failing approach after a few tries instead of looping on it. For how each stage maps onto the rest of the catalog, see the [Lifecycle Lens](#lifecycle-lens).
 
 **Workflow Interaction Sequence**
@@ -651,6 +663,10 @@ Jumping straight to coding with AI without proper planning, requirements, or tes
 **Description**: Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions.
 
 **Related Patterns**: [Security Sandbox](#security-sandbox), [Developer Lifecycle](#developer-lifecycle), [Observable Development](#observable-development)
+
+**Source**: Anthropic, "[Introducing the Model Context Protocol](https://www.anthropic.com/news/model-context-protocol)", November 25, 2024; Model Context Protocol, "[modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)" reference servers
+
+The industry implements this pattern as *tool use* (Anthropic), *function calling* (OpenAI), and the *Model Context Protocol (MCP)*.
 
 **Core Concept**
 
@@ -745,6 +761,8 @@ Attempting to solve complex data analysis, system integration, or real-time prob
 **Methodology Note**: This pattern aligns well with Kanban principles (continuous flow, small batches) but works with any development methodology including Scrum, Scrumban, or ad-hoc workflows.
 
 **Related Patterns**: [Readiness Assessment](#readiness-assessment), [Spec-Driven Development](#spec-driven-development)
+
+**Source**: GitHub Docs, "[Using GitHub Copilot to create issues](https://docs.github.com/en/copilot/using-github-copilot/using-github-copilot-to-create-issues)"; Eyal Toledano, "[Task Master](https://github.com/eyaltoledano/claude-task-master)"
 
 **[Issue Generation](#issue-generation) Framework**
 
@@ -845,6 +863,8 @@ Specifications use authority levels to resolve conflicts and establish precedenc
 When requirements conflict, higher authority levels take precedence, enabling clear decision-making for AI implementation.
 
 **Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Tool Integration](#tool-integration), [Custom Commands](#custom-commands), [Image Spec](#image-spec), [Testing Orchestration](experiments/README.md#testing-orchestration), [Observable Development](#observable-development), [Harness Engineering Lens](#harness-engineering-lens)
+
+**Source**: GitHub, "[Spec Kit](https://github.com/github/spec-kit)"; Birgitta Böckeler, "[Understanding Spec-Driven-Development: Kiro, spec-kit, and Tessl](https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html)", October 15, 2025
 
 **SpecDriven AI Workflow**
 
@@ -1014,6 +1034,10 @@ Uploading many diagrams at once without hierarchy or a clear starting point over
 **Description**: Interview, constrain, and plan before writing code so AI implementation matches actual requirements instead of confident-sounding assumptions.
 
 **Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Progressive Enhancement](#progressive-enhancement), [Adversarial Evaluator](#adversarial-evaluator), [Harness Engineering Lens](#harness-engineering-lens)
+
+**Source**: Cursor, "[Plan Mode](https://cursor.com/docs/agent/plan-mode)" documentation; Anthropic, "[Claude Code best practices](https://code.claude.com/docs/en/best-practices)"
+
+Industry tooling commonly implements the planning half of this pattern as *plan mode* (Cursor, Claude Code).
 
 **Core Principle: Think Before You Code**
 
@@ -1195,6 +1219,8 @@ Spending excessive time refining plans without moving to implementation, missing
 **Description**: Build complex features through small, deployable iterations rather than big-bang generation.
 
 **Related Patterns**: [Planned Implementation](#planned-implementation), [Developer Lifecycle](#developer-lifecycle), [Image Spec](#image-spec), [Adversarial Evaluator](#adversarial-evaluator)
+
+**Source**: GitHub Docs, "[Prompt engineering for GitHub Copilot Chat](https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering)"; Harper Reed, "[My LLM codegen workflow atm](https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/)", February 16, 2025
 
 **Examples**
 Building authentication progressively:
@@ -1547,6 +1573,8 @@ Running multiple agents without isolation, shared memory, or conflict resolution
 **Description**: Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols for efficient multi-session development.
 
 **Related Patterns**: [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure), [Spec-Driven Development](#spec-driven-development), [Parallel Agents](#parallel-agents)
+
+**Source**: Anthropic, "[Memory tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool)" (Claude API documentation); Packer et al., "[MemGPT: Towards LLMs as Operating Systems](https://arxiv.org/abs/2310.08560)", October 12, 2023
 
 **Core Principles**
 
