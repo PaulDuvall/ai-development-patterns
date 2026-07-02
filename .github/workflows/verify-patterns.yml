@@ -1,0 +1,172 @@
+name: Pattern Verification & Discovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Run mode"
+        type: choice
+        options:
+          - stale-default   # Phases 1-3 on the 10 stalest patterns
+          - full            # all phases, all patterns
+          - discover-only   # Phase 4 only
+          - single-pattern  # Phases 2-3 for one pattern (set 'pattern')
+        default: stale-default
+      pattern:
+        description: "Pattern name (single-pattern mode only)"
+        type: string
+        required: false
+      stale_days:
+        description: "Staleness threshold in days"
+        type: string
+        default: "90"
+      since_days:
+        description: "Discovery lookback window in days"
+        type: string
+        default: "30"
+      max_turns:
+        description: "Max agent turns (cost ceiling)"
+        type: string
+        default: "120"
+  schedule:
+    # Weekly, an hour before pattern-validation's Monday 06:00 UTC link check,
+    # so evidence PRs exist by the time that run fires. Scheduled runs use
+    # stale-default mode — the cheapest, most targeted slice.
+    - cron: '0 5 * * 1'
+
+# One run at a time: parallel runs would race on verify/* branches and the
+# derived inventory file.
+concurrency:
+  group: verify-patterns
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      actions: read
+      id-token: write
+    steps:
+      # Fail fast (scheduled) or warn loudly (manual) when the PAT is missing,
+      # instead of silently opening PRs that no CI will ever check.
+      - name: Check PAT configuration
+        env:
+          HAS_PAT: ${{ secrets.VERIFY_PATTERNS_PAT != '' }}
+        run: |
+          if [ "$HAS_PAT" = "true" ]; then
+            echo "VERIFY_PATTERNS_PAT configured — PRs opened by this run will trigger CI checks."
+            exit 0
+          fi
+          msg="VERIFY_PATTERNS_PAT is not configured. PRs opened with the fallback GITHUB_TOKEN do NOT trigger pattern-validation or claude-code-review — each PR would need a manual close/reopen to get checks. Remediation: add a fine-grained PAT (contents, pull-requests, issues: write) as the VERIFY_PATTERNS_PAT repo secret."
+          echo "::warning title=No PAT configured::$msg"
+          {
+            echo "## :warning: No PAT configured"
+            echo
+            echo "$msg"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "::error title=PAT required for scheduled runs::Unattended runs would silently produce unchecked PRs. Failing until VERIFY_PATTERNS_PAT is added."
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          # With VERIFY_PATTERNS_PAT configured, PRs opened by this run trigger
+          # pattern-validation and claude-code-review. Without it, the fallback
+          # GITHUB_TOKEN still opens PRs, but GitHub suppresses workflow runs on
+          # them — checks must be triggered manually (close/reopen the PR).
+          token: ${{ secrets.VERIFY_PATTERNS_PAT || github.token }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install validation dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r tests/requirements.txt
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Build command arguments
+        id: args
+        env:
+          MODE: ${{ inputs.mode || 'stale-default' }}
+          PATTERN: ${{ inputs.pattern }}
+          STALE_DAYS: ${{ inputs.stale_days || '90' }}
+          SINCE_DAYS: ${{ inputs.since_days || '30' }}
+        run: |
+          case "$MODE" in
+            full)           args="--full" ;;
+            discover-only)  args="--discover-only" ;;
+            single-pattern) args="--pattern \"$PATTERN\"" ;;
+            *)              args="" ;;
+          esac
+          args="$args --stale-days $STALE_DAYS --since $SINCE_DAYS"
+          echo "value=$args" >> "$GITHUB_OUTPUT"
+
+      - name: Run pattern verification pipeline
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        env:
+          # gh CLI auth inside the pipeline (branch pushes, PR/issue creation)
+          GH_TOKEN: ${{ secrets.VERIFY_PATTERNS_PAT || github.token }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: /verify-patterns ${{ steps.args.outputs.value }}
+          claude_args: |
+            --model claude-sonnet-5
+            --max-turns ${{ inputs.max_turns || '120' }}
+            --allowedTools "Bash(git:*),Bash(gh:*),Bash(python3:*),Bash(pytest:*),Bash(mkdir:*),Bash(date:*),Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Task"
+
+      # The agent writes its own report to the step summary when it finishes
+      # cleanly. These two steps run regardless — a timeout or max-turns cutoff
+      # still leaves an inspectable record.
+      - name: Upload agent execution log
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: verify-patterns-execution-log
+          path: ${{ steps.claude.outputs.execution_file }}
+          if-no-files-found: ignore
+
+      - name: Publish run summary
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.VERIFY_PATTERNS_PAT || github.token }}
+          MODE: ${{ inputs.mode || 'stale-default' }}
+          ARGS: ${{ steps.args.outputs.value }}
+          AGENT_OUTCOME: ${{ steps.claude.outcome }}
+        run: |
+          {
+            echo "## Pattern verification run"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Mode | \`$MODE\` |"
+            echo "| Args | \`/verify-patterns $ARGS\` |"
+            echo "| Agent step outcome | **$AGENT_OUTCOME** |"
+            echo "| Trigger | ${{ github.event_name }} |"
+            echo
+
+            echo "### Open verify/discover PRs (this run + any awaiting review)"
+            prs=$(gh pr list --state open --json number,title,headRefName,url \
+              --jq '.[] | select(.headRefName | test("^(verify|discover)/")) | "- [#\(.number)](\(.url)) \(.title) — `\(.headRefName)`"' || true)
+            if [ -n "$prs" ]; then echo "$prs"; else echo "_none_"; fi
+            echo
+
+            echo "### Open evidence-gap issues"
+            issues=$(gh issue list --label needs-evidence --state open --json number,title,url \
+              --jq '.[] | "- [#\(.number)](\(.url)) \(.title)"' || true)
+            if [ -n "$issues" ]; then echo "$issues"; else echo "_none_"; fi
+          } >> "$GITHUB_STEP_SUMMARY"
