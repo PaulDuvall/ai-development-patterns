@@ -1,0 +1,101 @@
+pattern: Planned Implementation
+slug: planned-implementation
+verified: '2026-07-02'
+adoption_score: 26
+naming_alignment: weak
+terminology_variants:
+- term: Plan Mode
+  used_by: Cursor (product feature) and Anthropic Claude Code (permission mode)
+  url: https://cursor.com/docs/agent/plan-mode
+- term: Explore first, then plan, then code (Explore, plan, code, commit)
+  used_by: Anthropic Claude Code best-practices docs
+  url: https://code.claude.com/docs/en/best-practices
+- term: Let Claude interview you
+  used_by: Anthropic Claude Code best-practices docs
+  url: https://code.claude.com/docs/en/best-practices
+- term: grill-me / clarify-first skill
+  used_by: Matt Pocock (skills.sh) and bswen.com practitioner writeup
+  url: https://skills.sh/mattpocock/skills/grill-me
+- term: intention clarification
+  used_by: Mu et al., ClarifyGPT (arXiv/ACM FSE)
+  url: https://arxiv.org/abs/2310.10996
+- term: brainstorm spec, then plan a plan, then execute
+  used_by: Harper Reed (harper.blog)
+  url: https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: Plan Mode creates detailed implementation plans before writing any code. Agent researches your
+    codebase, asks clarifying questions, and generates a reviewable plan you can edit before building.
+  source: Cursor - Plan Mode documentation
+  url: https://cursor.com/docs/agent/plan-mode
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: 'Cursor ships Plan Mode as a product feature (Shift+Tab): the agent asks clarifying questions, researches
+    the codebase, and generates a reviewable, editable implementation plan before any code is written (undated page;
+    date = retrieval date)'
+- tier: T1
+  match: aliased
+  mechanism_quote: For changes you want to review before they touch disk, switch to plan mode. Claude reads files
+    and proposes a plan but makes no edits until you approve.
+  source: Anthropic - Claude Code docs, Common workflows (plan mode)
+  url: https://code.claude.com/docs/en/common-workflows
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Claude Code ships a runnable plan mode (claude --permission-mode plan, Shift+Tab toggle) that restricts
+    the agent to read-only analysis and plan generation until the user approves (undated page; date = retrieval
+    date)
+- tier: T1
+  match: aliased
+  mechanism_quote: Conducts deep-dive questioning across all aspects of a plan, walking through decision trees branch-by-branch
+    until shared understanding is reached
+  source: Matt Pocock - 'grill-me' skill on skills.sh (mattpocock/skills)
+  url: https://skills.sh/mattpocock/skills/grill-me
+  date: '2026-03-13'
+  retrieved: '2026-07-02'
+  claim: 'An installable agent skill (npx skills add, 433.8K installs shown, first seen Mar 13 2026) that implements
+    the interview phase: systematic pre-implementation questioning of the user before code is generated'
+- tier: T2
+  match: aliased
+  mechanism_quote: For larger features, have Claude interview you first. Start with a minimal prompt and ask Claude
+    to interview you using the AskUserQuestion tool.
+  source: Anthropic - Claude Code docs, Best practices ('Explore first, then plan, then code' and 'Let Claude interview
+    you')
+  url: https://code.claude.com/docs/en/best-practices
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: 'Anthropic''s official best-practices doc prescribes both halves of the mechanism: separate exploration/planning
+    from implementation via plan mode, and have the AI interview the developer to produce a spec before coding (undated
+    page; date = retrieval date)'
+- tier: T3
+  match: aliased
+  mechanism_quote: We introduce a novel framework named ClarifyGPT, which aims to enhance code generation by empowering
+    LLMs with the ability to identify ambiguous requirements and ask targeted clarifying questions.
+  source: 'Fangwen Mu et al. - ClarifyGPT: Empowering LLM-based Code Generation with Intention Clarification (arXiv
+    2310.10996, also ACM DOI 10.1145/3660810)'
+  url: https://arxiv.org/abs/2310.10996
+  date: '2023-10-17'
+  retrieved: '2026-07-02'
+  claim: Peer-reviewed framework showing that detecting ambiguous requirements and asking targeted clarifying questions
+    before generating code raised GPT-4 Pass@1 from 70.96% to 80.80% on MBPP-sanitized
+- tier: T4
+  match: unnamed
+  mechanism_quote: Ask me one question at a time so we can develop a thorough, step-by-step spec for this idea.
+  source: Harper Reed - 'My LLM codegen workflow atm' (harper.blog)
+  url: https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
+  date: '2025-02-16'
+  retrieved: '2026-07-02'
+  claim: 'Practitioner workflow with full prompts: an LLM interviews the developer one question at a time to build
+    a spec, a reasoning model turns the spec into a step-by-step plan (prompt_plan.md), and only then is code generated'
+- tier: T4
+  match: aliased
+  mechanism_quote: This pattern changes the AI's behavior from “generate immediately” to “interview first, then
+    implement.”
+  source: Cowrie (Dev @ Bswen) - 'How to Get AI Coding Assistants to Ask Clarifying Questions Before Generating
+    Code' (docs.bswen.com)
+  url: https://docs.bswen.com/blog/2026-04-01-ai-clarifying-questions-codex/
+  date: '2026-04-01'
+  retrieved: '2026-07-02'
+  claim: Practitioner post with the full 5-sentence 'grill-me' prompt and a derived 'clarify-first' SKILL.md, reporting
+    fewer wrong assumptions and fewer revision cycles when Codex interviews before implementing
+verdict: verified
