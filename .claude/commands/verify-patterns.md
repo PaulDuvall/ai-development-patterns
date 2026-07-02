@@ -191,9 +191,25 @@ not a search-method failure. Demotion is a human decision.
 **(d)** If a terminology variant dominates industry usage: add an alias mention in the pattern
 description ("also referred to as X by Y") in the batched PR. Never rename.
 
-**(e)** `verified` with `naming_alignment: none` or `weak`: flag in the final report as a naming
-discussion (with the dominant industry term, if one exists). Renaming is a human decision — do not
-open a PR for it.
+**(e)** `verified` with `naming_alignment: none` or `weak`: produce a **naming recommendation**,
+not just a flag. For each such pattern:
+
+1. Identify the dominant industry term(s) from `terminology_variants` — dominance means multiple
+   independent (unaffiliated) sources, weighted by evidence tier.
+2. Derive candidate names from the dominant term and run each through the pattern-spec.md naming
+   validation checklist: exactly two words Title Case (hyphenated compounds count as one word),
+   Noun+Noun or Adj+Noun, no "AI" prefix, domain-specific vocabulary, 2-4 syllables per word,
+   unique across the catalog including experiments, passes the "Use the X Y pattern to..." test,
+   and describes a principle rather than a single vendor's feature name.
+3. Recommend exactly one action, with rationale citing specific evidence entries by source:
+   - **keep** — current name is defensible; no spec-compliant, evidence-backed candidate beats it.
+   - **keep + alias** — record the industry term via a Phase 3(d) alias mention.
+   - **rename to <Candidate>** — only when the candidate passes the full checklist AND either the
+     industry term dominates across independent sources or the current name has a documented
+     collision/discoverability problem (e.g. name-mode searches drown in an unrelated meaning).
+4. Record the recommendation in the final report. Renaming remains a human decision — never open
+   a rename PR; if a human accepts a rename, PATTERN_MIGRATION_GUIDE.md governs the mechanics
+   (anchors, slugs, evidence file key, site regeneration).
 
 ## Phase 4 — Unknown-unknowns discovery
 
@@ -219,8 +235,11 @@ open a PR for it.
 ## Final report (never committed)
 
 Table: pattern | prior verdict | new verdict | score delta | naming_alignment | PR/issue link.
+Then the Phase 3(e) naming recommendations, one row per `verified` pattern with weak/no naming
+alignment: pattern | dominant industry term | spec-checked candidate | recommendation (keep /
+keep + alias / rename to X) | evidence basis. Show why rejected candidates failed the checklist.
 Then discovery candidates: term (or "unnamed" + proposed name) | sources | closest existing pattern.
-End with the three highest-leverage follow-ups, keeping naming discussions (`verified` but weak/no
+End with the three highest-leverage follow-ups, keeping naming recommendations (`verified` but weak/no
 naming alignment) separate from evidence gaps (`unverified`). Note anything skipped due to bounds
 (query caps, PR cap) — silent truncation reads as full coverage.
 
