@@ -1,0 +1,133 @@
+pattern: Security Sandbox
+slug: security-sandbox
+verified: '2026-07-02'
+adoption_score: 35
+naming_alignment: weak
+terminology_variants:
+- term: sandboxing / sandboxed Bash tool
+  used_by: Anthropic (Claude Code official docs)
+  url: https://code.claude.com/docs/en/sandboxing
+- term: sandbox (read-only / workspace-write / danger-full-access modes)
+  used_by: OpenAI (Codex official docs)
+  url: https://developers.openai.com/codex/concepts/sandboxing
+- term: dev container / devcontainer isolation
+  used_by: Anthropic docs and practitioners (Mark Phelps)
+  url: https://markphelps.me/posts/running-ai-agents-in-devcontainers/
+- term: execution isolation
+  used_by: Docker (company blog)
+  url: https://www.docker.com/blog/how-to-secure-ai-agents/
+- term: microVM sandbox
+  used_by: E2B (product site)
+  url: https://e2b.dev
+- term: agent sandbox / agent-sandbox
+  used_by: Kubernetes SIGs project
+  url: https://github.com/kubernetes-sigs/agent-sandbox
+- term: action-sandboxing
+  used_by: Beurer-Kellner et al. (arXiv design-patterns paper)
+  url: https://arxiv.org/html/2506.08837v2
+evidence:
+- tier: T1
+  match: named
+  source: Anthropic (anthropic-experimental), sandbox-runtime GitHub repository
+  url: https://github.com/anthropic-experimental/sandbox-runtime
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Anthropic ships an open-source sandboxing tool (4,557 stars, last updated 2026-07-02 per GitHub API) that
+    enforces filesystem and network restrictions on agent processes at the OS level; it is also installable as @anthropic-ai/sandbox-runtime
+    to back Claude Code's sandbox.
+- tier: T1
+  match: named
+  source: Kubernetes SIGs, agent-sandbox project
+  url: https://github.com/kubernetes-sigs/agent-sandbox
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: A Kubernetes SIG project (3,046 stars, created 2025-08-12, last updated 2026-07-02 per GitHub API) provides
+    isolated sandbox workloads for AI agent runtimes, showing the practice standardized at platform level under
+    the name 'agent-sandbox'.
+- tier: T1
+  match: named
+  source: E2B, product site
+  url: https://e2b.dev
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: E2B is a shipped commercial product providing Firecracker microVM sandboxes so AI agents can execute code
+    in full isolation from the host (undated page; date = retrieval date).
+- tier: T2
+  match: named
+  source: 'Anthropic, Claude Code docs: Configure the sandboxed Bash tool'
+  url: https://code.claude.com/docs/en/sandboxing
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Anthropic's official Claude Code documentation defines a built-in /sandbox capability with OS-enforced
+    filesystem and network isolation (Seatbelt on macOS, bubblewrap on Linux), including a sandbox.credentials setting
+    that denies reads of credential files like ~/.aws/credentials and unsets secret environment variables (undated
+    page; date = retrieval date).
+- tier: T2
+  match: named
+  source: 'OpenAI, Codex docs: Sandbox concepts page'
+  url: https://developers.openai.com/codex/concepts/sandboxing
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: OpenAI's official Codex documentation describes an OS-enforced sandbox (Seatbelt, bubblewrap, Windows Sandbox)
+    with network access disabled by default and read-only/workspace-write filesystem modes so the agent can act
+    autonomously without unrestricted machine access (undated page; date = retrieval date).
+- tier: T2
+  match: aliased
+  mechanism_quote: Avoid mounting host secrets such as `~/.ssh` or cloud credential files into the container; prefer
+    repository-scoped or short-lived tokens.
+  source: 'Anthropic, Claude Code docs: Development containers'
+  url: https://code.claude.com/docs/en/devcontainer
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Anthropic's official docs prescribe running Claude Code in a dev container with an init-firewall.sh egress
+    firewall and explicitly warn against mounting host secrets into the container — the same container-isolation-plus-no-secrets
+    mechanism as the pattern's Docker example (undated page; date = retrieval date). The referenced .devcontainer/
+    (Dockerfile, devcontainer.json, init-firewall.sh) was verified present in anthropics/claude-code via GitHub
+    API.
+- tier: T3
+  match: aliased
+  mechanism_quote: Any code execution must be sandboxed into its own environment with only necessary connections
+    allowed.
+  source: Luca Beurer-Kellner et al. (14 authors incl. Florian Tramèr, Edoardo Debenedetti), arXiv paper 'Design
+    Patterns for Securing LLM Agents against Prompt Injections' (arXiv:2506.08837)
+  url: https://arxiv.org/html/2506.08837v2
+  date: '2025-06-10'
+  retrieved: '2026-07-02'
+  claim: 'A multi-institution research paper (submitted 2025-06-10, v3 2025-06-27) codifies ''action-sandboxing''
+    as a design pattern: agent code execution must run in an isolated environment with only necessary connections
+    allowed.'
+- tier: T4
+  match: aliased
+  mechanism_quote: The agent runs in the container. It can’t touch your home directory, your SSH keys, or that one
+    file you really shouldn’t have left in `/tmp`.
+  source: Mark Phelps, blog post 'Running AI Agents in Devcontainers'
+  url: https://markphelps.me/posts/running-ai-agents-in-devcontainers/
+  date: '2026-02-19'
+  retrieved: '2026-07-02'
+  claim: Practitioner blog post (2026-02-19) shows complete .devcontainer/Dockerfile and devcontainer.json configurations
+    for running AI agents in containers isolated from the host home directory and SSH keys, calling the practice
+    'devcontainers'.
+- tier: T4
+  match: aliased
+  mechanism_quote: The goal isn't to eliminate risk entirely – it's to limit the blast radius. If something goes
+    wrong, we want it contained to the sandbox rather than having full access to your machine, credentials, and
+    the ability to push malicious code to your repositories.
+  source: Daniel Demmel, blog post 'Coding agents in secured VS Code dev containers'
+  url: https://www.danieldemmel.me/blog/coding-agents-in-secured-vscode-dev-containers
+  date: '2026-01-24'
+  retrieved: '2026-07-02'
+  claim: Practitioner blog post (2026-01-24) provides a complete working implementation (devcontainer.json, docker-compose.yml,
+    Dockerfile) for containing coding agents away from host credentials, framing it as 'secured dev containers'
+    that limit blast radius.
+- tier: T5
+  match: aliased
+  mechanism_quote: The most effective pattern is to run each agent in its own isolated, disposable environment.
+    This could be a microVM, a hardened container, or a dedicated sandbox.
+  source: 'Srini Sekaran (Docker), blog post ''How to Secure AI Agents: A Practical Overview'''
+  url: https://www.docker.com/blog/how-to-secure-ai-agents/
+  date: '2026-06-02'
+  retrieved: '2026-07-02'
+  claim: Docker company blog post (2026-06-02, named author, conceptual guidance without code) names 'execution
+    isolation' as one of four domains of agent security and recommends running each agent in an isolated, disposable
+    environment.
+verdict: verified
