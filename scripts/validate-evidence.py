@@ -102,12 +102,8 @@ def validate_computed_fields(data, entries, errors):
             f"naming_alignment is '{data.get('naming_alignment')}', recomputes to '{alignment}'")
 
 
-def validate_file(path):
-    """Validate a single evidence file; return a list of error strings."""
-    errors = []
-    data = yaml.safe_load(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict):
-        return ["file is not a YAML mapping"]
+def validate_top_fields(data, path, errors):
+    """Check required top-level fields, slug/filename match, and verified date."""
     for field in REQUIRED_TOP_FIELDS:
         if field not in data:
             errors.append(f"missing required field '{field}'")
@@ -115,12 +111,34 @@ def validate_file(path):
         errors.append(f"filename '{path.name}' does not match slug '{data['slug']}'")
     if data.get("verified") and not is_iso_date(data["verified"]):
         errors.append("'verified' must be ISO 8601 (YYYY-MM-DD)")
+
+
+def validate_evidence_entries(data, errors):
+    """Validate evidence shape; return only dict-shaped entries for scoring."""
     evidence = data.get("evidence")
-    entries = evidence if isinstance(evidence, list) else []
     if not isinstance(evidence, list) and not is_none_found(evidence):
         errors.append("'evidence' must be a list of entries or the string 'none found'")
-    for index, entry in enumerate(entries):
-        validate_entry(entry if isinstance(entry, dict) else {}, index, errors)
+    entries = []
+    for index, item in enumerate(evidence if isinstance(evidence, list) else []):
+        if isinstance(item, dict):
+            validate_entry(item, index, errors)
+            entries.append(item)
+        else:
+            errors.append(f"evidence[{index}]: entry must be a mapping")
+    return entries
+
+
+def validate_file(path):
+    """Validate a single evidence file; return a list of error strings."""
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except yaml.YAMLError as exc:
+        return [f"invalid YAML: {exc}"]
+    if not isinstance(data, dict):
+        return ["file is not a YAML mapping"]
+    errors = []
+    validate_top_fields(data, path, errors)
+    entries = validate_evidence_entries(data, errors)
     validate_tier_caps(entries, errors)
     validate_computed_fields(data, entries, errors)
     return errors
@@ -133,7 +151,10 @@ def main():
                         help="Directory containing evidence YAML files")
     args = parser.parse_args()
     evidence_dir = Path(args.dir)
-    files = sorted(evidence_dir.glob("*.yaml")) if evidence_dir.is_dir() else []
+    if not evidence_dir.is_dir():
+        print(f"error: evidence directory not found: {evidence_dir}")
+        return 1
+    files = sorted(evidence_dir.glob("*.yaml"))
     failures = 0
     for path in files:
         errors = validate_file(path)
