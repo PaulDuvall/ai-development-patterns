@@ -53,7 +53,7 @@ def write_allowlist(directory, slugs):
 EVIDENCE_TEMPLATE = """\
 pattern: Example Pattern
 slug: {slug}
-verified: 2026-01-01
+last_checked: 2026-01-01
 adoption_score: {score}
 naming_alignment: {alignment}
 evidence:
@@ -74,8 +74,11 @@ def write_evidence(directory, filename="example.yaml", slug="example", score=2,
     """Write a single-entry evidence file (defaults recompute cleanly)."""
     content = EVIDENCE_TEMPLATE.format(
         slug=slug, score=score, alignment=alignment,
-        verdict=verdict, url=url, date=date,
+        verdict=verdict, url=url, date=date or "2026-01-01",
     )
+    if date is None:  # undated source: the date field is omitted entirely
+        lines = [l for l in content.splitlines() if not l.strip().startswith("date:")]
+        content = "\n".join(lines) + "\n"
     (directory / filename).write_text(content, encoding="utf-8")
 
 
@@ -166,6 +169,63 @@ def test_registry_includes_experimental_patterns(tmp_path):
         encoding="utf-8")
     result = run_validator(
         evidence_dir, "--registry", str(registry), "--experiments", str(experiments))
+    assert result.returncode == 0, result.stdout
+
+
+def test_validator_accepts_omitted_entry_date(tmp_path):
+    """Undated sources omit 'date'; only 'retrieved' is mandatory."""
+    write_evidence(tmp_path, date=None)
+    result = run_validator(tmp_path)
+    assert result.returncode == 0, result.stdout
+
+
+def test_validator_requires_last_checked(tmp_path):
+    """A file with neither last_checked nor legacy verified must fail."""
+    bad = textwrap.dedent("""\
+        pattern: Example Pattern
+        slug: no-date
+        adoption_score: 0
+        naming_alignment: none
+        evidence: none found
+        verdict: unverified
+    """)
+    (tmp_path / "no-date.yaml").write_text(bad, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "missing required field 'last_checked'" in result.stdout
+
+
+def test_validator_rejects_both_check_date_fields(tmp_path):
+    """Carrying last_checked AND legacy verified together must fail."""
+    bad = textwrap.dedent("""\
+        pattern: Example Pattern
+        slug: both-dates
+        last_checked: 2026-01-01
+        verified: 2026-01-01
+        adoption_score: 0
+        naming_alignment: none
+        evidence: none found
+        verdict: unverified
+    """)
+    (tmp_path / "both-dates.yaml").write_text(bad, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "use 'last_checked' only" in result.stdout
+
+
+def test_validator_accepts_legacy_verified_field(tmp_path):
+    """Files written before the rename (verified:) stay valid until regenerated."""
+    good = textwrap.dedent("""\
+        pattern: Example Pattern
+        slug: legacy
+        verified: 2026-01-01
+        adoption_score: 0
+        naming_alignment: none
+        evidence: none found
+        verdict: unverified
+    """)
+    (tmp_path / "legacy.yaml").write_text(good, encoding="utf-8")
+    result = run_validator(tmp_path)
     assert result.returncode == 0, result.stdout
 
 

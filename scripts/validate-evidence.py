@@ -25,10 +25,11 @@ EXPERIMENT_ROW_RE = re.compile(
     r"^\|\s*\*\*\[[^\]]+\]\(#([a-z0-9-]+)\)\*\*\s*\|\s*(?:Beginner|Intermediate|Advanced)\s*\|")
 
 REQUIRED_TOP_FIELDS = [
-    "pattern", "slug", "verified", "adoption_score",
+    "pattern", "slug", "adoption_score",
     "naming_alignment", "evidence", "verdict",
 ]
-REQUIRED_ENTRY_FIELDS = ["tier", "match", "source", "url", "date", "retrieved", "claim"]
+# 'date' (the source's own publication date) is optional: undated pages omit it.
+REQUIRED_ENTRY_FIELDS = ["tier", "match", "source", "url", "retrieved", "claim"]
 
 
 def is_iso_date(value):
@@ -128,18 +129,32 @@ def validate_computed_fields(data, entries, errors):
             f"naming_alignment is '{data.get('naming_alignment')}', recomputes to '{alignment}'")
 
 
+def validate_check_date(data, errors):
+    """Require last_checked (ISO date); accept legacy 'verified' until migration."""
+    if "last_checked" in data and "verified" in data:
+        errors.append("use 'last_checked' only — drop the legacy 'verified' field")
+        return
+    if "last_checked" not in data and "verified" not in data:
+        errors.append("missing required field 'last_checked'")
+        return
+    value = data.get("last_checked", data.get("verified"))
+    if not value:
+        errors.append("'last_checked' must be non-empty")
+    elif not is_iso_date(value):
+        errors.append("'last_checked' must be ISO 8601 (YYYY-MM-DD)")
+
+
 def validate_top_fields(data, path, errors):
-    """Check required top-level fields, slug/filename match, and verified date."""
+    """Check required top-level fields, slug/filename match, and check date."""
     for field in REQUIRED_TOP_FIELDS:
         if field not in data:
             errors.append(f"missing required field '{field}'")
-    for field in ("pattern", "slug", "verified", "naming_alignment", "verdict"):
+    for field in ("pattern", "slug", "naming_alignment", "verdict"):
         if field in data and not data[field]:
             errors.append(f"'{field}' must be non-empty")
     if data.get("slug") and path.stem != data["slug"]:
         errors.append(f"filename '{path.name}' does not match slug '{data['slug']}'")
-    if data.get("verified") and not is_iso_date(data["verified"]):
-        errors.append("'verified' must be ISO 8601 (YYYY-MM-DD)")
+    validate_check_date(data, errors)
 
 
 def validate_evidence_entries(data, errors):
