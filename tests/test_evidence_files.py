@@ -12,6 +12,8 @@ import textwrap
 from pathlib import Path
 
 import pytest
+import requests
+import yaml
 
 REPO_ROOT = Path(__file__).parent.parent
 VALIDATOR = REPO_ROOT / "scripts" / "validate-evidence.py"
@@ -430,3 +432,44 @@ def test_validator_accepts_none_found(tmp_path):
     (tmp_path / "nothing-found.yaml").write_text(good, encoding="utf-8")
     result = run_validator(tmp_path)
     assert result.returncode == 0, result.stdout
+
+
+def fetch_status(url):
+    """Return an HTTP status (falling back HEAD->GET) or an exception name."""
+    headers = {"User-Agent": "Mozilla/5.0 (ai-development-patterns link check)"}
+    try:
+        response = requests.head(url, timeout=10, allow_redirects=True, headers=headers)
+        if response.status_code >= 400:
+            response = requests.get(url, timeout=10, allow_redirects=True,
+                                    headers=headers, stream=True)
+        return response.status_code
+    except requests.RequestException as exc:
+        return type(exc).__name__
+
+
+def collect_evidence_urls():
+    """Map each unique evidence URL to the first file that cites it."""
+    urls = {}
+    for path in sorted(EVIDENCE_DIR.glob("*.yaml")):
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        evidence = data.get("evidence")
+        for entry in evidence if isinstance(evidence, list) else []:
+            url = entry.get("url") if isinstance(entry, dict) else None
+            if url:
+                urls.setdefault(url, path.name)
+    return urls
+
+
+@pytest.mark.slow
+def test_evidence_urls_alive():
+    """Verified verdicts must not silently rest on dead links (weekly check)."""
+    if not EVIDENCE_DIR.is_dir():
+        pytest.skip("no evidence directory committed yet")
+    bot_guarded = {401, 403, 429}  # alive but refusing automated clients
+    failures = []
+    for url, filename in collect_evidence_urls().items():
+        status = fetch_status(url)
+        if isinstance(status, int) and (status < 400 or status in bot_guarded):
+            continue
+        failures.append(f"{filename}: {url} -> {status}")
+    assert not failures, "evidence link rot detected:\n" + "\n".join(failures)

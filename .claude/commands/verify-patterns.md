@@ -14,7 +14,9 @@ Arguments: $ARGUMENTS
 - `--pattern <name>`: Phases 2-3 for one pattern. Validate the name against `patterns.yaml` first; fail fast if unknown.
 - `--discover-only`: Phase 4 only.
 - `--full`: all phases, all patterns.
-- Default (no args): Phases 1-3 on the 10 patterns with the oldest or missing evidence.
+- Default (no args): Phases 1-3 on up to 10 patterns whose evidence is missing, older than
+  `--stale-days`, or excluded from neither by an open `verify/<slug>-*` PR. If fewer than 10
+  qualify, verify only those — possibly zero; an idle run is correct, not a failure.
 - `--stale-days <n>` (default 90): staleness threshold for prioritization.
 - `--since <days>` (default 30): lookback window for Phase 4.
 
@@ -49,12 +51,10 @@ Arguments: $ARGUMENTS
 
 1. `mkdir -p verification/evidence`
 2. `gh label create needs-evidence --description "Pattern lacks adoption evidence" --color D93F0B 2>/dev/null || true`
-3. If `scripts/validate-evidence.py` does not exist, create it plus `tests/test_evidence_files.py`
-   in a one-time PR (`chore(verification): add evidence schema guard`). The guard validates every
-   `verification/evidence/*.yaml`: required fields present, ISO dates, ≤3 entries per tier,
-   `match` is a valid enum value, `mechanism_quote` present on every aliased/unnamed entry,
-   `adoption_score` equals the recomputed sum, `verdict` and `naming_alignment` equal their
-   recomputed values. **Verdicts are computed by this script, never asserted by the model.**
+3. If `scripts/validate-evidence.py` or `tests/test_evidence_files.py` is missing, **abort the
+   run** and tell the human to restore the guard — the pipeline must never regenerate the guard
+   that polices its own output. **Verdicts are computed by that script, never asserted by the
+   model** (rubric and rules: `verification/README.md`).
 
 ## Phase 1 — Inventory (deterministic, no web access)
 
@@ -66,8 +66,14 @@ Arguments: $ARGUMENTS
 3. Regenerate `verification/pattern-inventory.yaml` (an ephemeral working file — gitignored,
    regenerated every run, never committed): name, slug, type, maturity, location, last_verified
    (from `verification/evidence/<slug>.yaml`), evidence_count, aliases.
-4. Report: total patterns, zero-evidence patterns, patterns staler than `--stale-days`. This drives
+4. **In-flight dedup:** a pattern with an open `verify/<slug>-*` PR is already being reviewed —
+   exclude it from selection (`gh pr list --state open`). Re-verifying it would open a second
+   PR against the same resource.
+5. Report: total patterns, zero-evidence patterns, patterns staler than `--stale-days`. This drives
    default prioritization.
+6. Write the selected slugs, one per line, to `.verify-worklist` at the repo root (gitignored).
+   The workflow's always-on summary step diffs it against opened PRs, so a max-turns or timeout
+   cutoff cannot silently truncate coverage.
 
 ## Phase 2 — Evidence collection (per pattern; fan out subagents, read-only)
 
