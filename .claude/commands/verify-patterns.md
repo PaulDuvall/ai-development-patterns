@@ -120,7 +120,8 @@ pattern: Spec-Driven Development
 slug: spec-driven-development
 last_checked: 2026-07-02
 adoption_score: 7         # computed: 1×T1 (5) + 1×T4 (2); at most 3 entries admitted per tier
-naming_alignment: weak    # computed: 1 of 2 entries named — strong needs a named majority
+tier_counts: {T1: 1, T4: 1}  # computed breakdown so readers skip the arithmetic
+naming_alignment: weak    # computed: strong | weak | aliased | none (rules: verification/README.md)
 terminology_variants:
   - term: "spec-first development"
     used_by: "GitHub (Spec Kit docs)"
@@ -128,6 +129,7 @@ terminology_variants:
 evidence:
   - tier: T1
     match: named          # named | aliased | unnamed
+    mechanism_quote: "Spec Kit turns a written specification into a plan and executable tasks"
     source: "GitHub Spec Kit"
     url: https://...
     date: 2025-09-02

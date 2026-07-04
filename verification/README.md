@@ -71,9 +71,10 @@ conference talk presents it, and three practitioner posts show working implement
 
 **`verdict`** — computed by `scripts/validate-evidence.py`, never asserted:
 
-- `verified` — score ≥ 8 AND ≥ 1 entry from T1–T3. The practice demonstrably exists in runnable
-  tools, canonical vendor docs, or the conference/paper record.
-- `weak` — everything in between, including high scores built only on T4/T5 sources.
+- `verified` — score ≥ 8 AND ≥ 1 entry from T1–T3 AND ≥ 1 practitioner-side entry (T3–T5).
+  The practice demonstrably exists beyond a single vendor's own documentation.
+- `weak` — everything in between, including high scores built only on T4/T5 sources or on
+  vendor material alone.
 - `unverified` — score ≤ 2 after all three search modes ran. Routed to a `needs-evidence`
   GitHub issue for human review, never auto-demoted.
 
@@ -82,15 +83,28 @@ conference talk presents it, and three practitioner posts show working implement
 the same practice · `unnamed` = source practices the mechanism without naming it):
 
 - `strong` — more than half of entries are `named`.
-- `weak` — some `named`/`aliased` entries, but most sources call the practice something else.
-- `none` — zero `named` or `aliased` entries.
+- `weak` — some `named` entries, but most sources call the practice something else.
+- `aliased` — zero `named` entries while the industry uses other stable names for the same
+  practice. The strongest rename signal the pipeline can emit.
+- `none` — zero `named` or `aliased` entries: sources practice the mechanism without naming it.
 
 **`terminology_variants`** — the names other sources use for the same practice. These feed the
 next run's name-mode search and any alias/rename discussion.
 
-**`mechanism_quote`** — required on every `aliased`/`unnamed` entry: a verbatim sentence from
-the source demonstrating the mechanism, so "same practice" claims are checkable rather than
+**`mechanism_quote`** — required on every `aliased`/`unnamed` entry, and on `named` T1/T2
+entries (a name collision alone must not earn top weights): a verbatim sentence from the
+source demonstrating the mechanism, so "same practice" claims are checkable rather than
 vibes-based analogies.
+
+**`tier_counts`** — optional per-tier breakdown (e.g. `{T1: 3, T2: 2, T4: 1}`) so readers see
+the evidence mix without reverse-engineering the score; recompute-checked when present.
+
+**Generations.** Files written before the `last_checked` rename (they carry `verified:`)
+validate under the original rules until the pipeline regenerates them. Regenerated files
+additionally get: the `aliased` alignment value, the practitioner requirement for `verified`,
+`mechanism_quote` on named T1/T2 entries, and **one entry per organization per file**
+(same GitHub owner or same site can score only once; the validator also prints a NOTE when
+one URL is scored across multiple patterns, so shared-pool inflation stays visible).
 
 ## How evidence is collected and trusted
 

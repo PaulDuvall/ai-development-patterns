@@ -473,3 +473,173 @@ def test_evidence_urls_alive():
             continue
         failures.append(f"{filename}: {url} -> {status}")
     assert not failures, "evidence link rot detected:\n" + "\n".join(failures)
+
+
+STRICT_ALIASED_FILE = """\
+pattern: Example Pattern
+slug: {slug}
+{check_field}: 2026-01-01
+adoption_score: 2
+naming_alignment: {alignment}
+evidence:
+  - tier: T4
+    match: aliased
+    mechanism_quote: "the tool rebuilds the config from the spec on every run"
+    source: "Example blog"
+    url: https://example.com/post
+    date: '2026-01-01'
+    retrieved: '2026-01-01'
+    claim: "Example claim"
+verdict: unverified
+"""
+
+
+def test_strict_zero_named_computes_aliased(tmp_path):
+    """Regenerated files: zero named + stable industry names = 'aliased'."""
+    content = STRICT_ALIASED_FILE.format(
+        slug="rename-signal", check_field="last_checked", alignment="aliased")
+    (tmp_path / "rename-signal.yaml").write_text(content, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 0, result.stdout
+
+
+def test_legacy_zero_named_stays_weak(tmp_path):
+    """Legacy files keep the original three-value alignment until regenerated."""
+    content = STRICT_ALIASED_FILE.format(
+        slug="legacy-weak", check_field="verified", alignment="weak")
+    (tmp_path / "legacy-weak.yaml").write_text(content, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 0, result.stdout
+
+
+VENDOR_ONLY_FILE = """\
+pattern: Example Pattern
+slug: {slug}
+{check_field}: 2026-01-01
+adoption_score: 8
+naming_alignment: strong
+evidence:
+  - tier: T2
+    match: named
+    mechanism_quote: "the docs define exactly this mechanism"
+    source: "Vendor A docs"
+    url: https://vendor-a.example.com/docs
+    date: '2026-01-01'
+    retrieved: '2026-01-01'
+    claim: "Vendor A documents the practice"
+  - tier: T2
+    match: named
+    mechanism_quote: "the reference architecture prescribes this mechanism"
+    source: "Vendor B docs"
+    url: https://vendor-b.example.org/docs
+    date: '2026-01-01'
+    retrieved: '2026-01-01'
+    claim: "Vendor B documents the practice"
+verdict: verified
+"""
+
+
+def test_strict_verified_requires_practitioner_source(tmp_path):
+    """Regenerated files: vendor docs alone (2xT2=8) no longer verify."""
+    content = VENDOR_ONLY_FILE.format(slug="vendor-only", check_field="last_checked")
+    (tmp_path / "vendor-only.yaml").write_text(content, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "recomputes to 'weak'" in result.stdout
+
+
+def test_legacy_verified_allows_vendor_only(tmp_path):
+    """Legacy files keep the original verdict rule until regenerated."""
+    content = VENDOR_ONLY_FILE.format(slug="legacy-vendor", check_field="verified")
+    (tmp_path / "legacy-vendor.yaml").write_text(content, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 0, result.stdout
+
+
+def test_strict_named_t1_requires_mechanism_quote(tmp_path):
+    """Regenerated files: a name match alone must not earn T1/T2 weight."""
+    bad = textwrap.dedent("""\
+        pattern: Example Pattern
+        slug: name-collision
+        last_checked: 2026-01-01
+        adoption_score: 5
+        naming_alignment: strong
+        evidence:
+          - tier: T1
+            match: named
+            source: "Same-named product"
+            url: https://example.com/product
+            date: '2026-01-01'
+            retrieved: '2026-01-01'
+            claim: "Product shares the pattern's name"
+        verdict: weak
+    """)
+    (tmp_path / "name-collision.yaml").write_text(bad, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "named T1/T2 entries require mechanism_quote" in result.stdout
+
+
+def test_strict_one_entry_per_org(tmp_path):
+    """Regenerated files: the same organization cannot score twice in one file."""
+    bad = textwrap.dedent("""\
+        pattern: Example Pattern
+        slug: double-dip
+        last_checked: 2026-01-01
+        adoption_score: 4
+        naming_alignment: strong
+        evidence:
+          - tier: T4
+            match: named
+            source: "Author blog post A"
+            url: https://blog.example.com/post-a
+            date: '2026-01-01'
+            retrieved: '2026-01-01'
+            claim: "First write-up"
+          - tier: T4
+            match: named
+            source: "Author blog post B"
+            url: https://blog.example.com/post-b
+            date: '2026-01-01'
+            retrieved: '2026-01-01'
+            claim: "Second write-up of the same workflow"
+        verdict: weak
+    """)
+    (tmp_path / "double-dip.yaml").write_text(bad, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "one entry per org per file" in result.stdout
+
+
+def test_tier_counts_must_recompute(tmp_path):
+    """A tier_counts breakdown that disagrees with the entries must fail."""
+    bad = textwrap.dedent("""\
+        pattern: Example Pattern
+        slug: wrong-counts
+        last_checked: 2026-01-01
+        adoption_score: 2
+        tier_counts: {T4: 2}
+        naming_alignment: strong
+        evidence:
+          - tier: T4
+            match: named
+            source: "Example blog"
+            url: https://example.com/post
+            date: '2026-01-01'
+            retrieved: '2026-01-01'
+            claim: "Example claim"
+        verdict: unverified
+    """)
+    (tmp_path / "wrong-counts.yaml").write_text(bad, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "tier_counts" in result.stdout
+
+
+def test_shared_url_across_files_prints_note(tmp_path):
+    """One URL scoring in two patterns is visible (NOTE) but not fatal."""
+    write_evidence(tmp_path)
+    write_evidence(tmp_path, filename="second.yaml", slug="second")
+    result = run_validator(tmp_path)
+    assert result.returncode == 0, result.stdout
+    assert "shared source scored in example, second" in result.stdout
