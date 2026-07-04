@@ -16,14 +16,38 @@ import pytest
 REPO_ROOT = Path(__file__).parent.parent
 VALIDATOR = REPO_ROOT / "scripts" / "validate-evidence.py"
 EVIDENCE_DIR = REPO_ROOT / "verification" / "evidence"
+REGISTRY = REPO_ROOT / "patterns.yaml"
+ALLOWLIST = REPO_ROOT / "verification" / "pending-evidence.yaml"
 
 
-def run_validator(directory):
+def run_validator(directory, *extra_args):
     """Run the evidence validator against a directory; return CompletedProcess."""
     return subprocess.run(
-        [sys.executable, str(VALIDATOR), "--dir", str(directory)],
+        [sys.executable, str(VALIDATOR), "--dir", str(directory), *extra_args],
         capture_output=True, text=True, cwd=REPO_ROOT, timeout=30,
     )
+
+
+def registry_args(directory, registry):
+    """CLI args for a hermetic registry check (no real experiments file)."""
+    return ("--registry", str(registry),
+            "--experiments", str(directory / "no-experiments.md"))
+
+
+def write_registry(directory, ids=("example",)):
+    """Write a minimal patterns.yaml-shaped registry; return its path."""
+    body = "patterns:\n" + "".join(f"- id: {i}\n  name: {i}\n" for i in ids)
+    path = directory / "patterns.yaml"
+    path.write_text(body, encoding="utf-8")
+    return path
+
+
+def write_allowlist(directory, slugs):
+    """Write a pending-evidence allowlist; return its path."""
+    body = "pending:\n" + "".join(f"- {s}\n" for s in slugs)
+    path = directory / "pending-evidence.yaml"
+    path.write_text(body, encoding="utf-8")
+    return path
 
 
 EVIDENCE_TEMPLATE = """\
@@ -68,6 +92,81 @@ def test_all_evidence_files_valid():
     assert result.returncode == 0, (
         f"evidence validation failed:\n{result.stdout}\n{result.stderr}"
     )
+
+
+def test_catalog_and_evidence_stay_aligned():
+    """Every catalog slug has evidence or is pending; no evidence is orphaned."""
+    if not EVIDENCE_DIR.is_dir():
+        pytest.skip("no evidence directory committed yet")
+    result = run_validator(
+        EVIDENCE_DIR, "--registry", str(REGISTRY), "--allowlist", str(ALLOWLIST))
+    assert result.returncode == 0, (
+        f"catalog/evidence alignment failed:\n{result.stdout}\n{result.stderr}"
+    )
+
+
+def make_evidence_dir(tmp_path):
+    """Return an evidence subdirectory so registry files stay out of the glob."""
+    evidence_dir = tmp_path / "evidence"
+    evidence_dir.mkdir()
+    return evidence_dir
+
+
+def test_registry_flags_orphan_evidence(tmp_path):
+    """An evidence file whose slug left the catalog must fail, not linger."""
+    evidence_dir = make_evidence_dir(tmp_path)
+    write_evidence(evidence_dir)
+    registry = write_registry(tmp_path, ids=("other-pattern",))
+    result = run_validator(evidence_dir, *registry_args(tmp_path, registry))
+    assert result.returncode == 1
+    assert "orphan evidence file 'example.yaml'" in result.stdout
+
+
+def test_registry_flags_uncovered_pattern(tmp_path):
+    """A catalog pattern with no evidence file and no allowlist entry must fail."""
+    evidence_dir = make_evidence_dir(tmp_path)
+    write_evidence(evidence_dir)
+    registry = write_registry(tmp_path, ids=("example", "uncovered"))
+    result = run_validator(evidence_dir, *registry_args(tmp_path, registry))
+    assert result.returncode == 1
+    assert "pattern 'uncovered' has no evidence file" in result.stdout
+
+
+def test_registry_allowlist_permits_missing_evidence(tmp_path):
+    """An allowlisted pattern may lack evidence without failing the run."""
+    evidence_dir = make_evidence_dir(tmp_path)
+    write_evidence(evidence_dir)
+    registry = write_registry(tmp_path, ids=("example", "uncovered"))
+    allowlist = write_allowlist(tmp_path, ["uncovered"])
+    result = run_validator(
+        evidence_dir, *registry_args(tmp_path, registry), "--allowlist", str(allowlist))
+    assert result.returncode == 0, result.stdout
+
+
+def test_registry_notes_prunable_allowlist_entry(tmp_path):
+    """A pattern with evidence AND an allowlist entry passes but prints a NOTE."""
+    evidence_dir = make_evidence_dir(tmp_path)
+    write_evidence(evidence_dir)
+    registry = write_registry(tmp_path, ids=("example",))
+    allowlist = write_allowlist(tmp_path, ["example"])
+    result = run_validator(
+        evidence_dir, *registry_args(tmp_path, registry), "--allowlist", str(allowlist))
+    assert result.returncode == 0, result.stdout
+    assert "remove it from the pending allowlist" in result.stdout
+
+
+def test_registry_includes_experimental_patterns(tmp_path):
+    """Slugs from the experiments reference table count as catalog patterns."""
+    evidence_dir = make_evidence_dir(tmp_path)
+    write_evidence(evidence_dir, filename="exp-pattern.yaml", slug="exp-pattern")
+    registry = write_registry(tmp_path, ids=())
+    experiments = tmp_path / "experiments.md"
+    experiments.write_text(
+        "| **[Exp Pattern](#exp-pattern)** | Intermediate | Workflow | d | x |\n",
+        encoding="utf-8")
+    result = run_validator(
+        evidence_dir, "--registry", str(registry), "--experiments", str(experiments))
+    assert result.returncode == 0, result.stdout
 
 
 def test_validator_errors_on_missing_directory(tmp_path):

@@ -270,3 +270,6 @@ coverage/
 .pulumi/
 *.retry
 *.rescue
+# Verification pipeline — ephemeral per-run artifacts (see verification/README.md)
+verification/pattern-inventory.yaml
+.verify-worklist

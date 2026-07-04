@@ -19,6 +19,10 @@ TIER_WEIGHTS = {"T1": 5, "T2": 4, "T3": 3, "T4": 2, "T5": 1}
 MATCH_VALUES = {"named", "aliased", "unnamed"}
 MAX_ENTRIES_PER_TIER = 3
 ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+# A pattern row in the experiments reference table: linked bold name, then a
+# Maturity column — section headings linked in the same table have no maturity.
+EXPERIMENT_ROW_RE = re.compile(
+    r"^\|\s*\*\*\[[^\]]+\]\(#([a-z0-9-]+)\)\*\*\s*\|\s*(?:Beginner|Intermediate|Advanced)\s*\|")
 
 REQUIRED_TOP_FIELDS = [
     "pattern", "slug", "verified", "adoption_score",
@@ -172,12 +176,70 @@ def validate_file(path):
     return errors
 
 
-def main():
-    """Validate every evidence file; exit non-zero on any failure."""
+def load_registry_slugs(registry_path, experiments_path):
+    """Return catalog slugs: patterns.yaml ids plus experimental table anchors."""
+    registry = yaml.safe_load(Path(registry_path).read_text(encoding="utf-8"))
+    slugs = {pattern["id"] for pattern in registry.get("patterns") or []}
+    experiments = Path(experiments_path)
+    if experiments.is_file():
+        for line in experiments.read_text(encoding="utf-8").splitlines():
+            row = EXPERIMENT_ROW_RE.match(line)
+            if row:
+                slugs.add(row.group(1))
+    return slugs
+
+
+def load_allowlist(path):
+    """Return the set of slugs allowed to lack an evidence file."""
+    if not path:
+        return set()
+    data = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+    return set(data.get("pending") or [])
+
+
+def cross_check_registry(evidence_slugs, registry_slugs, allowlist):
+    """Return errors for orphan evidence files and uncovered catalog patterns."""
+    errors = [
+        f"orphan evidence file '{slug}.yaml' — no such pattern in the catalog "
+        "(renamed or deleted?)"
+        for slug in sorted(evidence_slugs - registry_slugs)]
+    errors += [
+        f"pattern '{slug}' has no evidence file and is not in the pending allowlist"
+        for slug in sorted(registry_slugs - evidence_slugs - allowlist)]
+    return errors
+
+
+def report_registry_alignment(args, evidence_slugs):
+    """Run catalog cross-checks when --registry is given; return failure count."""
+    if not args.registry:
+        return 0
+    registry_slugs = load_registry_slugs(args.registry, args.experiments)
+    allowlist = load_allowlist(args.allowlist)
+    errors = cross_check_registry(evidence_slugs, registry_slugs, allowlist)
+    for error in errors:
+        print(f"FAIL registry: {error}")
+    for slug in sorted(evidence_slugs & allowlist):
+        print(f"NOTE '{slug}' now has evidence — remove it from the pending allowlist")
+    return len(errors)
+
+
+def build_arg_parser():
+    """Define the CLI: evidence directory plus optional catalog cross-checks."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dir", default="verification/evidence",
                         help="Directory containing evidence YAML files")
-    args = parser.parse_args()
+    parser.add_argument("--registry",
+                        help="patterns.yaml path; enables catalog slug cross-checks")
+    parser.add_argument("--experiments", default="experiments/README.md",
+                        help="Experimental patterns README (used with --registry)")
+    parser.add_argument("--allowlist",
+                        help="YAML file whose 'pending' list may lack evidence files")
+    return parser
+
+
+def main():
+    """Validate every evidence file; exit non-zero on any failure."""
+    args = build_arg_parser().parse_args()
     evidence_dir = Path(args.dir)
     if not evidence_dir.is_dir():
         print(f"error: evidence directory not found: {evidence_dir}")
@@ -193,6 +255,7 @@ def main():
                 print(f"  - {error}")
         else:
             print(f"OK   {path}")
+    failures += report_registry_alignment(args, {path.stem for path in files})
     print(f"\n{len(files)} file(s) checked, {failures} failure(s)")
     return 1 if failures else 0
 

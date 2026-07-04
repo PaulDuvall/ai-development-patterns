@@ -79,6 +79,11 @@ vibes-based analogies.
 
 ## Files
 
-- `pattern-inventory.yaml` — snapshot of all catalog patterns with their evidence state; drives
-  prioritization of the next run (oldest or missing evidence first).
 - `evidence/<slug>.yaml` — one file per pattern, keyed by the pattern's README anchor slug.
+- `pending-evidence.yaml` — slugs allowed to lack an evidence file. The validator's
+  `--registry` cross-check fails CI when a catalog pattern has neither an evidence file nor an
+  entry here (and when an evidence file's slug no longer exists in the catalog), so adding,
+  renaming, or removing a pattern forces this directory to move with it. When a pattern gains
+  evidence, remove its slug — the validator prints a NOTE until you do.
+- `pattern-inventory.yaml` — ephemeral per-run working file (gitignored, never committed);
+  each pipeline run regenerates it to prioritize the stalest patterns.

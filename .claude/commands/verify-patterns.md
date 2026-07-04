@@ -61,9 +61,9 @@ Arguments: $ARGUMENTS
    `experiments/README.md` (experimental patterns, tracked with `location: experiments`).
 2. Canonical work-item key = the pattern's README anchor slug (the same id the site generator
    derives). One evidence file per slug — one writer per resource.
-3. Regenerate `verification/pattern-inventory.yaml` (a derived artifact — never hand-edit):
-   name, slug, type, maturity, location, last_verified (from `verification/evidence/<slug>.yaml`),
-   evidence_count, aliases.
+3. Regenerate `verification/pattern-inventory.yaml` (an ephemeral working file — gitignored,
+   regenerated every run, never committed): name, slug, type, maturity, location, last_verified
+   (from `verification/evidence/<slug>.yaml`), evidence_count, aliases.
 4. Report: total patterns, zero-evidence patterns, patterns staler than `--stale-days`. This drives
    default prioritization.
 
