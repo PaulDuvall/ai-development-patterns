@@ -7,9 +7,11 @@ Run: python3 scripts/validate-evidence.py [--dir verification/evidence]
 """
 
 import argparse
+import datetime
 import re
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 import yaml
 
@@ -26,8 +28,23 @@ REQUIRED_ENTRY_FIELDS = ["tier", "match", "source", "url", "date", "retrieved", 
 
 
 def is_iso_date(value):
-    """Return True when value is an ISO 8601 date (YYYY-MM-DD)."""
-    return ISO_DATE_RE.match(str(value)) is not None
+    """Return True when value is a real ISO 8601 calendar date (YYYY-MM-DD)."""
+    if ISO_DATE_RE.match(str(value)) is None:
+        return False
+    try:
+        datetime.date.fromisoformat(str(value))
+    except ValueError:
+        return False
+    return True
+
+
+def is_valid_url(value):
+    """Return True for a concrete http(s) URL — no placeholders or whitespace."""
+    url = str(value)
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https") or not parsed.netloc:
+        return False
+    return "..." not in url and not any(ch.isspace() for ch in url)
 
 
 def is_none_found(evidence):
@@ -73,6 +90,11 @@ def validate_entry(entry, index, errors):
     for field in ("date", "retrieved"):
         if entry.get(field) and not is_iso_date(entry[field]):
             errors.append(f"evidence[{index}]: '{field}' must be ISO 8601 (YYYY-MM-DD)")
+    if is_iso_date(entry.get("date")) and is_iso_date(entry.get("retrieved")) \
+            and str(entry["date"]) > str(entry["retrieved"]):
+        errors.append(f"evidence[{index}]: 'date' must not be after 'retrieved'")
+    if entry.get("url") and not is_valid_url(entry["url"]):
+        errors.append(f"evidence[{index}]: url must be a concrete http(s) URL")
     if entry.get("match") in ("aliased", "unnamed") and not entry.get("mechanism_quote"):
         errors.append(f"evidence[{index}]: {entry.get('match')} entries require mechanism_quote")
 
@@ -107,6 +129,9 @@ def validate_top_fields(data, path, errors):
     for field in REQUIRED_TOP_FIELDS:
         if field not in data:
             errors.append(f"missing required field '{field}'")
+    for field in ("pattern", "slug", "verified", "naming_alignment", "verdict"):
+        if field in data and not data[field]:
+            errors.append(f"'{field}' must be non-empty")
     if data.get("slug") and path.stem != data["slug"]:
         errors.append(f"filename '{path.name}' does not match slug '{data['slug']}'")
     if data.get("verified") and not is_iso_date(data["verified"]):
@@ -118,6 +143,8 @@ def validate_evidence_entries(data, errors):
     evidence = data.get("evidence")
     if not isinstance(evidence, list) and not is_none_found(evidence):
         errors.append("'evidence' must be a list of entries or the string 'none found'")
+    if isinstance(evidence, list) and not evidence:
+        errors.append("empty evidence must be recorded as the string 'none found'")
     entries = []
     for index, item in enumerate(evidence if isinstance(evidence, list) else []):
         if isinstance(item, dict):
@@ -132,7 +159,8 @@ def validate_file(path):
     """Validate a single evidence file; return a list of error strings."""
     try:
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
-    except yaml.YAMLError as exc:
+    except (yaml.YAMLError, ValueError) as exc:
+        # ValueError: PyYAML raises it for unquoted impossible dates (e.g. 2026-02-30)
         return [f"invalid YAML: {exc}"]
     if not isinstance(data, dict):
         return ["file is not a YAML mapping"]

@@ -26,6 +26,35 @@ def run_validator(directory):
     )
 
 
+EVIDENCE_TEMPLATE = """\
+pattern: Example Pattern
+slug: {slug}
+verified: 2026-01-01
+adoption_score: {score}
+naming_alignment: {alignment}
+evidence:
+  - tier: T4
+    match: named
+    source: "Example blog"
+    url: {url}
+    date: '{date}'
+    retrieved: '2026-01-01'
+    claim: "Example claim"
+verdict: {verdict}
+"""
+
+
+def write_evidence(directory, filename="example.yaml", slug="example", score=2,
+                   alignment="strong", verdict="unverified",
+                   url="https://example.com/post", date="2026-01-01"):
+    """Write a single-entry evidence file (defaults recompute cleanly)."""
+    content = EVIDENCE_TEMPLATE.format(
+        slug=slug, score=score, alignment=alignment,
+        verdict=verdict, url=url, date=date,
+    )
+    (directory / filename).write_text(content, encoding="utf-8")
+
+
 def test_validator_exists():
     """The evidence schema guard script must be present."""
     assert VALIDATOR.is_file(), f"missing {VALIDATOR}"
@@ -146,6 +175,86 @@ def test_validator_enforces_tier_cap(tmp_path):
     result = run_validator(tmp_path)
     assert result.returncode == 1
     assert "max 3" in result.stdout
+
+
+def test_validator_baseline_fixture_passes(tmp_path):
+    """The shared fixture must be valid so the mutation tests test one thing."""
+    write_evidence(tmp_path)
+    result = run_validator(tmp_path)
+    assert result.returncode == 0, result.stdout
+
+
+def test_validator_rejects_asserted_score(tmp_path):
+    """An adoption_score that does not recompute from the entries must fail."""
+    write_evidence(tmp_path, score=14)
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "adoption_score is 14, recomputes to 2" in result.stdout
+
+
+def test_validator_rejects_asserted_naming_alignment(tmp_path):
+    """A naming_alignment that does not recompute must fail."""
+    write_evidence(tmp_path, alignment="none")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "naming_alignment is 'none', recomputes to 'strong'" in result.stdout
+
+
+def test_validator_rejects_filename_slug_mismatch(tmp_path):
+    """A file whose name differs from its slug breaks one-writer-per-resource."""
+    write_evidence(tmp_path, filename="wrong-name.yaml")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "does not match slug" in result.stdout
+
+
+def test_validator_rejects_null_slug(tmp_path):
+    """A present-but-null slug must not bypass the filename-match check."""
+    write_evidence(tmp_path, slug="null")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "'slug' must be non-empty" in result.stdout
+
+
+def test_validator_rejects_impossible_calendar_date(tmp_path):
+    """A well-shaped but impossible date (month 13, Feb 30) must fail."""
+    write_evidence(tmp_path, date="2026-02-30")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "must be ISO 8601" in result.stdout
+
+
+def test_validator_rejects_date_after_retrieved(tmp_path):
+    """A source cannot carry a date later than the day it was retrieved."""
+    write_evidence(tmp_path, date="2026-02-01")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "must not be after 'retrieved'" in result.stdout
+
+
+def test_validator_rejects_placeholder_url(tmp_path):
+    """The spec example's 'https://...' placeholder must never validate."""
+    write_evidence(tmp_path, url="https://...")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "concrete http(s) URL" in result.stdout
+
+
+def test_validator_rejects_empty_evidence_list(tmp_path):
+    """'evidence: []' must be rejected in favor of the 'none found' encoding."""
+    empty = textwrap.dedent("""\
+        pattern: Example Pattern
+        slug: empty-list
+        verified: 2026-01-01
+        adoption_score: 0
+        naming_alignment: none
+        evidence: []
+        verdict: unverified
+    """)
+    (tmp_path / "empty-list.yaml").write_text(empty, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "none found" in result.stdout
 
 
 def test_validator_accepts_none_found(tmp_path):
