@@ -203,29 +203,43 @@ jobs:
             if [ -n "$issues" ]; then echo "$issues"; else echo "_none_"; fi
             echo
 
+            # One fetch of open PR heads feeds both sections below; on gh
+            # failure, say so instead of false-reporting everything.
+            if open_heads=$(gh pr list --state open --json headRefName --jq '.[].headRefName'); then
+              heads_ok=1
+            else
+              heads_ok=""
+            fi
+
             # A max-turns/timeout cutoff kills the agent's own truncation report,
             # so reconstruct coverage deterministically: the agent writes its
-            # selected slugs to .verify-worklist at Phase 1.
+            # selected slugs to .verify-worklist at Phase 1. Match by branch
+            # prefix, not today's date — the PR may have opened before midnight.
             echo "### Selected patterns without an opened PR (possible truncation)"
-            if [ -f .verify-worklist ]; then
+            if [ ! -f .verify-worklist ]; then
+              echo "_no worklist file written (run may have died before Phase 1 completed)_"
+            elif [ -z "$heads_ok" ]; then
+              echo "_could not list open PRs (gh failed); skipping coverage diff_"
+            else
               missing=""
               while IFS= read -r slug; do
                 [ -z "$slug" ] && continue
-                gh pr list --state open --head "verify/${slug}-$(date -u +%Y%m%d)" --json number --jq '.[0].number' | grep -q . \
+                echo "$open_heads" | grep -q "^verify/${slug}-" \
                   || missing="$missing- \`$slug\`\n"
               done < .verify-worklist
               if [ -n "$missing" ]; then printf "%b" "$missing"; else echo "_none — all selected patterns produced PRs or needed no change_"; fi
-            else
-              echo "_no worklist file written (run may have died before Phase 1 completed)_"
             fi
             echo
 
             # Orphan branches: pushed by a cut-off run, no PR ever opened.
             echo "### verify/discover branches with no open PR"
-            open_heads=$(gh pr list --state open --json headRefName --jq '.[].headRefName')
-            orphans=$(git ls-remote --heads origin 'verify/*' 'discover/*' | awk '{print $2}' | sed 's#refs/heads/##' \
-              | while IFS= read -r branch; do echo "$open_heads" | grep -qx "$branch" || echo "- \`$branch\`"; done)
-            if [ -n "$orphans" ]; then echo "$orphans"; else echo "_none_"; fi
+            if [ -z "$heads_ok" ]; then
+              echo "_could not list open PRs (gh failed); skipping orphan check_"
+            else
+              orphans=$(git ls-remote --heads origin 'verify/*' 'discover/*' | awk '{print $2}' | sed 's#refs/heads/##' \
+                | while IFS= read -r branch; do echo "$open_heads" | grep -qx "$branch" || echo "- \`$branch\`"; done)
+              if [ -n "$orphans" ]; then echo "$orphans"; else echo "_none_"; fi
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
 
   # Scheduled runs must not fail silently week after week (e.g. missing PAT,
