@@ -122,6 +122,32 @@ def test_validator_requires_mechanism_quote(tmp_path):
     assert "mechanism_quote" in result.stdout
 
 
+def test_validator_enforces_tier_cap(tmp_path):
+    """More than 3 entries in a single tier must fail validation."""
+    entry = textwrap.dedent("""\
+          - tier: T5
+            match: named
+            source: "Example discussion {n}"
+            url: https://example.com/post-{n}
+            date: 2026-01-01
+            retrieved: 2026-01-01
+            claim: "Example claim {n}"
+    """)
+    entries = "".join(entry.replace("{n}", str(n)) for n in range(4))
+    bad = textwrap.dedent("""\
+        pattern: Example Pattern
+        slug: over-cap
+        verified: 2026-01-01
+        adoption_score: 4
+        naming_alignment: strong
+        evidence:
+    """) + entries + "verdict: weak\n"
+    (tmp_path / "over-cap.yaml").write_text(bad, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "max 3" in result.stdout
+
+
 def test_validator_accepts_none_found(tmp_path):
     """A searched-but-empty file using 'none found' must pass."""
     good = textwrap.dedent("""\
