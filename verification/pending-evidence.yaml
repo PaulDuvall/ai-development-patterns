@@ -5,8 +5,6 @@
 # --registry). When a pattern gains evidence, the validator prints a NOTE — remove
 # its slug from this list in the same PR so the allowlist shrinks toward empty.
 #
-# Seeded 2026-07-04 with the full catalog (evidence PRs #19-#28 were not yet
-# merged); prune the first 10 slugs once those PRs land.
 pending:
 - adversarial-evaluator
 - asynchronous-research
@@ -18,13 +16,10 @@ pending:
 - centralized-rules
 - chaos-engineering
 - chatops-security
-- codified-rules
 - context-optimization
-- context-persistence
 - custom-commands
 - debt-forecasting
 - deployment-synthesis
-- developer-lifecycle
 - drift-remediation
 - error-resolution
 - event-automation
@@ -36,24 +31,17 @@ pending:
 - handoff-protocols
 - image-spec
 - incident-automation
-- issue-generation
 - long-running-orchestration
 - observable-development
 - parallel-agents
 - pipeline-synthesis
-- planned-implementation
 - policy-generation
 - progressive-disclosure
-- progressive-enhancement
-- readiness-assessment
 - release-synthesis
 - review-automation
 - security-orchestration
-- security-sandbox
-- spec-driven-development
 - suite-health
 - test-promotion
 - testing-orchestration
-- tool-integration
 - upgrade-advisor
 - workflow-orchestration
