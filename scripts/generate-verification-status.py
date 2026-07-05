@@ -41,6 +41,15 @@ mention = 1, at most 3 entries per tier). **Naming** — `strong`: most sources 
 name · `weak`: some do · `aliased`: industry uses other stable names (rename signal) ·
 `none`: sources practice the mechanism without naming it.
 Rules: [README.md](README.md) · recommendations and decisions: [DECISIONS.md](DECISIONS.md).
+
+## How to refresh
+
+- **This table only** (after evidence or DECISIONS.md changes):
+  `python3 scripts/generate-verification-status.py`
+- **Re-verify patterns** (new evidence, new verdicts): run the pipeline — see
+  "Running a verification" in [README.md](README.md). Quick versions:
+  `/verify-patterns` in Claude Code from the repo root, or
+  `gh workflow run verify-patterns.yml` (GitHub Actions, runs weekly on its own).
 """
 
 

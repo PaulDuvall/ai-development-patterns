@@ -11,6 +11,12 @@ their batched sources PR when evidence changes. CI (`tests/test_evidence_files.p
 a ledger row for every `verified` pattern whose `naming_alignment` is not `strong`, so a new
 naming signal cannot land without appearing here.
 
+**After editing this file** (recording a decision, adjusting a recommendation):
+run `python3 scripts/generate-verification-status.py` — [STATUS.md](STATUS.md) embeds the
+Recommendation and Decision columns and CI fails while it is stale. To gather fresh evidence
+behind a recommendation, run the pipeline instead: see "Running a verification" in
+[README.md](README.md) (`gh workflow run verify-patterns.yml` or `/verify-patterns`).
+
 ## Naming-decision ledger
 
 Alignment values come from each pattern's `evidence/<slug>.yaml`; rules are defined in

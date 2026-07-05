@@ -22,6 +22,44 @@ remains the canonical pattern registry.
    `needs-evidence` issues, and discovery candidates. Renames and demotions stay human
    decisions — the pipeline only supplies evidence.
 
+## Running a verification
+
+**GitHub Actions (preferred).** The `Pattern Verification & Discovery` workflow
+(`.github/workflows/verify-patterns.yml`) runs on two schedules — **Mondays 05:00 UTC**
+(the 10 stalest patterns) and the **1st of each month 06:00 UTC** (discovery of new pattern
+candidates). Trigger it manually from the Actions tab ("Run workflow") or the CLI:
+
+```bash
+gh workflow run verify-patterns.yml                        # stale-default: 10 stalest patterns
+gh workflow run verify-patterns.yml -f mode=full           # all phases, all patterns
+gh workflow run verify-patterns.yml -f mode=discover-only  # unknown-unknowns discovery only
+gh workflow run verify-patterns.yml -f mode=single-pattern -f pattern="Security Sandbox"
+```
+
+Requires two repo secrets: `ANTHROPIC_API_KEY` and `VERIFY_PATTERNS_PAT` (a fine-grained PAT
+with contents/pull-requests/issues write — without it, scheduled runs fail fast rather than
+opening PRs that no CI will check). Results arrive as `verify/*` PRs, a batched sources PR,
+and a run summary on the workflow page.
+
+**Manually (Claude Code).** From the repo root:
+
+```
+/verify-patterns                              # 10 stalest patterns
+/verify-patterns --pattern "Security Sandbox" # one pattern
+/verify-patterns --discover-only              # discovery only
+/verify-patterns --full                       # everything
+```
+
+**Refresh derived views without re-verifying** (after editing DECISIONS.md or merging
+evidence PRs):
+
+```bash
+python3 scripts/generate-verification-status.py   # rebuild STATUS.md
+python3 scripts/validate-evidence.py --registry patterns.yaml \
+  --allowlist verification/pending-evidence.yaml  # recheck all evidence + catalog alignment
+python3 -m pytest tests/test_evidence_files.py -m "not slow"  # everything CI enforces
+```
+
 ## What this answers
 
 Each file in `evidence/` replaces "I think this pattern is real" with tiered, dated, citable
