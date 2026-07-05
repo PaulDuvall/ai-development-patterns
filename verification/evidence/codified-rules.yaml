@@ -1,0 +1,109 @@
+pattern: Codified Rules
+slug: codified-rules
+verified: '2026-07-02'
+adoption_score: 25
+naming_alignment: weak
+terminology_variants:
+- term: AGENTS.md
+  used_by: OpenAI, Amp, Google Jules, Cursor, Factory; stewarded by the Agentic AI Foundation (Linux Foundation)
+  url: https://agents.md/
+- term: Rules / Project Rules / Team Rules
+  used_by: Cursor
+  url: https://cursor.com/docs/rules
+- term: CLAUDE.md / memory / .claude/rules/
+  used_by: Anthropic (Claude Code)
+  url: https://code.claude.com/docs/en/memory
+- term: repository custom instructions (copilot-instructions.md)
+  used_by: GitHub Copilot
+  url: https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions
+- term: custom instructions
+  used_by: 'OpenAI Codex (page title: "Custom instructions with AGENTS.md")'
+  url: https://developers.openai.com/codex/guides/agents-md
+- term: agent context files / Agent READMEs
+  used_by: Academic software-engineering research (Chatlatanagulchai et al., arXiv)
+  url: https://arxiv.org/abs/2511.12884
+- term: .cursorrules
+  used_by: Cursor community (PatrickJS/awesome-cursorrules)
+  url: https://github.com/PatrickJS/awesome-cursorrules
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: Project rules live in `.cursor/rules` as `.mdc` files and are version-controlled.
+  source: Cursor — Rules feature (official docs)
+  url: https://cursor.com/docs/rules
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Cursor ships a Rules feature where project rules live in .cursor/rules as version-controlled files scoped
+    by glob patterns, with User Rules, Team Rules enforced org-wide from a dashboard, and AGENTS.md as a plain-markdown
+    alternative; docs instruct users to check rules into git so the whole team benefits (undated page; date = retrieval
+    date)
+- tier: T1
+  match: aliased
+  mechanism_quote: Codex reads AGENTS.md files before doing any work. By layering global guidance with project-specific
+    overrides, you can start each task with consistent expectations, no matter which repository you open.
+  source: OpenAI — Codex AGENTS.md guide (shipped CLI/IDE/cloud agent behavior)
+  url: https://developers.openai.com/codex/guides/agents-md
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: OpenAI Codex, a shipped coding agent, reads layered AGENTS.md instruction files (global ~/.codex plus per-repository
+    and nested per-directory files) before doing any work, merging them root-down with closer files taking precedence
+    (undated page; date = retrieval date)
+- tier: T2
+  match: aliased
+  mechanism_quote: 'AGENTS.md complements this by containing the extra, sometimes detailed context coding agents
+    need: build steps, tests, and conventions that might clutter a README or aren’t relevant to human contributors.'
+  source: agents.md — AGENTS.md open format specification site (OpenAI, Amp, Google Jules, Cursor, Factory; stewarded
+    by the Agentic AI Foundation under the Linux Foundation)
+  url: https://agents.md/
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Canonical site for the AGENTS.md open format for repo-committed coding-agent instruction files (build steps,
+    code style, testing, security sections); states it is used by over 60k open-source projects and lists supporting
+    tools including Codex, Aider, Gemini CLI, Devin, Cursor, Windsurf, JetBrains Junie, VS Code, GitHub Copilot
+    coding agent, Google Jules, Zed, and Warp (undated page; date = retrieval date)
+- tier: T2
+  match: aliased
+  mechanism_quote: These instructions are shared with your team through version control, so focus on project-level
+    standards rather than personal preferences.
+  source: Anthropic — Claude Code docs, "How Claude remembers your project" (memory / CLAUDE.md)
+  url: https://code.claude.com/docs/en/memory
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Official Claude Code docs describe project CLAUDE.md files shared with the team through version control,
+    plus a .claude/rules/ directory of modular topic files (code-style.md, testing.md, security.md) with path-scoped
+    frontmatter — closely matching the pattern's .ai/rules/ structure; also documents managed org-wide CLAUDE.md
+    deployment (undated page; date = retrieval date)
+- tier: T2
+  match: aliased
+  mechanism_quote: These are specified in a `copilot-instructions.md` file in the `.github` directory of the repository.
+  source: GitHub — Copilot docs, "Adding repository custom instructions for GitHub Copilot"
+  url: https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Official GitHub docs define repository-wide custom instructions in .github/copilot-instructions.md, path-specific
+    NAME.instructions.md files with applyTo glob frontmatter, and AGENTS.md/CLAUDE.md/GEMINI.md agent instruction
+    files, all stored in the repository (undated page; date = retrieval date)
+- tier: T4
+  match: named
+  source: 'Nilo (AI Engineer, Google Cloud) — "SDLC Standards with Agentic Plugins: A Platform Engineer''s Field
+    Guide" (Google Cloud Community on Medium)'
+  url: https://medium.com/google-cloud/sdlc-standards-with-agentic-plugins-a-platform-engineers-field-guide-0c36f883b537
+  date: '2026-06-24'
+  retrieved: '2026-07-02'
+  claim: 'Practitioner guide showing org SDLC standards packaged as version-controlled rules/*.md files (with trigger:
+    always_on frontmatter, e.g. a secret-management rule) distributed to AI assistants via agentic plugins; the
+    conclusion states this facilitates ''how AI assistants adhere to standards in the organization with codified
+    rules'' — the only external source found using the pattern''s own phrase'
+- tier: T5
+  match: aliased
+  mechanism_quote: Already adopted by more than 20,000 repositories on GitHub, the format is being positioned as
+    a companion to traditional documentation, offering machine-readable context that complements human-facing files
+    like README.md.
+  source: Robert Krzaczyński — "AGENTS.md Emerges as Open Standard for AI Coding Agents" (InfoQ news)
+  url: https://www.infoq.com/news/2025/08/agents-md/
+  date: '2025-08-27'
+  retrieved: '2026-07-02'
+  claim: Dated, bylined industry news report that the AGENTS.md convention had already been adopted by more than
+    20,000 GitHub repositories at publication and is portable across Codex, Jules, Cursor, Aider, RooCode, and Zed;
+    includes practitioner skepticism from Hacker News
+verdict: verified
