@@ -18,6 +18,7 @@ This is the AI Development Patterns repository - a comprehensive collection of p
 ├── experiments/                 # Experimental patterns + examples
 ├── scripts/                     # Repo automation scripts (validation, updates)
 ├── tests/                       # Pytest-based validation suite
+├── verification/                # Machine-verified pattern adoption evidence (see verification/README.md)
 └── .github/                     # GitHub Actions workflows
 ```
 

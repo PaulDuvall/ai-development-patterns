@@ -1,0 +1,59 @@
+# Patterns allowed to lack an evidence file (verification/evidence/<slug>.yaml).
+#
+# This file makes evidence gaps visible: adding a pattern to the catalog without
+# either an evidence file or an entry here fails CI (scripts/validate-evidence.py
+# --registry). When a pattern gains evidence, the validator prints a NOTE — remove
+# its slug from this list in the same PR so the allowlist shrinks toward empty.
+#
+# Seeded 2026-07-04 with the full catalog (evidence PRs #19-#28 were not yet
+# merged); prune the first 10 slugs once those PRs land.
+pending:
+- adversarial-evaluator
+- asynchronous-research
+- atomic-decomposition
+- autonomous-acceptance
+- autonomous-defense
+- autonomous-remediation
+- bounded-autonomy
+- centralized-rules
+- chaos-engineering
+- chatops-security
+- codified-rules
+- context-optimization
+- context-persistence
+- custom-commands
+- debt-forecasting
+- deployment-synthesis
+- developer-lifecycle
+- drift-remediation
+- error-resolution
+- event-automation
+- evidence-automation
+- feedback-flywheel
+- guided-architecture
+- guided-refactoring
+- handoff-automation
+- handoff-protocols
+- image-spec
+- incident-automation
+- issue-generation
+- long-running-orchestration
+- observable-development
+- parallel-agents
+- pipeline-synthesis
+- planned-implementation
+- policy-generation
+- progressive-disclosure
+- progressive-enhancement
+- readiness-assessment
+- release-synthesis
+- review-automation
+- security-orchestration
+- security-sandbox
+- spec-driven-development
+- suite-health
+- test-promotion
+- testing-orchestration
+- tool-integration
+- upgrade-advisor
+- workflow-orchestration

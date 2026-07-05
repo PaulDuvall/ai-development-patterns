@@ -12,24 +12,50 @@ import textwrap
 from pathlib import Path
 
 import pytest
+import requests
+import yaml
 
 REPO_ROOT = Path(__file__).parent.parent
 VALIDATOR = REPO_ROOT / "scripts" / "validate-evidence.py"
 EVIDENCE_DIR = REPO_ROOT / "verification" / "evidence"
+REGISTRY = REPO_ROOT / "patterns.yaml"
+ALLOWLIST = REPO_ROOT / "verification" / "pending-evidence.yaml"
 
 
-def run_validator(directory):
+def run_validator(directory, *extra_args):
     """Run the evidence validator against a directory; return CompletedProcess."""
     return subprocess.run(
-        [sys.executable, str(VALIDATOR), "--dir", str(directory)],
+        [sys.executable, str(VALIDATOR), "--dir", str(directory), *extra_args],
         capture_output=True, text=True, cwd=REPO_ROOT, timeout=30,
     )
+
+
+def registry_args(directory, registry):
+    """CLI args for a hermetic registry check (no real experiments file)."""
+    return ("--registry", str(registry),
+            "--experiments", str(directory / "no-experiments.md"))
+
+
+def write_registry(directory, ids=("example",)):
+    """Write a minimal patterns.yaml-shaped registry; return its path."""
+    body = "patterns:\n" + "".join(f"- id: {i}\n  name: {i}\n" for i in ids)
+    path = directory / "patterns.yaml"
+    path.write_text(body, encoding="utf-8")
+    return path
+
+
+def write_allowlist(directory, slugs):
+    """Write a pending-evidence allowlist; return its path."""
+    body = "pending:\n" + "".join(f"- {s}\n" for s in slugs)
+    path = directory / "pending-evidence.yaml"
+    path.write_text(body, encoding="utf-8")
+    return path
 
 
 EVIDENCE_TEMPLATE = """\
 pattern: Example Pattern
 slug: {slug}
-verified: 2026-01-01
+last_checked: 2026-01-01
 adoption_score: {score}
 naming_alignment: {alignment}
 evidence:
@@ -50,8 +76,11 @@ def write_evidence(directory, filename="example.yaml", slug="example", score=2,
     """Write a single-entry evidence file (defaults recompute cleanly)."""
     content = EVIDENCE_TEMPLATE.format(
         slug=slug, score=score, alignment=alignment,
-        verdict=verdict, url=url, date=date,
+        verdict=verdict, url=url, date=date or "2026-01-01",
     )
+    if date is None:  # undated source: the date field is omitted entirely
+        lines = [l for l in content.splitlines() if not l.strip().startswith("date:")]
+        content = "\n".join(lines) + "\n"
     (directory / filename).write_text(content, encoding="utf-8")
 
 
@@ -68,6 +97,138 @@ def test_all_evidence_files_valid():
     assert result.returncode == 0, (
         f"evidence validation failed:\n{result.stdout}\n{result.stderr}"
     )
+
+
+def test_catalog_and_evidence_stay_aligned():
+    """Every catalog slug has evidence or is pending; no evidence is orphaned."""
+    if not EVIDENCE_DIR.is_dir():
+        pytest.skip("no evidence directory committed yet")
+    result = run_validator(
+        EVIDENCE_DIR, "--registry", str(REGISTRY), "--allowlist", str(ALLOWLIST))
+    assert result.returncode == 0, (
+        f"catalog/evidence alignment failed:\n{result.stdout}\n{result.stderr}"
+    )
+
+
+def make_evidence_dir(tmp_path):
+    """Return an evidence subdirectory so registry files stay out of the glob."""
+    evidence_dir = tmp_path / "evidence"
+    evidence_dir.mkdir()
+    return evidence_dir
+
+
+def test_registry_flags_orphan_evidence(tmp_path):
+    """An evidence file whose slug left the catalog must fail, not linger."""
+    evidence_dir = make_evidence_dir(tmp_path)
+    write_evidence(evidence_dir)
+    registry = write_registry(tmp_path, ids=("other-pattern",))
+    result = run_validator(evidence_dir, *registry_args(tmp_path, registry))
+    assert result.returncode == 1
+    assert "orphan evidence file 'example.yaml'" in result.stdout
+
+
+def test_registry_flags_uncovered_pattern(tmp_path):
+    """A catalog pattern with no evidence file and no allowlist entry must fail."""
+    evidence_dir = make_evidence_dir(tmp_path)
+    write_evidence(evidence_dir)
+    registry = write_registry(tmp_path, ids=("example", "uncovered"))
+    result = run_validator(evidence_dir, *registry_args(tmp_path, registry))
+    assert result.returncode == 1
+    assert "pattern 'uncovered' has no evidence file" in result.stdout
+
+
+def test_registry_allowlist_permits_missing_evidence(tmp_path):
+    """An allowlisted pattern may lack evidence without failing the run."""
+    evidence_dir = make_evidence_dir(tmp_path)
+    write_evidence(evidence_dir)
+    registry = write_registry(tmp_path, ids=("example", "uncovered"))
+    allowlist = write_allowlist(tmp_path, ["uncovered"])
+    result = run_validator(
+        evidence_dir, *registry_args(tmp_path, registry), "--allowlist", str(allowlist))
+    assert result.returncode == 0, result.stdout
+
+
+def test_registry_notes_prunable_allowlist_entry(tmp_path):
+    """A pattern with evidence AND an allowlist entry passes but prints a NOTE."""
+    evidence_dir = make_evidence_dir(tmp_path)
+    write_evidence(evidence_dir)
+    registry = write_registry(tmp_path, ids=("example",))
+    allowlist = write_allowlist(tmp_path, ["example"])
+    result = run_validator(
+        evidence_dir, *registry_args(tmp_path, registry), "--allowlist", str(allowlist))
+    assert result.returncode == 0, result.stdout
+    assert "remove it from the pending allowlist" in result.stdout
+
+
+def test_registry_includes_experimental_patterns(tmp_path):
+    """Slugs from the experiments reference table count as catalog patterns."""
+    evidence_dir = make_evidence_dir(tmp_path)
+    write_evidence(evidence_dir, filename="exp-pattern.yaml", slug="exp-pattern")
+    registry = write_registry(tmp_path, ids=())
+    experiments = tmp_path / "experiments.md"
+    experiments.write_text(
+        "| **[Exp Pattern](#exp-pattern)** | Intermediate | Workflow | d | x |\n",
+        encoding="utf-8")
+    result = run_validator(
+        evidence_dir, "--registry", str(registry), "--experiments", str(experiments))
+    assert result.returncode == 0, result.stdout
+
+
+def test_validator_accepts_omitted_entry_date(tmp_path):
+    """Undated sources omit 'date'; only 'retrieved' is mandatory."""
+    write_evidence(tmp_path, date=None)
+    result = run_validator(tmp_path)
+    assert result.returncode == 0, result.stdout
+
+
+def test_validator_requires_last_checked(tmp_path):
+    """A file with neither last_checked nor legacy verified must fail."""
+    bad = textwrap.dedent("""\
+        pattern: Example Pattern
+        slug: no-date
+        adoption_score: 0
+        naming_alignment: none
+        evidence: none found
+        verdict: unverified
+    """)
+    (tmp_path / "no-date.yaml").write_text(bad, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "missing required field 'last_checked'" in result.stdout
+
+
+def test_validator_rejects_both_check_date_fields(tmp_path):
+    """Carrying last_checked AND legacy verified together must fail."""
+    bad = textwrap.dedent("""\
+        pattern: Example Pattern
+        slug: both-dates
+        last_checked: 2026-01-01
+        verified: 2026-01-01
+        adoption_score: 0
+        naming_alignment: none
+        evidence: none found
+        verdict: unverified
+    """)
+    (tmp_path / "both-dates.yaml").write_text(bad, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "use 'last_checked' only" in result.stdout
+
+
+def test_validator_accepts_legacy_verified_field(tmp_path):
+    """Files written before the rename (verified:) stay valid until regenerated."""
+    good = textwrap.dedent("""\
+        pattern: Example Pattern
+        slug: legacy
+        verified: 2026-01-01
+        adoption_score: 0
+        naming_alignment: none
+        evidence: none found
+        verdict: unverified
+    """)
+    (tmp_path / "legacy.yaml").write_text(good, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 0, result.stdout
 
 
 def test_validator_errors_on_missing_directory(tmp_path):
@@ -271,3 +432,214 @@ def test_validator_accepts_none_found(tmp_path):
     (tmp_path / "nothing-found.yaml").write_text(good, encoding="utf-8")
     result = run_validator(tmp_path)
     assert result.returncode == 0, result.stdout
+
+
+def fetch_status(url):
+    """Return an HTTP status (falling back HEAD->GET) or an exception name."""
+    headers = {"User-Agent": "Mozilla/5.0 (ai-development-patterns link check)"}
+    try:
+        response = requests.head(url, timeout=10, allow_redirects=True, headers=headers)
+        if response.status_code >= 400:
+            response = requests.get(url, timeout=10, allow_redirects=True,
+                                    headers=headers, stream=True)
+        return response.status_code
+    except requests.RequestException as exc:
+        return type(exc).__name__
+
+
+def collect_evidence_urls():
+    """Map each unique evidence URL to the first file that cites it."""
+    urls = {}
+    for path in sorted(EVIDENCE_DIR.glob("*.yaml")):
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        evidence = data.get("evidence")
+        for entry in evidence if isinstance(evidence, list) else []:
+            url = entry.get("url") if isinstance(entry, dict) else None
+            if url:
+                urls.setdefault(url, path.name)
+    return urls
+
+
+@pytest.mark.slow
+def test_evidence_urls_alive():
+    """Verified verdicts must not silently rest on dead links (weekly check)."""
+    if not EVIDENCE_DIR.is_dir():
+        pytest.skip("no evidence directory committed yet")
+    bot_guarded = {401, 403, 429}  # alive but refusing automated clients
+    failures = []
+    for url, filename in collect_evidence_urls().items():
+        status = fetch_status(url)
+        if isinstance(status, int) and (status < 400 or status in bot_guarded):
+            continue
+        failures.append(f"{filename}: {url} -> {status}")
+    assert not failures, "evidence link rot detected:\n" + "\n".join(failures)
+
+
+STRICT_ALIASED_FILE = """\
+pattern: Example Pattern
+slug: {slug}
+{check_field}: 2026-01-01
+adoption_score: 2
+naming_alignment: {alignment}
+evidence:
+  - tier: T4
+    match: aliased
+    mechanism_quote: "the tool rebuilds the config from the spec on every run"
+    source: "Example blog"
+    url: https://example.com/post
+    date: '2026-01-01'
+    retrieved: '2026-01-01'
+    claim: "Example claim"
+verdict: unverified
+"""
+
+
+def test_strict_zero_named_computes_aliased(tmp_path):
+    """Regenerated files: zero named + stable industry names = 'aliased'."""
+    content = STRICT_ALIASED_FILE.format(
+        slug="rename-signal", check_field="last_checked", alignment="aliased")
+    (tmp_path / "rename-signal.yaml").write_text(content, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 0, result.stdout
+
+
+def test_legacy_zero_named_stays_weak(tmp_path):
+    """Legacy files keep the original three-value alignment until regenerated."""
+    content = STRICT_ALIASED_FILE.format(
+        slug="legacy-weak", check_field="verified", alignment="weak")
+    (tmp_path / "legacy-weak.yaml").write_text(content, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 0, result.stdout
+
+
+VENDOR_ONLY_FILE = """\
+pattern: Example Pattern
+slug: {slug}
+{check_field}: 2026-01-01
+adoption_score: 8
+naming_alignment: strong
+evidence:
+  - tier: T2
+    match: named
+    mechanism_quote: "the docs define exactly this mechanism"
+    source: "Vendor A docs"
+    url: https://vendor-a.example.com/docs
+    date: '2026-01-01'
+    retrieved: '2026-01-01'
+    claim: "Vendor A documents the practice"
+  - tier: T2
+    match: named
+    mechanism_quote: "the reference architecture prescribes this mechanism"
+    source: "Vendor B docs"
+    url: https://vendor-b.example.org/docs
+    date: '2026-01-01'
+    retrieved: '2026-01-01'
+    claim: "Vendor B documents the practice"
+verdict: verified
+"""
+
+
+def test_strict_verified_requires_practitioner_source(tmp_path):
+    """Regenerated files: vendor docs alone (2xT2=8) no longer verify."""
+    content = VENDOR_ONLY_FILE.format(slug="vendor-only", check_field="last_checked")
+    (tmp_path / "vendor-only.yaml").write_text(content, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "recomputes to 'weak'" in result.stdout
+
+
+def test_legacy_verified_allows_vendor_only(tmp_path):
+    """Legacy files keep the original verdict rule until regenerated."""
+    content = VENDOR_ONLY_FILE.format(slug="legacy-vendor", check_field="verified")
+    (tmp_path / "legacy-vendor.yaml").write_text(content, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 0, result.stdout
+
+
+def test_strict_named_t1_requires_mechanism_quote(tmp_path):
+    """Regenerated files: a name match alone must not earn T1/T2 weight."""
+    bad = textwrap.dedent("""\
+        pattern: Example Pattern
+        slug: name-collision
+        last_checked: 2026-01-01
+        adoption_score: 5
+        naming_alignment: strong
+        evidence:
+          - tier: T1
+            match: named
+            source: "Same-named product"
+            url: https://example.com/product
+            date: '2026-01-01'
+            retrieved: '2026-01-01'
+            claim: "Product shares the pattern's name"
+        verdict: weak
+    """)
+    (tmp_path / "name-collision.yaml").write_text(bad, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "named T1/T2 entries require mechanism_quote" in result.stdout
+
+
+def test_strict_one_entry_per_org(tmp_path):
+    """Regenerated files: the same organization cannot score twice in one file."""
+    bad = textwrap.dedent("""\
+        pattern: Example Pattern
+        slug: double-dip
+        last_checked: 2026-01-01
+        adoption_score: 4
+        naming_alignment: strong
+        evidence:
+          - tier: T4
+            match: named
+            source: "Author blog post A"
+            url: https://blog.example.com/post-a
+            date: '2026-01-01'
+            retrieved: '2026-01-01'
+            claim: "First write-up"
+          - tier: T4
+            match: named
+            source: "Author blog post B"
+            url: https://blog.example.com/post-b
+            date: '2026-01-01'
+            retrieved: '2026-01-01'
+            claim: "Second write-up of the same workflow"
+        verdict: weak
+    """)
+    (tmp_path / "double-dip.yaml").write_text(bad, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "one entry per org per file" in result.stdout
+
+
+def test_tier_counts_must_recompute(tmp_path):
+    """A tier_counts breakdown that disagrees with the entries must fail."""
+    bad = textwrap.dedent("""\
+        pattern: Example Pattern
+        slug: wrong-counts
+        last_checked: 2026-01-01
+        adoption_score: 2
+        tier_counts: {T4: 2}
+        naming_alignment: strong
+        evidence:
+          - tier: T4
+            match: named
+            source: "Example blog"
+            url: https://example.com/post
+            date: '2026-01-01'
+            retrieved: '2026-01-01'
+            claim: "Example claim"
+        verdict: unverified
+    """)
+    (tmp_path / "wrong-counts.yaml").write_text(bad, encoding="utf-8")
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "tier_counts" in result.stdout
+
+
+def test_shared_url_across_files_prints_note(tmp_path):
+    """One URL scoring in two patterns is visible (NOTE) but not fatal."""
+    write_evidence(tmp_path)
+    write_evidence(tmp_path, filename="second.yaml", slug="second")
+    result = run_validator(tmp_path)
+    assert result.returncode == 0, result.stdout
+    assert "shared source scored in example, second" in result.stdout

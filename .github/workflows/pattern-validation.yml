@@ -114,7 +114,7 @@ jobs:
     - name: Run external link tests (slow)
       run: |
         cd tests
-        python3 -m pytest test_links.py -v --tb=short -m "slow"
+        python3 -m pytest test_links.py test_evidence_files.py -v --tb=short -m "slow"
       continue-on-error: true  # External links may be temporarily unavailable
     
     - name: Upload link validation results
@@ -335,6 +335,7 @@ jobs:
         python3 -m pytest test_readme_accuracy.py::TestReadmeAccuracy::test_pattern_reference_table_matches_implementations -v
         python3 -m pytest test_links.py::TestHyperlinkIntegrity::test_internal_anchor_links_valid -v
         python3 -m pytest test_dependencies.py::TestPatternDependencies::test_no_circular_dependencies -v
+        python3 -m pytest test_evidence_files.py -v -m "not slow"
     
     - name: Check critical test results
       run: |

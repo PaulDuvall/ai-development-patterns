@@ -33,6 +33,9 @@ on:
     # so evidence PRs exist by the time that run fires. Scheduled runs use
     # stale-default mode — the cheapest, most targeted slice.
     - cron: '0 5 * * 1'
+    # Monthly unknown-unknowns discovery (Phase 4) — without this cron the
+    # discovery phase would only ever run on manual dispatch.
+    - cron: '0 6 1 * *'
 
 # One run at a time: parallel runs would race on verify/* branches and the
 # derived inventory file.
@@ -98,14 +101,36 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      # The pattern input reaches the agent prompt verbatim, so validate it
+      # deterministically first: it must be an exact name from patterns.yaml.
+      - name: Validate pattern input
+        if: inputs.mode == 'single-pattern'
+        env:
+          PATTERN: ${{ inputs.pattern }}
+        run: |
+          python3 - <<'PY'
+          import os, sys, yaml
+          pattern = os.environ.get("PATTERN") or ""
+          if any(ch in pattern for ch in "\"'\n\r"):
+              sys.exit("pattern input must not contain quotes or newlines")
+          names = {p["name"] for p in yaml.safe_load(open("patterns.yaml"))["patterns"]}
+          if pattern not in names:
+              sys.exit(f"unknown pattern name: {pattern!r} (must match patterns.yaml exactly)")
+          PY
+
       - name: Build command arguments
         id: args
         env:
           MODE: ${{ inputs.mode || 'stale-default' }}
+          # Which cron fired (empty on workflow_dispatch): the monthly
+          # '0 6 1 * *' entry runs discovery instead of stale-default.
+          SCHEDULE: ${{ github.event.schedule }}
           PATTERN: ${{ inputs.pattern }}
           STALE_DAYS: ${{ inputs.stale_days || '90' }}
           SINCE_DAYS: ${{ inputs.since_days || '30' }}
+          MAX_TURNS: ${{ inputs.max_turns }}
         run: |
+          if [ "$SCHEDULE" = "0 6 1 * *" ]; then MODE="discover-only"; fi
           case "$MODE" in
             full)           args="--full" ;;
             discover-only)  args="--discover-only" ;;
@@ -114,6 +139,13 @@ jobs:
           esac
           args="$args --stale-days $STALE_DAYS --since $SINCE_DAYS"
           echo "value=$args" >> "$GITHUB_OUTPUT"
+          # Turn ceilings scale with mode; an explicit max_turns input wins.
+          case "$MODE" in
+            full) default_turns=300 ;;
+            discover-only) default_turns=150 ;;
+            *) default_turns=120 ;;
+          esac
+          echo "turns=${MAX_TURNS:-$default_turns}" >> "$GITHUB_OUTPUT"
 
       - name: Run pattern verification pipeline
         id: claude
@@ -126,7 +158,7 @@ jobs:
           prompt: /verify-patterns ${{ steps.args.outputs.value }}
           claude_args: |
             --model claude-sonnet-5
-            --max-turns ${{ inputs.max_turns || '120' }}
+            --max-turns ${{ steps.args.outputs.turns }}
             --allowedTools "Bash(git:*),Bash(gh:*),Bash(python3:*),Bash(pytest:*),Bash(mkdir:*),Bash(date:*),Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Task"
 
       # The agent writes its own report to the step summary when it finishes
@@ -169,4 +201,88 @@ jobs:
             issues=$(gh issue list --label needs-evidence --state open --json number,title,url \
               --jq '.[] | "- [#\(.number)](\(.url)) \(.title)"' || true)
             if [ -n "$issues" ]; then echo "$issues"; else echo "_none_"; fi
+            echo
+
+            # One fetch of open PR heads feeds both sections below; on gh
+            # failure, say so instead of false-reporting everything.
+            if open_heads=$(gh pr list --state open --json headRefName --jq '.[].headRefName'); then
+              heads_ok=1
+            else
+              heads_ok=""
+            fi
+
+            # A max-turns/timeout cutoff kills the agent's own truncation report,
+            # so reconstruct coverage deterministically: the agent writes its
+            # selected slugs to .verify-worklist at Phase 1. Match by branch
+            # prefix, not today's date — the PR may have opened before midnight.
+            echo "### Selected patterns without an opened PR (possible truncation)"
+            if [ ! -f .verify-worklist ]; then
+              echo "_no worklist file written (run may have died before Phase 1 completed)_"
+            elif [ -z "$heads_ok" ]; then
+              echo "_could not list open PRs (gh failed); skipping coverage diff_"
+            else
+              missing=""
+              while IFS= read -r slug; do
+                [ -z "$slug" ] && continue
+                echo "$open_heads" | grep -q "^verify/${slug}-" \
+                  || missing="$missing- \`$slug\`\n"
+              done < .verify-worklist
+              if [ -n "$missing" ]; then printf "%b" "$missing"; else echo "_none — all selected patterns produced PRs or needed no change_"; fi
+            fi
+            echo
+
+            # Orphan branches: pushed by a cut-off run, no PR ever opened.
+            echo "### verify/discover branches with no open PR"
+            if [ -z "$heads_ok" ]; then
+              echo "_could not list open PRs (gh failed); skipping orphan check_"
+            else
+              orphans=$(git ls-remote --heads origin 'verify/*' 'discover/*' | awk '{print $2}' | sed 's#refs/heads/##' \
+                | while IFS= read -r branch; do echo "$open_heads" | grep -qx "$branch" || echo "- \`$branch\`"; done)
+              if [ -n "$orphans" ]; then echo "$orphans"; else echo "_none_"; fi
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
+
+  # Scheduled runs must not fail silently week after week (e.g. missing PAT,
+  # repeated agent errors). Mirror pattern-validation's issue-based alerting,
+  # but scoped to schedule events, which its push-scoped job never covers.
+  notify-failure:
+    runs-on: ubuntu-latest
+    name: Notify on Scheduled Failure
+    needs: [verify]
+    if: failure() && github.event_name == 'schedule'
+    permissions:
+      issues: write
+    steps:
+      - name: Create or update failure issue
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { data: existing } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'verify-patterns-failure',
+              state: 'open'
+            });
+            const runUrl = `${context.payload.repository.html_url}/actions/runs/${context.runId}`;
+            if (existing.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing[0].number,
+                body: `Scheduled verification failed again: ${runUrl}`
+              });
+              return;
+            }
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Scheduled pattern verification is failing',
+              labels: ['automation', 'verify-patterns-failure'],
+              body: [
+                'The weekly/monthly verify-patterns run is failing, so adoption',
+                'evidence is not being refreshed. Common cause: VERIFY_PATTERNS_PAT',
+                'missing or expired (scheduled runs hard-fail without it).',
+                '',
+                `Failed run: ${runUrl}`
+              ].join('\n')
+            });
