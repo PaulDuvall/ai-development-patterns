@@ -15,13 +15,14 @@ are answered per pattern:
 2. **Does the industry use our name for it?** → `naming_alignment` and `terminology_variants`
 
 These deliberately never collapse into one signal: `verified` with `naming_alignment: none`
-means "real practice, our name for it" (an alias/rename discussion), while `unverified` means
+means "real practice, not our name for it" (an alias/rename discussion), while `unverified` means
 "the practice itself may not be established" (a demotion discussion). Both discussions are
 human decisions — the pipeline only supplies evidence.
 
 ## Evidence tiers
 
-Every admitted source is scored against this rubric. At most 3 entries count per tier.
+Every admitted source is scored against this rubric. At most 3 entries per tier are admitted —
+the validator rejects a file that exceeds the cap, so keep the 3 strongest and drop the rest.
 
 | Tier | Evidence type | Weight | Admission test |
 |------|--------------|--------|----------------|
@@ -33,7 +34,7 @@ Every admitted source is scored against this rubric. At most 3 entries count per
 
 ## Reading an evidence file
 
-**`adoption_score`** — sum of tier weights across accepted entries (max 3 per tier), so the
+**`adoption_score`** — sum of tier weights across accepted entries (at most 3 admitted per tier), so the
 range is 0–45. Rough bands: **0–2** no meaningful evidence · **3–7** thin signal · **8+ with at
 least one T1–T3 entry** established practice, not just blog chatter. Example:
 `24 = 3×T1 (15) + 1×T3 (3) + 3×T4 (6)` means three shipped tools implement the practice, one

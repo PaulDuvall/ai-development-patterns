@@ -114,8 +114,8 @@ Only entries surviving verification are written to `verification/evidence/<slug>
 pattern: Spec-Driven Development
 slug: spec-driven-development
 verified: 2026-07-02
-adoption_score: 14        # computed: sum of tier weights, max 3 entries per tier
-naming_alignment: strong  # computed: strong | weak | none (see rules below)
+adoption_score: 7         # computed: 1×T1 (5) + 1×T4 (2); at most 3 entries admitted per tier
+naming_alignment: weak    # computed: 1 of 2 entries named — strong needs a named majority
 terminology_variants:
   - term: "spec-first development"
     used_by: "GitHub (Spec Kit docs)"
@@ -136,7 +136,7 @@ evidence:
     date: 2026-01-15
     retrieved: 2026-07-02
     claim: "Team practices spec-first agent workflow without naming it"
-verdict: verified         # computed — never asserted
+verdict: weak             # computed — never asserted (score 7 < 8, so not verified)
 ```
 
 Then run `scripts/validate-evidence.py` to confirm score, verdict, and naming_alignment recompute
