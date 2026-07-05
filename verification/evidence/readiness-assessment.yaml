@@ -1,0 +1,107 @@
+pattern: Readiness Assessment
+slug: readiness-assessment
+verified: '2026-07-02'
+adoption_score: 24
+naming_alignment: weak
+terminology_variants:
+- term: Agent Readiness / Readiness Report
+  used_by: Factory.ai (product and docs)
+  url: https://factory.ai/product/agent-readiness
+- term: agent-ready codebase
+  used_by: Guillaume Moigneu (Upsun engineering blog); also Eno Reyes (Factory AI) at AI Engineer
+  url: https://developer.upsun.com/posts/ai/making-coding-agents-reliable
+- term: DORA AI Capabilities Model
+  used_by: DORA research team / Google Cloud
+  url: https://cloud.google.com/blog/products/ai-machine-learning/introducing-doras-inaugural-ai-capabilities-model
+- term: AI Readiness Assessment
+  used_by: Microsoft Learn (interactive organizational assessment)
+  url: https://learn.microsoft.com/en-us/assessments/94f1c697-9ba7-4d47-ad83-7c6bd94b1505/
+- term: AI Maturity Self-Assessment
+  used_by: Coder
+  url: https://coder.com/blog/what-100-engineering-teams-revealed-about-ai-maturity-and-what-to-do-about-it
+- term: AI Readiness checklist
+  used_by: Dominika Zając (practitioner, Medium/dev.to)
+  url: https://domizajac.medium.com/is-your-repo-ready-for-the-ai-agents-revolution-926e548da528
+- term: AI-Readiness Assessment for Software Development
+  used_by: sw-craftsmanship-dojo (open-source assessment based on DORA and Stanford SWEPR research, hosted at ai-readiness.dev)
+  url: https://github.com/sw-craftsmanship-dojo/sw-ai-readiness-assessment
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: Evaluates your codebase across 8 technical pillars and 5 maturity levels. Finds the environment
+    problems that defeat any agent and tells you what to fix first.
+  source: Factory.ai — Agent Readiness (product)
+  url: https://factory.ai/product/agent-readiness
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Factory ships a commercial 'Agent Readiness' product that evaluates a codebase across 8 technical pillars
+    (Style & Validation, Build System, Testing, Documentation, Dev Environment, Observability, Security, Task Discovery)
+    and 5 maturity levels, producing a Readiness Report runnable today via app.factory.ai, a /readiness-report CLI
+    command, and CI integration (undated page; date = retrieval date)
+- tier: T1
+  match: aliased
+  mechanism_quote: Evaluate how ready your codebase is for autonomous AI coding agents like **Claude Code**, **Cursor**,
+    **GitHub Copilot**, and **Codex**. 39 automated checks, 7 pillars, 10+ languages.
+  source: Kodus — @kodus/agent-readiness (open-source CLI, npm)
+  url: https://github.com/kodustech/agent-readiness
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Open-source npm CLI (created 2026-02-02, 64 stars; date = repo last-updated per GitHub API) that runs 39
+    automated checks across 7 pillars (Style & Linting, Testing, Documentation, Dev Environment, CI/CD, Code Health,
+    Security) and outputs a maturity level, per-pillar scores, and prioritized recommendations — positioned as the
+    open-source alternative to Factory.ai's Agent Readiness
+- tier: T1
+  match: named
+  source: Microsoft Learn — AI Readiness Assessment (interactive assessment)
+  url: https://learn.microsoft.com/en-us/assessments/94f1c697-9ba7-4d47-ad83-7c6bd94b1505/
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Microsoft hosts a runnable ~45-minute interactive 'AI Readiness Assessment' that scores an organization's
+    preparedness for AI adoption across seven pillars (Business Strategy, AI Governance & Security, Data Foundations,
+    AI Strategy & Experience, Organization & Culture, Infrastructure for AI, Model Management) and returns curated
+    guidance; organization-level AI adoption rather than codebase-specific (undated page; date = retrieval date)
+- tier: T3
+  match: aliased
+  mechanism_quote: 'In this talk, we''ll explore eight categories that determine whether your codebase is agent-ready:
+    from style validation and build systems to dev environments and observability.'
+  source: Eno Reyes (CTO, Factory AI) — 'Making Codebases Agent Ready', AI Engineer conference talk (recording on
+    AI Engineer YouTube channel)
+  url: https://www.youtube.com/watch?v=ShuJ_CN6zr4
+  date: '2025-12-22'
+  retrieved: '2026-07-02'
+  claim: 15-minute conference talk arguing the bottleneck for agent adoption is codebase 'agent readiness' rather
+    than model quality, and presenting a framework of eight scored categories teams use to assess repos and prioritize
+    remediation before scaling agent use; 52k+ views
+- tier: T4
+  match: aliased
+  mechanism_quote: Getting your codebase agent-ready requires systematic coverage across eight areas.
+  source: Upsun engineering blog — Guillaume Moigneu, 'Making coding agents (Claude Code, Codex, etc.) reliable'
+  url: https://developer.upsun.com/posts/ai/making-coding-agents-reliable
+  date: '2026-02-17'
+  retrieved: '2026-07-02'
+  claim: Practitioner post with an '8 pillars of verification' framework and an 80-criteria checklist (10 criteria
+    per pillar across testing, documentation, code quality, build systems, dev environments, observability, security,
+    standards) for auditing whether a codebase is agent-ready and finding the biggest gap
+- tier: T4
+  match: named
+  source: Dominika Zając — 'Is your repo ready for the AI Agents revolution? Checklist' (Medium; also mirrored on
+    dev.to)
+  url: https://domizajac.medium.com/is-your-repo-ready-for-the-ai-agents-revolution-926e548da528
+  date: '2026-01-18'
+  retrieved: '2026-07-02'
+  claim: Practitioner article presenting an 'AI Readiness checklist' for evaluating a repository before AI-agent
+    adoption across four sections — Repository Hygiene, Testing Safety Net, Grounding Documents, and MCP Integrations
+    — including concrete criteria like a single obvious command for start/test/lint
+- tier: T4
+  match: aliased
+  mechanism_quote: The goal was to give engineering leaders a concrete way to benchmark where they stand and plan
+    what comes next.
+  source: Coder engineering blog — Carly Stephens and Kodie Dower, 'What 100 Engineering Teams Revealed About AI
+    Maturity and What to Do About It'
+  url: https://coder.com/blog/what-100-engineering-teams-revealed-about-ai-maturity-and-what-to-do-about-it
+  date: '2026-04-20'
+  retrieved: '2026-07-02'
+  claim: Coder released an 'AI Maturity Self-Assessment' plus a five-stage framework for how engineering organizations
+    adopt agentic AI, based on assessment data from 100+ engineering teams, so leaders can benchmark current state
+    and plan adoption
+verdict: verified
