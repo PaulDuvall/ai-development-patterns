@@ -191,8 +191,8 @@ not a search-method failure. Demotion is a human decision.
 **(d)** If a terminology variant dominates industry usage: add an alias mention in the pattern
 description ("also referred to as X by Y") in the batched PR. Never rename.
 
-**(e)** `verified` with `naming_alignment: none` or `weak`: produce a **naming recommendation**,
-not just a flag. For each such pattern:
+**(e)** `verified` with `naming_alignment: none`, `weak`, or `aliased`: produce a **naming
+recommendation**, not just a flag. For each such pattern:
 
 1. Identify the dominant industry term(s) from `terminology_variants` — dominance means multiple
    independent (unaffiliated) sources, weighted by evidence tier.
@@ -207,9 +207,12 @@ not just a flag. For each such pattern:
    - **rename to <Candidate>** — only when the candidate passes the full checklist AND either the
      industry term dominates across independent sources or the current name has a documented
      collision/discoverability problem (e.g. name-mode searches drown in an unrelated meaning).
-4. Record the recommendation in the final report. Renaming remains a human decision — never open
-   a rename PR; if a human accepts a rename, PATTERN_MIGRATION_GUIDE.md governs the mechanics
-   (anchors, slugs, evidence file key, site regeneration).
+4. Record the recommendation in the final report, and refresh the pattern's row in
+   `verification/DECISIONS.md` in the batched Phase 3(b) PR — data columns only (Alignment,
+   Industry terms, Recommendation); the Decision column is human-owned and must never be
+   written by the pipeline. Renaming remains a human decision — never open a rename PR; if a
+   human accepts a rename, PATTERN_MIGRATION_GUIDE.md governs the mechanics (anchors, slugs,
+   evidence file key, site regeneration).
 
 ## Phase 4 — Unknown-unknowns discovery
 

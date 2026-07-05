@@ -20,6 +20,7 @@ VALIDATOR = REPO_ROOT / "scripts" / "validate-evidence.py"
 EVIDENCE_DIR = REPO_ROOT / "verification" / "evidence"
 REGISTRY = REPO_ROOT / "patterns.yaml"
 ALLOWLIST = REPO_ROOT / "verification" / "pending-evidence.yaml"
+DECISIONS = REPO_ROOT / "verification" / "DECISIONS.md"
 
 
 def run_validator(directory, *extra_args):
@@ -643,3 +644,20 @@ def test_shared_url_across_files_prints_note(tmp_path):
     result = run_validator(tmp_path)
     assert result.returncode == 0, result.stdout
     assert "shared source scored in example, second" in result.stdout
+
+
+def test_naming_discussions_have_ledger_rows():
+    """Every verified pattern without strong naming alignment appears in DECISIONS.md."""
+    if not EVIDENCE_DIR.is_dir():
+        pytest.skip("no evidence directory committed yet")
+    assert DECISIONS.is_file(), f"missing {DECISIONS}"
+    ledger = DECISIONS.read_text(encoding="utf-8")
+    missing = []
+    for path in sorted(EVIDENCE_DIR.glob("*.yaml")):
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if data.get("verdict") == "verified" and data.get("naming_alignment") != "strong":
+            if data.get("pattern") not in ledger:
+                missing.append(data.get("pattern"))
+    assert not missing, (
+        "verified patterns with a naming signal lack a DECISIONS.md ledger row: "
+        + ", ".join(missing))
