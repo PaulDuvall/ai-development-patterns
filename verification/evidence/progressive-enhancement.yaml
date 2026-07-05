@@ -1,0 +1,95 @@
+pattern: Progressive Enhancement
+slug: progressive-enhancement
+verified: '2026-07-02'
+adoption_score: 23
+naming_alignment: weak
+terminology_variants:
+- term: Break complex tasks into simpler tasks
+  used_by: GitHub Docs (Copilot prompt engineering)
+  url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
+- term: bite sized steps
+  used_by: Aider official docs
+  url: https://aider.chat/docs/usage/tips.html
+- term: prompt plan / small, iterative chunks
+  used_by: Harper Reed (harper.blog), copied verbatim into 161+ GitHub files
+  url: https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
+- term: Incremental Development Rules
+  used_by: Rakia Ben Sassi (The Engineering Wisdom)
+  url: https://rakiabensassi.substack.com/p/stop-just-prompting-your-ai-coder
+evidence:
+- tier: T2
+  match: aliased
+  mechanism_quote: If you want Copilot to complete a complex or large task, break the task into multiple simple,
+    small tasks.
+  source: GitHub Docs, "Prompt engineering for GitHub Copilot Chat"
+  url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: GitHub's official Copilot documentation instructs users to complete complex or large tasks by breaking
+    them into multiple simple, small tasks accomplished one by one, with a worked word-search example decomposed
+    into four sequential prompts (undated page; date = retrieval date)
+- tier: T2
+  match: aliased
+  mechanism_quote: Break your goal down into bite sized steps. Do them one at a time.
+  source: Aider (Paul Gauthier), official usage docs "Tips"
+  url: https://aider.chat/docs/usage/tips.html
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Aider's official documentation tells users to break their goal into bite-sized steps done one at a time,
+    adjusting the files in the chat between steps, and to discuss a plan first for complex changes (undated page;
+    date = retrieval date)
+- tier: T1
+  match: unnamed
+  mechanism_quote: '**Single-tick build-loop conductor** — advances one ready spec by one pipeline stage (plan →
+    plan-review → work → make-pr, plus an optional `qa` stage when `pipeline.qa==on`) per tick, ends with a `PILOT_VERDICT`
+    line; drive it with `/loop` or `/goal`'
+  source: gmickel/flow-next (Claude Code/Codex workflow plugin, 648 stars)
+  url: https://github.com/gmickel/flow-next
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Shipped plugin whose pilot loop advances one ready spec by one pipeline stage per tick (plan, plan-review,
+    work, make-pr), producing a draft PR per small increment instead of one large generation; Ralph mode drives
+    a fresh session per iteration (README undated; date = repo last-push date, retrieved this run)
+- tier: T1
+  match: unnamed
+  mechanism_quote: Then, once you have a solid plan, break it down into small, iterative chunks that build on each
+    other.
+  source: harperreed/dotfiles, shipped .claude/commands/plan.md (representative of GitHub-wide artifact fingerprint)
+  url: https://github.com/harperreed/dotfiles/blob/master/.claude/commands/plan.md
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Runnable Claude Code command that plans a project as small iterative chunks implemented step-by-step; GitHub
+    code search this run found 519 files named prompt_plan.md and 161 files containing this exact prompt sentence
+    across repos, including Amazon Q prompt configs and Claude Code plugins (undated file; date = retrieval date)
+- tier: T4
+  match: unnamed
+  mechanism_quote: Draft a detailed, step-by-step blueprint for building this project. Then, once you have a solid
+    plan, break it down into small, iterative chunks that build on each other.
+  source: Harper Reed, "My LLM codegen workflow atm" (harper.blog)
+  url: https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
+  date: '2025-02-16'
+  retrieved: '2026-07-02'
+  claim: 'Practitioner workflow post with full prompts: plan a spec, break it into small iterative chunks saved
+    as prompt_plan.md, then execute each prompt one at a time in claude/aider, running code and tests before moving
+    to the next prompt'
+- tier: T4
+  match: named
+  source: Rakia Ben Sassi, "Stop Just Prompting Your AI Coder. Start Context Engineering." (The Engineering Wisdom,
+    Substack)
+  url: https://rakiabensassi.substack.com/p/stop-just-prompting-your-ai-coder
+  date: '2025-11-26'
+  retrieved: '2026-07-02'
+  claim: 'Practitioner post showing a full claude.md config whose "Incremental Development Rules" section names
+    "Progressive enhancement" as a rule alongside "Start minimal", "Iterate with purpose - Each iteration should
+    be reviewable and deployable", "No ''big bang'' commits", and "NEVER Generate: Entire features in one response"'
+- tier: T5
+  match: unnamed
+  mechanism_quote: Work in smaller steps and get more feedback.
+  source: 'Kent Beck (guest), O11ycast Ep. #80 "Augmented Coding with Kent Beck" (Heavybit podcast, transcript)'
+  url: https://www.heavybit.com/library/podcasts/o11ycast/ep-80-augmented-coding-with-kent-beck
+  date: '2025-04-30'
+  retrieved: '2026-07-02'
+  claim: Kent Beck, discussing AI-assisted ("augmented") coding, states the core wisdom he would impart is working
+    in smaller steps with more feedback, with co-host describing the discipline of going back and redoing work in
+    smaller increments when a big swing fails
+verdict: verified
