@@ -1,0 +1,87 @@
+pattern: Tool Integration
+slug: tool-integration
+verified: '2026-07-02'
+adoption_score: 27
+naming_alignment: weak
+terminology_variants:
+- term: function calling / tool calling
+  used_by: OpenAI (API documentation)
+  url: https://developers.openai.com/api/docs/guides/function-calling
+- term: tool use
+  used_by: Anthropic (Claude API documentation)
+  url: https://platform.claude.com/docs/en/docs/build-with-claude/tool-use
+- term: Model Context Protocol (MCP)
+  used_by: Anthropic and the MCP open-source ecosystem
+  url: https://www.anthropic.com/news/model-context-protocol
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: The servers in this repository showcase the versatility and extensibility of MCP, demonstrating
+    how it can be used to give Large Language Models (LLMs) secure, controlled access to tools and data sources.
+  source: Model Context Protocol steering group, modelcontextprotocol/servers GitHub repository
+  url: https://github.com/modelcontextprotocol/servers
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Reference implementations of MCP servers (filesystem, fetch, etc.) with 87,974 stars, runnable today via
+    npx — including @modelcontextprotocol/server-filesystem, the exact package named in this pattern's own config
+    example (repo last updated 2026-07-02; created 2024-11-19)
+- tier: T1
+  match: aliased
+  mechanism_quote: Model Context Protocol (MCP) enables Cursor to connect to external tools and data sources.
+  source: Cursor, MCP documentation
+  url: https://cursor.com/docs/context/mcp
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Cursor ships built-in MCP support letting users connect the IDE's AI to external tools and data sources
+    today (undated page; date = retrieval date)
+- tier: T2
+  match: aliased
+  mechanism_quote: It provides a universal, open standard for connecting AI systems with data sources, replacing
+    fragmented integrations with a single protocol.
+  source: Anthropic, Model Context Protocol announcement
+  url: https://www.anthropic.com/news/model-context-protocol
+  date: '2024-11-25'
+  retrieved: '2026-07-02'
+  claim: 'Anthropic announced MCP as an open standard for exactly this pattern''s mechanism: standardized two-way
+    connections between AI systems and external data sources and tools'
+- tier: T2
+  match: aliased
+  mechanism_quote: Connect Claude to external tools and APIs.
+  source: Anthropic, Tool use with Claude documentation
+  url: https://platform.claude.com/docs/en/docs/build-with-claude/tool-use
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Anthropic's canonical API docs describe tool use as the mechanism for connecting Claude to user-defined
+    functions, external APIs, and MCP servers, with client-executed and server-executed tools (undated page; date
+    = retrieval date)
+- tier: T2
+  match: aliased
+  mechanism_quote: Function calling (also known as tool calling) provides a powerful and flexible way for OpenAI
+    models to interface with external systems and access data outside their training data.
+  source: OpenAI, Function calling guide (API documentation)
+  url: https://developers.openai.com/api/docs/guides/function-calling
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: OpenAI's canonical API docs describe function calling (also called tool calling) as the way models interface
+    with external systems and access data beyond training data (undated page; date = retrieval date)
+- tier: T3
+  match: aliased
+  mechanism_quote: we show that LMs can teach themselves to use external tools via simple APIs and achieve the best
+    of both worlds.
+  source: 'Schick et al. (Meta AI), Toolformer: Language Models Can Teach Themselves to Use Tools (arXiv 2302.04761)'
+  url: https://arxiv.org/abs/2302.04761
+  date: '2023-02-09'
+  retrieved: '2026-07-02'
+  claim: Research paper demonstrating language models learning to call external tools (calculator, search, QA, calendar)
+    via APIs to overcome limits of prompt-only generation
+- tier: T4
+  match: aliased
+  mechanism_quote: Function calling allows large language models (LLMs) to interact with external tools, APIs, and
+    functions based on user input.
+  source: Saurabh Rai (Apideck), An introduction to function calling and tool use
+  url: https://www.apideck.com/blog/llm-tool-use-and-function-calling
+  date: '2025-01-28'
+  retrieved: '2026-07-02'
+  claim: Practitioner blog with full working Python/Ollama implementation of tool definitions, orchestration loop,
+    and an external search-API tool (published 2025-01-28, page shows updated 2026-05-05)
+verdict: verified
