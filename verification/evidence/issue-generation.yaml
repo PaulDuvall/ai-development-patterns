@@ -1,0 +1,95 @@
+pattern: Issue Generation
+slug: issue-generation
+verified: '2026-07-02'
+adoption_score: 26
+naming_alignment: weak
+terminology_variants:
+- term: parse PRD / generate tasks (parse-prd)
+  used_by: Task Master (eyaltoledano/claude-task-master)
+  url: https://github.com/eyaltoledano/claude-task-master
+- term: Copilot issue generation
+  used_by: InfoQ (Steef-Jan Wiggers)
+  url: https://www.infoq.com/news/2026/02/ai-floods-close-projects/
+- term: create issues from a natural-language prompt
+  used_by: GitHub Docs (Copilot)
+  url: https://docs.github.com/en/copilot/using-github-copilot/using-github-copilot-to-create-issues
+- term: suggested child work items
+  used_by: Atlassian Support (Rovo / Atlassian Intelligence)
+  url: https://support.atlassian.com/organization-administration/docs/atlassian-intelligence-features-in-jira-software/
+- term: automated user story generation
+  used_by: Rahman & Zhu, arXiv GeneUS paper
+  url: https://arxiv.org/abs/2404.01558
+- term: graph issue tracker for AI agents
+  used_by: Beads (gastownhall/beads)
+  url: https://github.com/gastownhall/beads
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: The more detailed your PRD, the better the generated tasks will be.
+  source: Eyal Toledano - Task Master (eyaltoledano/claude-task-master)
+  url: https://github.com/eyaltoledano/claude-task-master
+  date: '2026-04-28'
+  retrieved: '2026-07-02'
+  claim: Shipped CLI/MCP tool (27,751 GitHub stars) whose parse-prd command generates a task list with dependencies
+    from a PRD for AI coding assistants (Cursor, Claude Code, Windsurf); README instructs users to parse requirements
+    and work tasks in dependency order.
+- tier: T1
+  match: aliased
+  mechanism_quote: It replaces messy markdown plans with a dependency-aware graph, allowing agents to handle long-horizon
+    tasks without losing context.
+  source: Steve Yegge / Gastown Hall - Beads (gastownhall/beads)
+  url: https://github.com/gastownhall/beads
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Shipped git-native 'distributed graph issue tracker for AI agents' (25,040 GitHub stars) providing agents
+    dependency-aware work items with epic hierarchies, blocker links, and ready-task detection.
+- tier: T1
+  match: unnamed
+  mechanism_quote: Analyzes your requirements document and generates a complete task breakdown.
+  source: vanzan01 - claude-code-sub-agent-collective (parse-prd command template)
+  url: https://github.com/vanzan01/claude-code-sub-agent-collective
+  date: '2026-04-20'
+  retrieved: '2026-07-02'
+  claim: Third-party Claude Code agent-collective repo (522 stars) ships a parse-prd command template that turns
+    a requirements document into a task breakdown with dependencies and testing tasks; GitHub code search also surfaced
+    other repos carrying .taskmaster/docs/prd.txt artifacts (e.g., wilplus/frontend-cursor).
+- tier: T2
+  match: aliased
+  mechanism_quote: Copilot can create or update issues from a natural-language prompt or a screenshot.
+  source: GitHub Docs - Using GitHub Copilot to create issues
+  url: https://docs.github.com/en/copilot/using-github-copilot/using-github-copilot-to-create-issues
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Official GitHub docs describe Copilot creating issues from a natural-language prompt, filling in title,
+    body, labels, and assignees using the repository's issue templates (undated page; date = retrieval date).
+- tier: T2
+  match: aliased
+  mechanism_quote: Generate a list of suggested child work items, based on the details of the parent work item.
+  source: Atlassian Support - Rovo AI features in Jira (Atlassian Intelligence)
+  url: https://support.atlassian.com/organization-administration/docs/atlassian-intelligence-features-in-jira-software/
+  date: '2026-07-02'
+  retrieved: '2026-07-02'
+  claim: Official Atlassian docs describe an AI work-breakdown feature that generates suggested child work items
+    from a parent work item and links accepted suggestions as children, plus AI creation of work items from Slack/Teams/backlog
+    context (undated page; date = retrieval date).
+- tier: T4
+  match: aliased
+  mechanism_quote: 'And Claude executes the API calls: creates the Epic, then each Story with the Epic as parent,
+    with Acceptance Criteria in the description and estimates in the corresponding field.'
+  source: 'Nacho Bassino - ''PRD -> User Stories -> Jira: How to Automate the Full Pipeline with AI'' (Product Direction
+    Substack)'
+  url: https://productdirection.substack.com/p/prd-user-stories-jira-how-to-automate
+  date: '2026-01-27'
+  retrieved: '2026-07-02'
+  claim: Practitioner post with a reusable prompt template and Atlassian MCP configuration for converting a PRD
+    into an epic plus atomic user stories with Gherkin (Given/When/Then) acceptance criteria, created directly in
+    Jira with epic-child linking.
+- tier: T5
+  match: named
+  source: Steef-Jan Wiggers - InfoQ news, 'AI Vibe Coding Threatens Open Source as Maintainers Face Crisis'
+  url: https://www.infoq.com/news/2026/02/ai-floods-close-projects/
+  date: '2026-02-24'
+  retrieved: '2026-07-02'
+  claim: InfoQ news article refers to GitHub's shipped feature as 'Copilot issue generation' (launched May 2025)
+    while reporting that maintainers lack tools to filter the resulting AI-generated submissions.
+verdict: verified
