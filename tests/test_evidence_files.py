@@ -661,3 +661,13 @@ def test_naming_discussions_have_ledger_rows():
     assert not missing, (
         "verified patterns with a naming signal lack a DECISIONS.md ledger row: "
         + ", ".join(missing))
+
+
+def test_status_view_in_sync():
+    """verification/STATUS.md must match a fresh regeneration (the simple view)."""
+    result = subprocess.run(
+        [sys.executable, str(REPO_ROOT / "scripts" / "generate-verification-status.py"),
+         "--check"],
+        capture_output=True, text=True, cwd=REPO_ROOT, timeout=30,
+    )
+    assert result.returncode == 0, f"{result.stdout}{result.stderr}"

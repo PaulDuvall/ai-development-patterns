@@ -11,7 +11,7 @@
 
 A comprehensive collection of patterns based on my experience for building software with AI assistance, organized by implementation maturity and development lifecycle phases. These patterns are subject to change as the field evolves.
 
-Adoption claims are machine-verified: an automated pipeline collects tiered, dated evidence that each pattern is practiced in industry — under its name here or any other — and CI recomputes every verdict from the evidence. See [verification/](verification/README.md) for how it works.
+Adoption claims are machine-verified: an automated pipeline collects tiered, dated evidence that each pattern is practiced in industry — under its name here or any other — and CI recomputes every verdict from the evidence. See [verification/STATUS.md](verification/STATUS.md) for the at-a-glance status of every pattern, and [verification/](verification/README.md) for how it works.
 
 ```mermaid
 graph TB

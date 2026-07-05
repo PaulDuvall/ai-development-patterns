@@ -169,8 +169,10 @@ commits, no Co-Authored-By trailers. If a branch for the same slug and date alre
 same-day re-run), reset it to `origin/main`, redo the change, and `git push --force-with-lease`
 rather than stacking commits or inventing a variant branch name.
 
-**(a) Per-pattern evidence PRs** — branch `verify/<slug>-<yyyymmdd>`, touching ONLY
-`verification/evidence/<slug>.yaml`. These files are disjoint; open freely in parallel.
+**(a) Per-pattern evidence PRs** — branch `verify/<slug>-<yyyymmdd>`, touching
+`verification/evidence/<slug>.yaml` plus the regenerated `verification/STATUS.md`
+(`python3 scripts/generate-verification-status.py` — each pattern edits only its own table
+row, so parallel PRs stay line-disjoint). Open freely in parallel.
 Commit: `docs(verification): verify <slug> — <verdict>, score <n>`. PR body = evidence summary as
 markdown. Only open a PR when the verdict or evidence actually changed.
 
@@ -178,7 +180,7 @@ markdown. Only open a PR when the verdict or evidence actually changed.
 top evidence changed, add/refresh the pattern section's source line using the EXISTING convention —
 `**Source**: Author, "[Title](url)", Month D, YYYY` — top 1-2 entries only; evidence detail lives in
 `verification/`, preserving the 2-3 minute scannability rule. Regenerate site artifacts ONCE here
-(`update-pattern-count.py`, `generate-patterns-data.py`), run `pytest tests/`, commit
+(`update-pattern-count.py`, `generate-patterns-data.py`, `generate-verification-status.py`), run `pytest tests/`, commit
 `docs(patterns): refresh source citations from adoption evidence`.
 Rationale: `index.html` and `assets/js/patterns-data.js` are whole-file regenerated — per-pattern
 PRs touching them would all conflict.
