@@ -297,12 +297,12 @@ class PatternValidator:
     def check_for_old_names(self, repo_root: Path) -> list[tuple[str, str, int]]:
         """Search for old pattern names that should have been renamed."""
         old_names = [
-            "AI Readiness Assessment", "Rules as Code", "AI Security Sandbox",
+            "AI Readiness Assessment", "Readiness Assessment", "Rules as Code", "AI Security Sandbox",
             "AI Developer Lifecycle", "AI Tool Integration", "AI Issue Generation",
             "Specification Driven Development", "AI Plan-First Development",
-            "Progressive AI Enhancement", "AI Choice Generation",
+            "Progressive AI Enhancement", "Progressive Enhancement", "AI Choice Generation",
             "Atomic Task Decomposition", "Parallelized AI Coding Agents",
-            "AI Context Persistence", "Constraint-Based AI Development",
+            "AI Context Persistence", "Context Persistence", "Constraint-Based AI Development",
             "Observable AI Development", "AI-Driven Refactoring",
             "AI-Driven Architecture Design", "AI-Driven Traceability",
             "Policy-as-Code Generation", "Security Scanning Orchestration",

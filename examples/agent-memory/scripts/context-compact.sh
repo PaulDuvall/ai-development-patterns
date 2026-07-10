@@ -1,5 +1,5 @@
 #!/bin/bash
-# AI Context Persistence - Context Compaction
+# Agent Memory - Context Compaction
 #
 # Manage context size and create session summaries
 

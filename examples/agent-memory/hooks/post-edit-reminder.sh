@@ -1,5 +1,5 @@
 #!/bin/bash
-# AI Context Persistence - PostToolUse Hook
+# Agent Memory - PostToolUse Hook
 #
 # Reminds you to capture successful patterns after file edits
 # Configure in .claude/settings.json:

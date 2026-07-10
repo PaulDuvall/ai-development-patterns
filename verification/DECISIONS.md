@@ -25,9 +25,9 @@ Alignment values come from each pattern's `evidence/<slug>.yaml`; rules are defi
 
 | Pattern | Alignment | Industry terms | Recommendation | Decision |
 |---------|-----------|----------------|----------------|----------|
-| Readiness Assessment | weak | *agent readiness* (Factory.ai, Kodus); *AI readiness assessment* (Microsoft — org-level, a name collision) | **Rename → Agent Readiness** (strong case: most sources use the term; current name collides with org-level AI readiness) | Pending |
-| Progressive Enhancement | weak | no stable industry name; documented collision with the web-design term | **Rename → Incremental Generation** (strong case: naming vacuum plus collision) | Pending |
-| Context Persistence | weak | *memory* / *agent memory* (Anthropic, Cline, MemGPT) | **Rename → Agent Memory** (moderate case: "memory" unanimous across sources; cost: breaks the Context family pairing) | Pending |
+| Agent Readiness | strong | *agent readiness* (Factory.ai, Kodus); *AI readiness assessment* (Microsoft — org-level, a name collision) | **Keep — accepted rename from Readiness Assessment** (most sources use the agent-readiness term; the former name collided with org-level AI readiness) | Accepted 2026-07-10 — canonical rename applied |
+| Incremental Generation | aliased | no stable industry name; *progressive enhancement* collides with the established web-design term | **Keep — accepted rename from Progressive Enhancement** (the new catalog name describes the mechanism without retaining the collision) | Accepted 2026-07-10 — canonical rename applied |
+| Agent Memory | strong | *memory* / *agent memory* (Anthropic, Cline, MemGPT) | **Keep — accepted rename from Context Persistence** (memory terminology is consistent across sources) | Accepted 2026-07-10 — canonical rename applied |
 | Codified Rules | weak | `AGENTS.md` (open format), *Rules* (Cursor), `CLAUDE.md` (Anthropic), *repository custom instructions* (GitHub Copilot) | Keep + alias | Accepted 2026-07-04 — alias mentions merged (PR #29) |
 | Tool Integration | aliased | *tool use* (Anthropic), *function calling* (OpenAI), *MCP* | Keep + alias | Accepted 2026-07-04 — alias mentions merged (PR #29) |
 | Planned Implementation | aliased | *plan mode* (Cursor, Claude Code) | Keep + alias (a Plan Mode rename would strain the principle-not-vendor-feature rule) | Accepted 2026-07-04 — alias mention merged (PR #29) |
@@ -35,11 +35,28 @@ Alignment values come from each pattern's `evidence/<slug>.yaml`; rules are defi
 | Issue Generation | weak | no dominant competing term | Keep | Accepted 2026-07-04 |
 | Developer Lifecycle | aliased | *AI-DLC* (AWS), spec-driven workflow framings | Keep (note the scope overlap with Spec-Driven Development) | Accepted 2026-07-04 |
 
-All ten current assessments are schema-v2 legacy imports and therefore have `weak` verdicts until
-a complete refresh supplies query, content-hash, and verifier provenance. This ledger retains the
-earlier human naming decisions during that refresh. Spec-Driven Development remains omitted because
-its naming alignment is `strong`; Security Sandbox is retained to preserve its accepted decision
-history even though its independently scoreable sources now recompute to `strong` alignment.
+Ten of the eleven current assessments are schema-v2 legacy imports and therefore have `weak`
+verdicts until a complete refresh supplies query, content-hash, and verifier provenance; Event
+Automation has complete provenance. This ledger retains the earlier human naming decisions during
+that refresh. Spec-Driven Development remains omitted because its naming alignment is `strong`;
+Security Sandbox is retained to preserve its accepted decision history even though its independently
+scoreable sources now recompute to `strong` alignment.
+
+### 2026-07-10 — three accepted evidence-led renames
+
+The maintainer accepted the three recommendations that were still pending and applied them across
+the catalog as atomic migrations:
+
+1. **Readiness Assessment → Agent Readiness** — aligns the catalog with codebase-focused industry
+   terminology and avoids confusion with organization-level AI readiness assessments.
+2. **Progressive Enhancement → Incremental Generation** — removes the collision with the established
+   web-development term while retaining the small, deployable-generation mechanism.
+3. **Context Persistence → Agent Memory** — adopts the memory terminology used consistently by agent
+   products, documentation, implementations, and practitioner artifacts.
+
+The source records remain explicit `legacy-import` evidence and still need a complete automated
+refresh. Renaming changes only their canonical catalog mapping and the mechanically derived naming
+alignment; it does not upgrade their adoption verdicts or provenance.
 
 ## Rubric decision record
 

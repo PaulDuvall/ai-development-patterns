@@ -37,15 +37,15 @@ The repository currently organizes patterns into three main categories:
 
 ### Foundation Patterns
 Essential patterns for team readiness and basic AI integration:
-- **[Readiness Assessment](../README.md#readiness-assessment)**: Evaluating if your codebase and team are prepared for AI adoption
+- **[Agent Readiness](../README.md#agent-readiness)**: Evaluating if your codebase and team are prepared for AI adoption
 - **[Codified Rules](../README.md#codified-rules)**: Versioning AI coding standards like infrastructure
 - **[Security Sandbox](../README.md#security-sandbox)**: Running AI tools without credential leak risks
 
 ### Development Patterns  
 Daily practice patterns for AI-assisted coding workflows:
 - **[Spec-Driven Development](../README.md#spec-driven-development)**: Using executable specs to guide AI code generation
-- **[Progressive Enhancement](../README.md#progressive-enhancement)**: Building features incrementally rather than all at once
-- **[Context Persistence](../README.md#context-persistence)**: Managing context and continuity across AI-assisted sessions
+- **[Incremental Generation](../README.md#incremental-generation)**: Building features incrementally rather than all at once
+- **[Agent Memory](../README.md#agent-memory)**: Managing context and continuity across AI-assisted sessions
 
 ### Operations Patterns
 CI/CD, security, and production management with AI:

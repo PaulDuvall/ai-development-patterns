@@ -1,5 +1,5 @@
 #!/bin/bash
-# AI Context Persistence - SessionStart Hook
+# Agent Memory - SessionStart Hook
 #
 # Automatically loads context when starting a Claude Code session
 # Configure in .claude/settings.json:

@@ -4,8 +4,8 @@ legacy_run_url: https://github.com/PaulDuvall/ai-development-patterns/pull/27
 legacy_limitations: The PR records 9 aggregate queries, all three search modes, and an independent URL
   re-fetch. Exact query strings, per-mode candidate counts, normalized content hashes, and verifier metadata
   were not retained.
-pattern: Progressive Enhancement
-slug: progressive-enhancement
+pattern: Incremental Generation
+slug: incremental-generation
 last_checked: '2026-07-02'
 search:
   run_id: legacy-import
@@ -30,8 +30,11 @@ adoption_dimensions:
   implementation_available: true
   independent_adoption: true
   independence_groups: 6
-naming_alignment: weak
+naming_alignment: aliased
 terminology_variants:
+- term: Progressive Enhancement
+  used_by: Rakia Ben Sassi (The Engineering Wisdom)
+  url: https://rakiabensassi.substack.com/p/stop-just-prompting-your-ai-coder
 - term: Break complex tasks into simpler tasks
   used_by: GitHub Docs (Copilot prompt engineering)
   url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
@@ -129,7 +132,8 @@ evidence:
     GitHub code search this run found 519 files named prompt_plan.md and 161 files containing this exact
     prompt sentence across repos, including Amazon Q prompt configs and Claude Code plugins (undated file)
 - tier: T4
-  match: named
+  match: aliased
+  mechanism_quote: Progressive enhancement - Add complexity only when requirements demand it
   source: Rakia Ben Sassi, "Stop Just Prompting Your AI Coder. Start Context Engineering." (The Engineering
     Wisdom, Substack)
   source_kind: practitioner_report
@@ -144,7 +148,7 @@ evidence:
     prompt_version: null
     run_url: null
   date: '2025-11-26'
-  retrieved: '2026-07-02'
+  retrieved: '2026-07-10'
   claim: 'Practitioner post showing a full claude.md config whose "Incremental Development Rules" section
     names "Progressive enhancement" as a rule alongside "Start minimal", "Iterate with purpose - Each
     iteration should be reviewable and deployable", "No ''big bang'' commits", and "NEVER Generate: Entire

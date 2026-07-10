@@ -4,13 +4,13 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 ## Foundation & Team Readiness
 
-1. **Assess Before Implementing**: Systematically evaluate team and codebase readiness using [Readiness Assessment](../README.md#readiness-assessment) before introducing AI development patterns.
+1. **Assess Before Implementing**: Systematically evaluate team and codebase readiness using [Agent Readiness](../README.md#agent-readiness) before introducing AI development patterns.
 
 2. **Establish Codified Rules**: Store AI coding standards, prompts, and preferences in versioned `.ai/` configuration directories using [Codified Rules](../README.md#codified-rules) rather than relying on ad-hoc prompting.
 
 3. **Security by Design**: Run AI tools in isolated environments with no network access, no system privileges, and read-only source code access to prevent credential leaks using [Security Sandbox](../README.md#security-sandbox).
 
-4. **Start Small, Scale Systematically**: Begin with simple AI-assisted tasks and progressively enhance complexity using [Progressive Enhancement](../README.md#progressive-enhancement) rather than attempting comprehensive solutions immediately.
+4. **Start Small, Scale Systematically**: Begin with simple AI-assisted tasks and increase complexity incrementally using [Incremental Generation](../README.md#incremental-generation) rather than attempting comprehensive solutions immediately.
 
 ## Workflow & Development Process
 
@@ -18,7 +18,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 6. **Test-First AI Development**: Create automated tests from specifications before AI code generation, ensuring every specification has corresponding test coverage with measurable success criteria using [Testing Orchestration](../experiments/README.md#testing-orchestration).
 
-7. **Progressive Enhancement Over Big-Bang**: Apply Lean and Kanban principles by building features through small, deployable iterations with daily feedback cycles rather than large-scale AI generation attempts using [Progressive Enhancement](../README.md#progressive-enhancement).
+7. **Incremental Generation Over Big-Bang**: Apply Lean and Kanban principles by building features through small, deployable iterations with daily feedback cycles rather than large-scale AI generation attempts using [Incremental Generation](../README.md#incremental-generation).
 
 8. **Structured Development Lifecycle**: Follow a systematic 9-stage process from problem definition through deployment and monitoring for consistent AI-assisted development using [Developer Lifecycle](../README.md#developer-lifecycle).
 
@@ -46,7 +46,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 18. **Atomic Decomposition**: Break complex features into independently implementable tasks that can be completed in isolation without cross-dependencies using [Atomic Decomposition](../README.md#atomic-decomposition).
 
-19. **Shared Memory for Coordination**: Enable AI agents to share discoveries and coordinate work while maintaining strict isolation boundaries for safety using [Context Persistence](../README.md#context-persistence).
+19. **Shared Memory for Coordination**: Enable AI agents to share discoveries and coordinate work while maintaining strict isolation boundaries for safety using [Agent Memory](../README.md#agent-memory).
 
 20. **Conflict Detection and Resolution**: Implement automated systems to detect and resolve integration conflicts between parallel AI agent outputs.
 

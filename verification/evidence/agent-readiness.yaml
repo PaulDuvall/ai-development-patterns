@@ -4,8 +4,8 @@ legacy_run_url: https://github.com/PaulDuvall/ai-development-patterns/pull/19
 legacy_limitations: The PR records 9 aggregate queries, all three search modes, and an independent URL
   re-fetch. Exact query strings, per-mode candidate counts, normalized content hashes, and verifier metadata
   were not retained.
-pattern: Readiness Assessment
-slug: readiness-assessment
+pattern: Agent Readiness
+slug: agent-readiness
 last_checked: '2026-07-02'
 search:
   run_id: legacy-import
@@ -28,9 +28,9 @@ adoption_dimensions:
   implementation_available: true
   independent_adoption: true
   independence_groups: 5
-naming_alignment: weak
+naming_alignment: strong
 terminology_variants:
-- term: Agent Readiness / Readiness Report
+- term: Readiness Report
   used_by: Factory.ai (product and docs)
   url: https://factory.ai/product/agent-readiness
 - term: agent-ready codebase
@@ -54,7 +54,7 @@ terminology_variants:
   url: https://github.com/sw-craftsmanship-dojo/sw-ai-readiness-assessment
 evidence:
 - tier: T1
-  match: aliased
+  match: named
   mechanism_quote: Evaluates your codebase across 8 technical pillars and 5 maturity levels. Finds the
     environment problems that defeat any agent and tells you what to fix first.
   source: Factory.ai — Agent Readiness (product)
@@ -75,7 +75,7 @@ evidence:
     Security, Task Discovery) and 5 maturity levels, producing a Readiness Report runnable today via app.factory.ai,
     a /readiness-report CLI command, and CI integration (undated page; date = retrieval date)
 - tier: T1
-  match: aliased
+  match: named
   mechanism_quote: Evaluate how ready your codebase is for autonomous AI coding agents like **Claude Code**,
     **Cursor**, **GitHub Copilot**, and **Codex**. 39 automated checks, 7 pillars, 10+ languages.
   source: Kodus — @kodus/agent-readiness (open-source CLI, npm)
@@ -97,7 +97,7 @@ evidence:
     CI/CD, Code Health, Security) and outputs a maturity level, per-pillar scores, and prioritized recommendations
     — positioned as the open-source alternative to Factory.ai's Agent Readiness
 - tier: T4
-  match: aliased
+  match: named
   mechanism_quote: Getting your codebase agent-ready requires systematic coverage across eight areas.
   source: Upsun engineering blog — Guillaume Moigneu, 'Making coding agents (Claude Code, Codex, etc.)
     reliable'
@@ -119,7 +119,8 @@ evidence:
     observability, security, standards) for auditing whether a codebase is agent-ready and finding the
     biggest gap
 - tier: T4
-  match: named
+  match: aliased
+  mechanism_quote: a simple, practical checklist for preparing a codebase to work effectively with AI agents
   source: Dominika Zając — 'Is your repo ready for the AI Agents revolution? Checklist' (Medium; also
     mirrored on dev.to)
   source_kind: practitioner_report
@@ -134,7 +135,7 @@ evidence:
     prompt_version: null
     run_url: null
   date: '2026-01-18'
-  retrieved: '2026-07-02'
+  retrieved: '2026-07-10'
   claim: Practitioner article presenting an 'AI Readiness checklist' for evaluating a repository before
     AI-agent adoption across four sections — Repository Hygiene, Testing Safety Net, Grounding Documents,
     and MCP Integrations — including concrete criteria like a single obvious command for start/test/lint

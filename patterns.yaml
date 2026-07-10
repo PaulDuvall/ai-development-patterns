@@ -2,11 +2,11 @@ version: "1.0"
 base_url: "https://github.com/PaulDuvall/ai-development-patterns?tab=readme-ov-file"
 patterns:
   # Foundation (6 patterns)
-  - id: readiness-assessment
-    name: Readiness Assessment
+  - id: agent-readiness
+    name: Agent Readiness
     category: foundation
     maturity: beginner
-    anchor: "#readiness-assessment"
+    anchor: "#agent-readiness"
     automatable: false
     description: >
       Systematic evaluation of codebase and team readiness for AI integration.
@@ -20,7 +20,7 @@ patterns:
     automatable: true
     description: >
       Version and maintain AI coding standards as explicit configuration files.
-    related: [readiness-assessment, security-sandbox, context-persistence, progressive-disclosure, event-automation, guided-refactoring]
+    related: [agent-readiness, security-sandbox, agent-memory, progressive-disclosure, event-automation, guided-refactoring]
 
   - id: security-sandbox
     name: Security Sandbox
@@ -60,7 +60,7 @@ patterns:
     automatable: true
     description: >
       Generate Kanban-optimized work items from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies.
-    related: [readiness-assessment]
+    related: [agent-readiness]
 
   # Development (17 patterns)
   - id: spec-driven-development
@@ -81,23 +81,23 @@ patterns:
     automatable: true
     description: >
       Interview, constrain, and plan before writing code so AI implementation matches actual requirements instead of confident-sounding assumptions.
-    related: [progressive-enhancement, spec-driven-development, adversarial-evaluator]
+    related: [incremental-generation, spec-driven-development, adversarial-evaluator]
 
-  - id: progressive-enhancement
-    name: Progressive Enhancement
+  - id: incremental-generation
+    name: Incremental Generation
     category: development
     maturity: beginner
-    anchor: "#progressive-enhancement"
+    anchor: "#incremental-generation"
     automatable: true
     description: >
       Build complex features through small, deployable iterations rather than big-bang generation.
     related: [planned-implementation, atomic-decomposition, image-spec, adversarial-evaluator]
 
-  - id: context-persistence
-    name: Context Persistence
+  - id: agent-memory
+    name: Agent Memory
     category: development
     maturity: intermediate
-    anchor: "#context-persistence"
+    anchor: "#agent-memory"
     automatable: true
     description: >
       Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols.
@@ -131,7 +131,7 @@ patterns:
     automatable: true
     description: >
       Load AI assistant rules incrementally based on task context to prevent instruction saturation and context bloat.
-    related: [codified-rules, context-persistence, centralized-rules]
+    related: [codified-rules, agent-memory, centralized-rules]
 
   - id: atomic-decomposition
     name: Atomic Decomposition
@@ -141,7 +141,7 @@ patterns:
     automatable: true
     description: >
       Break complex features into atomic, independently implementable tasks for parallel AI agent execution.
-    related: [progressive-enhancement, parallel-agents]
+    related: [incremental-generation, parallel-agents]
 
   - id: guided-refactoring
     name: Guided Refactoring
@@ -171,7 +171,7 @@ patterns:
     automatable: true
     description: >
       Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context.
-    related: [spec-driven-development, progressive-enhancement]
+    related: [spec-driven-development, incremental-generation]
 
   - id: adversarial-evaluator
     name: Adversarial Evaluator
@@ -181,7 +181,7 @@ patterns:
     automatable: true
     description: >
       Separate the generating agent from an independent judging agent (ideally a different model) and use adversarial pressure or cross-model divergence as eval signal for high-stakes decisions.
-    related: [planned-implementation, progressive-enhancement, spec-driven-development]
+    related: [planned-implementation, incremental-generation, spec-driven-development]
 
   - id: parallel-agents
     name: Parallel Agents

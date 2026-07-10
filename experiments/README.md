@@ -36,10 +36,10 @@ These experimental patterns extend the core AI development patterns with advance
 | **[Chaos Engineering](#chaos-engineering)** | Advanced | Operations | Generate targeted chaos experiments based on system architecture and dependencies | Baseline Management |
 | **[ChatOps Security](#chatops-security)** | Beginner | Operations | Deploy security scanning capabilities through chat commands for immediate feedback | Security Orchestration |
 | **[Evidence Automation](#evidence-automation)** | Advanced | Operations | Generate audit evidence matrices from logs and configuration changes automatically | Security Orchestration |
-| **[Context Optimization](#context-optimization)** | Advanced | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Progressive Enhancement |
-| **[Asynchronous Research](#asynchronous-research)** | Intermediate | Development | Use fire-and-forget coding agents in dedicated repositories to conduct autonomous code investigations that prove technical feasibility through executable experiments | Parallel Agents, Context Persistence, Adversarial Evaluator |
-| **[Feedback Flywheel](#feedback-flywheel)** | Intermediate | Development | Systematically improve AI collaboration by analyzing session outcomes and feeding corrections back into team rules and commands | Codified Rules, Context Persistence, Progressive Disclosure |
-| **[Long-Running Orchestration](#long-running-orchestration)** | Advanced | Workflow | Coordinate agents working autonomously for hours or days, maintaining coherent state across sessions with strategic human checkpoints | Parallel Agents, Context Persistence, Workflow Orchestration |
+| **[Context Optimization](#context-optimization)** | Advanced | Development | Match AI tool selection to task complexity and optimize cost/performance trade-offs | Incremental Generation |
+| **[Asynchronous Research](#asynchronous-research)** | Intermediate | Development | Use fire-and-forget coding agents in dedicated repositories to conduct autonomous code investigations that prove technical feasibility through executable experiments | Parallel Agents, Agent Memory, Adversarial Evaluator |
+| **[Feedback Flywheel](#feedback-flywheel)** | Intermediate | Development | Systematically improve AI collaboration by analyzing session outcomes and feeding corrections back into team rules and commands | Codified Rules, Agent Memory, Progressive Disclosure |
+| **[Long-Running Orchestration](#long-running-orchestration)** | Advanced | Workflow | Coordinate agents working autonomously for hours or days, maintaining coherent state across sessions with strategic human checkpoints | Parallel Agents, Agent Memory, Workflow Orchestration |
 | **[Guided Architecture](#guided-architecture)** | Intermediate | Development | Apply architectural frameworks (DDD, Well-Architected, 12-Factor) using AI to ensure sound system design | Developer Lifecycle, Codified Rules |
 | **[Autonomous Defense](#autonomous-defense)** | Advanced | Operations | Deploy AI agents for real-time security threat detection and automated response at machine speed to match the pace of autonomous threats | Security Orchestration, Incident Automation |
 | **[Bounded Autonomy](#bounded-autonomy)** | Advanced | Workflow | Cap a loop's turns, spend, and time, detect stalls and divergence, and emit a machine-readable evidence trail so autonomy never exceeds verification reach | Long-Running Orchestration, Parallel Agents, Workflow Orchestration |
@@ -390,7 +390,7 @@ Running parallel agents without proper isolation, conflict detection, or sync po
 **Maturity**: Advanced  
 **Description**: Match AI tool selection to task complexity and optimize cost/performance trade-offs by understanding different AI models' context window capabilities and computational costs.
 
-**Related Patterns**: [Progressive Enhancement](../README.md#progressive-enhancement), [Adversarial Evaluator](../README.md#adversarial-evaluator)
+**Related Patterns**: [Incremental Generation](../README.md#incremental-generation), [Adversarial Evaluator](../README.md#adversarial-evaluator)
 
 **Tool Selection Decision Matrix**
 
@@ -410,7 +410,7 @@ Always using the most powerful (expensive) AI model for simple tasks wastes reso
 **Maturity**: Intermediate
 **Description**: Use fire-and-forget coding agents in dedicated repositories to conduct autonomous code investigations that prove technical feasibility through executable experiments.
 
-**Related Patterns**: [Parallel Agents](../README.md#parallel-agents), [Context Persistence](../README.md#context-persistence), [Adversarial Evaluator](../README.md#adversarial-evaluator)
+**Related Patterns**: [Parallel Agents](../README.md#parallel-agents), [Agent Memory](../README.md#agent-memory), [Adversarial Evaluator](../README.md#adversarial-evaluator)
 
 **Source**: Simon Willison, "[Code research projects with async coding agents](https://simonwillison.net/2025/Nov/6/async-code-research/)", November 6, 2025
 
@@ -646,7 +646,7 @@ Production Code
 
 - **Before Adversarial Evaluator**: Validate which options are technically feasible
 - **Before Planned Implementation**: Provide real performance data for planning
-- **With Context Persistence**: Archive research for future sessions
+- **With Agent Memory**: Archive research for future sessions
 - **With Parallel Agents**: Run multiple research questions simultaneously
 
 #### Complete Example
@@ -711,7 +711,7 @@ Simon's caveat: *"They can't prove something is impossible—just because the co
 **Maturity**: Intermediate
 **Description**: Systematically improve AI collaboration effectiveness by analyzing session outcomes and feeding corrections back into team rules and commands.
 
-**Related Patterns**: [Codified Rules](../README.md#codified-rules), [Context Persistence](../README.md#context-persistence), [Progressive Disclosure](../README.md#progressive-disclosure)
+**Related Patterns**: [Codified Rules](../README.md#codified-rules), [Agent Memory](../README.md#agent-memory), [Progressive Disclosure](../README.md#progressive-disclosure)
 
 **Source**: Rahul Garg, "[Patterns for Reducing Friction in AI-Assisted Development](https://martinfowler.com/articles/reduce-friction-ai/)" (martinfowler.com, Feb-Mar 2026)
 
@@ -779,7 +779,7 @@ Running AI-assisted sessions repeatedly without analyzing what went wrong or fee
 **Maturity**: Advanced
 **Description**: Coordinate agents working autonomously for hours or days, maintaining coherent state across work sessions with strategic human checkpoints and failure recovery.
 
-**Related Patterns**: [Parallel Agents](../README.md#parallel-agents), [Context Persistence](../README.md#context-persistence), [Workflow Orchestration](#workflow-orchestration), [Handoff Protocols](#handoff-protocols)
+**Related Patterns**: [Parallel Agents](../README.md#parallel-agents), [Agent Memory](../README.md#agent-memory), [Workflow Orchestration](#workflow-orchestration), [Handoff Protocols](#handoff-protocols)
 
 **Source**: [Anthropic 2026 Agentic Coding Trends Report](https://resources.anthropic.com/hubfs/2026%20Agentic%20Coding%20Trends%20Report.pdf) (Trend 3: Long-running agents build complete systems)
 

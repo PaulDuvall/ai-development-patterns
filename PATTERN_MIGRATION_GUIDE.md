@@ -2,10 +2,10 @@
 
 ## Overview
 
-This guide documents the comprehensive renaming of all patterns and antipatterns in the AI Development Patterns repository to comply with a strict two-word naming convention.
+This guide documents the comprehensive renaming of patterns and antipatterns in the AI Development Patterns repository to comply with a strict two-word naming convention, including later evidence-led refinements to canonical names.
 
-**Migration Date:** November 2025
-**Impact:** All 42 patterns and 56 antipatterns
+**Migration Dates:** November 2025; July 2026 evidence-led refinements
+**Impact:** All 42 patterns and 56 antipatterns in the initial migration; 3 later canonical refinements
 **Compliance:** 8% → 100% (98 naming changes)
 
 ---
@@ -37,7 +37,7 @@ This change aligns with established pattern naming conventions:
 
 | Old Name | New Name | Change Type | Notes |
 |----------|----------|-------------|-------|
-| AI Readiness Assessment | Readiness Assessment | Removed "AI" prefix | "AI" is redundant in AI development context |
+| AI Readiness Assessment | Agent Readiness | Removed "AI" prefix, then evidence-led refinement | Industry practice uses *agent readiness* for codebase-focused assessment; the intermediate name was `Readiness Assessment` |
 | Rules as Code | Codified Rules | Removed preposition | More concise, maintains meaning |
 | AI Security Sandbox | Security Sandbox | Removed "AI" prefix | Context is already AI development |
 | AI Developer Lifecycle | Developer Lifecycle | Removed "AI" prefix | Lifecycle applies to AI development by default |
@@ -45,7 +45,7 @@ This change aligns with established pattern naming conventions:
 | AI Issue Generation | Issue Generation | Removed "AI" prefix | Generation implies AI automation |
 | Specification Driven Development | Spec-Driven Development | Hyphenated compound + clarified | Aligns with the repository's current canonical naming |
 | AI Plan-First Development | Planned Implementation | Removed "AI", clarified | Describes planned approach to implementation |
-| Progressive AI Enhancement | Progressive Enhancement | Removed "AI" prefix | Progressive enhancement is well-known pattern |
+| Progressive AI Enhancement | Incremental Generation | Removed "AI" prefix, then evidence-led refinement | Avoids collision with the established web-design term; the intermediate name was `Progressive Enhancement` |
 | AI Choice Generation | Choice Generation | Removed "AI" prefix | Generation implies AI automation |
 | Choice Generation | Cross-Model Validation | Reframed | Original pattern reduced to "ask one model for N options" — table stakes in 2026. Reframed around running the same prompt across multiple frontier models, where disagreement is signal. |
 | Cross-Model Validation | Adversarial Evaluator | Renamed + expanded | Broadened to the GAN-style principle of separating the generating agent from an independent judging agent. Cross-model fan-out becomes one of two topologies (the other: an adversarial judge that attacks a single candidate). Old `#cross-model-validation` anchor preserved as an alias on the new section. |
@@ -56,7 +56,7 @@ This change aligns with established pattern naming conventions:
 | Baseline Management | (archived) | Removed | 20-line stub on AI-set CloudWatch thresholds; orphan with no incoming dependents and no plan to develop further. |
 | Atomic Task Decomposition | Atomic Decomposition | Simplified | "Atomic" already implies task-level |
 | Parallelized AI Coding Agents | Parallel Agents | Simplified, removed "AI" | Agents are AI agents in this context |
-| AI Context Persistence | Context Persistence | Removed "AI" prefix | Context is AI-specific in this repository |
+| AI Context Persistence | Agent Memory | Removed "AI" prefix, then evidence-led refinement | Aligns with industry memory terminology; the intermediate name was `Context Persistence` |
 | Constraint-Based AI Development | Constrained Generation | Simplified, focused | Emphasizes the generation constraint |
 | Observable AI Development | Observable Development | Removed "AI" prefix | Observability applies to AI development |
 | AI-Driven Refactoring | Guided Refactoring | Changed "AI-Driven" to "Guided" | More concise, maintains meaning |
@@ -158,9 +158,25 @@ This change aligns with established pattern naming conventions:
 
 ---
 
+## July 2026 Evidence-Led Refinements
+
+Machine-collected naming evidence led to three additional canonical changes accepted by the
+maintainer on July 10, 2026:
+
+| Retired Intermediate Name | Current Canonical Name | Retired Anchor | Current Anchor |
+|---------------------------|------------------------|----------------|----------------|
+| Readiness Assessment | Agent Readiness | `#readiness-assessment` | `#agent-readiness` |
+| Progressive Enhancement | Incremental Generation | `#progressive-enhancement` | `#incremental-generation` |
+| Context Persistence | Agent Memory | `#context-persistence` | `#agent-memory` |
+
+These are full canonical migrations. Registry IDs, internal links, example paths, evidence
+filenames, tests, and generated artifacts use the current names. The README preserves one explicit
+legacy anchor for each immediately retired name so inbound links continue to resolve; decision
+history and evidence source text also retain retired terminology where necessary for auditability.
+
 ## Summary Statistics
 
-### Overall Changes
+### Initial November 2025 Migration
 - **Total items**: 98 (42 patterns + 56 antipatterns)
 - **Items renamed**: 90 (92%)
 - **Items unchanged**: 8 (8%)
@@ -214,9 +230,13 @@ If you have external references to these patterns (documentation, presentations,
 
 ### Backward Compatibility
 
-**No alias system provided.** The old pattern names are deprecated and no longer used in the repository.
+Canonical IDs do not retain aliases. The README provides explicit compatibility anchors for the
+three July 2026 refinements (and for Cross-Model Validation) so existing inbound links still land on
+the replacement section. Retired names remain deprecated and are not used by internal links,
+registry entries, examples, evidence filenames, or generated pattern IDs.
 
-**Migration window:** Users should update their references immediately. Old names will not be maintained.
+**Migration window:** Users should update their references to canonical names immediately. Compatibility
+anchors may be removed in a future major migration.
 
 ### Search and Replace Guidance
 
@@ -229,13 +249,13 @@ For bulk updates in external documentation:
 
 **Example regex patterns for bulk replacement:**
 ```bash
-# Pattern: "AI Readiness Assessment" → "Readiness Assessment"
+# Pattern: "AI Readiness Assessment" → "Agent Readiness"
 find: "AI Readiness Assessment"
-replace: "Readiness Assessment"
+replace: "Agent Readiness"
 
-# Pattern: "#ai-readiness-assessment" → "#readiness-assessment"
+# Pattern: "#ai-readiness-assessment" → "#agent-readiness"
 find: "#ai-readiness-assessment"
-replace: "#readiness-assessment"
+replace: "#agent-readiness"
 ```
 
 ---
@@ -248,7 +268,7 @@ All GitHub markdown anchor links have changed. Update your hyperlinks:
 
 | Old Anchor | New Anchor |
 |------------|------------|
-| `#ai-readiness-assessment` | `#readiness-assessment` |
+| `#ai-readiness-assessment` | `#agent-readiness` |
 | `#rules-as-code` | `#codified-rules` |
 | `#ai-security-sandbox` | `#security-sandbox` |
 | `#ai-developer-lifecycle` | `#developer-lifecycle` |
@@ -256,7 +276,7 @@ All GitHub markdown anchor links have changed. Update your hyperlinks:
 | `#ai-issue-generation` | `#issue-generation` |
 | `#specification-driven-development` | `#spec-driven-development` |
 | `#ai-plan-first-development` | `#planned-implementation` |
-| `#progressive-ai-enhancement` | `#progressive-enhancement` |
+| `#progressive-ai-enhancement` | `#incremental-generation` |
 | `#ai-choice-generation` | `#choice-generation` |
 | `#choice-generation` | `#cross-model-validation` |
 | `#question-generation` | `#planned-implementation` (merged) |
@@ -266,7 +286,7 @@ All GitHub markdown anchor links have changed. Update your hyperlinks:
 | `#baseline-management` | (archived, no replacement) |
 | `#atomic-task-decomposition` | `#atomic-decomposition` |
 | `#parallelized-ai-coding-agents` | `#parallel-agents` |
-| `#ai-context-persistence` | `#context-persistence` |
+| `#ai-context-persistence` | `#agent-memory` |
 | `#constraint-based-ai-development` | `#constrained-generation` |
 | `#observable-ai-development` | `#observable-development` |
 | `#ai-driven-refactoring` | `#guided-refactoring` |
@@ -308,7 +328,7 @@ All patterns now follow these strict rules:
 
 ### Pattern Naming Rules
 
-1. **Exactly two words, Title Case** (e.g., "Context Persistence", "Guided Refactoring")
+1. **Exactly two words, Title Case** (e.g., "Agent Memory", "Guided Refactoring")
 2. **Format: Noun + Noun OR Adjective + Noun**
 3. **Must clearly imply what the pattern solves or how it works**
 4. **Use concrete, domain-specific AI-native engineering terms**
@@ -369,6 +389,10 @@ For questions about this migration:
 
 ## Version History
 
+- **v1.1** (July 10, 2026): Recorded evidence-led canonical refinements
+  - Readiness Assessment → Agent Readiness
+  - Progressive Enhancement → Incremental Generation
+  - Context Persistence → Agent Memory
 - **v1.0** (November 2025): Initial migration guide created
   - 98 total naming changes documented
   - Complete mapping tables for all patterns and antipatterns
@@ -379,4 +403,4 @@ For questions about this migration:
 
 **Document Status**: Official Migration Guide
 **Maintained By**: AI Development Patterns Repository Maintainers
-**Last Updated**: November 2025
+**Last Updated**: July 10, 2026

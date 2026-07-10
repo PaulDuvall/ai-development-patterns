@@ -16,7 +16,7 @@ Adoption verdicts are mechanically recomputed from structured, tiered evidence; 
 ```mermaid
 graph TB
     %% ROW 1: Foundation start (left to right)
-    RA([Readiness<br/>Assessment]) --> CR([Codified<br/>Rules])
+    RDY([Agent<br/>Readiness]) --> CR([Codified<br/>Rules])
     CR --> SS([Security<br/>Sandbox])
     SS --> DL([Developer<br/>Lifecycle])
     DL --> TI([Tool<br/>Integration])
@@ -30,24 +30,24 @@ graph TB
     DL --> OD([Observable<br/>Development])
     DL --> SD([Spec-Driven<br/>Development])
     CR --> GR([Guided<br/>Refactoring])
-    CR --> CP([Context<br/>Persistence])
-    RA --> IG([Issue<br/>Generation])
+    CR --> AM([Agent<br/>Memory])
+    RDY --> IG([Issue<br/>Generation])
     CR --> EA([Event<br/>Automation])
     SS --> EA
     EA --> CC([Custom<br/>Commands])
     SD --> CC
-    CP --> PD([Progressive<br/>Disclosure])
+    AM --> PD([Progressive<br/>Disclosure])
     CR --> PD
     SD --> IS([Image<br/>Spec])
     PD --> CZR
 
     %% ROW 4: Development chain
-    PE([Progressive<br/>Enhancement]) --> AD([Atomic<br/>Decomposition])
+    INCR([Incremental<br/>Generation]) --> AD([Atomic<br/>Decomposition])
     AD --> PA([Parallel<br/>Agents])
-    PE --> IS
+    INCR --> IS
 
     %% ROW 5: Additional development patterns
-    PE --> AE([Adversarial<br/>Evaluator])
+    INCR --> AE([Adversarial<br/>Evaluator])
     DL --> ER([Error<br/>Resolution])
     OD --> ER
     TI --> ER
@@ -62,19 +62,19 @@ graph TB
     classDef development fill:#f9e79f,stroke:#b7950b,stroke-width:2px,color:#7d6608
     classDef operations fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,color:#78281f
 
-    class RA,CR,SS,DL,TI,IG foundation
-    class PE,SD,AD,PA,OD,GR,EA,CC,PD,IS,CP,AE,ER,PI,AR development
+    class RDY,CR,SS,DL,TI,IG foundation
+    class INCR,SD,AD,PA,OD,GR,EA,CC,PD,IS,AM,AE,ER,PI,AR development
     class PG,SO,CZR operations
 
     %% CLICKABLE LINKS
-    click RA "https://github.com/PaulDuvall/ai-development-patterns#readiness-assessment"
+    click RDY "https://github.com/PaulDuvall/ai-development-patterns#agent-readiness"
     click CR "https://github.com/PaulDuvall/ai-development-patterns#codified-rules"
     click SS "https://github.com/PaulDuvall/ai-development-patterns#security-sandbox"
     click DL "https://github.com/PaulDuvall/ai-development-patterns#developer-lifecycle"
     click TI "https://github.com/PaulDuvall/ai-development-patterns#tool-integration"
     click IG "https://github.com/PaulDuvall/ai-development-patterns#issue-generation"
-    click CP "https://github.com/PaulDuvall/ai-development-patterns#context-persistence"
-    click PE "https://github.com/PaulDuvall/ai-development-patterns#progressive-enhancement"
+    click AM "https://github.com/PaulDuvall/ai-development-patterns#agent-memory"
+    click INCR "https://github.com/PaulDuvall/ai-development-patterns#incremental-generation"
     click SD "https://github.com/PaulDuvall/ai-development-patterns#spec-driven-development"
     click AD "https://github.com/PaulDuvall/ai-development-patterns#atomic-decomposition"
     click PA "https://github.com/PaulDuvall/ai-development-patterns#parallel-agents"
@@ -148,7 +148,7 @@ Three principles set the lens's dimensions:
 |-----------|-------------------------|----------------------------------|
 | No executable done-check, no loop | An observable goal, acceptance criteria written first, and cheap reversal | [Spec-Driven Development](#spec-driven-development), [Planned Implementation](#planned-implementation), [Observable Development](#observable-development); reversible failure via [Parallel Agents](#parallel-agents) worktrees |
 | The test arbitrates, not the model | Tight scope, an independent verifier, and checks wired to fire on every change | [Atomic Decomposition](#atomic-decomposition), [Adversarial Evaluator](#adversarial-evaluator), [Test Promotion](experiments/README.md#test-promotion), [Autonomous Remediation](#autonomous-remediation), [Event Automation](#event-automation), [Autonomous Acceptance](experiments/README.md#autonomous-acceptance) |
-| Verification reach sets the autonomy ceiling | Hard bounds, state in git, and human-owned edges | [Bounded Autonomy](experiments/README.md#bounded-autonomy), [Context Persistence](#context-persistence), [Long-Running Orchestration](experiments/README.md#long-running-orchestration), [Centralized Rules](#centralized-rules), [Handoff Protocols](experiments/README.md#handoff-protocols) |
+| Verification reach sets the autonomy ceiling | Hard bounds, state in git, and human-owned edges | [Bounded Autonomy](experiments/README.md#bounded-autonomy), [Agent Memory](#agent-memory), [Long-Running Orchestration](experiments/README.md#long-running-orchestration), [Centralized Rules](#centralized-rules), [Handoff Protocols](experiments/README.md#handoff-protocols) |
 
 The one part of Principle 3 that no other catalog pattern covers — bounding the loop (turn caps, spend caps, stall/divergence detection) and capturing an in-loop diagnostic trail — is what the [Bounded Autonomy](experiments/README.md#bounded-autonomy) experimental pattern adds.
 
@@ -167,10 +167,10 @@ Most of this catalog reads like a menu: pick the patterns you need. The **Lifecy
 
 | Stage | What it produces | Catalog patterns |
 |-------|------------------|------------------|
-| 1. Problem definition | A scoped problem statement and a readiness check | [Readiness Assessment](#readiness-assessment) |
+| 1. Problem definition | A scoped problem statement and a readiness check | [Agent Readiness](#agent-readiness) |
 | 2-3. Plan & requirements | Architecture, tasks, and API specs | [Planned Implementation](#planned-implementation), [Issue Generation](#issue-generation) |
 | 4-5. Specifications & tests | Acceptance criteria written before any code | [Spec-Driven Development](#spec-driven-development) |
-| 6. Implementation | Working code in small, verifiable increments | [Atomic Decomposition](#atomic-decomposition), [Progressive Enhancement](#progressive-enhancement) |
+| 6. Implementation | Working code in small, verifiable increments | [Atomic Decomposition](#atomic-decomposition), [Incremental Generation](#incremental-generation) |
 | 7. Testing & review | Test results, security scan, independent review | [Observable Development](#observable-development), [Adversarial Evaluator](#adversarial-evaluator) |
 | 8. Deployment | A shipped change | [Custom Commands](#custom-commands), [Event Automation](#event-automation) |
 | 9. Monitoring & correction | Runtime signals and validated fixes | [Observable Development](#observable-development), [Autonomous Remediation](#autonomous-remediation), [Error Resolution](#error-resolution) |
@@ -186,7 +186,7 @@ Read top to bottom it is a feedforward chain: each stage's output is the next st
 ```mermaid
 graph TD
     subgraph "Phase 1: Foundation (Weeks 1-2)"
-        A[Readiness Assessment] --> B[Codified Rules]
+        A[Agent Readiness] --> B[Codified Rules]
         B --> C[Security Sandbox]
         C --> D[Developer Lifecycle]
         A --> E[Issue Generation]
@@ -196,7 +196,7 @@ graph TD
     subgraph "Phase 2: Development (Weeks 3-4)"
         D --> G[Spec-Driven Development]
         H[Planned Implementation]
-        I[Progressive Enhancement]
+        I[Incremental Generation]
         I --> J[Adversarial Evaluator]
         Q[Event Automation]
         R[Custom Commands]
@@ -233,23 +233,23 @@ graph TD
 
 | Pattern | Maturity | Type | Description | Dependencies |
 |---------|----------|------|-------------|--------------|
-| **[Readiness Assessment](#readiness-assessment)** | Beginner | Foundation | Systematic evaluation of codebase and team readiness for AI integration | None |
-| **[Codified Rules](#codified-rules)** | Beginner | Foundation | Version and maintain AI coding standards as explicit configuration files | Readiness Assessment |
+| **[Agent Readiness](#agent-readiness)** | Beginner | Foundation | Systematic evaluation of codebase and team readiness for AI integration | None |
+| **[Codified Rules](#codified-rules)** | Beginner | Foundation | Version and maintain AI coding standards as explicit configuration files | Agent Readiness |
 | **[Security Sandbox](#security-sandbox)** | Beginner | Foundation | Run AI tools in isolated environments without access to secrets or sensitive data | Codified Rules |
 | **[Developer Lifecycle](#developer-lifecycle)** | Intermediate | Workflow | A staged, plan-first discipline for taking a single feature from problem to production with AI assistance | Codified Rules, Security Sandbox |
 | **[Tool Integration](#tool-integration)** | Intermediate | Foundation | Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions | Security Sandbox, Developer Lifecycle |
-| **[Issue Generation](#issue-generation)** | Intermediate | Foundation | Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies | Readiness Assessment |
+| **[Issue Generation](#issue-generation)** | Intermediate | Foundation | Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies | Agent Readiness |
 | **[Spec-Driven Development](#spec-driven-development)** | Intermediate | Development | Use executable specifications to guide AI code generation with clear acceptance criteria before implementation | Developer Lifecycle |
-| **[Image Spec](#image-spec)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Spec-Driven Development, Progressive Enhancement |
+| **[Image Spec](#image-spec)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Spec-Driven Development, Incremental Generation |
 | **[Planned Implementation](#planned-implementation)** | Beginner | Development | Interview, constrain, and plan before writing code so AI implementation matches actual requirements instead of confident-sounding assumptions | None |
-| **[Progressive Enhancement](#progressive-enhancement)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | None |
-| **[Adversarial Evaluator](#adversarial-evaluator)** | Intermediate | Development | Separate the generating agent from an independent judging agent (ideally a different model) and use adversarial pressure or cross-model divergence as eval signal for high-stakes decisions | Progressive Enhancement |
-| **[Atomic Decomposition](#atomic-decomposition)** | Intermediate | Development | Break complex features into atomic, independently implementable tasks for parallel AI agent execution | Progressive Enhancement |
+| **[Incremental Generation](#incremental-generation)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | None |
+| **[Adversarial Evaluator](#adversarial-evaluator)** | Intermediate | Development | Separate the generating agent from an independent judging agent (ideally a different model) and use adversarial pressure or cross-model divergence as eval signal for high-stakes decisions | Incremental Generation |
+| **[Atomic Decomposition](#atomic-decomposition)** | Intermediate | Development | Break complex features into atomic, independently implementable tasks for parallel AI agent execution | Incremental Generation |
 | **[Parallel Agents](#parallel-agents)** | Advanced | Development | Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration | Atomic Decomposition |
-| **[Context Persistence](#context-persistence)** | Intermediate | Development | Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols | Codified Rules |
+| **[Agent Memory](#agent-memory)** | Intermediate | Development | Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols | Codified Rules |
 | **[Event Automation](#event-automation)** | Intermediate | Development | Execute custom commands automatically at assistant lifecycle events to enforce policies and automate workflows | Codified Rules, Security Sandbox |
 | **[Custom Commands](#custom-commands)** | Intermediate | Development | Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and sophisticated workflows | Event Automation, Spec-Driven Development, Codified Rules |
-| **[Progressive Disclosure](#progressive-disclosure)** | Intermediate | Development | Load AI assistant rules incrementally based on task context to prevent instruction saturation and context bloat | Codified Rules, Context Persistence |
+| **[Progressive Disclosure](#progressive-disclosure)** | Intermediate | Development | Load AI assistant rules incrementally based on task context to prevent instruction saturation and context bloat | Codified Rules, Agent Memory |
 | **[Observable Development](#observable-development)** | Intermediate | Development | Logging and tracing as a bidirectional control: feeds forward to steer the agent, feeds back as a sensor it reads to self-correct | Developer Lifecycle |
 | **[Guided Refactoring](#guided-refactoring)** | Intermediate | Development | Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics | Codified Rules |
 | **[Error Resolution](#error-resolution)** | Intermediate | Development | Automatically collect error context from logs, system state, and git history, then use AI to diagnose root causes and generate validated fixes | Developer Lifecycle, Observable Development, Tool Integration |
@@ -291,7 +291,7 @@ graph TD
     B --> C[4-8 Hour Work Items]
     C --> D{Parallel Implementation?}
     D -->|Yes| E[Atomic Decomposition]
-    D -->|No| F[Progressive Enhancement]
+    D -->|No| F[Incremental Generation]
     E --> G[1-2 Hour Atomic Tasks]
     F --> H[Daily Deployment Cycles]
 
@@ -304,17 +304,17 @@ graph TD
 
 - **[Issue Generation](#issue-generation)** (4-8 hours): Standard Kanban work items for continuous flow and rapid feedback
 - **[Atomic Decomposition](#atomic-decomposition)** (1-2 hours): Ultra-small tasks for parallel agent execution without conflicts
-- **[Progressive Enhancement](#progressive-enhancement)** (Daily cycles): Deployment-focused iterations that may contain multiple work items
+- **[Incremental Generation](#incremental-generation)** (Daily cycles): Deployment-focused iterations that may contain multiple work items
 
 **When to Use Each Approach**:
 - Use **[Issue Generation](#issue-generation)** for standard team development with human developers
 - Use **[Atomic Decomposition](#atomic-decomposition)** when implementing with parallel AI agents
-- Use **[Progressive Enhancement](#progressive-enhancement)** when prioritizing rapid market feedback over task granularity
+- Use **[Incremental Generation](#incremental-generation)** when prioritizing rapid market feedback over task granularity
 
 **Pattern Differentiation**:
 - **[Issue Generation](#issue-generation)**: Creates Kanban work items (4-8 hours) for human team workflows
 - **[Atomic Decomposition](#atomic-decomposition)**: Creates ultra-small tasks (1-2 hours) for parallel AI agents
-- **[Progressive Enhancement](#progressive-enhancement)**: Creates deployment cycles (daily) focused on user feedback
+- **[Incremental Generation](#incremental-generation)**: Creates deployment cycles (daily) focused on user feedback
 
 ## Pattern Selection Decision Framework
 
@@ -329,13 +329,13 @@ graph TD
     B -->|Some Experience| D[Focus on Development Patterns]
     B -->|Advanced| E[Implement Operations Patterns]
 
-    C --> F[Readiness Assessment]
+    C --> F[Agent Readiness]
     F --> G[Codified Rules]
     G --> H[Security Sandbox]
     H --> I{Need Structured Development?}
     I -->|Yes| J[Developer Lifecycle]
     I -->|No| K[Planned Implementation]
-    K --> L[Progressive Enhancement]
+    K --> L[Incremental Generation]
 
     D --> M{Multiple Developers/Agents?}
     M -->|Yes| N[Parallel Agents]
@@ -351,11 +351,11 @@ graph TD
 ### Context-Based Pattern Selection
 
 **For New Teams (First 2 weeks)**:
-1. **[Readiness Assessment](#readiness-assessment)** - Evaluate current state
+1. **[Agent Readiness](#agent-readiness)** - Evaluate current state
 2. **[Codified Rules](#codified-rules)** - Establish consistent standards
 3. **[Security Sandbox](#security-sandbox)** - Ensure safe experimentation
 4. **[Planned Implementation](#planned-implementation)** - Learn structured planning approaches
-5. **[Progressive Enhancement](#progressive-enhancement)** - Start with simple iterations
+5. **[Incremental Generation](#incremental-generation)** - Start with simple iterations
 
 **For Development Teams (Weeks 3-8)**:
 1. **[Developer Lifecycle](#developer-lifecycle)** - Structured development process
@@ -378,7 +378,7 @@ graph TD
 ### Project Type Recommendations
 
 **MVP/Startup Projects**:
-- **Primary**: [Progressive Enhancement](#progressive-enhancement), [Planned Implementation](#planned-implementation)
+- **Primary**: [Incremental Generation](#incremental-generation), [Planned Implementation](#planned-implementation)
 - **Secondary**: [Security Sandbox](#security-sandbox), [Adversarial Evaluator](#adversarial-evaluator)
 - **Avoid**: Complex orchestration patterns until scale demands
 
@@ -389,7 +389,7 @@ graph TD
 
 **Research/Experimental Projects**:
 - **Primary**: [Adversarial Evaluator](#adversarial-evaluator), [Observable Development](#observable-development)
-- **Secondary**: [Context Persistence](#context-persistence), [Context Optimization](experiments/README.md#context-optimization)
+- **Secondary**: [Agent Memory](#agent-memory), [Context Optimization](experiments/README.md#context-optimization)
 - **Focus**: Learning and exploration over production readiness
 
 **High-Scale Production**:
@@ -400,7 +400,7 @@ graph TD
 ### Team Size Considerations
 
 **Solo Teams**:
-- Focus on **[Progressive Enhancement](#progressive-enhancement)** and **[Adversarial Evaluator](#adversarial-evaluator)**
+- Focus on **[Incremental Generation](#incremental-generation)** and **[Adversarial Evaluator](#adversarial-evaluator)**
 - Add **[Observable Development](#observable-development)** for debugging
 - Skip parallel orchestration patterns
 
@@ -426,7 +426,7 @@ graph TD
 
 **On-Premise Systems**:
 - Focus on **[Security Sandbox](#security-sandbox)** with network isolation
-- Implement **[Context Persistence](#context-persistence)** for institutional knowledge
+- Implement **[Agent Memory](#agent-memory)** for institutional knowledge
 - Use **Debt Forecasting** for maintenance planning
 
 **Microservices Architecture**:
@@ -435,7 +435,7 @@ graph TD
 - **[Autonomous Remediation](#autonomous-remediation)** for cross-service code-quality consistency
 
 **Monolithic Applications**:
-- **[Progressive Enhancement](#progressive-enhancement)** for gradual modernization
+- **[Incremental Generation](#incremental-generation)** for gradual modernization
 - **[Guided Refactoring](#guided-refactoring)** for code quality improvement
 - **[Planned Implementation](#planned-implementation)** to prevent over-engineering through its constraint phase
 
@@ -445,7 +445,8 @@ graph TD
 
 Foundation patterns establish the essential infrastructure and team readiness required for successful AI-assisted development. These patterns must be implemented first as they enable all subsequent patterns.
 
-## Readiness Assessment
+<a id="readiness-assessment"></a>
+## Agent Readiness
 
 **Maturity**: Beginner
 **Description**: Systematic evaluation of codebase and team readiness for AI-assisted development before implementing AI patterns.
@@ -495,7 +496,7 @@ Starting AI adoption without proper assessment leads to inconsistent practices, 
 **Maturity**: Beginner
 **Description**: Version and maintain AI coding standards as explicit configuration files that persist across sessions and team members.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Context Persistence](#context-persistence), [Progressive Disclosure](#progressive-disclosure), [Event Automation](#event-automation), [Custom Commands](#custom-commands), [Centralized Rules](#centralized-rules), [Harness Engineering Lens](#harness-engineering-lens)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Agent Memory](#agent-memory), [Progressive Disclosure](#progressive-disclosure), [Event Automation](#event-automation), [Custom Commands](#custom-commands), [Centralized Rules](#centralized-rules), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Source**: "[AGENTS.md](https://agents.md/)" open format specification (OpenAI, Google Jules, Cursor, Factory); Cursor, "[Rules](https://cursor.com/docs/rules)" documentation
 
@@ -760,7 +761,7 @@ Attempting to solve complex data analysis, system integration, or real-time prob
 
 **Methodology Note**: This pattern aligns well with Kanban principles (continuous flow, small batches) but works with any development methodology including Scrum, Scrumban, or ad-hoc workflows.
 
-**Related Patterns**: [Readiness Assessment](#readiness-assessment), [Spec-Driven Development](#spec-driven-development)
+**Related Patterns**: [Agent Readiness](#agent-readiness), [Spec-Driven Development](#spec-driven-development)
 
 **Source**: GitHub Docs, "[Using GitHub Copilot to create issues](https://docs.github.com/en/copilot/using-github-copilot/using-github-copilot-to-create-issues)"; Eyal Toledano, "[Task Master](https://github.com/eyaltoledano/claude-task-master)"
 
@@ -992,7 +993,7 @@ Saving collections of prompts as if they were specifications. Prompts are implem
 **Maturity**: Intermediate
 **Description**: Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context.
 
-**Related Patterns**: [Spec-Driven Development](#spec-driven-development), [Progressive Enhancement](#progressive-enhancement), [Context Optimization](experiments/README.md#context-optimization)
+**Related Patterns**: [Spec-Driven Development](#spec-driven-development), [Incremental Generation](#incremental-generation), [Context Optimization](experiments/README.md#context-optimization)
 
 **Core Implementation**
 
@@ -1033,7 +1034,7 @@ Uploading many diagrams at once without hierarchy or a clear starting point over
 **Maturity**: Beginner
 **Description**: Interview, constrain, and plan before writing code so AI implementation matches actual requirements instead of confident-sounding assumptions.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Progressive Enhancement](#progressive-enhancement), [Adversarial Evaluator](#adversarial-evaluator), [Harness Engineering Lens](#harness-engineering-lens)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Spec-Driven Development](#spec-driven-development), [Incremental Generation](#incremental-generation), [Adversarial Evaluator](#adversarial-evaluator), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Source**: Cursor, "[Plan Mode](https://cursor.com/docs/agent/plan-mode)" documentation; Anthropic, "[Claude Code best practices](https://code.claude.com/docs/en/best-practices)"
 
@@ -1213,7 +1214,8 @@ Spending excessive time refining plans without moving to implementation, missing
 ---
 
 
-## Progressive Enhancement
+<a id="progressive-enhancement"></a>
+## Incremental Generation
 
 **Maturity**: Beginner  
 **Description**: Build complex features through small, deployable iterations rather than big-bang generation.
@@ -1222,8 +1224,12 @@ Spending excessive time refining plans without moving to implementation, missing
 
 **Source**: GitHub Docs, "[Prompt engineering for GitHub Copilot Chat](https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering)"; Harper Reed, "[My LLM codegen workflow atm](https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/)", February 16, 2025
 
+Industry sources describe this mechanism as small tasks, bite-sized steps, or incremental
+development. This catalog uses *incremental generation* to avoid collision with the established
+web-design meaning of *progressive enhancement*.
+
 **Examples**
-Building authentication progressively:
+Building authentication incrementally:
 ```bash
 # Day 1: Minimal login
 "Create POST /login that returns 200 for admin/admin, 401 otherwise"
@@ -1244,7 +1250,7 @@ Building authentication progressively:
 
 **Developer Review Required**: Each iteration requires developer review and testing of AI-generated code before deployment.
 
-**When to Use [Progressive Enhancement](#progressive-enhancement)**
+**When to Use [Incremental Generation](#incremental-generation)**
 
 - **MVP Development**: When you need to get to market quickly with minimal features
 - **Uncertain Requirements**: When requirements are likely to change based on user feedback  
@@ -1263,7 +1269,7 @@ Asking AI to "create a complete user management system" results in 5000 lines of
 **Maturity**: Intermediate
 **Description**: Separate the agent that generates work from an independent agent that judges it — ideally a different model — so adversarial pressure and cross-model divergence, not a model grading its own output, become the eval signal for high-stakes decisions.
 
-**Related Patterns**: [Planned Implementation](#planned-implementation), [Progressive Enhancement](#progressive-enhancement), [Spec-Driven Development](#spec-driven-development), [Autonomous Acceptance](experiments/README.md#autonomous-acceptance), [Harness Engineering Lens](#harness-engineering-lens)
+**Related Patterns**: [Planned Implementation](#planned-implementation), [Incremental Generation](#incremental-generation), [Spec-Driven Development](#spec-driven-development), [Autonomous Acceptance](experiments/README.md#autonomous-acceptance), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Core Principle: Separate the Producer from the Judge**
 
@@ -1567,7 +1573,8 @@ Running multiple agents without isolation, shared memory, or conflict resolution
 ---
 
 
-## Context Persistence
+<a id="context-persistence"></a>
+## Agent Memory
 
 **Maturity**: Intermediate
 **Description**: Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols for efficient multi-session development.
@@ -1575,6 +1582,9 @@ Running multiple agents without isolation, shared memory, or conflict resolution
 **Related Patterns**: [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure), [Spec-Driven Development](#spec-driven-development), [Parallel Agents](#parallel-agents)
 
 **Source**: Anthropic, "[Memory tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool)" (Claude API documentation); Packer et al., "[MemGPT: Towards LLMs as Operating Systems](https://arxiv.org/abs/2310.08560)", October 12, 2023
+
+Industry tooling commonly calls this practice *memory*, *agent memory*, a *memory bank*, or a
+*memory tool*.
 
 **Core Principles**
 
@@ -1657,7 +1667,7 @@ Capture successful prompts and failures with success rates for reuse:
 ./session-resume.sh  # Displays TODO + recent decisions + notes recap
 ```
 
-**Complete Implementation**: See [examples/context-persistence/](examples/context-persistence/) for:
+**Complete Implementation**: See [examples/agent-memory/](examples/agent-memory/) for:
 - Memory schema templates (TODO.md, DECISIONS.log, NOTES.md, scratchpad.md)
 - Context compaction and session resume automation scripts
 - Prompt pattern capture and maintenance tools
@@ -1933,7 +1943,7 @@ Deploy to database: $1 (default: $STAGING_DB)
 **Maturity**: Intermediate
 **Description**: Load AI assistant rules incrementally based on task context rather than bundling all instructions upfront, preventing context bloat and improving instruction-following consistency.
 
-**Related Patterns**: [Codified Rules](#codified-rules), [Context Persistence](#context-persistence), [Custom Commands](#custom-commands), [Event Automation](#event-automation), [Centralized Rules](#centralized-rules), [Context Optimization](experiments/README.md#context-optimization)
+**Related Patterns**: [Codified Rules](#codified-rules), [Agent Memory](#agent-memory), [Custom Commands](#custom-commands), [Event Automation](#event-automation), [Centralized Rules](#centralized-rules), [Context Optimization](experiments/README.md#context-optimization)
 
 **Core Problem**
 
@@ -2021,7 +2031,7 @@ Creating specialized rule files but never documenting when/how to load them forc
 **Maturity**: Intermediate  
 **Description**: Break complex features into atomic, independently implementable tasks for parallel AI agent execution.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Workflow Orchestration](experiments/README.md#workflow-orchestration), [Progressive Enhancement](#progressive-enhancement), [Issue Generation](#issue-generation), [Parallel Agents](#parallel-agents)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Workflow Orchestration](experiments/README.md#workflow-orchestration), [Incremental Generation](#incremental-generation), [Issue Generation](#issue-generation), [Parallel Agents](#parallel-agents)
 
 **Atomic Task Criteria**
 
@@ -2881,7 +2891,7 @@ Copying AI rules into every repository without a central source causes drift, in
 ## Getting Started
 
 ### Phase 1: Foundation (Weeks 1-2)
-1. **[Readiness Assessment](#readiness-assessment)** - Evaluate team and codebase readiness
+1. **[Agent Readiness](#agent-readiness)** - Evaluate team and codebase readiness
 2. **[Codified Rules](#codified-rules)** - Establish consistent AI coding standards
 3. **[Security Sandbox](#security-sandbox)** - Implement secure AI tool isolation
 4. **[Developer Lifecycle](#developer-lifecycle)** - Define structured development process
@@ -2889,7 +2899,7 @@ Copying AI rules into every repository without a central source causes drift, in
 
 ### Phase 2: Development (Weeks 3-4)
 1. **[Spec-Driven Development](#spec-driven-development)** - Implement specification-first approach
-2. **[Progressive Enhancement](#progressive-enhancement)** - Practice iterative development
+2. **[Incremental Generation](#incremental-generation)** - Practice iterative development
 3. **[Adversarial Evaluator](#adversarial-evaluator)** - Stress-test high-stakes decisions with an independent judge or across multiple frontier models
 4. **[Atomic Decomposition](#atomic-decomposition)** - Break down complex features
 

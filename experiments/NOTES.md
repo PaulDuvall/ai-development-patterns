@@ -36,12 +36,12 @@ This file tracks patterns under exploration that may eventually be formalized in
 - [ ] Evaluate voice accuracy for Python/JavaScript/TypeScript
 - [ ] Measure WPM (words per minute) voice vs. keyboard for prompts
 - [ ] Document voice command vocabulary for common AI interactions
-- [ ] Assess impact on [Context Persistence](../README.md#context-persistence) pattern
+- [ ] Assess impact on [Agent Memory](../README.md#agent-memory) pattern
 
 **Related Patterns**:
 - [Tool Integration](../README.md#tool-integration) - Voice as input tool for AI
 - [Developer Lifecycle](../README.md#developer-lifecycle) - Voice-triggered workflow commands
-- [Context Persistence](../README.md#context-persistence) - Voice input as context source
+- [Agent Memory](../README.md#agent-memory) - Voice input as context source
 
 **Anti-patterns to Avoid**:
 - Over-reliance on voice for precise code editing (better for high-level commands)
@@ -137,7 +137,7 @@ This file tracks patterns under exploration that may eventually be formalized in
 - [ ] Document checkpoint integration with CI/CD pipelines
 
 **Related Patterns**:
-- [Readiness Assessment](../README.md#readiness-assessment) - Code quality prerequisites before automation
+- [Agent Readiness](../README.md#agent-readiness) - Code quality prerequisites before automation
 - [Security Sandbox](../README.md#security-sandbox) - Running agents in isolated environments
 - [Agentic Loops](#agentic-loops) - Long autonomous coding sessions with self-correction
 - [Guided Refactoring](../README.md#guided-refactoring) - Code improvement checks

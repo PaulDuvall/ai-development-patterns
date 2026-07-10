@@ -1,5 +1,5 @@
 #!/bin/bash
-# Setup AI Context Persistence Hooks for Claude Code
+# Setup Agent Memory Hooks for Claude Code
 #
 # This script configures Claude Code hooks for automatic context management
 
@@ -8,7 +8,7 @@ set -euo pipefail
 PROJECT_ROOT="${1:-.}"
 cd "$PROJECT_ROOT"
 
-echo "Setting up AI Context Persistence hooks..."
+echo "Setting up Agent Memory hooks..."
 echo ""
 
 # Create directory structure
@@ -18,8 +18,8 @@ mkdir -p .claude
 
 # Copy memory templates
 echo "📝 Creating memory schema templates..."
-if [[ -f "examples/ai-context-persistence/templates/TODO.md" ]]; then
-    cp -n examples/ai-context-persistence/templates/*.{md,log,json} .ai/memory/ 2>/dev/null || true
+if [[ -f "examples/agent-memory/templates/TODO.md" ]]; then
+    cp -n examples/agent-memory/templates/*.{md,log,json} .ai/memory/ 2>/dev/null || true
 else
     # Create minimal templates
     cat > .ai/memory/TODO.md << 'EOF'

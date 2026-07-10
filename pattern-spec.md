@@ -67,12 +67,12 @@ All pattern names MUST follow these strict naming conventions:
 #### Pattern Naming Rules
 
 1. **Exactly two words, Title Case**
-   - No more, no less (e.g., "Context Persistence", "Guided Refactoring")
+   - No more, no less (e.g., "Agent Memory", "Guided Refactoring")
    - Hyphenated compounds count as one word (e.g., "Spec-Driven" = 1 word)
    - Special case: "-Driven Development" patterns (e.g., "Spec-Driven Development", "Test-Driven Development") follow industry convention where "X-Driven" + "Development" = 2 words
 
 2. **Format: Noun + Noun OR Adjective + Noun**
-   - Noun + Noun: "Pipeline Synthesis", "Context Persistence", "Error Resolution"
+   - Noun + Noun: "Pipeline Synthesis", "Agent Memory", "Error Resolution"
    - Adjective + Noun: "Parallel Agents", "Guided Architecture", "Atomic Decomposition"
    - Avoid verbs unless absolutely essential to meaning
 
@@ -95,7 +95,7 @@ All pattern names MUST follow these strict naming conventions:
 6. **Unique within catalog**
    - No duplicate pattern names
    - Reuse root words ONLY for related sub-patterns
-   - Example: "Context Persistence" and "Context Optimization" share "Context" because they're related
+   - Example: "Security Sandbox" and "Security Orchestration" share "Security" because they're related
 
 7. **Parallel structure across related pattern sets**
    - Synthesis family: "Pipeline Synthesis", "Deployment Synthesis", "Release Synthesis"
@@ -146,7 +146,7 @@ All antipattern names MUST follow these strict conventions:
 |--------------|--------|--------------|
 | Pipeline Synthesis | Noun + Noun | Clear meaning, domain-specific, 2 words |
 | Parallel Agents | Adj + Noun | Describes multiple agents working together |
-| Context Persistence | Noun + Noun | Technical term + clear benefit |
+| Agent Memory | Noun + Noun | Technical term + clear benefit |
 | Guided Refactoring | Adj + Noun | Implies AI assistance in refactoring |
 | Error Resolution | Noun + Noun | Simple, clear problem-solving pattern |
 | Deployment Synthesis | Noun + Noun | Parallels "Pipeline Synthesis", clear meaning |
@@ -155,7 +155,7 @@ All antipattern names MUST follow these strict conventions:
 
 | Bad Pattern Name | Violation | Fixed Version |
 |------------------|-----------|---------------|
-| AI Readiness Assessment | 3 words, "AI" redundant | Readiness Assessment |
+| AI Readiness Assessment | 3 words, "AI" redundant | Agent Readiness |
 | Comprehensive AI Testing Strategy | 4 words, vague | Testing Orchestration |
 | AI-Guided Blue-Green Deployment | 3 words (hyphen compounds count as one), too specific | Deployment Synthesis |
 | Rules as Code | 3 words, preposition | Codified Rules |

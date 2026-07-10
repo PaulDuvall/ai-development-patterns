@@ -1,4 +1,4 @@
-# Claude Code Hooks for AI Context Persistence
+# Claude Code Hooks for Agent Memory
 
 Automate context loading and knowledge capture using Claude Code hooks.
 
@@ -334,5 +334,5 @@ fi
 ## See Also
 
 - [Claude Code Hooks Documentation](https://docs.claude.com/en/docs/claude-code/hooks)
-- [Main README](../README.md) - Core context persistence concepts
+- [Main README](../README.md) - Core agent memory concepts
 - [Scripts README](../scripts/) - Manual context management tools
