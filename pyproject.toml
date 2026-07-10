@@ -4,7 +4,7 @@ version = "0.0.0"
 description = "Repository validation tooling for AI Development Patterns"
 requires-python = ">=3.11"
 dependencies = [
-  "beautifulsoup4==4.14.3",
+  "beautifulsoup4==4.15.0",
   "PyYAML==6.0.2",
   "requests==2.32.3",
 ]
