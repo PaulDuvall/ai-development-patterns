@@ -10,6 +10,11 @@ allow_login_shell = false
 inherit = "core"
 ignore_default_excludes = false
 
+[shell_environment_policy.set]
+# The action runs Codex as a separate Unix account whose sudo PATH does not
+# include setup-python. This immutable venv is prepared by the trusted job.
+PATH = "/opt/evidence-python/bin:/usr/local/bin:/usr/bin:/bin"
+
 [permissions.evidence-research]
 description = "Read the repository, write only verification candidate paths, and fetch public evidence."
 extends = ":workspace"
@@ -19,15 +24,10 @@ extends = ":workspace"
 "/home/runner/work/_actions" = "deny"
 
 [permissions.evidence-research.filesystem.":workspace_roots"]
-"." = "read"
-"README.md" = "write"
-"index.html" = "write"
-"assets/js/patterns-data.js" = "write"
-"experiments/NOTES.md" = "write"
-"verification/DECISIONS.md" = "write"
-"verification/STATUS.md" = "write"
-"verification/pending-evidence.yaml" = "write"
-"verification/evidence" = "write"
+# Bubblewrap writable roots must be directories. The workflow makes this
+# directory visible as writable to the sandbox, while Unix ownership and modes
+# restrict evidence-agent to the fixed candidate files and evidence directory.
+"." = "write"
 ".git" = "deny"
 ".beads" = "deny"
 

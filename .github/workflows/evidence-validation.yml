@@ -24,6 +24,7 @@ on:
       - scripts/build-verification-inventory.py
       - scripts/evidence_content.py
       - scripts/scan-candidate-secrets.py
+      - scripts/check-research-workspace.py
       - tests/test_evidence_files.py
       - tests/test_evidence_content.py
       - tests/test_verification_inventory.py
@@ -31,9 +32,12 @@ on:
       - tests/test_candidate_secret_scan.py
       - tests/test_repository_rules.py
       - tests/test_verification_workflows.py
+      - tests/test_research_workspace_permissions.py
       - tests/requirements.txt
+      - .github/codex/evidence-research.toml
       - .github/workflows/evidence-validation.yml
       - .github/workflows/trusted-evidence-validation.yml
+      - .github/workflows/verify-patterns.yml
   pull_request:
     branches: [main]
   schedule:
@@ -94,8 +98,63 @@ jobs:
           tests/test_verification_status.py
           tests/test_candidate_secret_scan.py
           tests/test_repository_rules.py
+          tests/test_research_workspace_permissions.py
           tests/test_verification_workflows.py
           -m "not slow" --tb=short
+
+  codex-permission-profile:
+    name: Codex permission profile smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+
+      - name: Build read-only research Python environment
+        run: |
+          set -euo pipefail
+          sudo "$(command -v python3)" -m venv /opt/evidence-python
+          sudo /opt/evidence-python/bin/python -m pip install \
+            --requirement tests/requirements.txt
+          sudo chown -hR root:root /opt/evidence-python
+          sudo chmod -R a=rX /opt/evidence-python
+
+      - name: Compile and launch the pinned Codex sandbox without credentials
+        env:
+          CODEX_HOME: ${{ runner.temp }}/codex-profile-preflight
+        run: | # zizmor: ignore[adhoc-packages] pinned to workflow CLI version
+          set -euo pipefail
+          npm install --global "@openai/codex@0.144.1"
+          install -d -m 0700 "$CODEX_HOME"
+          install -m 0600 .github/codex/evidence-research.toml "$CODEX_HOME/config.toml"
+          current_userns=$(sysctl -n kernel.unprivileged_userns_clone 2>/dev/null || true)
+          if [ -n "$current_userns" ] && [ "$current_userns" != "1" ]; then
+            sudo sysctl -w kernel.unprivileged_userns_clone=1
+          fi
+          current_apparmor=$(
+            sysctl -n kernel.apparmor_restrict_unprivileged_userns 2>/dev/null || true
+          )
+          if [ -n "$current_apparmor" ] && [ "$current_apparmor" != "0" ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+          timeout 30s codex mcp-server --strict-config </dev/null
+          timeout 30s codex sandbox \
+            --permission-profile evidence-research \
+            --cd "$GITHUB_WORKSPACE" \
+            -- python3 -c \
+              'import bs4, requests, sys, yaml; assert sys.version_info >= (3, 11)'
 
   evidence-links:
     name: Evidence URL recheck
