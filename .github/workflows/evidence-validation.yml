@@ -1,0 +1,272 @@
+name: Adoption Evidence
+
+on:
+  workflow_dispatch:
+    inputs:
+      check_links:
+        description: Also re-fetch every evidence URL
+        required: false
+        type: boolean
+        default: false
+  workflow_call:
+  push:
+    branches: [main]
+    paths:
+      - README.md
+      - index.html
+      - assets/js/patterns-data.js
+      - patterns.yaml
+      - experiments/README.md
+      - experiments/NOTES.md
+      - verification/**
+      - scripts/validate-evidence.py
+      - scripts/generate-verification-status.py
+      - scripts/build-verification-inventory.py
+      - scripts/evidence_content.py
+      - scripts/scan-candidate-secrets.py
+      - tests/test_evidence_files.py
+      - tests/test_evidence_content.py
+      - tests/test_verification_inventory.py
+      - tests/test_verification_status.py
+      - tests/test_candidate_secret_scan.py
+      - tests/test_repository_rules.py
+      - tests/test_verification_workflows.py
+      - tests/requirements.txt
+      - .github/workflows/evidence-validation.yml
+      - .github/workflows/trusted-evidence-validation.yml
+  pull_request:
+    branches: [main]
+  schedule:
+    # Recompute every verdict weekly even when the repository is unchanged.
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evidence-validation-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deterministic-evidence:
+    name: Deterministic evidence checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tests/requirements.txt
+
+      - name: Install validation dependencies
+        run: python3 -m pip install --requirement tests/requirements.txt
+
+      - name: Recompute adoption verdicts
+        run: >-
+          python3 scripts/validate-evidence.py
+          --registry patterns.yaml
+          --allowlist verification/pending-evidence.yaml
+
+      - name: Enforce 90-day freshness on the weekly run
+        if: github.event_name == 'schedule'
+        run: >-
+          python3 scripts/validate-evidence.py
+          --registry patterns.yaml
+          --allowlist verification/pending-evidence.yaml
+          --max-age-days 90
+
+      - name: Check generated status
+        run: python3 scripts/generate-verification-status.py --check
+
+      - name: Run fast evidence tests
+        run: >-
+          python3 -m pytest
+          tests/test_evidence_files.py
+          tests/test_evidence_content.py
+          tests/test_verification_inventory.py
+          tests/test_verification_status.py
+          tests/test_candidate_secret_scan.py
+          tests/test_repository_rules.py
+          tests/test_verification_workflows.py
+          -m "not slow" --tb=short
+
+  evidence-links:
+    name: Evidence URL recheck
+    needs: deterministic-evidence
+    if: >-
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && inputs.check_links)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tests/requirements.txt
+
+      - name: Install validation dependencies
+        run: python3 -m pip install --requirement tests/requirements.txt
+
+      - name: Re-fetch evidence URLs
+        run: >-
+          python3 -m pytest
+          tests/test_evidence_files.py
+          tests/test_evidence_content.py
+          -m slow --tb=short
+
+  reconcile-evidence-gaps:
+    name: Reconcile merged evidence gaps
+    needs: deterministic-evidence
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout validated main revision
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          persist-credentials: false
+
+      - name: Install YAML dependency
+        run: python3 -m pip install pyyaml==6.0.2
+
+      - name: Close gaps resolved on the default branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          import yaml
+
+          registry = yaml.safe_load(Path("patterns.yaml").read_text(encoding="utf-8"))
+          main_patterns = {item["id"]: item["name"] for item in registry["patterns"]}
+          completed = set()
+          for slug, name in main_patterns.items():
+              path = Path("verification/evidence") / f"{slug}.yaml"
+              if not path.is_file():
+                  continue
+              evidence = yaml.safe_load(path.read_text(encoding="utf-8"))
+              if evidence.get("provenance_status") == "complete" \
+                      and evidence.get("verdict") == "verified":
+                  completed.add(f"Adoption evidence gap: {name}")
+
+          issues = json.loads(subprocess.run(
+              [
+                  "gh", "issue", "list", "--state", "open", "--label", "needs-evidence",
+                  "--limit", "200", "--json", "number,title",
+              ],
+              check=True, capture_output=True, text=True,
+          ).stdout)
+          for issue in issues:
+              if issue["title"] not in completed:
+                  continue
+              subprocess.run(
+                  [
+                      "gh", "issue", "close", str(issue["number"]),
+                      "--reason", "completed", "--comment",
+                      "Merged evidence now deterministically computes to `verified`.\n\n"
+                      f"Validation run: {os.environ['RUN_URL']}",
+                  ],
+                  check=True,
+              )
+          PY
+
+  notify-failure:
+    name: Notify on scheduled evidence failure
+    needs: [deterministic-evidence, evidence-links]
+    if: >-
+      always() && github.event_name == 'schedule' &&
+      contains(needs.*.result, 'failure')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Create or update failure issue
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const label = 'evidence-validation-failure';
+            try {
+              await github.rest.issues.getLabel({
+                owner: context.repo.owner, repo: context.repo.repo, name: label
+              });
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner, repo: context.repo.repo,
+                name: label, color: 'B60205',
+                description: 'Scheduled evidence validation is failing'
+              });
+            }
+            const { data: existing } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              labels: label, state: 'open'
+            });
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            if (existing.length) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing[0].number,
+                body: `Scheduled evidence validation failed again: ${runUrl}`
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title: 'Scheduled adoption evidence validation is failing',
+                labels: [label],
+                body: `Freshness, source integrity, or deterministic validation failed.\n\n${runUrl}`
+              });
+            }
+
+  close-resolved-failures:
+    name: Close resolved evidence failures
+    needs: [deterministic-evidence, evidence-links]
+    if: >-
+      always() && github.event_name == 'schedule' &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Close recovered failure issues
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              labels: 'evidence-validation-failure', state: 'open'
+            });
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            for (const issue of issues) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `Scheduled evidence validation recovered: ${runUrl}`
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed', state_reason: 'completed'
+              });
+            }

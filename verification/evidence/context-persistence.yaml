@@ -1,7 +1,35 @@
+schema_version: 2
+provenance_status: legacy-import
+legacy_run_url: https://github.com/PaulDuvall/ai-development-patterns/pull/28
+legacy_limitations: The PR records 9 aggregate queries, all three search modes, and an independent URL
+  re-fetch. Exact query strings, per-mode candidate counts, normalized content hashes, and verifier metadata
+  were not retained.
 pattern: Context Persistence
 slug: context-persistence
-verified: '2026-07-02'
-adoption_score: 24
+last_checked: '2026-07-02'
+search:
+  run_id: legacy-import
+  checked_at: '2026-07-02'
+  modes:
+    name:
+      queries: []
+      candidate_count: null
+    mechanism:
+      queries: []
+      candidate_count: null
+    artifact:
+      queries: []
+      candidate_count: null
+adoption_score: 17
+tier_counts:
+  T1: 2
+  T2: 1
+  T4: 1
+  T5: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 5
 naming_alignment: weak
 terminology_variants:
 - term: structured note-taking / agentic memory
@@ -28,82 +56,108 @@ terminology_variants:
 evidence:
 - tier: T1
   match: aliased
-  mechanism_quote: The memory tool lets Claude store and retrieve information across conversations in a directory
-    of memory files. Claude can create, read, update, and delete files that persist between sessions, building up
-    knowledge over time without keeping everything in the context window.
+  mechanism_quote: The memory tool lets Claude store and retrieve information across conversations in
+    a directory of memory files. Claude can create, read, update, and delete files that persist between
+    sessions, building up knowledge over time without keeping everything in the context window.
   source: Anthropic - Memory tool (Claude Messages API documentation)
+  source_kind: shipped_product
+  organization: Anthropic
+  independence_group: anthropic
   url: https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool
-  date: '2026-07-02'
+  resolved_url: https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   retrieved: '2026-07-02'
-  claim: Anthropic ships a generally-available memory tool on the Messages API (tool type memory_20250818, no beta
-    header required) that lets Claude persist files outside the context window across sessions, and the same doc
-    prescribes a 'Multi-session software development pattern' with an initializer session, progress log, session-start
-    file reads, and end-of-session updates (undated page; date = retrieval date)
+  claim: Anthropic ships a generally-available memory tool on the Messages API (tool type memory_20250818,
+    no beta header required) that lets Claude persist files outside the context window across sessions,
+    and the same doc prescribes a 'Multi-session software development pattern' with an initializer session,
+    progress log, session-start file reads, and end-of-session updates (undated page; date = retrieval
+    date)
 - tier: T1
   match: named
   source: mkreyman - MCP Memory Keeper (GitHub repository)
+  source_kind: open_source_implementation
+  organization: mkreyman
+  independence_group: independent:mkreyman
   url: https://github.com/mkreyman/mcp-memory-keeper
+  resolved_url: https://github.com/mkreyman/mcp-memory-keeper
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   date: '2026-03-25'
   retrieved: '2026-07-02'
-  claim: A runnable MCP server (128 stars, latest release v0.12.1 on 2026-03-25) that provides persistent context
-    management for Claude Code and carries the exact repository topic tag 'context-persistence'
+  claim: A runnable MCP server (128 stars, latest release v0.12.1 on 2026-03-25) that provides persistent
+    context management for Claude Code and carries the exact repository topic tag 'context-persistence'
 - tier: T2
   match: aliased
-  mechanism_quote: Structured note-taking, or agentic memory, is a technique where the agent regularly writes notes
-    persisted to memory outside of the context window.
-  source: Anthropic - Effective context engineering for AI agents (engineering guidance)
-  url: https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
-  date: '2025-09-29'
-  retrieved: '2026-07-02'
-  claim: 'Anthropic''s canonical context-engineering guidance (cross-referenced from its platform docs as ''the
-    broader pattern'') names and recommends the pattern''s two mechanisms: compaction (''taking a conversation nearing
-    the context window limit, summarizing its contents, and reinitiating a new context window with the summary'')
-    and structured note-taking, citing an agent ''maintaining a NOTES.md file'' to track progress across tasks'
-- tier: T2
-  match: aliased
-  mechanism_quote: Memory Bank is a documentation methodology that transforms Cline from a stateless assistant into
-    a persistent development partner. Through structured markdown files, Cline can "remember" your project details
-    across sessions.
+  mechanism_quote: Memory Bank is a documentation methodology that transforms Cline from a stateless assistant
+    into a persistent development partner. Through structured markdown files, Cline can "remember" your
+    project details across sessions.
   source: Cline - Memory Bank documentation (docs.cline.bot best practices)
+  source_kind: official_documentation
+  organization: Cline
+  independence_group: cline
   url: https://docs.cline.bot/best-practices/memory-bank
-  date: '2026-07-02'
+  resolved_url: https://docs.cline.bot/best-practices/memory-bank
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   retrieved: '2026-07-02'
-  claim: Cline's official docs prescribe a six-file structured markdown memory schema (projectbrief.md, productContext.md,
-    activeContext.md, systemPatterns.md, techContext.md, progress.md) that the agent must read at the start of every
-    session to restore project context after memory resets (undated page; date = retrieval date)
-- tier: T3
-  match: aliased
-  mechanism_quote: we propose virtual context management, a technique drawing inspiration from hierarchical memory
-    systems in traditional operating systems that provide the appearance of large memory resources through data
-    movement between fast and slow memory.
-  source: 'Packer, Wooders, Lin, Fang, Patil, Stoica, Gonzalez - MemGPT: Towards LLMs as Operating Systems (arXiv
-    2310.08560)'
-  url: https://arxiv.org/abs/2310.08560
-  date: '2023-10-12'
-  retrieved: '2026-07-02'
-  claim: Research paper (v1 2023-10-12, v2 2024-02-12) formalizing management of the limited LLM context window
-    by paging information between in-context and external memory tiers, the academic basis later productized as
-    Letta
+  claim: Cline's official docs prescribe a six-file structured markdown memory schema (projectbrief.md,
+    productContext.md, activeContext.md, systemPatterns.md, techContext.md, progress.md) that the agent
+    must read at the start of every session to restore project context after memory resets (undated page;
+    date = retrieval date)
 - tier: T4
   match: aliased
-  mechanism_quote: After each reset, I rely ENTIRELY on my Memory Bank to understand the project and continue work
-    effectively. I MUST read ALL memory bank files at the start of EVERY task - this is not optional.
+  mechanism_quote: After each reset, I rely ENTIRELY on my Memory Bank to understand the project and continue
+    work effectively. I MUST read ALL memory bank files at the start of EVERY task - this is not optional.
   source: Gitpod - .clinerules/memory-bank.md in gitpod-io/gitpod (production repo config)
+  source_kind: case_study
+  organization: Gitpod
+  independence_group: gitpod
   url: https://github.com/gitpod-io/gitpod/blob/main/.clinerules/memory-bank.md
+  resolved_url: https://github.com/gitpod-io/gitpod/blob/main/.clinerules/memory-bank.md
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   date: '2025-06-19'
   retrieved: '2026-07-02'
   claim: A 13,736-star production repository checks in Memory Bank instruction files (last committed 2025-06-19)
-    defining a hierarchical markdown memory schema for AI session continuity; GitHub code search for the same instruction
-    fingerprint ('memory resets completely between sessions') returns 1,326 files across repositories, and a search
-    for HANDOFF.md files mentioning 'context window' returns 3,576 files
+    defining a hierarchical markdown memory schema for AI session continuity; GitHub code search for the
+    same instruction fingerprint ('memory resets completely between sessions') returns 1,326 files across
+    repositories, and a search for HANDOFF.md files mentioning 'context window' returns 3,576 files
 - tier: T5
   match: aliased
   mechanism_quote: Works across sessions, projects, even machines (if you use cloud Redis)
-  source: 'elfenleid - Show HN: Recall: Give Claude memory with Redis-backed persistent context (Hacker News)'
+  source: 'elfenleid - Show HN: Recall: Give Claude memory with Redis-backed persistent context (Hacker
+    News)'
+  source_kind: social_discussion
+  organization: elfenleid
+  independence_group: independent:elfenleid
   url: https://news.ycombinator.com/item?id=45516584
+  resolved_url: https://news.ycombinator.com/item?id=45516584
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   date: '2025-10-08'
   retrieved: '2026-07-02'
-  claim: Show HN discussion (submitter elfenleid, 2025-10-08 per HN API timestamp 1759933686) of a tool giving Claude
-    persistent context across sessions via external storage, with commenters comparing it to plain memory files
-    Claude Code can natively edit
-verdict: verified
+  claim: Show HN discussion (submitter elfenleid, 2025-10-08 per HN API timestamp 1759933686) of a tool
+    giving Claude persistent context across sessions via external storage, with commenters comparing it
+    to plain memory files Claude Code can natively edit
+verdict: weak

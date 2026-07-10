@@ -4,266 +4,888 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "Run mode"
+        description: Run mode
         type: choice
         options:
-          - stale-default   # Phases 1-3 on the 10 stalest patterns
-          - full            # all phases, all patterns
-          - discover-only   # Phase 4 only
-          - single-pattern  # Phases 2-3 for one pattern (set 'pattern')
+          - stale-default
+          - full
+          - discover-only
+          - single-pattern
         default: stale-default
       pattern:
-        description: "Pattern name (single-pattern mode only)"
+        description: Exact pattern name (required for single-pattern mode)
         type: string
         required: false
       stale_days:
-        description: "Staleness threshold in days"
+        description: Staleness threshold, 1-3650 days
         type: string
         default: "90"
       since_days:
-        description: "Discovery lookback window in days"
+        description: Discovery lookback, 1-365 days
         type: string
         default: "30"
       max_turns:
-        description: "Max agent turns (cost ceiling)"
+        description: Optional agent turn ceiling, 1-500 (blank uses the mode default)
         type: string
-        default: "120"
+        required: false
   schedule:
-    # Weekly, an hour before pattern-validation's Monday 06:00 UTC link check,
-    # so evidence PRs exist by the time that run fires. Scheduled runs use
-    # stale-default mode — the cheapest, most targeted slice.
-    - cron: '0 5 * * 1'
-    # Monthly unknown-unknowns discovery (Phase 4) — without this cron the
-    # discovery phase would only ever run on manual dispatch.
-    - cron: '0 6 1 * *'
+    # Weekly evidence refresh; monthly cron switches to discovery-only mode.
+    - cron: "0 5 * * 1"
+    - cron: "0 6 1 * *"
 
-# One run at a time: parallel runs would race on verify/* branches and the
-# derived inventory file.
+permissions: {}
+
 concurrency:
   group: verify-patterns
   cancel-in-progress: false
 
 jobs:
-  verify:
+  prepare:
+    name: Validate run inputs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      base_sha: ${{ steps.inputs.outputs.base_sha }}
+      mode: ${{ steps.inputs.outputs.mode }}
+      pattern: ${{ steps.inputs.outputs.pattern }}
+      stale_days: ${{ steps.inputs.outputs.stale_days }}
+      since_days: ${{ steps.inputs.outputs.since_days }}
+      max_turns: ${{ steps.inputs.outputs.max_turns }}
+      selected_slugs: ${{ steps.inventory.outputs.selected_slugs }}
+      scanner_sha256: ${{ steps.scanner.outputs.sha256 }}
+    steps:
+      - name: Checkout trusted base revision
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+
+      - name: Install input-validation dependency
+        run: python3 -m pip install pyyaml==6.0.2
+
+      - name: Fingerprint trusted candidate scanner
+        id: scanner
+        run: echo "sha256=$(sha256sum scripts/scan-candidate-secrets.py | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+
+      - name: Validate and normalize inputs
+        id: inputs
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_REF: ${{ github.ref }}
+          REQUESTED_MODE: ${{ inputs.mode || 'stale-default' }}
+          REQUESTED_PATTERN: ${{ inputs.pattern }}
+          REQUESTED_STALE_DAYS: ${{ inputs.stale_days || '90' }}
+          REQUESTED_SINCE_DAYS: ${{ inputs.since_days || '30' }}
+          REQUESTED_MAX_TURNS: ${{ inputs.max_turns }}
+          SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          import yaml
+
+          modes = {"stale-default", "full", "discover-only", "single-pattern"}
+          if os.environ["EVENT_NAME"] == "workflow_dispatch" \
+                  and os.environ["EVENT_REF"] != f"refs/heads/{os.environ['DEFAULT_BRANCH']}":
+              sys.exit("manual verification must be dispatched from the default branch")
+          mode = os.environ["REQUESTED_MODE"]
+          if os.environ.get("SCHEDULE") == "0 6 1 * *":
+              mode = "discover-only"
+          if mode not in modes:
+              sys.exit(f"unsupported mode: {mode!r}")
+
+          def bounded_integer(name, raw, minimum, maximum, default=None):
+              raw = raw.strip()
+              if not raw and default is not None:
+                  return default
+              if not re.fullmatch(r"[0-9]+", raw):
+                  sys.exit(f"{name} must be an integer")
+              value = int(raw)
+              if not minimum <= value <= maximum:
+                  sys.exit(f"{name} must be between {minimum} and {maximum}")
+              return value
+
+          stale_days = bounded_integer(
+              "stale_days", os.environ["REQUESTED_STALE_DAYS"], 1, 3650
+          )
+          since_days = bounded_integer(
+              "since_days", os.environ["REQUESTED_SINCE_DAYS"], 1, 365
+          )
+          mode_turns = {"full": 300, "discover-only": 150}
+          max_turns = bounded_integer(
+              "max_turns",
+              os.environ.get("REQUESTED_MAX_TURNS", ""),
+              1,
+              500,
+              mode_turns.get(mode, 120),
+          )
+
+          pattern = os.environ.get("REQUESTED_PATTERN", "").strip()
+          registry = yaml.safe_load(Path("patterns.yaml").read_text(encoding="utf-8"))
+          names = {item["name"] for item in registry["patterns"]}
+          if mode == "single-pattern":
+              if pattern not in names:
+                  sys.exit("single-pattern mode requires an exact name from patterns.yaml")
+          elif pattern:
+              sys.exit("pattern may only be set in single-pattern mode")
+          if "\n" in pattern or "\r" in pattern:
+              sys.exit("pattern must be a single line")
+
+          values = {
+              "base_sha": subprocess.run(
+                  ["git", "rev-parse", "HEAD"], check=True,
+                  capture_output=True, text=True,
+              ).stdout.strip(),
+              "mode": mode,
+              "pattern": pattern,
+              "stale_days": stale_days,
+              "since_days": since_days,
+              "max_turns": max_turns,
+          }
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              for key, value in values.items():
+                  print(f"{key}={value}", file=output)
+          PY
+
+      - name: Collect in-flight evidence slugs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p verification/run-plan
+          pull_list="$RUNNER_TEMP/open-pulls.tsv"
+          pull_files="$RUNNER_TEMP/pull-files.txt"
+          raw_slugs="$RUNNER_TEMP/inflight-slugs.txt"
+          : > "$raw_slugs"
+          gh api --paginate \
+            "repos/${GITHUB_REPOSITORY}/pulls?state=open&per_page=100" \
+            --jq '.[] | [.number, .head.ref, .head.repo.full_name] | @tsv' \
+            > "$pull_list"
+          while IFS=$'\t' read -r number head_ref head_repo; do
+            [ "$head_repo" = "$GITHUB_REPOSITORY" ] || continue
+            [[ "$head_ref" =~ ^verify/refresh-[0-9]+-[0-9]+$ ]] || continue
+            gh api --paginate \
+              "repos/${GITHUB_REPOSITORY}/pulls/${number}/files?per_page=100" \
+              --jq '.[].filename' > "$pull_files"
+            while IFS= read -r path; do
+              case "$path" in
+                verification/evidence/*.yaml)
+                  slug=${path#verification/evidence/}
+                  slug=${slug%.yaml}
+                  if [[ "$slug" != */* && "$slug" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
+                    echo "$slug" >> "$raw_slugs"
+                  fi
+                  ;;
+              esac
+            done < "$pull_files"
+          done < "$pull_list"
+          LC_ALL=C sort -u "$raw_slugs" > verification/run-plan/inflight-slugs.txt
+
+      - name: Build deterministic inventory and worklist
+        id: inventory
+        env:
+          MODE: ${{ steps.inputs.outputs.mode }}
+          PATTERN: ${{ steps.inputs.outputs.pattern }}
+          STALE_DAYS: ${{ steps.inputs.outputs.stale_days }}
+        run: |
+          set -euo pipefail
+          limit=10
+          if [ "$MODE" = "full" ]; then limit=0; fi
+          arguments=(
+            --mode "$MODE"
+            --stale-days "$STALE_DAYS"
+            --limit "$limit"
+            --inflight-slugs verification/run-plan/inflight-slugs.txt
+            --inventory verification/run-plan/pattern-inventory.yaml
+            --worklist verification/run-plan/worklist.txt
+            --json
+          )
+          if [ "$MODE" = "single-pattern" ]; then
+            arguments+=(--pattern "$PATTERN")
+          fi
+          selected_slugs=$(python3 scripts/build-verification-inventory.py "${arguments[@]}")
+          echo "selected_slugs=$selected_slugs" >> "$GITHUB_OUTPUT"
+          echo "Selected worklist JSON: $selected_slugs" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload deterministic research plan
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: verification-research-plan
+          path: verification/run-plan/
+          if-no-files-found: error
+          retention-days: 7
+
+  research:
+    name: Read-only evidence research
+    needs: prepare
+    if: >-
+      needs.prepare.outputs.mode == 'discover-only' ||
+      needs.prepare.outputs.selected_slugs != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     permissions:
-      contents: write
-      pull-requests: write
-      issues: write
-      actions: read
+      contents: read
+      # Used only for optional Anthropic workload-identity federation. The
+      # explicit GitHub token below remains read-only.
       id-token: write
     steps:
-      # Fail fast (scheduled) or warn loudly (manual) when the PAT is missing,
-      # instead of silently opening PRs that no CI will ever check.
-      - name: Check PAT configuration
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ needs.prepare.outputs.base_sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+
+      - name: Install local validation dependencies
+        run: python3 -m pip install --requirement tests/requirements.txt
+
+      - name: Download deterministic research plan
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: verification-research-plan
+          path: verification/run-plan
+
+      # This is the only LLM step. It receives only a read-scoped repository
+      # token; direct git/gh tools are disallowed and publication is separate.
+      - name: Collect candidate evidence
+        id: research
+        uses: anthropics/claude-code-action@a6a5b60a078a0af52612aac63e05e3f95fd4ff64 # v1
+        with:
+          github_token: ${{ github.token }}
+          anthropic_api_key: >-
+            ${{ vars.ANTHROPIC_FEDERATION_RULE_ID == '' && secrets.ANTHROPIC_API_KEY || '' }}
+          anthropic_federation_rule_id: ${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}
+          anthropic_organization_id: ${{ vars.ANTHROPIC_ORGANIZATION_ID }}
+          anthropic_service_account_id: ${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}
+          anthropic_workspace_id: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          prompt: |
+            Use .claude/commands/verify-patterns.md as the research and evidence methodology.
+
+            This is candidate-only mode. GitHub Actions, not the agent, owns publication.
+            Do not create branches, commits, pull requests, labels, or issues. Do not invoke
+            git or gh. Make proposed repository edits only in this checkout. Do not modify
+            workflows, scripts, tests, or patterns.yaml. Update
+            verification/pending-evidence.yaml whenever adding an evidence file so a slug can
+            never be both pending and evidenced.
+            Regenerate verification/STATUS.md when evidence or decisions change, and keep
+            README.md/index.html/assets/js/patterns-data.js synchronized when source lines change.
+
+            Requested mode: ${{ needs.prepare.outputs.mode }}
+            Exact pattern (empty unless single-pattern): ${{ needs.prepare.outputs.pattern }}
+            Stale threshold: ${{ needs.prepare.outputs.stale_days }} days
+            Discovery lookback: ${{ needs.prepare.outputs.since_days }} days
+            Deterministically selected slugs: ${{ needs.prepare.outputs.selected_slugs }}
+            Required evidence run_id: github-actions:${{ github.run_id }}
+            Required search and verifier run_url:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            For stale-default, full, and single-pattern modes, research only the slugs in
+            verification/run-plan/worklist.txt. The complete derived inventory is at
+            verification/run-plan/pattern-inventory.yaml. Do not add patterns to the worklist.
+            For every admitted source, populate resolved_url and content_sha256 by running
+            `python3 scripts/evidence_content.py URL --quote QUOTE`; never invent either value.
+          claude_args: >-
+            --model claude-sonnet-5
+            --max-turns ${{ needs.prepare.outputs.max_turns }}
+            --allowedTools
+            "Bash(python3 scripts/evidence_content.py:*),Bash(python3 scripts/validate-evidence.py:*),Bash(python3 scripts/generate-verification-status.py:*),Bash(python3 scripts/generate-patterns-data.py:*),Bash(date -I),Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Task"
+
+      - name: Scan fixed-path candidate bundle
         env:
-          HAS_PAT: ${{ secrets.VERIFY_PATTERNS_PAT != '' }}
+          EXPECTED_SCANNER_SHA256: ${{ needs.prepare.outputs.scanner_sha256 }}
         run: |
-          if [ "$HAS_PAT" = "true" ]; then
-            echo "VERIFY_PATTERNS_PAT configured — PRs opened by this run will trigger CI checks."
-            exit 0
+          set -euo pipefail
+          actual=$(sha256sum scripts/scan-candidate-secrets.py | cut -d ' ' -f 1)
+          if [ "$actual" != "$EXPECTED_SCANNER_SHA256" ]; then
+            echo "::error::Research modified the trusted candidate scanner"
+            exit 1
           fi
-          msg="VERIFY_PATTERNS_PAT is not configured. PRs opened with the fallback GITHUB_TOKEN do NOT trigger pattern-validation or claude-code-review — each PR would need a manual close/reopen to get checks. Remediation: add a fine-grained PAT (contents, pull-requests, issues: write) as the VERIFY_PATTERNS_PAT repo secret."
-          echo "::warning title=No PAT configured::$msg"
-          {
-            echo "## :warning: No PAT configured"
-            echo
-            echo "$msg"
-          } >> "$GITHUB_STEP_SUMMARY"
-          if [ "${{ github.event_name }}" = "schedule" ]; then
-            echo "::error title=PAT required for scheduled runs::Unattended runs would silently produce unchecked PRs. Failing until VERIFY_PATTERNS_PAT is added."
+          python3 scripts/scan-candidate-secrets.py \
+            README.md \
+            index.html \
+            assets/js/patterns-data.js \
+            experiments/NOTES.md \
+            verification/DECISIONS.md \
+            verification/STATUS.md \
+            verification/pending-evidence.yaml \
+            verification/evidence
+
+      - name: Upload fixed-path candidate bundle
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: verification-candidate
+          path: |
+            README.md
+            index.html
+            assets/js/patterns-data.js
+            experiments/NOTES.md
+            verification/DECISIONS.md
+            verification/STATUS.md
+            verification/pending-evidence.yaml
+            verification/evidence/
+          if-no-files-found: error
+          retention-days: 7
+
+  validate-candidate:
+    name: Validate untrusted candidate
+    needs: [prepare, research]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      has_changes: ${{ steps.diff.outputs.has_changes }}
+      changed_paths: ${{ steps.diff.outputs.changed_paths }}
+    steps:
+      - name: Checkout trusted base revision
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ needs.prepare.outputs.base_sha }}
+          persist-credentials: false
+
+      - name: Download candidate bundle
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: verification-candidate
+          path: candidate
+
+      - name: Reject unsafe artifact entries
+        run: |
+          set -euo pipefail
+          total=0
+          while IFS= read -r -d '' path; do
+            if [ -L "$path" ]; then
+              echo "::error::Candidate artifacts must not contain symlinks: $path"
+              exit 1
+            fi
+            [ -f "$path" ] || continue
+            relative=${path#candidate/}
+            case "$relative" in
+              README.md|index.html|assets/js/patterns-data.js|experiments/NOTES.md|verification/DECISIONS.md|verification/STATUS.md|verification/pending-evidence.yaml)
+                ;;
+              verification/evidence/*.yaml)
+                evidence_name=${relative#verification/evidence/}
+                if [[ "$evidence_name" == */* ]]; then
+                  echo "::error::Nested evidence path is not allowed: $relative"
+                  exit 1
+                fi
+                ;;
+              *)
+                echo "::error::Unexpected candidate path: $relative"
+                exit 1
+                ;;
+            esac
+            size=$(stat --format=%s "$path")
+            if (( size > 5242880 )); then
+              echo "::error::Candidate file exceeds 5 MiB: $relative"
+              exit 1
+            fi
+            total=$((total + size))
+          done < <(find candidate -mindepth 1 -print0)
+          if (( total > 26214400 )); then
+            echo "::error::Candidate artifact exceeds 25 MiB"
             exit 1
           fi
 
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-          # With VERIFY_PATTERNS_PAT configured, PRs opened by this run trigger
-          # pattern-validation and claude-code-review. Without it, the fallback
-          # GITHUB_TOKEN still opens PRs, but GitHub suppresses workflow runs on
-          # them — checks must be triggered manually (close/reopen the PR).
-          token: ${{ secrets.VERIFY_PATTERNS_PAT || github.token }}
+      - name: Reject credentials in candidate data
+        run: python3 scripts/scan-candidate-secrets.py candidate
+
+      - name: Apply candidate through fixed paths
+        run: |
+          set -euo pipefail
+          for path in \
+            README.md \
+            index.html \
+            assets/js/patterns-data.js \
+            experiments/NOTES.md \
+            verification/DECISIONS.md \
+            verification/STATUS.md \
+            verification/pending-evidence.yaml; do
+            if [ -f "candidate/$path" ]; then install -m 0644 "candidate/$path" "$path"; fi
+          done
+          for path in candidate/verification/evidence/*.yaml; do
+            [ -e "$path" ] || continue
+            install -m 0644 "$path" "verification/evidence/${path##*/}"
+          done
+
+      - name: Verify changed path allowlist
+        id: diff
+        run: |
+          set -euo pipefail
+          changed_paths=$(
+            {
+              git diff --name-only
+              git ls-files --others --exclude-standard -- verification/evidence
+            } | LC_ALL=C sort -u
+          )
+          while IFS= read -r path; do
+            [ -n "$path" ] || continue
+            case "$path" in
+              README.md|index.html|assets/js/patterns-data.js|experiments/NOTES.md|verification/DECISIONS.md|verification/STATUS.md|verification/pending-evidence.yaml|verification/evidence/*.yaml)
+                ;;
+              *)
+                echo "::error::Candidate changed a forbidden path: $path"
+                exit 1
+                ;;
+            esac
+          done <<< "$changed_paths"
+          git diff --check
+          if [ -n "$changed_paths" ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "changed_paths<<EOF"
+              echo "$changed_paths"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "changed_paths=" >> "$GITHUB_OUTPUT"
+            echo "No repository changes were proposed." >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
-          python-version: '3.11'
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tests/requirements.txt
 
       - name: Install validation dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install -r tests/requirements.txt
+        run: python3 -m pip install --requirement tests/requirements.txt
 
-      - name: Configure git identity
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      # The pattern input reaches the agent prompt verbatim, so validate it
-      # deterministically first: it must be an exact name from patterns.yaml.
-      - name: Validate pattern input
-        if: inputs.mode == 'single-pattern'
-        env:
-          PATTERN: ${{ inputs.pattern }}
+      - name: Protect human-owned naming decisions
         run: |
           python3 - <<'PY'
-          import os, sys, yaml
-          pattern = os.environ.get("PATTERN") or ""
-          if any(ch in pattern for ch in "\"'\n\r"):
-              sys.exit("pattern input must not contain quotes or newlines")
-          names = {p["name"] for p in yaml.safe_load(open("patterns.yaml"))["patterns"]}
-          if pattern not in names:
-              sys.exit(f"unknown pattern name: {pattern!r} (must match patterns.yaml exactly)")
+          import subprocess
+          from pathlib import Path
+
+          def decision_column(text):
+              decisions = {}
+              in_ledger = False
+              for line in text.splitlines():
+                  if line == "## Naming-decision ledger":
+                      in_ledger = True
+                      continue
+                  if in_ledger and line.startswith("## "):
+                      break
+                  if not in_ledger or not line.startswith("|"):
+                      continue
+                  cells = [cell.strip() for cell in line.split("|")]
+                  if len(cells) < 7 or cells[1] == "Pattern" or set(cells[1]) <= {"-"}:
+                      continue
+                  decisions[cells[1]] = cells[5]
+              return decisions
+
+          before = subprocess.run(
+              ["git", "show", "HEAD:verification/DECISIONS.md"],
+              check=True,
+              capture_output=True,
+              text=True,
+          ).stdout
+          after = Path("verification/DECISIONS.md").read_text(encoding="utf-8")
+          if decision_column(before) != decision_column(after):
+              raise SystemExit(
+                  "verification refresh must not add, remove, or edit the human-owned "
+                  "Decision column"
+              )
           PY
 
-      - name: Build command arguments
-        id: args
+      - name: Enforce exact research scope and current-run provenance
         env:
-          MODE: ${{ inputs.mode || 'stale-default' }}
-          # Which cron fired (empty on workflow_dispatch): the monthly
-          # '0 6 1 * *' entry runs discovery instead of stale-default.
-          SCHEDULE: ${{ github.event.schedule }}
-          PATTERN: ${{ inputs.pattern }}
-          STALE_DAYS: ${{ inputs.stale_days || '90' }}
-          SINCE_DAYS: ${{ inputs.since_days || '30' }}
-          MAX_TURNS: ${{ inputs.max_turns }}
+          MODE: ${{ needs.prepare.outputs.mode }}
+          SELECTED_SLUGS: ${{ needs.prepare.outputs.selected_slugs }}
+          EXPECTED_RUN_ID: github-actions:${{ github.run_id }}
+          EXPECTED_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          if [ "$SCHEDULE" = "0 6 1 * *" ]; then MODE="discover-only"; fi
-          case "$MODE" in
-            full)           args="--full" ;;
-            discover-only)  args="--discover-only" ;;
-            single-pattern) args="--pattern \"$PATTERN\"" ;;
-            *)              args="" ;;
-          esac
-          args="$args --stale-days $STALE_DAYS --since $SINCE_DAYS"
-          echo "value=$args" >> "$GITHUB_OUTPUT"
-          # Turn ceilings scale with mode; an explicit max_turns input wins.
-          case "$MODE" in
-            full) default_turns=300 ;;
-            discover-only) default_turns=150 ;;
-            *) default_turns=120 ;;
-          esac
-          echo "turns=${MAX_TURNS:-$default_turns}" >> "$GITHUB_OUTPUT"
+          python3 - <<'PY'
+          import datetime
+          import json
+          import os
+          import re
+          import subprocess
+          from pathlib import Path
 
-      - name: Run pattern verification pipeline
-        id: claude
-        uses: anthropics/claude-code-action@v1
+          import yaml
+
+          mode = os.environ["MODE"]
+          selected_list = json.loads(os.environ["SELECTED_SLUGS"])
+          if not isinstance(selected_list, list) or not all(
+                  isinstance(slug, str) and re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", slug)
+                  for slug in selected_list):
+              raise SystemExit("selected_slugs must be a JSON list of canonical slugs")
+          if len(selected_list) != len(set(selected_list)):
+              raise SystemExit("selected_slugs contains duplicates")
+          selected = set(selected_list)
+
+          changed = set(subprocess.run(
+              ["git", "diff", "--name-only"], check=True, capture_output=True, text=True,
+          ).stdout.splitlines())
+          changed.update(subprocess.run(
+              [
+                  "git", "ls-files", "--others", "--exclude-standard", "--",
+                  "verification/evidence",
+              ],
+              check=True, capture_output=True, text=True,
+          ).stdout.splitlines())
+          evidence_changed = {
+              match.group(1)
+              for path in changed
+              if (match := re.fullmatch(
+                  r"verification/evidence/([a-z0-9]+(?:-[a-z0-9]+)*)\.yaml", path))
+          }
+
+          before_pending = set((yaml.safe_load(subprocess.run(
+              ["git", "show", "HEAD:verification/pending-evidence.yaml"],
+              check=True, capture_output=True, text=True,
+          ).stdout) or {}).get("pending", []))
+          after_pending = set((yaml.safe_load(Path(
+              "verification/pending-evidence.yaml").read_text(encoding="utf-8")) or {}).get(
+                  "pending", []))
+          pending_delta = before_pending ^ after_pending
+
+          if mode == "discover-only":
+              if evidence_changed or pending_delta:
+                  raise SystemExit(
+                      "discover-only mode must not change evidence or pending membership")
+              unexpected = changed - {"experiments/NOTES.md"}
+              if unexpected:
+                  raise SystemExit(
+                      f"discover-only mode changed forbidden paths: {sorted(unexpected)}")
+              raise SystemExit(0)
+
+          missing = selected - evidence_changed
+          extra = evidence_changed - selected
+          if missing or extra:
+              raise SystemExit(
+                  f"evidence scope mismatch; missing={sorted(missing)}, extra={sorted(extra)}")
+          if pending_delta - selected:
+              raise SystemExit(
+                  f"pending membership changed outside scope: {sorted(pending_delta - selected)}")
+          still_pending = selected & after_pending
+          if still_pending:
+              raise SystemExit(
+                  f"selected evidence remains pending: {sorted(still_pending)}")
+
+          expected_date = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
+          for slug in selected_list:
+              path = Path("verification/evidence") / f"{slug}.yaml"
+              data = yaml.safe_load(path.read_text(encoding="utf-8"))
+              if data.get("provenance_status") != "complete":
+                  raise SystemExit(f"{slug}: selected output must have complete provenance")
+              if str(data.get("last_checked")) != expected_date:
+                  raise SystemExit(f"{slug}: last_checked must be {expected_date}")
+              search = data.get("search") or {}
+              if search.get("run_id") != os.environ["EXPECTED_RUN_ID"]:
+                  raise SystemExit(f"{slug}: search.run_id does not identify this run")
+              if search.get("run_url") != os.environ["EXPECTED_RUN_URL"]:
+                  raise SystemExit(f"{slug}: search.run_url does not identify this run")
+          print(f"Validated exact completion of {len(selected)} selected evidence record(s)")
+          PY
+
+      - name: Recompute candidate verdicts
+        run: >-
+          python3 scripts/validate-evidence.py
+          --registry patterns.yaml
+          --allowlist verification/pending-evidence.yaml
+
+      - name: Check generated status
+        run: python3 scripts/generate-verification-status.py --check
+
+      - name: Run evidence guard tests
+        run: >-
+          python3 -m pytest
+          tests/test_evidence_files.py
+          tests/test_evidence_content.py
+          -m "not slow" --tb=short
+
+      - name: Verify semantic evidence content
         env:
-          # gh CLI auth inside the pipeline (branch pushes, PR/issue creation)
-          GH_TOKEN: ${{ secrets.VERIFY_PATTERNS_PAT || github.token }}
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          prompt: /verify-patterns ${{ steps.args.outputs.value }}
-          claude_args: |
-            --model claude-sonnet-5
-            --max-turns ${{ steps.args.outputs.turns }}
-            --allowedTools "Bash(git:*),Bash(gh:*),Bash(python3:*),Bash(pytest:*),Bash(mkdir:*),Bash(date:*),Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Task"
+          EVIDENCE_HASH_STRICT: "1"
+          EVIDENCE_SCOPE_SLUGS: ${{ needs.prepare.outputs.selected_slugs }}
+        run: python3 -m pytest tests/test_evidence_content.py -m slow --tb=short
 
-      # The agent writes its own report to the step summary when it finishes
-      # cleanly. These two steps run regardless — a timeout or max-turns cutoff
-      # still leaves an inspectable record.
-      - name: Upload agent execution log
-        if: always()
-        uses: actions/upload-artifact@v6
-        with:
-          name: verify-patterns-execution-log
-          path: ${{ steps.claude.outputs.execution_file }}
-          if-no-files-found: ignore
-
-      - name: Publish run summary
-        if: always()
-        env:
-          GH_TOKEN: ${{ secrets.VERIFY_PATTERNS_PAT || github.token }}
-          MODE: ${{ inputs.mode || 'stale-default' }}
-          ARGS: ${{ steps.args.outputs.value }}
-          AGENT_OUTCOME: ${{ steps.claude.outcome }}
+      - name: Check site artifacts
         run: |
-          {
-            echo "## Pattern verification run"
-            echo
-            echo "| | |"
-            echo "|---|---|"
-            echo "| Mode | \`$MODE\` |"
-            echo "| Args | \`/verify-patterns $ARGS\` |"
-            echo "| Agent step outcome | **$AGENT_OUTCOME** |"
-            echo "| Trigger | ${{ github.event_name }} |"
-            echo
+          python3 scripts/generate-patterns-data.py --check
+          python3 -m pytest tests/test_readme_accuracy.py tests/test_patterns_data.py -m "not slow" --tb=short
 
-            echo "### Open verify/discover PRs (this run + any awaiting review)"
-            prs=$(gh pr list --state open --json number,title,headRefName,url \
-              --jq '.[] | select(.headRefName | test("^(verify|discover)/")) | "- [#\(.number)](\(.url)) \(.title) — `\(.headRefName)`"' || true)
-            if [ -n "$prs" ]; then echo "$prs"; else echo "_none_"; fi
-            echo
+      - name: Upload validated candidate
+        if: steps.diff.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: validated-verification-candidate
+          path: candidate/
+          if-no-files-found: error
+          retention-days: 7
 
-            echo "### Open evidence-gap issues"
-            issues=$(gh issue list --label needs-evidence --state open --json number,title,url \
-              --jq '.[] | "- [#\(.number)](\(.url)) \(.title)"' || true)
-            if [ -n "$issues" ]; then echo "$issues"; else echo "_none_"; fi
-            echo
-
-            # One fetch of open PR heads feeds both sections below; on gh
-            # failure, say so instead of false-reporting everything.
-            if open_heads=$(gh pr list --state open --json headRefName --jq '.[].headRefName'); then
-              heads_ok=1
-            else
-              heads_ok=""
-            fi
-
-            # A max-turns/timeout cutoff kills the agent's own truncation report,
-            # so reconstruct coverage deterministically: the agent writes its
-            # selected slugs to .verify-worklist at Phase 1. Match by branch
-            # prefix, not today's date — the PR may have opened before midnight.
-            echo "### Selected patterns without an opened PR (possible truncation)"
-            if [ ! -f .verify-worklist ]; then
-              echo "_no worklist file written (run may have died before Phase 1 completed)_"
-            elif [ -z "$heads_ok" ]; then
-              echo "_could not list open PRs (gh failed); skipping coverage diff_"
-            else
-              missing=""
-              while IFS= read -r slug; do
-                [ -z "$slug" ] && continue
-                echo "$open_heads" | grep -q "^verify/${slug}-" \
-                  || missing="$missing- \`$slug\`\n"
-              done < .verify-worklist
-              if [ -n "$missing" ]; then printf "%b" "$missing"; else echo "_none — all selected patterns produced PRs or needed no change_"; fi
-            fi
-            echo
-
-            # Orphan branches: pushed by a cut-off run, no PR ever opened.
-            echo "### verify/discover branches with no open PR"
-            if [ -z "$heads_ok" ]; then
-              echo "_could not list open PRs (gh failed); skipping orphan check_"
-            else
-              orphans=$(git ls-remote --heads origin 'verify/*' 'discover/*' | awk '{print $2}' | sed 's#refs/heads/##' \
-                | while IFS= read -r branch; do echo "$open_heads" | grep -qx "$branch" || echo "- \`$branch\`"; done)
-              if [ -n "$orphans" ]; then echo "$orphans"; else echo "_none_"; fi
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
-
-  # Scheduled runs must not fail silently week after week (e.g. missing PAT,
-  # repeated agent errors). Mirror pattern-validation's issue-based alerting,
-  # but scoped to schedule events, which its push-scoped job never covers.
-  notify-failure:
+  publish:
+    name: Publish validated candidate
+    needs: [prepare, validate-candidate]
+    if: needs.validate-candidate.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
-    name: Notify on Scheduled Failure
-    needs: [verify]
-    if: failure() && github.event_name == 'schedule'
+    timeout-minutes: 20
+    permissions:
+      actions: write
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Mint short-lived GitHub App token
+        id: app-token
+        if: ${{ vars.VERIFY_PATTERNS_APP_ID != '' }}
+        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
+        with:
+          app-id: ${{ vars.VERIFY_PATTERNS_APP_ID }}
+          private-key: ${{ secrets.VERIFY_PATTERNS_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+          permission-issues: write
+          permission-pull-requests: write
+
+      - name: Checkout trusted base revision
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ needs.prepare.outputs.base_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Download validated candidate
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: validated-verification-candidate
+          path: candidate
+
+      - name: Apply validated fixed-path files
+        run: |
+          set -euo pipefail
+          for path in \
+            README.md \
+            index.html \
+            assets/js/patterns-data.js \
+            experiments/NOTES.md \
+            verification/DECISIONS.md \
+            verification/STATUS.md \
+            verification/pending-evidence.yaml; do
+            if [ -f "candidate/$path" ]; then install -m 0644 "candidate/$path" "$path"; fi
+          done
+          for path in candidate/verification/evidence/*.yaml; do
+            [ -e "$path" ] || continue
+            install -m 0644 "$path" "verification/evidence/${path##*/}"
+          done
+          git diff --check
+
+      - name: Recheck evidence before publication
+        run: |
+          python3 -m pip install pyyaml==6.0.2
+          python3 scripts/validate-evidence.py \
+            --registry patterns.yaml \
+            --allowlist verification/pending-evidence.yaml
+          python3 scripts/generate-verification-status.py --check
+
+      - name: Commit, push, and open pull request
+        id: publish
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
+          PUBLISH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          branch="verify/refresh-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          [[ "$branch" =~ ^verify/refresh-[0-9]+-[0-9]+$ ]]
+
+          git switch --create "$branch"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- \
+            README.md \
+            index.html \
+            assets/js/patterns-data.js \
+            experiments/NOTES.md \
+            verification/DECISIONS.md \
+            verification/STATUS.md \
+            verification/pending-evidence.yaml \
+            verification/evidence/
+          git diff --cached --check
+          git commit -m "docs(verification): refresh adoption evidence"
+          git push \
+            "https://x-access-token:${PUBLISH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            "HEAD:refs/heads/${branch}"
+
+          pr_url=$(gh pr list --head "$branch" --state open --json url --jq '.[0].url // empty')
+          if [ -z "$pr_url" ]; then
+            body_file="$RUNNER_TEMP/evidence-pr-body.md"
+            printf '%s\n\nSource run: %s\n' \
+              'Candidate evidence collected without repository write credentials, then deterministically validated before publication.' \
+              "$RUN_URL" > "$body_file"
+            pr_url=$(gh pr create \
+              --base "$DEFAULT_BRANCH" \
+              --head "$branch" \
+              --draft \
+              --title "docs(verification): refresh adoption evidence" \
+              --body-file "$body_file")
+          fi
+          pr_number=$(gh pr view "$pr_url" --json number --jq .number)
+          {
+            echo "branch=$branch"
+            echo "pr_url=$pr_url"
+            echo "pr_number=$pr_number"
+          } >> "$GITHUB_OUTPUT"
+          echo "Published candidate PR: $pr_url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Reconcile main-catalog evidence-gap issues
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
+          BASE_SHA: ${{ needs.prepare.outputs.base_sha }}
+          PR_URL: ${{ steps.publish.outputs.pr_url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          gh label create needs-evidence \
+            --description "Pattern lacks sufficient adoption evidence" \
+            --color D93F0B \
+            --force
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import subprocess
+          from pathlib import Path
+
+          import yaml
+
+          def gh(*arguments, capture=False):
+              completed = subprocess.run(
+                  ["gh", *arguments],
+                  check=True,
+                  text=True,
+                  capture_output=capture,
+              )
+              return completed.stdout if capture else ""
+
+          registry = yaml.safe_load(Path("patterns.yaml").read_text(encoding="utf-8"))
+          main_patterns = {item["id"]: item["name"] for item in registry["patterns"]}
+          changed = subprocess.run(
+              [
+                  "git", "diff", "--name-only", os.environ["BASE_SHA"], "HEAD", "--",
+                  "verification/evidence",
+              ],
+              check=True,
+              text=True,
+              capture_output=True,
+          ).stdout.splitlines()
+          open_issues = json.loads(gh(
+              "issue", "list", "--state", "open", "--label", "needs-evidence",
+              "--limit", "200", "--json", "number,title", capture=True,
+          ))
+          by_title = {issue["title"]: issue for issue in open_issues}
+
+          for relative in changed:
+              match = re.fullmatch(r"verification/evidence/([a-z0-9-]+)\.yaml", relative)
+              if not match or match.group(1) not in main_patterns:
+                  continue
+              slug = match.group(1)
+              name = main_patterns[slug]
+              evidence = yaml.safe_load(Path(relative).read_text(encoding="utf-8"))
+              verdict = evidence.get("verdict")
+              provenance = evidence.get("provenance_status")
+              title = f"Adoption evidence gap: {name}"
+              issue = by_title.get(title)
+              links = f"Candidate PR: {os.environ['PR_URL']}\nSource run: {os.environ['RUN_URL']}"
+
+              if verdict in {"unverified", "weak"}:
+                  body = (
+                      f"Deterministic validation still classifies **{name}** as `{verdict}` "
+                      f"after the scheduled three-mode evidence search.\n\n{links}"
+                  )
+                  if issue:
+                      gh("issue", "comment", str(issue["number"]), "--body", body)
+                  else:
+                      gh(
+                          "issue", "create", "--title", title,
+                          "--label", "needs-evidence", "--body", body,
+                      )
+              elif verdict == "verified" and provenance == "complete" and issue:
+                  gh(
+                      "issue", "comment", str(issue["number"]),
+                      "--body", (
+                          "The candidate computes to `verified`; this issue will close only "
+                          f"after the evidence PR merges.\n\n{links}"
+                      ),
+                  )
+          PY
+
+      # Explicit default-branch dispatch guarantees the required status is
+      # emitted by trusted code even when an automation-created PR event waits
+      # behind GitHub's approval gate.
+      - name: Dispatch trusted pull request validation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          PR_NUMBER: ${{ steps.publish.outputs.pr_number }}
+        run: >-
+          gh workflow run trusted-evidence-validation.yml
+          --ref "$DEFAULT_BRANCH"
+          --field pr_number="$PR_NUMBER"
+
+  notify-failure:
+    name: Notify on scheduled failure
+    needs: [prepare, research, validate-candidate, publish]
+    if: >-
+      always() && github.event_name == 'schedule' &&
+      contains(needs.*.result, 'failure')
+    runs-on: ubuntu-latest
     permissions:
       issues: write
     steps:
       - name: Create or update failure issue
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
           script: |
+            for (const label of [
+              { name: 'automation', color: '1D76DB', description: 'Repository automation' },
+              {
+                name: 'verify-patterns-failure', color: 'B60205',
+                description: 'Scheduled pattern verification is failing'
+              }
+            ]) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner, repo: context.repo.repo, name: label.name
+                });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner, repo: context.repo.repo, ...label
+                });
+              }
+            }
             const { data: existing } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               labels: 'verify-patterns-failure',
               state: 'open'
             });
-            const runUrl = `${context.payload.repository.html_url}/actions/runs/${context.runId}`;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             if (existing.length > 0) {
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
@@ -278,11 +900,43 @@ jobs:
               repo: context.repo.repo,
               title: 'Scheduled pattern verification is failing',
               labels: ['automation', 'verify-patterns-failure'],
-              body: [
-                'The weekly/monthly verify-patterns run is failing, so adoption',
-                'evidence is not being refreshed. Common cause: VERIFY_PATTERNS_PAT',
-                'missing or expired (scheduled runs hard-fail without it).',
-                '',
-                `Failed run: ${runUrl}`
-              ].join('\n')
+              body: `The scheduled evidence refresh failed.\n\nFailed run: ${runUrl}`
             });
+
+  close-resolved-failures:
+    name: Close resolved scheduled failures
+    needs: [prepare, research, validate-candidate, publish]
+    if: >-
+      always() && github.event_name == 'schedule' &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Close recovered failure issues
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'verify-patterns-failure',
+              state: 'open'
+            });
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            for (const issue of issues) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `Scheduled verification recovered: ${runUrl}`
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed',
+                state_reason: 'completed'
+              });
+            }

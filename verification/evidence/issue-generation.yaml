@@ -1,7 +1,35 @@
+schema_version: 2
+provenance_status: legacy-import
+legacy_run_url: https://github.com/PaulDuvall/ai-development-patterns/pull/24
+legacy_limitations: The PR records 7 aggregate queries, all three search modes, and an independent URL
+  re-fetch. Exact query strings, per-mode candidate counts, normalized content hashes, and verifier metadata
+  were not retained.
 pattern: Issue Generation
 slug: issue-generation
-verified: '2026-07-02'
-adoption_score: 26
+last_checked: '2026-07-02'
+search:
+  run_id: legacy-import
+  checked_at: '2026-07-02'
+  modes:
+    name:
+      queries: []
+      candidate_count: null
+    mechanism:
+      queries: []
+      candidate_count: null
+    artifact:
+      queries: []
+      candidate_count: null
+adoption_score: 21
+tier_counts:
+  T1: 2
+  T2: 2
+  T4: 1
+  T5: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 6
 naming_alignment: weak
 terminology_variants:
 - term: parse PRD / generate tasks (parse-prd)
@@ -19,77 +47,124 @@ terminology_variants:
 - term: automated user story generation
   used_by: Rahman & Zhu, arXiv GeneUS paper
   url: https://arxiv.org/abs/2404.01558
-- term: graph issue tracker for AI agents
-  used_by: Beads (gastownhall/beads)
-  url: https://github.com/gastownhall/beads
 evidence:
 - tier: T1
   match: aliased
   mechanism_quote: The more detailed your PRD, the better the generated tasks will be.
   source: Eyal Toledano - Task Master (eyaltoledano/claude-task-master)
+  source_kind: open_source_implementation
+  organization: Eyal Toledano
+  independence_group: independent:eyal-toledano
   url: https://github.com/eyaltoledano/claude-task-master
+  resolved_url: https://github.com/eyaltoledano/claude-task-master
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   date: '2026-04-28'
   retrieved: '2026-07-02'
-  claim: Shipped CLI/MCP tool (27,751 GitHub stars) whose parse-prd command generates a task list with dependencies
-    from a PRD for AI coding assistants (Cursor, Claude Code, Windsurf); README instructs users to parse requirements
-    and work tasks in dependency order.
-- tier: T1
-  match: aliased
-  mechanism_quote: It replaces messy markdown plans with a dependency-aware graph, allowing agents to handle long-horizon
-    tasks without losing context.
-  source: Steve Yegge / Gastown Hall - Beads (gastownhall/beads)
-  url: https://github.com/gastownhall/beads
-  date: '2026-07-02'
-  retrieved: '2026-07-02'
-  claim: Shipped git-native 'distributed graph issue tracker for AI agents' (25,040 GitHub stars) providing agents
-    dependency-aware work items with epic hierarchies, blocker links, and ready-task detection.
+  claim: Shipped CLI/MCP tool (27,751 GitHub stars) whose parse-prd command generates a task list with
+    dependencies from a PRD for AI coding assistants (Cursor, Claude Code, Windsurf); README instructs
+    users to parse requirements and work tasks in dependency order.
 - tier: T1
   match: unnamed
   mechanism_quote: Analyzes your requirements document and generates a complete task breakdown.
   source: vanzan01 - claude-code-sub-agent-collective (parse-prd command template)
+  source_kind: open_source_implementation
+  organization: vanzan01
+  independence_group: independent:vanzan01
   url: https://github.com/vanzan01/claude-code-sub-agent-collective
+  resolved_url: https://github.com/vanzan01/claude-code-sub-agent-collective
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   date: '2026-04-20'
   retrieved: '2026-07-02'
-  claim: Third-party Claude Code agent-collective repo (522 stars) ships a parse-prd command template that turns
-    a requirements document into a task breakdown with dependencies and testing tasks; GitHub code search also surfaced
-    other repos carrying .taskmaster/docs/prd.txt artifacts (e.g., wilplus/frontend-cursor).
+  claim: Third-party Claude Code agent-collective repo (522 stars) ships a parse-prd command template
+    that turns a requirements document into a task breakdown with dependencies and testing tasks; GitHub
+    code search also surfaced other repos carrying .taskmaster/docs/prd.txt artifacts (e.g., wilplus/frontend-cursor).
 - tier: T2
   match: aliased
   mechanism_quote: Copilot can create or update issues from a natural-language prompt or a screenshot.
   source: GitHub Docs - Using GitHub Copilot to create issues
+  source_kind: official_documentation
+  organization: GitHub
+  independence_group: github
   url: https://docs.github.com/en/copilot/using-github-copilot/using-github-copilot-to-create-issues
-  date: '2026-07-02'
+  resolved_url: https://docs.github.com/en/copilot/using-github-copilot/using-github-copilot-to-create-issues
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   retrieved: '2026-07-02'
-  claim: Official GitHub docs describe Copilot creating issues from a natural-language prompt, filling in title,
-    body, labels, and assignees using the repository's issue templates (undated page; date = retrieval date).
+  claim: Official GitHub docs describe Copilot creating issues from a natural-language prompt, filling
+    in title, body, labels, and assignees using the repository's issue templates (undated page; date =
+    retrieval date).
 - tier: T2
   match: aliased
-  mechanism_quote: Generate a list of suggested child work items, based on the details of the parent work item.
+  mechanism_quote: Generate a list of suggested child work items, based on the details of the parent work
+    item.
   source: Atlassian Support - Rovo AI features in Jira (Atlassian Intelligence)
+  source_kind: official_documentation
+  organization: Atlassian
+  independence_group: atlassian
   url: https://support.atlassian.com/organization-administration/docs/atlassian-intelligence-features-in-jira-software/
-  date: '2026-07-02'
+  resolved_url: https://support.atlassian.com/organization-administration/docs/atlassian-intelligence-features-in-jira-software/
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   retrieved: '2026-07-02'
-  claim: Official Atlassian docs describe an AI work-breakdown feature that generates suggested child work items
-    from a parent work item and links accepted suggestions as children, plus AI creation of work items from Slack/Teams/backlog
-    context (undated page; date = retrieval date).
+  claim: Official Atlassian docs describe an AI work-breakdown feature that generates suggested child
+    work items from a parent work item and links accepted suggestions as children, plus AI creation of
+    work items from Slack/Teams/backlog context (undated page; date = retrieval date).
 - tier: T4
   match: aliased
-  mechanism_quote: 'And Claude executes the API calls: creates the Epic, then each Story with the Epic as parent,
-    with Acceptance Criteria in the description and estimates in the corresponding field.'
-  source: 'Nacho Bassino - ''PRD -> User Stories -> Jira: How to Automate the Full Pipeline with AI'' (Product Direction
-    Substack)'
+  mechanism_quote: 'And Claude executes the API calls: creates the Epic, then each Story with the Epic
+    as parent, with Acceptance Criteria in the description and estimates in the corresponding field.'
+  source: 'Nacho Bassino - ''PRD -> User Stories -> Jira: How to Automate the Full Pipeline with AI''
+    (Product Direction Substack)'
+  source_kind: practitioner_report
+  organization: Nacho Bassino
+  independence_group: independent:nacho-bassino
   url: https://productdirection.substack.com/p/prd-user-stories-jira-how-to-automate
+  resolved_url: https://productdirection.substack.com/p/prd-user-stories-jira-how-to-automate
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   date: '2026-01-27'
   retrieved: '2026-07-02'
-  claim: Practitioner post with a reusable prompt template and Atlassian MCP configuration for converting a PRD
-    into an epic plus atomic user stories with Gherkin (Given/When/Then) acceptance criteria, created directly in
-    Jira with epic-child linking.
+  claim: Practitioner post with a reusable prompt template and Atlassian MCP configuration for converting
+    a PRD into an epic plus atomic user stories with Gherkin (Given/When/Then) acceptance criteria, created
+    directly in Jira with epic-child linking.
 - tier: T5
   match: named
   source: Steef-Jan Wiggers - InfoQ news, 'AI Vibe Coding Threatens Open Source as Maintainers Face Crisis'
+  source_kind: opinion
+  organization: InfoQ
+  independence_group: infoq
   url: https://www.infoq.com/news/2026/02/ai-floods-close-projects/
+  resolved_url: https://www.infoq.com/news/2026/02/ai-floods-close-projects/
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   date: '2026-02-24'
   retrieved: '2026-07-02'
-  claim: InfoQ news article refers to GitHub's shipped feature as 'Copilot issue generation' (launched May 2025)
-    while reporting that maintainers lack tools to filter the resulting AI-generated submissions.
-verdict: verified
+  claim: InfoQ news article refers to GitHub's shipped feature as 'Copilot issue generation' (launched
+    May 2025) while reporting that maintainers lack tools to filter the resulting AI-generated submissions.
+verdict: weak

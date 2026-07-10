@@ -7,7 +7,7 @@ pipeline recommends, and what the maintainer decided) and the **rubric decision 
 
 Ownership: the **Decision column is written only by humans** — the pipeline never decides.
 Verification runs refresh the data columns (Alignment, Industry terms, Recommendation) in
-their batched sources PR when evidence changes. CI (`tests/test_evidence_files.py`) requires
+their single batched evidence PR when evidence changes. CI (`tests/test_evidence_files.py`) requires
 a ledger row for every `verified` pattern whose `naming_alignment` is not `strong`, so a new
 naming signal cannot land without appearing here.
 
@@ -29,25 +29,45 @@ Alignment values come from each pattern's `evidence/<slug>.yaml`; rules are defi
 | Progressive Enhancement | weak | no stable industry name; documented collision with the web-design term | **Rename → Incremental Generation** (strong case: naming vacuum plus collision) | Pending |
 | Context Persistence | weak | *memory* / *agent memory* (Anthropic, Cline, MemGPT) | **Rename → Agent Memory** (moderate case: "memory" unanimous across sources; cost: breaks the Context family pairing) | Pending |
 | Codified Rules | weak | `AGENTS.md` (open format), *Rules* (Cursor), `CLAUDE.md` (Anthropic), *repository custom instructions* (GitHub Copilot) | Keep + alias | Accepted 2026-07-04 — alias mentions merged (PR #29) |
-| Tool Integration | weak | *tool use* (Anthropic), *function calling* (OpenAI), *MCP* | Keep + alias | Accepted 2026-07-04 — alias mentions merged (PR #29) |
-| Planned Implementation | weak | *plan mode* (Cursor, Claude Code) | Keep + alias (a Plan Mode rename would strain the principle-not-vendor-feature rule) | Accepted 2026-07-04 — alias mention merged (PR #29) |
-| Security Sandbox | weak | *sandboxing*, *devcontainer isolation*, *execution isolation*, *microVM sandbox*, *action-sandboxing* | Keep (half the sources use our word; no spec-compliant candidate beats it) | Accepted 2026-07-04 |
+| Tool Integration | aliased | *tool use* (Anthropic), *function calling* (OpenAI), *MCP* | Keep + alias | Accepted 2026-07-04 — alias mentions merged (PR #29) |
+| Planned Implementation | aliased | *plan mode* (Cursor, Claude Code) | Keep + alias (a Plan Mode rename would strain the principle-not-vendor-feature rule) | Accepted 2026-07-04 — alias mention merged (PR #29) |
+| Security Sandbox | strong | *sandboxing*, *devcontainer isolation*, *execution isolation*, *microVM sandbox* | Keep (most independently scoreable sources use our word; no spec-compliant candidate beats it) | Accepted 2026-07-04 |
 | Issue Generation | weak | no dominant competing term | Keep | Accepted 2026-07-04 |
-| Developer Lifecycle | weak | *AI-DLC* (AWS), spec-driven workflow framings | Keep (note the scope overlap with Spec-Driven Development) | Accepted 2026-07-04 |
+| Developer Lifecycle | aliased | *AI-DLC* (AWS), spec-driven workflow framings | Keep (note the scope overlap with Spec-Driven Development) | Accepted 2026-07-04 |
 
-Spec-Driven Development is the only verified pattern with `strong` alignment and therefore
-needs no row. Tool Integration, Planned Implementation, and Developer Lifecycle have zero
-`named` sources, so their alignment recomputes to `aliased` (the strongest rename signal)
-when the pipeline next regenerates their evidence — revisit their Keep decisions then.
+All ten current assessments are schema-v2 legacy imports and therefore have `weak` verdicts until
+a complete refresh supplies query, content-hash, and verifier provenance. This ledger retains the
+earlier human naming decisions during that refresh. Spec-Driven Development remains omitted because
+its naming alignment is `strong`; Security Sandbox is retained to preserve its accepted decision
+history even though its independently scoreable sources now recompute to `strong` alignment.
 
 ## Rubric decision record
 
+### 2026-07-10 — schema v2 and legacy-evidence migration
+
+The validator now requires a versioned schema and treats provenance as part of the verdict rather
+than optional commentary.
+
+1. **Complete provenance is required for `verified`** — all three search modes record exact queries
+   and candidate counts; every entry records its organization, independence group, canonical URL,
+   normalized-content hash, and verifier metadata.
+2. **Adoption is multidimensional** — `verified` requires a runnable T1 implementation and
+   independent T3/T4 adoption from another group. T5 never unlocks the verdict.
+3. **Independence is enforced** — one entry per independence group per file and one canonical URL
+   across the evidence set. Duplicate sources no longer inflate multiple claims.
+4. **Legacy assertions were withdrawn** — the ten July 2 files were migrated honestly as
+   `provenance_status: legacy-import`. Their immutable PRs record aggregate search coverage, but
+   unavailable query strings, per-mode candidate counts, hashes, and verifier metadata remain
+   explicitly unknown. They cannot be `verified` until refreshed.
+5. **Status semantics changed** — assessed coverage, adoption verdict, staleness, and provenance
+   refresh needs are separate signals in `STATUS.md`.
+
 ### 2026-07-04 — four decisions following the tooling review
 
-Approved by the maintainer; all four are **generation-gated**: they apply to evidence files
-carrying `last_checked` (everything the pipeline writes going forward), while legacy
-`verified:` files keep the original rules until regenerated. Enforced in
-`scripts/validate-evidence.py`; human-readable rules in [README.md](README.md).
+Approved by the maintainer and originally generation-gated by `last_checked`. The July 10 schema-v2
+migration supersedes that temporary split: legacy `verified:` fields are no longer accepted, and
+provenance status now controls eligibility. Enforced in `scripts/validate-evidence.py`;
+human-readable rules in [README.md](README.md).
 
 1. **`naming_alignment` gains `aliased`** — zero `named` entries while stable industry names
    exist. Separates "nobody uses our name" (rename signal) from "half use our name" (both

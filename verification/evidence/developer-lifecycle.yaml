@@ -1,8 +1,35 @@
+schema_version: 2
+provenance_status: legacy-import
+legacy_run_url: https://github.com/PaulDuvall/ai-development-patterns/pull/22
+legacy_limitations: The PR records 10 aggregate queries, all three search modes, and an independent URL
+  re-fetch. Exact query strings, per-mode candidate counts, normalized content hashes, and verifier metadata
+  were not retained.
 pattern: Developer Lifecycle
 slug: developer-lifecycle
-verified: '2026-07-02'
-adoption_score: 28
-naming_alignment: weak
+last_checked: '2026-07-02'
+search:
+  run_id: legacy-import
+  checked_at: '2026-07-02'
+  modes:
+    name:
+      queries: []
+      candidate_count: null
+    mechanism:
+      queries: []
+      candidate_count: null
+    artifact:
+      queries: []
+      candidate_count: null
+adoption_score: 11
+tier_counts:
+  T1: 1
+  T2: 1
+  T4: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: aliased
 terminology_variants:
 - term: Spec-Driven Development
   used_by: GitHub (Spec Kit) and Amazon Kiro
@@ -10,7 +37,8 @@ terminology_variants:
 - term: AI-DLC (AI-Driven Development Life Cycle)
   used_by: AWS (DevOps blog methodology + awslabs/aidlc-workflows)
   url: https://aws.amazon.com/blogs/devops/ai-driven-development-life-cycle/
-- term: 'Explore, Plan, Code, Commit (docs heading: ''Explore first, then plan, then code''; feature: plan mode)'
+- term: 'Explore, Plan, Code, Commit (docs heading: ''Explore first, then plan, then code''; feature:
+    plan mode)'
   used_by: Anthropic (Claude Code official docs)
   url: https://code.claude.com/docs/en/best-practices
 - term: Specs / Three-Phase Workflow (Requirements -> Design -> Tasks)
@@ -19,77 +47,63 @@ terminology_variants:
 evidence:
 - tier: T1
   match: aliased
-  mechanism_quote: Use the **`/speckit.specify`** command to describe what you want to build. Focus on the **what**
-    and **why**, not the tech stack.
-  source: GitHub, Spec Kit (github/spec-kit repository)
-  url: https://github.com/github/spec-kit
-  date: '2026-07-02'
-  retrieved: '2026-07-02'
-  claim: 'GitHub ships Spec Kit (117,443 stars per GitHub API this run), an open-source toolkit whose staged slash-command
-    workflow (/speckit.constitution -> /speckit.specify -> /speckit.plan -> /speckit.tasks) takes a single feature
-    from problem description through governing principles, spec, and technical plan before any implementation. Repo
-    last-updated date shown by GitHub API: 2026-07-02.'
-- tier: T1
-  match: aliased
   mechanism_quote: 'AI-DLC follows a structured three-phase approach that adapts to your project''s complexity:'
   source: AWS Labs, aidlc-workflows repository
+  source_kind: open_source_implementation
+  organization: Amazon Web Services
+  independence_group: amazon
   url: https://github.com/awslabs/aidlc-workflows
+  resolved_url: https://github.com/awslabs/aidlc-workflows
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   date: '2026-07-02'
   retrieved: '2026-07-02'
-  claim: 'AWS Labs ships AI-DLC workflow steering rules (3,278 stars per GitHub API this run) installable into Kiro,
-    Amazon Q Developer, Cursor, Cline, Claude Code, GitHub Copilot, and OpenAI Codex, running features through Inception
-    (WHAT/WHY), Construction (HOW), and Operations phases. Repo last-updated date shown by GitHub API: 2026-07-02.'
-- tier: T1
-  match: aliased
-  mechanism_quote: 'All specs follow a three-phase workflow that transforms your idea into executable implementation:'
-  source: AWS Kiro IDE, Specs documentation
-  url: https://kiro.dev/docs/specs/
-  date: '2026-06-25'
-  retrieved: '2026-07-02'
-  claim: 'Kiro (AWS''s agentic IDE) ships a spec mode that generates requirements.md, design.md, and tasks.md per
-    feature and gates implementation behind a phased Requirements -> Design -> Tasks workflow with real-time task
-    tracking; page shows ''Page updated: June 25, 2026''.'
+  claim: 'AWS Labs ships AI-DLC workflow steering rules (3,278 stars per GitHub API this run) installable
+    into Kiro, Amazon Q Developer, Cursor, Cline, Claude Code, GitHub Copilot, and OpenAI Codex, running
+    features through Inception (WHAT/WHY), Construction (HOW), and Operations phases. Repo last-updated
+    date shown by GitHub API: 2026-07-02.'
 - tier: T2
   match: aliased
-  mechanism_quote: Letting Claude jump straight to coding can produce code that solves the wrong problem. Use plan
-    mode to separate exploration from execution.
+  mechanism_quote: Letting Claude jump straight to coding can produce code that solves the wrong problem.
+    Use plan mode to separate exploration from execution.
   source: Anthropic, Claude Code docs 'Best practices' (Explore first, then plan, then code)
+  source_kind: official_documentation
+  organization: Anthropic
+  independence_group: anthropic
   url: https://code.claude.com/docs/en/best-practices
-  date: '2026-07-02'
+  resolved_url: https://code.claude.com/docs/en/best-practices
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   retrieved: '2026-07-02'
-  claim: Anthropic's canonical Claude Code docs prescribe a four-phase Explore -> Plan -> Implement -> Commit workflow
-    using plan mode to separate research/planning from code generation (undated page; date = retrieval date).
-- tier: T2
-  match: aliased
-  mechanism_quote: This pattern, where AI creates a plan, asks clarifying questions to seek context, and implements
-    solutions only after receiving human validation, repeats rapidly for every SDLC activity, to provide a unified
-    vision and approach for all development pathways.
-  source: 'AWS DevOps & Developer Productivity Blog, ''AI-Driven Development Life Cycle: Reimagining Software Engineering'''
-  url: https://aws.amazon.com/blogs/devops/ai-driven-development-life-cycle/
-  date: '2025-07-31'
-  retrieved: '2026-07-02'
-  claim: AWS's official methodology announcement defines AI-DLC as a three-phase (Inception, Construction, Operations)
-    development lifecycle in which AI plans first and implements only after human validation, positioned as AWS's
-    reference approach for AI-assisted software delivery.
-- tier: T3
-  match: aliased
-  mechanism_quote: Spec-Driven Development allows for reproducible and reliable delivery, but spending time up-front
-    to improve the spec process will yield the best approach.
-  source: 'Al Harris (Principal Engineer, Amazon Kiro), ''Spec-Driven Development: Agentic Coding at FAANG Scale
-    and Quality'', AI Engineer conference talk (YouTube recording, 51,692 views)'
-  url: https://www.youtube.com/watch?v=HY_JyxAZsiE
-  date: '2026-01-09'
-  retrieved: '2026-07-02'
-  claim: A named Amazon principal engineer presents a 63-minute AI Engineer conference talk on running agentic coding
-    through an up-front spec/plan process rather than direct prompting-to-code; recording published 2026-01-09.
+  claim: Anthropic's canonical Claude Code docs prescribe a four-phase Explore -> Plan -> Implement ->
+    Commit workflow using plan mode to separate research/planning from code generation (undated page;
+    date = retrieval date).
 - tier: T4
   match: unnamed
   mechanism_quote: Brainstorm spec, then plan a plan, then execute using LLM codegen. Discrete loops.
   source: Harper Reed, 'My LLM codegen workflow atm' (harper.blog)
+  source_kind: practitioner_report
+  organization: Harper Reed
+  independence_group: independent:harper-reed
   url: https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
+  resolved_url: https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   date: '2025-02-16'
   retrieved: '2026-07-02'
   claim: Practitioner post with full prompts and file conventions (spec.md, prompt_plan.md, todo.md) describing
-    a staged spec -> plan -> incremental execution workflow for building features with LLM codegen, explicitly crediting
-    the planning step with keeping projects under control.
-verdict: verified
+    a staged spec -> plan -> incremental execution workflow for building features with LLM codegen, explicitly
+    crediting the planning step with keeping projects under control.
+verdict: weak
