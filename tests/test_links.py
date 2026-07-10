@@ -96,8 +96,9 @@ class TestHyperlinkIntegrity:
 
         # A real broken link returns a definitive HTTP error (e.g. 404). Treat
         # those as critical. Transient failures (timeouts, connection errors,
-        # already retried in the checker) and anti-bot responses (403/429) are
-        # NOT proof a link is dead, so they only produce a warning.
+        # already retried in the checker), server-side 5xx responses, and
+        # anti-bot responses (403/429) are NOT proof a link is dead, so they
+        # only produce a warning.
         critical_errors = []
         transient_errors = []
         for link_error in invalid_external_links:
@@ -107,6 +108,7 @@ class TestHyperlinkIntegrity:
                 or 'connection error' in error
                 or 'http 403' in error
                 or 'http 429' in error
+                or 'http 5' in error
             )
             (transient_errors if is_transient else critical_errors).append(link_error)
 

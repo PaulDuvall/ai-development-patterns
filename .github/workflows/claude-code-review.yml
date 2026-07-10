@@ -19,6 +19,9 @@ concurrency:
 jobs:
   claude-review:
     name: Review pull request
+    # Optional AI review must be explicitly enabled. Deterministic PR checks
+    # remain active regardless of provider configuration.
+    if: vars.ENABLE_ANTHROPIC_REVIEW == 'true'
     # Optional: Filter by PR author
     # if: |
     #   github.event.pull_request.user.login == 'external-contributor' ||
@@ -28,16 +31,31 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
-      issues: read
-      id-token: write
+      pull-requests: read # Supplies candidate metadata to the optional reviewer.
+      issues: read # Supplies the action's review-comment context.
+      id-token: write # Exchanges the Anthropic GitHub App's short-lived token.
     
     steps:
+      - name: Detect optional Anthropic credential
+        id: anthropic-credential
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          configured=false
+          if [ -n "$ANTHROPIC_API_KEY" ]; then
+            configured=true
+          else
+            echo "Claude review skipped: ANTHROPIC_API_KEY is not configured." \
+              >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "configured=$configured" >> "$GITHUB_OUTPUT"
+
       # Anthropic's App token exchange intentionally rejects a workflow that
       # differs from the default-branch copy. Skip that one impossible
       # self-review case while leaving all deterministic PR checks active.
       - name: Detect review-workflow self change
         id: self-change
+        if: steps.anthropic-credential.outputs.configured == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -55,14 +73,18 @@ jobs:
           echo "changed=$changed" >> "$GITHUB_OUTPUT"
 
       - name: Checkout repository
-        if: steps.self-change.outputs.changed != 'true'
+        if: >-
+          steps.anthropic-credential.outputs.configured == 'true' &&
+          steps.self-change.outputs.changed != 'true'
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
           fetch-depth: 1
           persist-credentials: false
 
       - name: Run Claude Code Review
-        if: steps.self-change.outputs.changed != 'true'
+        if: >-
+          steps.anthropic-credential.outputs.configured == 'true' &&
+          steps.self-change.outputs.changed != 'true'
         id: claude-review
         uses: anthropics/claude-code-action@28f83620103c48a57093dcc2837eec89e036bb9f # beta
         with:

@@ -6,10 +6,11 @@ pipeline recommends, and what the maintainer decided) and the **rubric decision 
 (changes to how evidence is scored and verdicts computed).
 
 Ownership: the **Decision column is written only by humans** — the pipeline never decides.
-Verification runs refresh the data columns (Alignment, Industry terms, Recommendation) in
-their single batched evidence PR when evidence changes. CI (`tests/test_evidence_files.py`) requires
-a ledger row for every `verified` pattern whose `naming_alignment` is not `strong`, so a new
-naming signal cannot land without appearing here.
+Verification runs synchronize evidence-derived Alignment values in their single run-level PR and
+add a neutral `Review naming signal` placeholder when a newly verified, non-strong pattern has no
+row. Humans refine Industry terms and Recommendation and exclusively own Decision. CI
+(`tests/test_evidence_files.py`) requires a ledger row for every `verified` pattern whose
+`naming_alignment` is not `strong`, so a new naming signal cannot land without appearing here.
 
 **After editing this file** (recording a decision, adjusting a recommendation):
 run `python3 scripts/generate-verification-status.py` — [STATUS.md](STATUS.md) embeds the
@@ -35,12 +36,9 @@ Alignment values come from each pattern's `evidence/<slug>.yaml`; rules are defi
 | Issue Generation | weak | no dominant competing term | Keep | Accepted 2026-07-04 |
 | Developer Lifecycle | aliased | *AI-DLC* (AWS), spec-driven workflow framings | Keep (note the scope overlap with Spec-Driven Development) | Accepted 2026-07-04 |
 
-Ten of the eleven current assessments are schema-v2 legacy imports and therefore have `weak`
-verdicts until a complete refresh supplies query, content-hash, and verifier provenance; Event
-Automation has complete provenance. This ledger retains the earlier human naming decisions during
-that refresh. Spec-Driven Development remains omitted because its naming alignment is `strong`;
-Security Sandbox is retained to preserve its accepted decision history even though its independently
-scoreable sources now recompute to `strong` alignment.
+This ledger retains earlier human naming decisions while evidence is refreshed independently.
+Current coverage, provenance, verdicts, and freshness are generated in `STATUS.md`. A pattern may
+remain here after its alignment becomes `strong` when the row preserves accepted decision history.
 
 ### 2026-07-10 — three accepted evidence-led renames
 
@@ -54,9 +52,9 @@ the catalog as atomic migrations:
 3. **Context Persistence → Agent Memory** — adopts the memory terminology used consistently by agent
    products, documentation, implementations, and practitioner artifacts.
 
-The source records remain explicit `legacy-import` evidence and still need a complete automated
-refresh. Renaming changes only their canonical catalog mapping and the mechanically derived naming
-alignment; it does not upgrade their adoption verdicts or provenance.
+At rename time, the source records remained explicit `legacy-import` evidence; the rename changed
+only their canonical catalog mapping and mechanically derived naming alignment. Subsequent evidence
+refreshes, if any, are reflected in `STATUS.md` and do not alter that historical rationale.
 
 ## Rubric decision record
 

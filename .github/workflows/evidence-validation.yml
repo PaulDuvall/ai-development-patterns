@@ -22,9 +22,16 @@ on:
       - scripts/validate-evidence.py
       - scripts/generate-verification-status.py
       - scripts/build-verification-inventory.py
+      - scripts/activate-verification-unit.py
+      - scripts/assemble-verification-units.py
       - scripts/evidence_content.py
+      - scripts/export-verification-unit.py
+      - scripts/hydrate-evidence-content.py
       - scripts/scan-candidate-secrets.py
+      - scripts/check-claude-execution.py
       - scripts/check-research-workspace.py
+      - scripts/sync-verification-decisions.py
+      - scripts/validate-research-scope.py
       - tests/test_evidence_files.py
       - tests/test_evidence_content.py
       - tests/test_verification_inventory.py
@@ -32,6 +39,7 @@ on:
       - tests/test_candidate_secret_scan.py
       - tests/test_repository_rules.py
       - tests/test_verification_workflows.py
+      - tests/test_verification_units.py
       - tests/test_research_workspace_permissions.py
       - tests/requirements.txt
       - .github/codex/evidence-research.toml
@@ -100,6 +108,7 @@ jobs:
           tests/test_repository_rules.py
           tests/test_research_workspace_permissions.py
           tests/test_verification_workflows.py
+          tests/test_verification_units.py
           -m "not slow" --tb=short
 
   codex-permission-profile:
@@ -260,7 +269,7 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
-      issues: write
+      issues: write # Closes evidence-gap issues resolved on the validated default branch.
     steps:
       - name: Checkout validated main revision
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
@@ -324,7 +333,7 @@ jobs:
       contains(needs.*.result, 'failure')
     runs-on: ubuntu-latest
     permissions:
-      issues: write
+      issues: write # Creates or updates the scheduled validation failure issue.
     steps:
       - name: Create or update failure issue
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
@@ -372,7 +381,7 @@ jobs:
       !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-latest
     permissions:
-      issues: write
+      issues: write # Closes the scheduled validation failure issue after recovery.
     steps:
       - name: Close recovered failure issues
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8

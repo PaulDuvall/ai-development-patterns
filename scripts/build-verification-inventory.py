@@ -15,6 +15,8 @@ from pathlib import Path
 import yaml
 
 
+MAX_EXECUTION_UNITS = 256
+SLUG_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 EXPERIMENT_ROW_RE = re.compile(
     r"^\|\s*\*\*\[([^]]+)\]\(#([a-z0-9-]+)\)\*\*\s*\|\s*"
     r"(Beginner|Intermediate|Advanced)\s*\|\s*([^|]+)\|"
@@ -135,6 +137,58 @@ def select_work(inventory, mode, pattern=None, limit=10):
     return selected[:limit] if limit else selected
 
 
+def build_execution_matrix(
+        selected, mode, unit_dir="verification/run-plan/units"):
+    """Return one immutable research unit per pattern plus optional discovery."""
+    unit_dir = Path(unit_dir)
+    units = []
+    for index, item in enumerate(selected, 1):
+        slug = item["slug"]
+        if not isinstance(slug, str) or SLUG_RE.fullmatch(slug) is None:
+            raise ValueError(f"selected pattern has an unsafe slug: {slug!r}")
+        unit_id = f"evidence-{index:03d}-{slug}"
+        units.append({
+            "unit_id": unit_id,
+            "kind": "evidence",
+            "slug": slug,
+            "selected_slugs_json": json.dumps([slug], separators=(",", ":")),
+            "worklist": (unit_dir / f"{unit_id}.txt").as_posix(),
+        })
+    if mode in {"full", "discover-only"}:
+        units.append({
+            "unit_id": "discovery",
+            "kind": "discovery",
+            "slug": "",
+            "selected_slugs_json": "[]",
+            "worklist": (unit_dir / "discovery.txt").as_posix(),
+        })
+    if len(units) > MAX_EXECUTION_UNITS:
+        raise ValueError(
+            f"execution plan exceeds GitHub's {MAX_EXECUTION_UNITS}-job matrix limit")
+    # GitHub rejects an empty matrix before a job-level condition can reliably
+    # short-circuit it. The sentinel is never executed because has_units=false.
+    include = units or [{
+        "unit_id": "noop",
+        "kind": "noop",
+        "slug": "",
+        "selected_slugs_json": "[]",
+        "worklist": (unit_dir / "noop.txt").as_posix(),
+    }]
+    return {"include": include}, units
+
+
+def write_execution_plan(matrix, units, unit_dir, matrix_output):
+    """Persist auditable unit worklists and a compact Actions matrix."""
+    directory = Path(unit_dir)
+    directory.mkdir(parents=True, exist_ok=True)
+    for unit in units:
+        slugs = json.loads(unit["selected_slugs_json"])
+        (directory / f"{unit['unit_id']}.txt").write_text(
+            "".join(f"{slug}\n" for slug in slugs), encoding="utf-8")
+    Path(matrix_output).write_text(
+        json.dumps(matrix, indent=2) + "\n", encoding="utf-8")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--registry", default="patterns.yaml")
@@ -151,6 +205,9 @@ def main():
     parser.add_argument("--today", help="ISO date override for reproducible tests")
     parser.add_argument("--inventory", default="verification/pattern-inventory.yaml")
     parser.add_argument("--worklist", default=".verify-worklist")
+    parser.add_argument("--unit-dir", default="verification/run-plan/units")
+    parser.add_argument(
+        "--matrix-output", default="verification/run-plan/execution-matrix.json")
     parser.add_argument("--json", action="store_true", help="print selected slugs as JSON")
     args = parser.parse_args()
 
@@ -164,6 +221,7 @@ def main():
             catalog, args.evidence_dir, load_inflight(args.inflight_slugs),
             today, args.stale_days)
         selected = select_work(inventory, args.mode, args.pattern, args.limit)
+        matrix, units = build_execution_matrix(selected, args.mode, args.unit_dir)
     except (OSError, ValueError, yaml.YAMLError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
@@ -177,6 +235,7 @@ def main():
     )
     Path(args.worklist).write_text(
         "".join(f"{item['slug']}\n" for item in selected), encoding="utf-8")
+    write_execution_plan(matrix, units, args.unit_dir, args.matrix_output)
     if args.json:
         print(json.dumps([item["slug"] for item in selected]))
     else:
