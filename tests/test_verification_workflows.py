@@ -12,6 +12,7 @@ WORKFLOWS = ROOT / ".github" / "workflows"
 VERIFY = WORKFLOWS / "verify-patterns.yml"
 TRUSTED = WORKFLOWS / "trusted-evidence-validation.yml"
 EVIDENCE = WORKFLOWS / "evidence-validation.yml"
+CLAUDE_REVIEW = WORKFLOWS / "claude-code-review.yml"
 CODEX_CONFIG = ROOT / ".github" / "codex" / "evidence-research.toml"
 METHODOLOGY = ROOT / ".claude" / "commands" / "verify-patterns.md"
 
@@ -61,6 +62,19 @@ def test_openai_is_the_explicit_default_provider():
     assert "evidence-v2-openai-codex-v1" in inputs["run"]
     assert "evidence-v2-anthropic-claude-v1" in inputs["run"]
     assert "+sha256.{contract_sha256}" in inputs["run"]
+
+
+def test_optional_claude_review_is_opt_in_and_skips_without_a_key():
+    workflow = load_workflow(CLAUDE_REVIEW)
+    job = workflow["jobs"]["claude-review"]
+    assert job["if"] == "vars.ENABLE_ANTHROPIC_REVIEW == 'true'"
+    credential = named_step(job, "Detect optional Anthropic credential")
+    assert credential["env"]["ANTHROPIC_API_KEY"] == (
+        "${{ secrets.ANTHROPIC_API_KEY }}")
+    assert 'if [ -n "$ANTHROPIC_API_KEY" ]' in credential["run"]
+    assert "configured=$configured" in credential["run"]
+    action = named_step(job, "Run Claude Code Review")
+    assert "steps.anthropic-credential.outputs.configured == 'true'" in action["if"]
 
 
 def test_open_verification_pr_gate_is_default_closed_and_rechecked_before_publish():

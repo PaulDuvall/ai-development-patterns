@@ -184,6 +184,10 @@ when federation is absent. Provider selection never silently falls back to the o
 The Anthropic job root-locks the checkout except for the assigned unit path, uses `dontAsk` mode
 with an exact project-read/one-file-edit permission rule, restricts the built-in tool set, disables
 all MCP and Bash tools, and derives retrieval hashes afterward with an immutable trusted helper.
+This verifier provider is independent from the optional `Claude Code Review` workflow. That PR
+reviewer runs only when the `ENABLE_ANTHROPIC_REVIEW` repository variable is `true`; with the
+variable absent or `ANTHROPIC_API_KEY` unset, deterministic PR checks continue without Claude
+review.
 No provider final-message or raw execution-file artifact is retained; normal action progress remains
 in GitHub's retained Actions log. The provider stage scans each fixed unit before upload; a fresh
 clean runner rejects unsafe entries and scans again after download. The trusted assembler rejects
