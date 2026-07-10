@@ -1068,7 +1068,14 @@ jobs:
   publish:
     name: Publish validated candidate
     needs: [prepare, validate-candidate]
-    if: needs.validate-candidate.outputs.has_changes == 'true'
+    # validate-candidate intentionally tolerates the unused provider job being
+    # skipped. Override GitHub's implicit success() here as well so that skip
+    # does not propagate through the dependency chain and suppress a real diff.
+    if: >-
+      !cancelled() &&
+      needs.prepare.result == 'success' &&
+      needs.validate-candidate.result == 'success' &&
+      needs.validate-candidate.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
