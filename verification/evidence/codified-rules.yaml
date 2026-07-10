@@ -1,7 +1,35 @@
+schema_version: 2
+provenance_status: legacy-import
+legacy_run_url: https://github.com/PaulDuvall/ai-development-patterns/pull/20
+legacy_limitations: The PR records 7 aggregate queries, all three search modes, and an independent URL
+  re-fetch. Exact query strings, per-mode candidate counts, normalized content hashes, and verifier metadata
+  were not retained.
 pattern: Codified Rules
 slug: codified-rules
-verified: '2026-07-02'
+last_checked: '2026-07-02'
+search:
+  run_id: legacy-import
+  checked_at: '2026-07-02'
+  modes:
+    name:
+      queries: []
+      candidate_count: null
+    mechanism:
+      queries: []
+      candidate_count: null
+    artifact:
+      queries: []
+      candidate_count: null
 adoption_score: 25
+tier_counts:
+  T1: 2
+  T2: 3
+  T4: 1
+  T5: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 7
 naming_alignment: weak
 terminology_variants:
 - term: AGENTS.md
@@ -30,80 +58,150 @@ evidence:
   match: aliased
   mechanism_quote: Project rules live in `.cursor/rules` as `.mdc` files and are version-controlled.
   source: Cursor — Rules feature (official docs)
+  source_kind: shipped_product
+  organization: Cursor
+  independence_group: cursor
   url: https://cursor.com/docs/rules
-  date: '2026-07-02'
+  resolved_url: https://cursor.com/docs/rules
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   retrieved: '2026-07-02'
-  claim: Cursor ships a Rules feature where project rules live in .cursor/rules as version-controlled files scoped
-    by glob patterns, with User Rules, Team Rules enforced org-wide from a dashboard, and AGENTS.md as a plain-markdown
-    alternative; docs instruct users to check rules into git so the whole team benefits (undated page; date = retrieval
-    date)
+  claim: Cursor ships a Rules feature where project rules live in .cursor/rules as version-controlled
+    files scoped by glob patterns, with User Rules, Team Rules enforced org-wide from a dashboard, and
+    AGENTS.md as a plain-markdown alternative; docs instruct users to check rules into git so the whole
+    team benefits (undated page; date = retrieval date)
 - tier: T1
   match: aliased
-  mechanism_quote: Codex reads AGENTS.md files before doing any work. By layering global guidance with project-specific
-    overrides, you can start each task with consistent expectations, no matter which repository you open.
+  mechanism_quote: Codex reads AGENTS.md files before doing any work. By layering global guidance with
+    project-specific overrides, you can start each task with consistent expectations, no matter which
+    repository you open.
   source: OpenAI — Codex AGENTS.md guide (shipped CLI/IDE/cloud agent behavior)
+  source_kind: shipped_product
+  organization: OpenAI
+  independence_group: openai
   url: https://developers.openai.com/codex/guides/agents-md
-  date: '2026-07-02'
+  resolved_url: https://developers.openai.com/codex/guides/agents-md
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   retrieved: '2026-07-02'
-  claim: OpenAI Codex, a shipped coding agent, reads layered AGENTS.md instruction files (global ~/.codex plus per-repository
-    and nested per-directory files) before doing any work, merging them root-down with closer files taking precedence
-    (undated page; date = retrieval date)
+  claim: OpenAI Codex, a shipped coding agent, reads layered AGENTS.md instruction files (global ~/.codex
+    plus per-repository and nested per-directory files) before doing any work, merging them root-down
+    with closer files taking precedence (undated page; date = retrieval date)
 - tier: T2
   match: aliased
-  mechanism_quote: 'AGENTS.md complements this by containing the extra, sometimes detailed context coding agents
-    need: build steps, tests, and conventions that might clutter a README or aren’t relevant to human contributors.'
-  source: agents.md — AGENTS.md open format specification site (OpenAI, Amp, Google Jules, Cursor, Factory; stewarded
-    by the Agentic AI Foundation under the Linux Foundation)
+  mechanism_quote: 'AGENTS.md complements this by containing the extra, sometimes detailed context coding
+    agents need: build steps, tests, and conventions that might clutter a README or aren’t relevant to
+    human contributors.'
+  source: agents.md — AGENTS.md open format specification site (OpenAI, Amp, Google Jules, Cursor, Factory;
+    stewarded by the Agentic AI Foundation under the Linux Foundation)
+  source_kind: official_documentation
+  organization: Agentic AI Foundation
+  independence_group: agentic-ai-foundation
   url: https://agents.md/
-  date: '2026-07-02'
+  resolved_url: https://agents.md/
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   retrieved: '2026-07-02'
-  claim: Canonical site for the AGENTS.md open format for repo-committed coding-agent instruction files (build steps,
-    code style, testing, security sections); states it is used by over 60k open-source projects and lists supporting
-    tools including Codex, Aider, Gemini CLI, Devin, Cursor, Windsurf, JetBrains Junie, VS Code, GitHub Copilot
-    coding agent, Google Jules, Zed, and Warp (undated page; date = retrieval date)
+  claim: Canonical site for the AGENTS.md open format for repo-committed coding-agent instruction files
+    (build steps, code style, testing, security sections); states it is used by over 60k open-source projects
+    and lists supporting tools including Codex, Aider, Gemini CLI, Devin, Cursor, Windsurf, JetBrains
+    Junie, VS Code, GitHub Copilot coding agent, Google Jules, Zed, and Warp (undated page; date = retrieval
+    date)
 - tier: T2
   match: aliased
   mechanism_quote: These instructions are shared with your team through version control, so focus on project-level
     standards rather than personal preferences.
   source: Anthropic — Claude Code docs, "How Claude remembers your project" (memory / CLAUDE.md)
+  source_kind: official_documentation
+  organization: Anthropic
+  independence_group: anthropic
   url: https://code.claude.com/docs/en/memory
-  date: '2026-07-02'
+  resolved_url: https://code.claude.com/docs/en/memory
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   retrieved: '2026-07-02'
-  claim: Official Claude Code docs describe project CLAUDE.md files shared with the team through version control,
-    plus a .claude/rules/ directory of modular topic files (code-style.md, testing.md, security.md) with path-scoped
-    frontmatter — closely matching the pattern's .ai/rules/ structure; also documents managed org-wide CLAUDE.md
-    deployment (undated page; date = retrieval date)
+  claim: Official Claude Code docs describe project CLAUDE.md files shared with the team through version
+    control, plus a .claude/rules/ directory of modular topic files (code-style.md, testing.md, security.md)
+    with path-scoped frontmatter — closely matching the pattern's .ai/rules/ structure; also documents
+    managed org-wide CLAUDE.md deployment (undated page; date = retrieval date)
 - tier: T2
   match: aliased
-  mechanism_quote: These are specified in a `copilot-instructions.md` file in the `.github` directory of the repository.
+  mechanism_quote: These are specified in a `copilot-instructions.md` file in the `.github` directory
+    of the repository.
   source: GitHub — Copilot docs, "Adding repository custom instructions for GitHub Copilot"
+  source_kind: official_documentation
+  organization: GitHub
+  independence_group: github
   url: https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions
-  date: '2026-07-02'
+  resolved_url: https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   retrieved: '2026-07-02'
-  claim: Official GitHub docs define repository-wide custom instructions in .github/copilot-instructions.md, path-specific
-    NAME.instructions.md files with applyTo glob frontmatter, and AGENTS.md/CLAUDE.md/GEMINI.md agent instruction
-    files, all stored in the repository (undated page; date = retrieval date)
+  claim: Official GitHub docs define repository-wide custom instructions in .github/copilot-instructions.md,
+    path-specific NAME.instructions.md files with applyTo glob frontmatter, and AGENTS.md/CLAUDE.md/GEMINI.md
+    agent instruction files, all stored in the repository (undated page; date = retrieval date)
 - tier: T4
   match: named
-  source: 'Nilo (AI Engineer, Google Cloud) — "SDLC Standards with Agentic Plugins: A Platform Engineer''s Field
-    Guide" (Google Cloud Community on Medium)'
+  source: 'Nilo (AI Engineer, Google Cloud) — "SDLC Standards with Agentic Plugins: A Platform Engineer''s
+    Field Guide" (Google Cloud Community on Medium)'
+  source_kind: practitioner_report
+  organization: Google Cloud
+  independence_group: google
   url: https://medium.com/google-cloud/sdlc-standards-with-agentic-plugins-a-platform-engineers-field-guide-0c36f883b537
+  resolved_url: https://medium.com/google-cloud/sdlc-standards-with-agentic-plugins-a-platform-engineers-field-guide-0c36f883b537
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   date: '2026-06-24'
   retrieved: '2026-07-02'
-  claim: 'Practitioner guide showing org SDLC standards packaged as version-controlled rules/*.md files (with trigger:
-    always_on frontmatter, e.g. a secret-management rule) distributed to AI assistants via agentic plugins; the
-    conclusion states this facilitates ''how AI assistants adhere to standards in the organization with codified
-    rules'' — the only external source found using the pattern''s own phrase'
+  claim: 'Practitioner guide showing org SDLC standards packaged as version-controlled rules/*.md files
+    (with trigger: always_on frontmatter, e.g. a secret-management rule) distributed to AI assistants
+    via agentic plugins; the conclusion states this facilitates ''how AI assistants adhere to standards
+    in the organization with codified rules'' — the only external source found using the pattern''s own
+    phrase'
 - tier: T5
   match: aliased
-  mechanism_quote: Already adopted by more than 20,000 repositories on GitHub, the format is being positioned as
-    a companion to traditional documentation, offering machine-readable context that complements human-facing files
-    like README.md.
+  mechanism_quote: Already adopted by more than 20,000 repositories on GitHub, the format is being positioned
+    as a companion to traditional documentation, offering machine-readable context that complements human-facing
+    files like README.md.
   source: Robert Krzaczyński — "AGENTS.md Emerges as Open Standard for AI Coding Agents" (InfoQ news)
+  source_kind: opinion
+  organization: InfoQ
+  independence_group: infoq
   url: https://www.infoq.com/news/2025/08/agents-md/
+  resolved_url: https://www.infoq.com/news/2025/08/agents-md/
+  content_sha256: null
+  verifier:
+    method: legacy-import
+    model: null
+    prompt_version: null
+    run_url: null
   date: '2025-08-27'
   retrieved: '2026-07-02'
-  claim: Dated, bylined industry news report that the AGENTS.md convention had already been adopted by more than
-    20,000 GitHub repositories at publication and is portable across Codex, Jules, Cursor, Aider, RooCode, and Zed;
-    includes practitioner skepticism from Hacker News
-verdict: verified
+  claim: Dated, bylined industry news report that the AGENTS.md convention had already been adopted by
+    more than 20,000 GitHub repositories at publication and is portable across Codex, Jules, Cursor, Aider,
+    RooCode, and Zed; includes practitioner skepticism from Hacker News
+verdict: weak

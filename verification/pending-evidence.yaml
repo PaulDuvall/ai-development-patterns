@@ -2,8 +2,8 @@
 #
 # This file makes evidence gaps visible: adding a pattern to the catalog without
 # either an evidence file or an entry here fails CI (scripts/validate-evidence.py
-# --registry). When a pattern gains evidence, the validator prints a NOTE — remove
-# its slug from this list in the same PR so the allowlist shrinks toward empty.
+# --registry). When a pattern gains evidence, remove its slug atomically in the
+# same PR: overlaps, duplicate slugs, and unknown catalog slugs are validation errors.
 #
 pending:
 - adversarial-evaluator

@@ -16,15 +16,17 @@ This test framework ensures that the AI Development Patterns repository maintain
 
 ### Prerequisites
 
-- Python 3.9+
+- Python 3.11+ (the repository pins `3.11` in `.python-version`)
 - Bash (for shell script validation)
 - Internet connection (for external link testing)
 
 ### Installation
 
 ```bash
-# Install test dependencies
-pip install -r tests/requirements.txt
+# Create an isolated Python 3.11 environment and install pinned test dependencies
+python3.11 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r tests/requirements.txt
 ```
 
 ### Run All Tests

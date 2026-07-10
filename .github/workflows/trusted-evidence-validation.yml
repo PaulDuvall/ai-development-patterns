@@ -1,0 +1,150 @@
+name: Trusted Adoption Evidence
+
+on:
+  pull_request_target: # zizmor: ignore[dangerous-triggers] candidate data is never executed
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request number to validate from the trusted default branch
+        type: string
+        required: true
+
+# The base-branch workflow and scripts are the trust root. Candidate code is
+# checked out as inert data and is never imported or executed.
+permissions:
+  contents: read
+  pull-requests: read
+  statuses: write
+
+concurrency:
+  group: trusted-evidence-${{ github.event.pull_request.number || inputs.pr_number }}
+  cancel-in-progress: true
+
+jobs:
+  trusted-evidence:
+    name: Trusted validator execution
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Resolve immutable pull request revisions
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+        run: |
+          set -euo pipefail
+          [[ "$PR_NUMBER" =~ ^[1-9][0-9]*$ ]]
+          pull=$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}")
+          [ "$(jq -r .state <<< "$pull")" = "open" ]
+          [ "$(jq -r .base.ref <<< "$pull")" = "main" ]
+          {
+            echo "head_sha=$(jq -r .head.sha <<< "$pull")"
+            echo "head_repo=$(jq -r .head.repo.full_name <<< "$pull")"
+            echo "base_sha=$(jq -r .base.sha <<< "$pull")"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Checkout trusted base
+        id: checkout-base
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ steps.resolve.outputs.base_sha }}
+          path: trusted
+          persist-credentials: false
+
+      - name: Checkout candidate as inert data
+        id: checkout-candidate
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          repository: ${{ steps.resolve.outputs.head_repo }}
+          ref: ${{ steps.resolve.outputs.head_sha }}
+          path: candidate
+          persist-credentials: false
+
+      - name: Reject unsafe candidate filesystem entries
+        id: filesystem
+        run: |
+          set -euo pipefail
+          if find candidate -type l -print -quit | grep -q .; then
+            echo "::error::Candidate checkout must not contain symbolic links"
+            exit 1
+          fi
+          while IFS= read -r -d '' path; do
+            size=$(stat --format=%s "$path")
+            if (( size > 5242880 )); then
+              echo "::error::Candidate file exceeds 5 MiB: $path"
+              exit 1
+            fi
+          done < <(find candidate/verification candidate/patterns.yaml candidate/experiments/README.md \
+            -type f -print0)
+
+      - name: Set up Python 3.11
+        id: setup-python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: trusted/tests/requirements.txt
+
+      - name: Install trusted validation dependencies
+        id: install
+        run: python3 -m pip install --requirement trusted/tests/requirements.txt
+
+      - name: Reject credentials in candidate data
+        id: secret-scan
+        run: >-
+          python3 trusted/scripts/scan-candidate-secrets.py
+          candidate/README.md
+          candidate/index.html
+          candidate/assets/js/patterns-data.js
+          candidate/experiments/NOTES.md
+          candidate/verification
+
+      - name: Recompute candidate evidence with trusted validator
+        id: evidence
+        run: >-
+          python3 trusted/scripts/validate-evidence.py
+          --dir candidate/verification/evidence
+          --registry candidate/patterns.yaml
+          --experiments candidate/experiments/README.md
+          --allowlist candidate/verification/pending-evidence.yaml
+
+      - name: Recompute candidate status with trusted generator
+        id: status
+        run: >-
+          python3 trusted/scripts/generate-verification-status.py
+          --root candidate --check
+
+      - name: Publish trusted result on the candidate revision
+        if: ${{ always() && steps.resolve.outputs.head_sha != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
+          FAILED: >-
+            ${{
+              steps.checkout-base.outcome != 'success' ||
+              steps.checkout-candidate.outcome != 'success' ||
+              steps.filesystem.outcome != 'success' ||
+              steps.setup-python.outcome != 'success' ||
+              steps.install.outcome != 'success' ||
+              steps.secret-scan.outcome != 'success' ||
+              steps.evidence.outcome != 'success' ||
+              steps.status.outcome != 'success'
+            }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          state=success
+          description="Trusted default-branch validator passed"
+          if [ "$FAILED" = "true" ]; then
+            state=failure
+            description="Trusted default-branch validator failed"
+          fi
+          gh api --method POST \
+            "repos/${GITHUB_REPOSITORY}/statuses/${HEAD_SHA}" \
+            -f state="$state" \
+            -f context="Trusted evidence checks" \
+            -f description="$description" \
+            -f target_url="$RUN_URL" > /dev/null
+          [ "$state" = success ]

@@ -22,12 +22,14 @@ if command -v python3.11 &> /dev/null; then
     echo "✅ Found python3.11"
 elif command -v python3 &> /dev/null; then
     PYTHON_VERSION=$(python3 --version | cut -d' ' -f2 | cut -d'.' -f1-2)
-    if [[ "$PYTHON_VERSION" == "3.11" ]]; then
+    if python3 -c 'import sys; raise SystemExit(sys.version_info < (3, 11))'; then
         PYTHON_CMD="python3"
-        echo "✅ Found python3 (version 3.11)"
+        echo "✅ Found python3 (version $PYTHON_VERSION)"
     else
-        echo "⚠️  Found python3 (version $PYTHON_VERSION), but prefer 3.11"
-        PYTHON_CMD="python3"
+        echo "❌ Python 3.11+ is required; found python3 $PYTHON_VERSION"
+        echo "   On macOS: brew install python@3.11"
+        echo "   On Ubuntu: apt-get install python3.11 python3.11-venv"
+        exit 1
     fi
 else
     echo "❌ Python 3.11 not found. Please install Python 3.11"
