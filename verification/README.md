@@ -28,6 +28,7 @@ The flow is:
 ```text
 schedule/manual request
   -> deterministic catalog inventory
+  -> selected-provider credential/model/quota preflight
   -> one read-only research unit per pattern
   -> trusted URL/quote hydration -> content-bound unit artifact
   -> exact per-unit validation
@@ -143,16 +144,23 @@ succeeds. Trusted code then combines only the disjoint evidence files, applies p
 removals, synchronizes deterministic decision-ledger signals, regenerates `STATUS.md`, and opens
 one draft PR for the run. Renames and demotions remain human decisions.
 
+Before any research matrix starts, one provider-specific preflight makes a minimal real model
+request with the selected credential and exact configured model. A missing or invalid credential,
+an inaccessible model, or already exhausted quota therefore fails one job instead of starting up to
+49 doomed workers. This request is billable and proves provider availability at the start of the
+run; it cannot reserve enough capacity for every later research unit. Provider selection remains
+explicit, and a failed preflight never falls back to the other provider.
+
 The draft PR is the single review surface. Evidence-gap issues are tracking outputs, not separate
 approval requests. If the aggregate adds `Review naming signal` rows, make any naming choice in
 `verification/DECISIONS.md` on that PR (or in a follow-up PR); no response is required when no such
 row appears.
 
-Each provider has a separate `contents: read` research job, disables persisted checkout
-credentials, and disallows direct GitHub mutation tools. Keeping the jobs separate prevents the
-OpenAI action from receiving the OIDC permission used only by optional Anthropic federation. The
-publisher prefers a short-lived GitHub App token configured with the `VERIFY_PATTERNS_APP_ID`
-repository variable and `VERIFY_PATTERNS_APP_PRIVATE_KEY` secret.
+Each provider has separate preflight and `contents: read` research jobs, disables persisted checkout
+credentials, and disallows direct GitHub mutation tools. Keeping both stages provider-specific
+prevents OpenAI code from receiving the OIDC permission used only by optional Anthropic federation.
+The publisher prefers a short-lived GitHub App token configured with the
+`VERIFY_PATTERNS_APP_ID` repository variable and `VERIFY_PATTERNS_APP_PRIVATE_KEY` secret.
 After opening a draft PR, it dispatches trusted default-branch validation by PR number, so the
 required result is attached to the candidate revision even when an automation-created PR event is
 approval-gated. No long-lived personal access token is passed to the research agent.
@@ -180,17 +188,21 @@ the `OPENAI_API_KEY` Actions secret. A ChatGPT subscription/session token is not
 usage is billed to the Platform project. The default model is
 [`gpt-5.6-terra`](https://developers.openai.com/api/docs/guides/latest-model) at medium reasoning
 effort; set the optional `OPENAI_EVIDENCE_MODEL` repository variable to another permitted model
-identifier.
+identifier. For cost-sensitive full-catalog runs, `gpt-5.6-luna` is the documented high-volume
+option. The OpenAI preflight calls the configured model once before the first isolated worker starts.
 
 ```bash
 gh secret set OPENAI_API_KEY       # prompts without echoing the key
-gh variable set OPENAI_EVIDENCE_MODEL --body gpt-5.6-terra  # optional
+gh variable set OPENAI_EVIDENCE_MODEL --body gpt-5.6-luna  # optional high-volume setting
 ```
 
 Anthropic remains an explicit `provider=anthropic` option. That path prefers workload-identity
 federation when `ANTHROPIC_FEDERATION_RULE_ID`, `ANTHROPIC_ORGANIZATION_ID`, and optional
 service-account/workspace repository variables are configured, then uses `ANTHROPIC_API_KEY` only
 when federation is absent. Provider selection never silently falls back to the other provider.
+API-key runs use the same provider preflight helper as OpenAI. Federation runs use a one-turn,
+no-tools invocation of the same pinned Claude action as research, followed by the same fail-closed
+execution-result check, before the matrix is allowed to start.
 The Anthropic job root-locks the checkout except for the assigned unit path, uses `dontAsk` mode
 with an exact project-read/one-file-edit permission rule, restricts the built-in tool set, disables
 all MCP and Bash tools, and derives retrieval metadata afterward with an immutable trusted helper.

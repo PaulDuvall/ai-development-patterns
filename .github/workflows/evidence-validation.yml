@@ -29,6 +29,7 @@ on:
       - scripts/hydrate-evidence-content.py
       - scripts/scan-candidate-secrets.py
       - scripts/check-claude-execution.py
+      - scripts/check-provider-preflight.py
       - scripts/check-research-workspace.py
       - scripts/sync-verification-decisions.py
       - scripts/validate-research-scope.py
@@ -37,6 +38,7 @@ on:
       - tests/test_verification_inventory.py
       - tests/test_verification_status.py
       - tests/test_candidate_secret_scan.py
+      - tests/test_provider_preflight.py
       - tests/test_repository_rules.py
       - tests/test_verification_workflows.py
       - tests/test_verification_units.py
