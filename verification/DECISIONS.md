@@ -25,7 +25,7 @@ Alignment values come from each pattern's `evidence/<slug>.yaml`; rules are defi
 
 | Pattern | Alignment | Industry terms | Recommendation | Decision |
 |---------|-----------|----------------|----------------|----------|
-| Agent Readiness | strong | *agent readiness* (Factory.ai, Kodus); *AI readiness assessment* (Microsoft — org-level, a name collision) | **Keep — accepted rename from Readiness Assessment** (most sources use the agent-readiness term; the former name collided with org-level AI readiness) | Accepted 2026-07-10 — canonical rename applied |
+| Agent Readiness | strong | *agent readiness* (Factory.ai, Kodus); *agent-ready codebase* (Upsun); *AI readiness checklist* (independent practitioner); *AI maturity self-assessment* (Coder) | **Keep — accepted rename from Readiness Assessment** (most sources use the agent-readiness term; the former name collided with org-level AI readiness) | Accepted 2026-07-10 — canonical rename applied |
 | Incremental Generation | aliased | no stable industry name; *progressive enhancement* collides with the established web-design term | **Keep — accepted rename from Progressive Enhancement** (the new catalog name describes the mechanism without retaining the collision) | Accepted 2026-07-10 — canonical rename applied |
 | Agent Memory | strong | *memory* / *agent memory* (Anthropic, Cline, MemGPT) | **Keep — accepted rename from Context Persistence** (memory terminology is consistent across sources) | Accepted 2026-07-10 — canonical rename applied |
 | Codified Rules | weak | `AGENTS.md` (open format), *Rules* (Cursor), `CLAUDE.md` (Anthropic), *repository custom instructions* (GitHub Copilot) | Keep + alias | Accepted 2026-07-04 — alias mentions merged (PR #29) |
@@ -35,12 +35,12 @@ Alignment values come from each pattern's `evidence/<slug>.yaml`; rules are defi
 | Issue Generation | weak | no dominant competing term | Keep | Accepted 2026-07-04 |
 | Developer Lifecycle | aliased | *AI-DLC* (AWS), spec-driven workflow framings | Keep (note the scope overlap with Spec-Driven Development) | Accepted 2026-07-04 |
 
-Ten of the eleven current assessments are schema-v2 legacy imports and therefore have `weak`
-verdicts until a complete refresh supplies query, content-hash, and verifier provenance; Event
-Automation has complete provenance. This ledger retains the earlier human naming decisions during
-that refresh. Spec-Driven Development remains omitted because its naming alignment is `strong`;
-Security Sandbox is retained to preserve its accepted decision history even though its independently
-scoreable sources now recompute to `strong` alignment.
+Nine of the eleven current assessments are schema-v2 legacy imports and therefore have `weak`
+verdicts until a complete refresh supplies query, content-hash, and verifier provenance; Agent
+Readiness and Event Automation have complete provenance. This ledger retains the earlier human
+naming decisions during that refresh. Spec-Driven Development remains omitted because its naming
+alignment is `strong`; Security Sandbox is retained to preserve its accepted decision history even
+though its independently scoreable sources now recompute to `strong` alignment.
 
 ### 2026-07-10 — three accepted evidence-led renames
 

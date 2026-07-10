@@ -1,25 +1,34 @@
 schema_version: 2
-provenance_status: legacy-import
-legacy_run_url: https://github.com/PaulDuvall/ai-development-patterns/pull/19
-legacy_limitations: The PR records 9 aggregate queries, all three search modes, and an independent URL
-  re-fetch. Exact query strings, per-mode candidate counts, normalized content hashes, and verifier metadata
-  were not retained.
+provenance_status: complete
 pattern: Agent Readiness
 slug: agent-readiness
-last_checked: '2026-07-02'
+last_checked: '2026-07-10'
 search:
-  run_id: legacy-import
-  checked_at: '2026-07-02'
+  run_id: 'github-actions:29117515902'
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29117515902
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.9534676c6d39c14ea76297d9fe49af54dd212574a5c0c7c4ec639b2fad37a43c
+  checked_at: '2026-07-10'
   modes:
     name:
-      queries: []
-      candidate_count: null
+      queries:
+      - '"Agent Readiness" "codebase" "AI coding agents"'
+      - '"Getting your codebase agent-ready" "eight areas"'
+      - '"39 automated checks" "7 pillars" "agent-readiness"'
+      candidate_count: 8
     mechanism:
-      queries: []
-      candidate_count: null
+      queries:
+      - '"agent-ready" codebase "testing" "documentation" "CI/CD"'
+      - '"preparing a codebase" "AI agents" checklist repository testing documentation'
+      - '"codebase readiness" "AI coding agents" checklist'
+      candidate_count: 10
     artifact:
-      queries: []
-      candidate_count: null
+      queries:
+      - 'site:github.com "@kodus/agent-readiness" "--ci"'
+      - 'site:github.com "agent-ready check" "fail-on-missing"'
+      - 'site:github.com "readiness-report" "Factory.ai" "Agent Readiness"'
+      candidate_count: 3
 adoption_score: 16
 tier_counts:
   T1: 2
@@ -31,134 +40,109 @@ adoption_dimensions:
 naming_alignment: strong
 terminology_variants:
 - term: Readiness Report
-  used_by: Factory.ai (product and docs)
+  used_by: Factory.ai product and documentation
   url: https://factory.ai/product/agent-readiness
 - term: agent-ready codebase
-  used_by: Guillaume Moigneu (Upsun engineering blog); also Eno Reyes (Factory AI) at AI Engineer
+  used_by: Upsun engineering blog and Factory AI conference material
   url: https://developer.upsun.com/posts/ai/making-coding-agents-reliable
-- term: DORA AI Capabilities Model
-  used_by: DORA research team / Google Cloud
-  url: https://cloud.google.com/blog/products/ai-machine-learning/introducing-doras-inaugural-ai-capabilities-model
-- term: AI Readiness Assessment
-  used_by: Microsoft Learn (interactive organizational assessment)
-  url: https://learn.microsoft.com/en-us/assessments/94f1c697-9ba7-4d47-ad83-7c6bd94b1505/
+- term: AI Readiness checklist
+  used_by: Dominika Zajac
+  url: https://dev.to/domizajac/is-your-repo-ready-for-the-ai-agents-revolution-checklist-1a1b
 - term: AI Maturity Self-Assessment
   used_by: Coder
   url: https://coder.com/blog/what-100-engineering-teams-revealed-about-ai-maturity-and-what-to-do-about-it
-- term: AI Readiness checklist
-  used_by: Dominika Zając (practitioner, Medium/dev.to)
-  url: https://domizajac.medium.com/is-your-repo-ready-for-the-ai-agents-revolution-926e548da528
-- term: AI-Readiness Assessment for Software Development
-  used_by: sw-craftsmanship-dojo (open-source assessment based on DORA and Stanford SWEPR research, hosted
-    at ai-readiness.dev)
-  url: https://github.com/sw-craftsmanship-dojo/sw-ai-readiness-assessment
 evidence:
 - tier: T1
   match: named
-  mechanism_quote: Evaluates your codebase across 8 technical pillars and 5 maturity levels. Finds the
-    environment problems that defeat any agent and tells you what to fix first.
-  source: Factory.ai — Agent Readiness (product)
+  mechanism_quote: Evaluates your codebase across 8 technical pillars and 5 maturity levels.
+  source: Factory.ai, Agent Readiness
   source_kind: shipped_product
   organization: Factory AI
   independence_group: factory-ai
   url: https://factory.ai/product/agent-readiness
   resolved_url: https://factory.ai/product/agent-readiness
-  content_sha256: null
+  content_sha256: 29fa65504901ef6a3c3251b4d05111a88dc318edd0ced9b9891451b19bb77d10
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  retrieved: '2026-07-02'
-  claim: Factory ships a commercial 'Agent Readiness' product that evaluates a codebase across 8 technical
-    pillars (Style & Validation, Build System, Testing, Documentation, Dev Environment, Observability,
-    Security, Task Discovery) and 5 maturity levels, producing a Readiness Report runnable today via app.factory.ai,
-    a /readiness-report CLI command, and CI integration (undated page; date = retrieval date)
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.9534676c6d39c14ea76297d9fe49af54dd212574a5c0c7c4ec639b2fad37a43c
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29117515902
+  retrieved: '2026-07-10'
+  claim: Factory ships an Agent Readiness product that evaluates a codebase across technical pillars
+    and maturity levels before agent adoption.
 - tier: T1
   match: named
-  mechanism_quote: Evaluate how ready your codebase is for autonomous AI coding agents like **Claude Code**,
-    **Cursor**, **GitHub Copilot**, and **Codex**. 39 automated checks, 7 pillars, 10+ languages.
-  source: Kodus — @kodus/agent-readiness (open-source CLI, npm)
+  mechanism_quote: 39 automated checks, 7 pillars, 10+ languages.
+  source: Kodus, agent-readiness
   source_kind: open_source_implementation
   organization: Kodus
   independence_group: kodus
   url: https://github.com/kodustech/agent-readiness
   resolved_url: https://github.com/kodustech/agent-readiness
-  content_sha256: null
+  content_sha256: cf742cd5bd68cd54b165342d4ad93f07b277303c06814b0e17c120920ff1cb57
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-07-02'
-  retrieved: '2026-07-02'
-  claim: Open-source npm CLI (created 2026-02-02, 64 stars; date = repo last-updated per GitHub API) that
-    runs 39 automated checks across 7 pillars (Style & Linting, Testing, Documentation, Dev Environment,
-    CI/CD, Code Health, Security) and outputs a maturity level, per-pillar scores, and prioritized recommendations
-    — positioned as the open-source alternative to Factory.ai's Agent Readiness
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.9534676c6d39c14ea76297d9fe49af54dd212574a5c0c7c4ec639b2fad37a43c
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29117515902
+  retrieved: '2026-07-10'
+  claim: Kodus publishes a runnable open-source CLI that scores whether a codebase is ready for
+    autonomous AI coding agents across multiple readiness pillars.
 - tier: T4
   match: named
   mechanism_quote: Getting your codebase agent-ready requires systematic coverage across eight areas.
-  source: Upsun engineering blog — Guillaume Moigneu, 'Making coding agents (Claude Code, Codex, etc.)
-    reliable'
+  source: Upsun engineering blog, Making coding agents reliable
   source_kind: practitioner_report
   organization: Upsun
   independence_group: upsun
   url: https://developer.upsun.com/posts/ai/making-coding-agents-reliable
   resolved_url: https://developer.upsun.com/posts/ai/making-coding-agents-reliable
-  content_sha256: null
+  content_sha256: 67b7225aea0987f0af35e9648dc938b321a11a999d044f865f7c6199534a7cb3
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.9534676c6d39c14ea76297d9fe49af54dd212574a5c0c7c4ec639b2fad37a43c
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29117515902
   date: '2026-02-17'
-  retrieved: '2026-07-02'
-  claim: Practitioner post with an '8 pillars of verification' framework and an 80-criteria checklist
-    (10 criteria per pillar across testing, documentation, code quality, build systems, dev environments,
-    observability, security, standards) for auditing whether a codebase is agent-ready and finding the
-    biggest gap
+  retrieved: '2026-07-10'
+  claim: Upsun describes an eight-area agent-ready codebase assessment covering testing,
+    documentation, code quality, build systems, environments, observability, security, and standards.
 - tier: T4
   match: aliased
   mechanism_quote: a simple, practical checklist for preparing a codebase to work effectively with AI agents
-  source: Dominika Zając — 'Is your repo ready for the AI Agents revolution? Checklist' (Medium; also
-    mirrored on dev.to)
+  source: Dominika Zajac, Is your repo ready for the AI Agents revolution?
   source_kind: practitioner_report
-  organization: Dominika Zając
+  organization: Dominika Zajac
   independence_group: independent:dominika-zajac
-  url: https://domizajac.medium.com/is-your-repo-ready-for-the-ai-agents-revolution-926e548da528
-  resolved_url: https://domizajac.medium.com/is-your-repo-ready-for-the-ai-agents-revolution-926e548da528
-  content_sha256: null
+  url: https://dev.to/domizajac/is-your-repo-ready-for-the-ai-agents-revolution-checklist-1a1b
+  resolved_url: https://dev.to/domizajac/is-your-repo-ready-for-the-ai-agents-revolution-checklist-1a1b
+  content_sha256: a12d93535fba46fd1d6138789ccc6fb579b47654bb711a2ed136a95b00d68d85
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.9534676c6d39c14ea76297d9fe49af54dd212574a5c0c7c4ec639b2fad37a43c
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29117515902
   date: '2026-01-18'
   retrieved: '2026-07-10'
-  claim: Practitioner article presenting an 'AI Readiness checklist' for evaluating a repository before
-    AI-agent adoption across four sections — Repository Hygiene, Testing Safety Net, Grounding Documents,
-    and MCP Integrations — including concrete criteria like a single obvious command for start/test/lint
+  claim: The practitioner checklist evaluates repository hygiene, tests, grounding documents, and
+    integrations before using AI agents on a repository.
 - tier: T4
   match: aliased
-  mechanism_quote: The goal was to give engineering leaders a concrete way to benchmark where they stand
-    and plan what comes next.
-  source: Coder engineering blog — Carly Stephens and Kodie Dower, 'What 100 Engineering Teams Revealed
-    About AI Maturity and What to Do About It'
+  mechanism_quote: The goal was to give engineering leaders a concrete way to benchmark where they stand and plan what comes next.
+  source: Coder engineering blog, What 100 Engineering Teams Revealed About AI Maturity
   source_kind: case_study
   organization: Coder
   independence_group: coder
   url: https://coder.com/blog/what-100-engineering-teams-revealed-about-ai-maturity-and-what-to-do-about-it
   resolved_url: https://coder.com/blog/what-100-engineering-teams-revealed-about-ai-maturity-and-what-to-do-about-it
-  content_sha256: null
+  content_sha256: aa891e0dfa655070c13977c31199cc79a2fbcd40e251bb73473b29b601b9f749
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.9534676c6d39c14ea76297d9fe49af54dd212574a5c0c7c4ec639b2fad37a43c
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29117515902
   date: '2026-04-20'
-  retrieved: '2026-07-02'
-  claim: Coder released an 'AI Maturity Self-Assessment' plus a five-stage framework for how engineering
-    organizations adopt agentic AI, based on assessment data from 100+ engineering teams, so leaders can
-    benchmark current state and plan adoption
-verdict: weak
+  retrieved: '2026-07-10'
+  claim: Coder reports an AI maturity self-assessment used by engineering teams to benchmark readiness
+    and plan their next agentic AI adoption steps.
+verdict: verified
