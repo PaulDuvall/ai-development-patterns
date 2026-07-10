@@ -134,8 +134,12 @@ approval-gated. No long-lived personal access token is passed to the research ag
 
 The default OpenAI path uses the official pinned
 [`openai/codex-action`](https://learn.chatgpt.com/docs/github-action) with native web search,
-candidate-path-only repository writes, and a dedicated unprivileged OS account operating on a
-private copy with no `.git` or `.beads` directory. Its reviewed network profile permits public
+one directory-scoped bubblewrap root, and a dedicated unprivileged OS account operating on a
+private copy with no `.git` or `.beads` data (only empty, locked sandbox sentinels). Root-owned
+read-only directories restrict that account to the seven fixed candidate files plus
+`verification/evidence/`; an OS-boundary check and a keyless pinned-CLI sandbox smoke test verify
+the effective profile and immutable Python 3.11 research environment before the model starts.
+Its reviewed network profile permits public
 evidence fetches while the sandbox continues to reject local/private targets; model-run commands
 inherit only core process variables and cannot launch a login shell that rehydrates the runner
 environment. After Codex exits, the workflow kills every research-user process and the API proxy

@@ -301,8 +301,14 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install local validation dependencies
-        run: python3 -m pip install --requirement tests/requirements.txt
+      - name: Build read-only research Python environment
+        run: |
+          set -euo pipefail
+          sudo "$(command -v python3)" -m venv /opt/evidence-python
+          sudo /opt/evidence-python/bin/python -m pip install \
+            --requirement tests/requirements.txt
+          sudo chown -hR root:root /opt/evidence-python
+          sudo chmod -R a=rX /opt/evidence-python
 
       - name: Download deterministic research plan
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
@@ -328,18 +334,105 @@ jobs:
           sudo install -d -o evidence-agent -g evidence-agent -m 0750 \
             /home/evidence-agent/workspace
           # The runner-owned API proxy must traverse CODEX_HOME while Codex
-          # itself runs as evidence-agent.
-          sudo install -d -o evidence-agent -g evidence-agent -m 0755 \
+          # itself runs as evidence-agent. Keep the directory root-owned so
+          # the model cannot replace the reviewed configuration.
+          sudo install -d -o root -g root -m 0755 \
             /home/evidence-agent/.codex
           /usr/bin/tar \
             --exclude='./.git' --exclude='./.beads' -cf - . \
             | sudo -u evidence-agent /usr/bin/tar \
                 -xf - -C /home/evidence-agent/workspace
-          sudo install -o evidence-agent -g evidence-agent -m 0644 \
+          workspace=/home/evidence-agent/workspace
+          sudo chown -hR root:root "$workspace"
+          sudo chmod -R a=rX "$workspace"
+          for metadata in .git .agents .codex .beads; do
+            path="$workspace/$metadata"
+            if [ -e "$path" ] || [ -L "$path" ]; then
+              echo "::error::Isolated metadata sentinel already exists: $metadata"
+              exit 1
+            fi
+            sudo install -d -o root -g root -m 0555 "$path"
+          done
+          writable_files=(
+            README.md
+            index.html
+            assets/js/patterns-data.js
+            experiments/NOTES.md
+            verification/DECISIONS.md
+            verification/STATUS.md
+            verification/pending-evidence.yaml
+          )
+          for relative in "${writable_files[@]}"; do
+            path="$workspace/$relative"
+            if [ -L "$path" ] || [ ! -f "$path" ]; then
+              echo "::error::Writable candidate path must be a regular file: $relative"
+              exit 1
+            fi
+            sudo chown evidence-agent:evidence-agent "$path"
+            sudo chmod 0640 "$path"
+          done
+          evidence_dir="$workspace/verification/evidence"
+          if [ -L "$evidence_dir" ] || [ ! -d "$evidence_dir" ]; then
+            echo "::error::Writable evidence path must be a real directory"
+            exit 1
+          fi
+          sudo chown -hR evidence-agent:evidence-agent "$evidence_dir"
+          sudo find "$evidence_dir" -type d -exec chmod 0750 {} +
+          sudo find "$evidence_dir" -type f -exec chmod 0640 {} +
+          sudo install -o root -g root -m 0644 \
             .github/codex/evidence-research.toml \
             /home/evidence-agent/.codex/config.toml
-          sudo install -o evidence-agent -g evidence-agent -m 0666 \
+          sudo install -o root -g root -m 0666 \
             /dev/null "/home/evidence-agent/.codex/${GITHUB_RUN_ID}.json"
+          sudo chown root:root /home/evidence-agent
+          sudo chmod 0755 /home/evidence-agent
+
+      - name: Verify isolated research write boundary
+        run: >-
+          sudo -u evidence-agent python3
+          /home/evidence-agent/workspace/scripts/check-research-workspace.py
+          /home/evidence-agent/workspace
+
+      - name: Set up Node.js 24 for Codex sandbox preflight
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
+
+      - name: Smoke-test pinned Codex permission profile without credentials
+        run: | # zizmor: ignore[adhoc-packages] pinned to action CLI version
+          set -euo pipefail
+          npm install --global "@openai/codex@0.144.1"
+          current_userns=$(sysctl -n kernel.unprivileged_userns_clone 2>/dev/null || true)
+          if [ -n "$current_userns" ] && [ "$current_userns" != "1" ]; then
+            sudo sysctl -w kernel.unprivileged_userns_clone=1
+          fi
+          current_apparmor=$(
+            sysctl -n kernel.apparmor_restrict_unprivileged_userns 2>/dev/null || true
+          )
+          if [ -n "$current_apparmor" ] && [ "$current_apparmor" != "0" ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+
+          preflight_home=/home/evidence-agent/.codex-preflight
+          sudo install -d -o evidence-agent -g evidence-agent -m 0700 "$preflight_home"
+          sudo install -o evidence-agent -g evidence-agent -m 0600 \
+            .github/codex/evidence-research.toml "$preflight_home/config.toml"
+          trap 'sudo rm -rf "$preflight_home"' EXIT
+          codex_bin=$(command -v codex)
+          node_dir=$(dirname "$(command -v node)")
+          sanitized_env=(
+            HOME=/home/evidence-agent
+            CODEX_HOME="$preflight_home"
+            PATH="$node_dir:/usr/bin:/bin"
+          )
+          sudo -u evidence-agent env -i "${sanitized_env[@]}" \
+            timeout 30s "$codex_bin" mcp-server --strict-config </dev/null
+          sudo -u evidence-agent env -i "${sanitized_env[@]}" \
+            timeout 30s "$codex_bin" sandbox \
+              --permission-profile evidence-research \
+              --cd /home/evidence-agent/workspace \
+              -- python3 -c \
+                'import bs4, requests, sys, yaml; assert sys.version_info >= (3, 11)'
 
       # This is the only OpenAI model step. The action's internal GitHub token
       # is read-scoped; direct git/gh publication is forbidden and separate.

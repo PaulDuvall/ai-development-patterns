@@ -1,6 +1,7 @@
 """Structural regression tests for the evidence workflow trust boundaries."""
 
 import re
+import runpy
 import tomllib
 from pathlib import Path
 
@@ -13,6 +14,8 @@ VERIFY = WORKFLOWS / "verify-patterns.yml"
 TRUSTED = WORKFLOWS / "trusted-evidence-validation.yml"
 EVIDENCE = WORKFLOWS / "evidence-validation.yml"
 CODEX_CONFIG = ROOT / ".github" / "codex" / "evidence-research.toml"
+RESEARCH_BOUNDARY = runpy.run_path(
+    str(ROOT / "scripts" / "check-research-workspace.py"))
 
 
 def load_workflow(path):
@@ -88,12 +91,56 @@ def test_openai_research_uses_pinned_bounded_codex_action():
     action = named_step(research, "Collect candidate evidence with OpenAI")
     step_names = [step.get("name") for step in research["steps"]]
     assert step_names.index("Prepare isolated OpenAI research account") < (
+        step_names.index("Verify isolated research write boundary"))
+    assert step_names.index("Verify isolated research write boundary") < (
+        step_names.index("Smoke-test pinned Codex permission profile without credentials"))
+    assert step_names.index("Smoke-test pinned Codex permission profile without credentials") < (
         step_names.index("Collect candidate evidence with OpenAI"))
     isolation = named_step(research, "Prepare isolated OpenAI research account")
     assert "-m 0750" in isolation["run"]
     assert "/home/evidence-agent/workspace" in isolation["run"]
     assert "-m 0755" in isolation["run"]
     assert "/home/evidence-agent/.codex" in isolation["run"]
+    assert "chown -hR root:root" in isolation["run"]
+    assert "chmod -R a=rX" in isolation["run"]
+    assert "chmod 0640" in isolation["run"]
+    assert "verification/evidence" in isolation["run"]
+    assert "for metadata in .git .agents .codex .beads" in isolation["run"]
+    assert "install -d -o root -g root -m 0555" in isolation["run"]
+    assert "chown root:root /home/evidence-agent" in isolation["run"]
+    assert "-o root -g root -m 0644" in isolation["run"]
+    writable_block = re.search(
+        r"writable_files=\(\n(?P<body>.*?)\n\)", isolation["run"], re.DOTALL)
+    assert writable_block is not None
+    workflow_writable_files = {
+        line.strip() for line in writable_block.group("body").splitlines()
+        if line.strip()
+    }
+    assert workflow_writable_files == set(RESEARCH_BOUNDARY["WRITABLE_FILES"])
+    boundary = named_step(research, "Verify isolated research write boundary")
+    assert "sudo -u evidence-agent python3" in boundary["run"]
+    assert "scripts/check-research-workspace.py" in boundary["run"]
+    node = named_step(research, "Set up Node.js 24 for Codex sandbox preflight")
+    assert node["uses"] == (
+        "actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f")
+    assert node["with"]["node-version"] == "24"
+    python_env = named_step(research, "Build read-only research Python environment")
+    assert "$(command -v python3)" in python_env["run"]
+    assert "/opt/evidence-python/bin/python -m pip install" in python_env["run"]
+    assert "chown -hR root:root /opt/evidence-python" in python_env["run"]
+    assert "chmod -R a=rX /opt/evidence-python" in python_env["run"]
+    smoke = named_step(
+        research, "Smoke-test pinned Codex permission profile without credentials")
+    assert '"@openai/codex@0.144.1"' in smoke["run"]
+    assert "sudo -u evidence-agent env -i" in smoke["run"]
+    assert "CODEX_HOME=\"$preflight_home\"" in smoke["run"]
+    assert "timeout 30s" in smoke["run"]
+    assert "mcp-server --strict-config" in smoke["run"]
+    assert "sandbox" in smoke["run"]
+    assert "--permission-profile evidence-research" in smoke["run"]
+    assert "-- python3 -c" in smoke["run"]
+    assert "import bs4, requests, sys, yaml" in smoke["run"]
+    assert "OPENAI_API_KEY" not in smoke.get("env", {})
     assert step_names.index("Collect candidate evidence with OpenAI") < (
         step_names.index("Terminate isolated research processes and proxy"))
     assert step_names.index("Terminate isolated research processes and proxy") < (
@@ -129,26 +176,52 @@ def test_codex_research_profile_is_candidate_scoped_and_network_guarded():
     assert config["web_search"] == "live"
     assert config["default_permissions"] == "evidence-research"
     assert config["allow_login_shell"] is False
-    assert config["shell_environment_policy"] == {
-        "inherit": "core", "ignore_default_excludes": False}
+    shell_environment = config["shell_environment_policy"]
+    assert shell_environment["inherit"] == "core"
+    assert shell_environment["ignore_default_excludes"] is False
+    assert shell_environment["set"] == {
+        "PATH": "/opt/evidence-python/bin:/usr/local/bin:/usr/bin:/bin"}
     profile = config["permissions"]["evidence-research"]
     assert profile["extends"] == ":workspace"
     assert profile["filesystem"][
         "/home/runner/work/_temp/_runner_file_commands"] == "deny"
     assert profile["filesystem"]["/home/runner/work/_actions"] == "deny"
     roots = profile["filesystem"][":workspace_roots"]
-    assert roots["."] == "read"
-    assert roots[".git"] == roots[".beads"] == "deny"
-    assert {
+    assert roots == {".": "write", ".git": "deny", ".beads": "deny"}
+    write_roots = {
         path for path, permission in roots.items() if permission == "write"
-    } == {
-        "README.md", "index.html", "assets/js/patterns-data.js",
-        "experiments/NOTES.md", "verification/DECISIONS.md",
-        "verification/STATUS.md", "verification/pending-evidence.yaml",
-        "verification/evidence",
     }
+    assert write_roots == {"."}
+    for relative in write_roots:
+        target = ROOT / relative
+        assert target.is_dir() and not target.is_symlink(), (
+            f"Codex 0.144.1 Linux write root must be a real directory: {relative}")
     assert profile["network"]["enabled"] is True
     assert profile["network"]["domains"] == {"*": "allow"}
+
+
+def test_evidence_validation_smokes_real_codex_profile_without_a_key():
+    workflow = load_workflow(EVIDENCE)
+    job = workflow["jobs"]["codex-permission-profile"]
+    assert workflow["permissions"] == {"contents": "read"}
+    assert "permissions" not in job
+    node = named_step(job, "Set up Node.js 24")
+    assert node["uses"] == (
+        "actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f")
+    python = named_step(job, "Set up Python 3.11")
+    assert python["uses"] == (
+        "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1")
+    python_env = named_step(job, "Build read-only research Python environment")
+    assert "/opt/evidence-python/bin/python -m pip install" in python_env["run"]
+    assert "chown -hR root:root /opt/evidence-python" in python_env["run"]
+    smoke = named_step(
+        job, "Compile and launch the pinned Codex sandbox without credentials")
+    assert smoke["env"]["CODEX_HOME"] == "${{ runner.temp }}/codex-profile-preflight"
+    assert '"@openai/codex@0.144.1"' in smoke["run"]
+    assert "mcp-server --strict-config" in smoke["run"]
+    assert "--permission-profile evidence-research" in smoke["run"]
+    assert "import bs4, requests, sys, yaml" in smoke["run"]
+    assert "OPENAI_API_KEY" not in smoke.get("env", {})
 
 
 def test_anthropic_research_retains_wif_and_fail_closed_guard():
