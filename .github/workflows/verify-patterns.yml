@@ -333,11 +333,16 @@ jobs:
             --group evidence-agent
           sudo install -d -o evidence-agent -g evidence-agent -m 0750 \
             /home/evidence-agent/workspace
-          # The runner-owned API proxy must traverse CODEX_HOME while Codex
-          # itself runs as evidence-agent. Keep the directory root-owned so
-          # the model cannot replace the reviewed configuration.
+          # Keep CODEX_HOME root-owned, but precreate the two exact runtime
+          # paths Codex 0.144.1 must write before it can launch its sandbox.
           sudo install -d -o root -g root -m 0755 \
             /home/evidence-agent/.codex
+          sudo install -d -o root -g root -m 0755 \
+            /home/evidence-agent/.codex/tmp
+          sudo install -d -o evidence-agent -g evidence-agent -m 0700 \
+            /home/evidence-agent/.codex/tmp/arg0
+          sudo install -o evidence-agent -g evidence-agent -m 0644 \
+            /dev/null /home/evidence-agent/.codex/installation_id
           /usr/bin/tar \
             --exclude='./.git' --exclude='./.beads' -cf - . \
             | sudo -u evidence-agent /usr/bin/tar \
@@ -413,26 +418,64 @@ jobs:
             sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
           fi
 
-          preflight_home=/home/evidence-agent/.codex-preflight
-          sudo install -d -o evidence-agent -g evidence-agent -m 0700 "$preflight_home"
-          sudo install -o evidence-agent -g evidence-agent -m 0600 \
-            .github/codex/evidence-research.toml "$preflight_home/config.toml"
-          trap 'sudo rm -rf "$preflight_home"' EXIT
           codex_bin=$(command -v codex)
           node_dir=$(dirname "$(command -v node)")
           sanitized_env=(
             HOME=/home/evidence-agent
-            CODEX_HOME="$preflight_home"
+            CODEX_HOME=/home/evidence-agent/.codex
             PATH="$node_dir:/usr/bin:/bin"
           )
           sudo -u evidence-agent env -i "${sanitized_env[@]}" \
             timeout 30s "$codex_bin" mcp-server --strict-config </dev/null
+          sudo -u evidence-agent test -s \
+            /home/evidence-agent/.codex/installation_id
+          missing_thread=00000000-0000-4000-8000-000000000001
+          set +e
+          startup_output=$(
+            sudo -u evidence-agent env -i "${sanitized_env[@]}" \
+              timeout 30s "$codex_bin" exec \
+                --skip-git-repo-check \
+                --cd /home/evidence-agent/workspace \
+                --ephemeral --strict-config \
+                --config 'default_permissions="evidence-research"' \
+                resume "$missing_thread" 'startup smoke' 2>&1
+          )
+          startup_status=$?
+          set -e
+          printf '%s\n' "$startup_output"
+          if [ "$startup_status" -eq 124 ]; then
+            echo "::error::Codex startup smoke timed out"
+            exit 1
+          fi
+          if [ "$startup_status" -eq 0 ]; then
+            echo "::error::Missing-thread startup smoke unexpectedly succeeded"
+            exit 1
+          fi
+          expected="no rollout found for thread id $missing_thread"
+          if ! grep -Fq "$expected" <<<"$startup_output"; then
+            echo "::error::Codex did not reach initialized thread/resume handling"
+            exit 1
+          fi
+          if grep -Eq \
+              'could not create PATH aliases|failed to initialize in-process app-server client' \
+              <<<"$startup_output"; then
+            echo "::error::Codex CODEX_HOME startup initialization failed"
+            exit 1
+          fi
           sudo -u evidence-agent env -i "${sanitized_env[@]}" \
             timeout 30s "$codex_bin" sandbox \
               --permission-profile evidence-research \
               --cd /home/evidence-agent/workspace \
               -- python3 -c \
                 'import bs4, requests, sys, yaml; assert sys.version_info >= (3, 11)'
+          if sudo -u evidence-agent env -i "${sanitized_env[@]}" \
+              timeout 30s "$codex_bin" sandbox \
+                --permission-profile evidence-research \
+                --cd /home/evidence-agent/workspace \
+                -- /usr/bin/touch /home/evidence-agent/.codex/installation_id; then
+            echo "::error::Sandbox wrote outside the isolated workspace"
+            exit 1
+          fi
 
       # This is the only OpenAI model step. The action's internal GitHub token
       # is read-scoped; direct git/gh publication is forbidden and separate.
