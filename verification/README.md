@@ -139,7 +139,9 @@ private copy with no `.git` or `.beads` data (only empty, locked sandbox sentine
 read-only directories restrict that account to the seven fixed candidate files plus
 `verification/evidence/`; an OS-boundary check and a keyless pinned-CLI sandbox smoke test verify
 the effective profile and immutable Python 3.11 research environment before the model starts.
-Its reviewed network profile permits public
+`CODEX_HOME` remains root-owned except for Codex's required `installation_id` file and
+`tmp/arg0` runtime directory; a credential-free missing-thread smoke initializes the same
+in-process app server used by the model action. Its reviewed network profile permits public
 evidence fetches while the sandbox continues to reject local/private targets; model-run commands
 inherit only core process variables and cannot launch a login shell that rehydrates the runner
 environment. After Codex exits, the workflow kills every research-user process and the API proxy

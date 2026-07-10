@@ -101,6 +101,10 @@ def test_openai_research_uses_pinned_bounded_codex_action():
     assert "/home/evidence-agent/workspace" in isolation["run"]
     assert "-m 0755" in isolation["run"]
     assert "/home/evidence-agent/.codex" in isolation["run"]
+    assert "/home/evidence-agent/.codex/tmp/arg0" in isolation["run"]
+    assert "/home/evidence-agent/.codex/installation_id" in isolation["run"]
+    assert "-o evidence-agent -g evidence-agent -m 0700" in isolation["run"]
+    assert "-o evidence-agent -g evidence-agent -m 0644" in isolation["run"]
     assert "chown -hR root:root" in isolation["run"]
     assert "chmod -R a=rX" in isolation["run"]
     assert "chmod 0640" in isolation["run"]
@@ -133,13 +137,20 @@ def test_openai_research_uses_pinned_bounded_codex_action():
         research, "Smoke-test pinned Codex permission profile without credentials")
     assert '"@openai/codex@0.144.1"' in smoke["run"]
     assert "sudo -u evidence-agent env -i" in smoke["run"]
-    assert "CODEX_HOME=\"$preflight_home\"" in smoke["run"]
+    assert "CODEX_HOME=/home/evidence-agent/.codex" in smoke["run"]
+    assert ".codex-preflight" not in smoke["run"]
     assert "timeout 30s" in smoke["run"]
     assert "mcp-server --strict-config" in smoke["run"]
+    assert "exec" in smoke["run"]
+    assert "resume \"$missing_thread\" 'startup smoke'" in smoke["run"]
+    assert "no rollout found for thread id" in smoke["run"]
+    assert "failed to initialize in-process app-server client" in smoke["run"]
     assert "sandbox" in smoke["run"]
     assert "--permission-profile evidence-research" in smoke["run"]
     assert "-- python3 -c" in smoke["run"]
     assert "import bs4, requests, sys, yaml" in smoke["run"]
+    assert "/usr/bin/touch /home/evidence-agent/.codex/installation_id" in (
+        smoke["run"])
     assert "OPENAI_API_KEY" not in smoke.get("env", {})
     assert step_names.index("Collect candidate evidence with OpenAI") < (
         step_names.index("Terminate isolated research processes and proxy"))
@@ -218,9 +229,18 @@ def test_evidence_validation_smokes_real_codex_profile_without_a_key():
         job, "Compile and launch the pinned Codex sandbox without credentials")
     assert smoke["env"]["CODEX_HOME"] == "${{ runner.temp }}/codex-profile-preflight"
     assert '"@openai/codex@0.144.1"' in smoke["run"]
+    assert "profile_user=codex-profile-agent" in smoke["run"]
+    assert "profile_workspace=/home/$profile_user/workspace" in smoke["run"]
+    assert '--cd "$profile_workspace"' in smoke["run"]
+    assert '"$profile_home/tmp/arg0"' in smoke["run"]
+    assert '"$profile_home/installation_id"' in smoke["run"]
+    assert 'sudo -u "$profile_user" env -i' in smoke["run"]
     assert "mcp-server --strict-config" in smoke["run"]
+    assert "no rollout found for thread id" in smoke["run"]
+    assert "failed to initialize in-process app-server client" in smoke["run"]
     assert "--permission-profile evidence-research" in smoke["run"]
     assert "import bs4, requests, sys, yaml" in smoke["run"]
+    assert '"$CODEX_HOME/sandbox-write-probe"' in smoke["run"]
     assert "OPENAI_API_KEY" not in smoke.get("env", {})
 
 
