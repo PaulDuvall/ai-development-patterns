@@ -308,6 +308,14 @@ jobs:
             --allowedTools
             "Bash(python3 scripts/evidence_content.py:*),Bash(python3 scripts/validate-evidence.py:*),Bash(python3 scripts/generate-verification-status.py:*),Bash(python3 scripts/generate-patterns-data.py:*),Bash(date -I),Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Task"
 
+      # claude-code-action currently keys its conclusion only off the result
+      # subtype. Fail closed on the contradictory success + is_error result and
+      # keep raw model output out of the public Actions log and artifacts.
+      - name: Require successful Claude execution
+        env:
+          CLAUDE_EXECUTION_FILE: ${{ steps.research.outputs.execution_file }}
+        run: python3 scripts/check-claude-execution.py
+
       - name: Scan fixed-path candidate bundle
         env:
           EXPECTED_SCANNER_SHA256: ${{ needs.prepare.outputs.scanner_sha256 }}
