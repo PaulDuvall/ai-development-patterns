@@ -117,6 +117,35 @@ def test_quote_normalization_rejects_unrelated_content():
     )
 
 
+def test_canonical_url_discards_volatile_tracking_parameters():
+    first = CONTENT.canonical_url(
+        "https://blog.example/article?gi=random-a&utm_source=newsletter&section=proof")
+    second = CONTENT.canonical_url(
+        "https://blog.example/article?section=proof&gi=random-b&utm_medium=email")
+
+    assert first == second == "https://blog.example/article?section=proof"
+
+
+def test_weekly_recheck_tolerates_rotating_redirect_tracking_query(monkeypatch):
+    monkeypatch.setattr(CONTENT, "fetch", lambda *args, **kwargs: {
+        "resolved_url": "https://blog.example/article?gi=random-b",
+        "content_sha256": "a" * 64,
+        "mechanism_quote_present": True,
+    })
+    failures = check_complete_entry(
+        "example.yaml", 0,
+        {
+            "url": "https://blog.example/article",
+            "resolved_url": "https://blog.example/article?gi=random-a",
+            "mechanism_quote": "A sufficiently long mechanism quote for validation.",
+            "content_sha256": "a" * 64,
+        },
+        strict_hashes=False,
+    )
+
+    assert failures == []
+
+
 @pytest.mark.parametrize("url", [
     "http://127.0.0.1/secret",
     "http://169.254.169.254/latest/meta-data/",

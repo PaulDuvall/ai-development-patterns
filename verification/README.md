@@ -19,8 +19,9 @@ The capability deliberately separates three operations:
    and that recorded mechanism quotes remain present in fetched content. This runs weekly and can
    also be requested manually.
 3. **Refresh evidence** — bounded web research creates one isolated artifact per selected pattern.
-   Research has no repository mutation credential; clean matrix jobs validate every fixed-path
-   unit before trusted code assembles shared state and a scoped publisher opens one run-level PR.
+   Research has no repository mutation credential; trusted post-model code hydrates source
+   retrieval metadata, then clean matrix jobs validate every fixed-path unit before trusted code
+   assembles shared state and a scoped publisher opens one run-level PR.
 
 The flow is:
 
@@ -28,6 +29,7 @@ The flow is:
 schedule/manual request
   -> deterministic catalog inventory
   -> one read-only research unit per pattern
+  -> trusted URL/quote hydration -> content-bound unit artifact
   -> exact per-unit validation
   -> trusted all-or-nothing assembly and global validation
   -> scoped publisher -> one reviewable PR
@@ -91,8 +93,11 @@ gh workflow run evidence-validation.yml -f check_links=true
 Bot-protected responses are handled separately from dead links. Complete evidence also records a
 normalized-content SHA-256 and an exact mechanism quote so content drift is observable even when a
 URL remains live. Legacy imports have null hashes and are skipped by semantic provenance checks
-until refreshed. Weekly checks fail when the quote disappears and warn when the normalized digest
-changes; candidate validation makes a digest mismatch fatal:
+until refreshed. During refresh, trusted post-model hydration fails unless the quote is present and
+overwrites the resolved URL, digest, and retrieval date before the unit manifest is created. Weekly
+checks later fail when the quote disappears and warn when the normalized digest changes. A strict
+second fetch is available as a diagnostic for sources expected to be byte-stable, but dynamic pages
+can legitimately produce a different normalized digest between requests:
 
 ```bash
 EVIDENCE_HASH_STRICT=1 python3 -m pytest tests/test_evidence_content.py -m slow
@@ -162,8 +167,9 @@ the effective profile and immutable Python 3.11 research environment before the 
 in-process app server used by the model action. Its reviewed network profile permits public
 evidence fetches while the sandbox continues to reject local/private targets; model-run commands
 inherit only core process variables and cannot launch a login shell that rehydrates the runner
-environment. After Codex exits, the workflow kills every research-user process and the API proxy
-before trusted code from the untouched checkout exports that one fixed unit path. Configure a
+environment. After Codex exits, the workflow kills every research-user process and the API proxy;
+trusted code from the untouched checkout then hydrates retrieval metadata and exports that one fixed
+unit path. Configure a
 dedicated OpenAI Platform project or
 [service-account key](https://platform.openai.com/docs/api-reference/project-service-accounts) as
 the `OPENAI_API_KEY` Actions secret. A ChatGPT subscription/session token is not an API key, and API
@@ -183,14 +189,17 @@ service-account/workspace repository variables are configured, then uses `ANTHRO
 when federation is absent. Provider selection never silently falls back to the other provider.
 The Anthropic job root-locks the checkout except for the assigned unit path, uses `dontAsk` mode
 with an exact project-read/one-file-edit permission rule, restricts the built-in tool set, disables
-all MCP and Bash tools, and derives retrieval hashes afterward with an immutable trusted helper.
+all MCP and Bash tools, and derives retrieval metadata afterward with an immutable trusted helper.
 This verifier provider is independent from the optional `Claude Code Review` workflow. That PR
 reviewer runs only when the `ENABLE_ANTHROPIC_REVIEW` repository variable is `true`; with the
 variable absent or `ANTHROPIC_API_KEY` unset, deterministic PR checks continue without Claude
 review.
 No provider final-message or raw execution-file artifact is retained; normal action progress remains
-in GitHub's retained Actions log. The provider stage scans each fixed unit before upload; a fresh
-clean runner rejects unsafe entries and scans again after download. The trusted assembler rejects
+in GitHub's retained Actions log. For both providers, trusted hydration happens after the model and
+before export, so each immutable unit manifest binds the fetched resolved URLs, content hashes, and
+retrieval dates.
+The provider stage scans each fixed unit before upload; a fresh clean runner rejects unsafe entries
+and scans again after download without duplicating the just-completed fetch. The trusted assembler rejects
 missing, extra, duplicate, or mismatched units and reruns global cross-pattern validation before
 PR creation.
 

@@ -2,6 +2,7 @@
 """Populate trusted retrieval fields for one model-authored evidence file."""
 
 import argparse
+import datetime
 import sys
 from pathlib import Path
 
@@ -16,8 +17,14 @@ from evidence_content import (
 )
 
 
-def hydrate(path):
+def hydrate(path, retrieved_date=None):
     """Fetch every admitted source and persist verified retrieval metadata."""
+    if retrieved_date is None:
+        retrieved_date = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
+    try:
+        retrieved_date = datetime.date.fromisoformat(str(retrieved_date)).isoformat()
+    except ValueError as exc:
+        raise ValueError("retrieved_date must be ISO 8601 (YYYY-MM-DD)") from exc
     path = Path(path)
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
@@ -40,6 +47,7 @@ def hydrate(path):
                 f"evidence[{index}] mechanism_quote is absent from fetched content")
         entry["resolved_url"] = result["resolved_url"]
         entry["content_sha256"] = result["content_sha256"]
+        entry["retrieved"] = retrieved_date
     path.write_text(
         yaml.safe_dump(data, sort_keys=False, allow_unicode=True), encoding="utf-8")
     return len(entries)
@@ -48,9 +56,10 @@ def hydrate(path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("path")
+    parser.add_argument("--retrieved-date")
     args = parser.parse_args()
     try:
-        count = hydrate(args.path)
+        count = hydrate(args.path, args.retrieved_date)
     except (
             OSError, ValueError, yaml.YAMLError, requests.RequestException,
             UnsafeURL, ResponseTooLarge, UnsupportedContent) as exc:

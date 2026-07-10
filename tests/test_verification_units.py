@@ -132,14 +132,18 @@ def test_scope_validator_rejects_extra_evidence(tmp_path):
         SCOPE.validate(tmp_path, "evidence", '["sample-pattern"]', expected)
 
 
-def test_hydrate_derives_retrieval_fields_from_trusted_fetch(tmp_path, monkeypatch):
-    path = tmp_path / "sample.yaml"
+def test_hydrate_derives_and_manifest_binds_trusted_retrieval_fields(
+        tmp_path, monkeypatch):
+    source = tmp_path / "source"
+    path = source / "verification" / "evidence" / "sample-pattern.yaml"
+    path.parent.mkdir(parents=True)
     path.write_text(yaml.safe_dump({
         "evidence": [{
             "url": "https://example.test/source",
             "mechanism_quote": "A sufficiently specific mechanism quote from the source.",
             "resolved_url": "invented",
             "content_sha256": "0" * 64,
+            "retrieved": "1999-01-01",
         }],
     }), encoding="utf-8")
     monkeypatch.setattr(HYDRATE, "fetch", lambda url, quote: {
@@ -148,10 +152,22 @@ def test_hydrate_derives_retrieval_fields_from_trusted_fetch(tmp_path, monkeypat
         "mechanism_quote_present": True,
     })
 
-    assert HYDRATE.hydrate(path) == 1
+    assert HYDRATE.hydrate(path, "2026-07-10") == 1
     entry = yaml.safe_load(path.read_text(encoding="utf-8"))["evidence"][0]
     assert entry["resolved_url"] == "https://example.test/canonical"
     assert entry["content_sha256"] == "a" * 64
+    assert str(entry["retrieved"]) == "2026-07-10"
+
+    destination = tmp_path / "candidate"
+    manifest = EXPORT.export_unit(source, destination, {
+        "unit_id": "evidence-001-sample-pattern",
+        "kind": "evidence",
+        "slug": "sample-pattern",
+        "selected_slugs": ["sample-pattern"],
+    })
+    exported = destination / manifest["path"]
+    assert exported.read_bytes() == path.read_bytes()
+    assert manifest["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def test_hydrate_rejects_quote_missing_from_fetched_content(tmp_path, monkeypatch):

@@ -116,6 +116,7 @@ jobs:
               scripts/scan-candidate-secrets.py \
               scripts/validate-evidence.py \
               scripts/validate-research-scope.py \
+              tests/requirements.txt \
               | sha256sum | cut -d ' ' -f 1
           )
           echo "sha256=$sha256" >> "$GITHUB_OUTPUT"
@@ -633,8 +634,9 @@ jobs:
             The active verification/run-plan/worklist.txt is immutable and is the entire scope
             for this invocation even when the parent mode is full. Do not add patterns to it.
             Do not edit any pre-existing evidence file that is not named there.
-            For every admitted source, populate resolved_url and content_sha256 by running
-            `python3 scripts/evidence_content.py URL --quote QUOTE`; never invent either value.
+            For every admitted source, provide a concrete public URL and an exact mechanism quote
+            present on that page. Trusted post-processing, not your tools, derives resolved_url
+            and content_sha256; never invent either value.
 
       - name: Terminate isolated research processes and proxy
         if: always()
@@ -668,6 +670,17 @@ jobs:
           if [ -e /home/evidence-agent/workspace ]; then
             sudo chown -hR runner:runner /home/evidence-agent/workspace
           fi
+
+      - name: Hydrate trusted evidence retrieval metadata
+        if: matrix.kind == 'evidence'
+        env:
+          UNIT_SLUG: ${{ matrix.slug }}
+          CHECKED_DATE: ${{ needs.prepare.outputs.checked_date }}
+        run: >-
+          /opt/evidence-python/bin/python
+          scripts/hydrate-evidence-content.py
+          "/home/evidence-agent/workspace/verification/evidence/${UNIT_SLUG}.yaml"
+          --retrieved-date "$CHECKED_DATE"
 
       - name: Export isolated fixed-path research unit
         env:
@@ -888,9 +901,11 @@ jobs:
         if: matrix.kind == 'evidence'
         env:
           UNIT_SLUG: ${{ matrix.slug }}
+          CHECKED_DATE: ${{ needs.prepare.outputs.checked_date }}
         run: >-
           python3 /opt/evidence-tools/hydrate-evidence-content.py
           "verification/evidence/${UNIT_SLUG}.yaml"
+          --retrieved-date "$CHECKED_DATE"
 
       - name: Validate proposed research unit scope
         env:
@@ -1275,13 +1290,6 @@ jobs:
         run: |
           python3 scripts/generate-verification-status.py
           python3 scripts/generate-verification-status.py --check
-
-      - name: Verify unit semantic evidence content
-        if: matrix.kind == 'evidence'
-        env:
-          EVIDENCE_HASH_STRICT: "1"
-          EVIDENCE_SCOPE_SLUGS: ${{ matrix.selected_slugs_json }}
-        run: python3 -m pytest tests/test_evidence_content.py -m slow --tb=short
 
       - name: Check site artifacts
         run: |

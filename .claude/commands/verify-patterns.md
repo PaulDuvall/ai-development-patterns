@@ -37,7 +37,9 @@ Arguments: $ARGUMENTS
 4. Never fabricate URLs, dates, authors, queries, candidate counts, organizations, quotes, hashes,
    or verifier metadata. **A URL may only be written after it has been fetched this run and its
    content supports the claim.** `evidence: none found` is valid only when the complete three-mode
-   search record proves the search ran.
+   search record proves the search ran. In GitHub Actions, research writes the submitted URL and
+   exact mechanism quote; trusted post-model hydration overwrites `resolved_url` and
+   `content_sha256` from its own fetch before the unit is exported.
 5. Research and verification subagents receive only a read-scoped repository token. Direct
    `git`/`gh` tools are disallowed. In GitHub Actions, each evidence worker can write exactly its
    assigned evidence YAML (the discovery worker can write only `experiments/NOTES.md`); trusted
@@ -117,9 +119,10 @@ Score every admitted hit against the evidence-tier rubric in `verification/READM
 (**the single human-readable copy** — T1–T5 with weights 5/4/3/2/1, admission tests per tier,
 at most 3 entries admitted per tier). Record what the source demonstrates; do not editorialize.
 
-**Independent verify pass (producer ≠ grader).** A separate read-only subagent re-fetches every
-URL before it is written and confirms the page exists and supports the recorded claim. The bar
-scales with how the source relates to our name:
+**Independent verify pass (producer ≠ retrieval verifier).** In GitHub Actions, trusted code
+re-fetches every model-admitted URL after the model exits, confirms the exact mechanism quote is
+present, and overwrites the resolved URL, content digest, and retrieval date. Semantic grading still
+applies the bar below according to how the source relates to our name:
 
 - `named` entries: page live, claim supported. Default reject on doubt.
 - `aliased` / `unnamed` entries: the risk is false analogy, not fabrication. The grader gets the
@@ -187,9 +190,10 @@ Entry `date` is the source's own publication/update date — omit the field for 
 
 Each admitted entry needs a unique `independence_group` within the file and a unique canonical
 `resolved_url` across the evidence set. T3 must be a recorded conference talk or genuinely
-peer-reviewed publication; an arXiv preprint alone does not qualify. Use
-`python3 scripts/evidence_content.py <url> --quote <exact-quote>` to follow redirects, normalize
-visible response text, compute SHA-256, and prove the quote is present. The displayed score includes T5, but the verified
+peer-reviewed publication; an arXiv preprint alone does not qualify. In GitHub Actions, provide the
+submitted URL and exact quote and let the trusted post-model hydrator follow redirects, normalize
+visible text, compute SHA-256, and prove the quote is present. For a local run, perform the same
+operation with `python3 scripts/evidence_content.py <url> --quote <exact-quote>`. The displayed score includes T5, but the verified
 threshold counts T1–T4 points only; T5 may inform discovery/naming but never supplies a deciding
 adoption point.
 
@@ -225,14 +229,18 @@ excluded, and any shared generated-file conflict must be resolved by rebasing th
    values and add a neutral `Review naming signal` row, but it preserves every human Decision cell.
 4. Regenerate `verification/STATUS.md`. README citations and catalog renames remain separately
    reviewed human-owned follow-ups; parallel research workers never compete to edit them.
-5. Validate every evidence unit in a clean checkout, including
-   `EVIDENCE_HASH_STRICT=1 python3 -m pytest tests/test_evidence_content.py -m slow`; the
-   unit manifest binds those checked bytes. After exact manifest-verified assembly, validate the
-   resulting tree without re-fetching the same URLs:
+5. In Actions, trusted provider code hydrates every model-authored URL/quote pair and fails unless
+   the quote is present, then exports a unit manifest that hashes those hydrated bytes. Validate
+   every unit in a clean checkout without immediately re-fetching the same URLs. After exact
+   manifest-verified assembly, validate the resulting tree with:
    `python3 scripts/validate-evidence.py --registry patterns.yaml --allowlist verification/pending-evidence.yaml`,
    `python3 scripts/generate-verification-status.py --check`, and
    `python3 -m pytest tests/test_evidence_files.py -m "not slow"`; run `pytest tests/` when
-   README or site artifacts changed. Any failure aborts publishing with no repository mutation.
+   README or site artifacts changed. The separate weekly evidence-link workflow re-fetches every
+   complete source to detect later quote or digest drift. For a local candidate, run
+   `scripts/hydrate-evidence-content.py` on each edited evidence file before the static validators;
+   a strict second fetch is diagnostic only because dynamic pages can legitimately change their
+   normalized digest between requests. Any failure aborts publishing with no repository mutation.
 6. Create one lowercase conventional commit and one draft PR containing the evidence, atomic pending-list
    changes, deterministic ledger signals, status, and any discovery queue updates from this run. Report a
    no-op without a branch when nothing changed.
