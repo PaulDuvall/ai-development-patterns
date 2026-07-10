@@ -98,18 +98,19 @@ EVIDENCE_HASH_STRICT=1 python3 -m pytest tests/test_evidence_content.py -m slow
 
 ### Evidence refresh
 
-The `Pattern Verification & Discovery` workflow (`.github/workflows/verify-patterns.yml`) refreshes
-the stalest evidence on Monday at 05:00 UTC and runs discovery on the first day of each month at
-06:00 UTC. Trigger it from the Actions tab or with:
+The `Pattern Verification & Discovery` workflow (`.github/workflows/verify-patterns.yml`) uses
+OpenAI by default, refreshes the stalest evidence on Monday at 05:00 UTC, and runs discovery on the
+first day of each month at 06:00 UTC. Trigger it from the Actions tab or with:
 
 ```bash
 gh workflow run verify-patterns.yml                        # up to 10 stalest/missing patterns
 gh workflow run verify-patterns.yml -f mode=full           # all phases, bounded by run limits
 gh workflow run verify-patterns.yml -f mode=discover-only  # discovery only
 gh workflow run verify-patterns.yml -f mode=single-pattern -f pattern="Security Sandbox"
+gh workflow run verify-patterns.yml -f provider=anthropic  # explicit alternate provider
 ```
 
-From Claude Code at the repository root, the equivalent collector command is:
+As a local alternative, Claude Code can run the same evidence methodology from the repository root:
 
 ```text
 /verify-patterns
@@ -122,18 +123,44 @@ Research produces candidate data only. The publisher applies all accepted eviden
 pending-list removals, decision-ledger data updates, and regenerated `STATUS.md` in one batched PR.
 Renames and demotions remain human decisions.
 
-The research job has `contents: read`, disables persisted checkout credentials, and disallows
-direct GitHub mutation tools. The publisher prefers a short-lived GitHub App token configured with
-the `VERIFY_PATTERNS_APP_ID` repository variable and `VERIFY_PATTERNS_APP_PRIVATE_KEY` secret.
+Each provider has a separate `contents: read` research job, disables persisted checkout
+credentials, and disallows direct GitHub mutation tools. Keeping the jobs separate prevents the
+OpenAI action from receiving the OIDC permission used only by optional Anthropic federation. The
+publisher prefers a short-lived GitHub App token configured with the `VERIFY_PATTERNS_APP_ID`
+repository variable and `VERIFY_PATTERNS_APP_PRIVATE_KEY` secret.
 After opening a draft PR, it dispatches trusted default-branch validation by PR number, so the
 required result is attached to the candidate revision even when an automation-created PR event is
 approval-gated. No long-lived personal access token is passed to the research agent.
 
-For model authentication, the workflow prefers Anthropic workload-identity federation when the
-`ANTHROPIC_FEDERATION_RULE_ID`, `ANTHROPIC_ORGANIZATION_ID`, and optional service-account/workspace
-repository variables are configured. Until then it falls back to `ANTHROPIC_API_KEY`. Raw agent
-execution transcripts are not retained, and both the research job and clean validator scan the
-fixed candidate paths for credential-shaped content before any artifact or PR is created.
+The default OpenAI path uses the official pinned
+[`openai/codex-action`](https://learn.chatgpt.com/docs/github-action) with native web search,
+candidate-path-only repository writes, and a dedicated unprivileged OS account operating on a
+private copy with no `.git` or `.beads` directory. Its reviewed network profile permits public
+evidence fetches while the sandbox continues to reject local/private targets; model-run commands
+inherit only core process variables and cannot launch a login shell that rehydrates the runner
+environment. After Codex exits, the workflow kills every research-user process and the API proxy
+before trusted code from the untouched checkout exports fixed candidate paths. Configure a
+dedicated OpenAI Platform project or
+[service-account key](https://platform.openai.com/docs/api-reference/project-service-accounts) as
+the `OPENAI_API_KEY` Actions secret. A ChatGPT subscription/session token is not an API key, and API
+usage is billed to the Platform project. The default model is
+[`gpt-5.6-terra`](https://developers.openai.com/api/docs/guides/latest-model) at medium reasoning
+effort; set the optional `OPENAI_EVIDENCE_MODEL` repository variable to another permitted model
+identifier.
+
+```bash
+gh secret set OPENAI_API_KEY       # prompts without echoing the key
+gh variable set OPENAI_EVIDENCE_MODEL --body gpt-5.6-terra  # optional
+```
+
+Anthropic remains an explicit `provider=anthropic` option. That path prefers workload-identity
+federation when `ANTHROPIC_FEDERATION_RULE_ID`, `ANTHROPIC_ORGANIZATION_ID`, and optional
+service-account/workspace repository variables are configured, then uses `ANTHROPIC_API_KEY` only
+when federation is absent. Provider selection never silently falls back to the other provider.
+No provider final-message or raw execution-file artifact is retained; normal action progress remains
+in GitHub's retained Actions log. The provider stage scans fixed paths before uploading the
+untrusted candidate artifact; a fresh clean runner rejects unsafe entries and scans again after
+download, before deterministic validation or PR creation.
 
 ## Schema v2
 
@@ -148,6 +175,9 @@ last_checked: 2026-07-10
 search:
   run_id: "github-actions:123456789"
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/123456789
+  provider: openai
+  model: gpt-5.6-terra
+  prompt_version: evidence-v2-openai-codex-v1+sha256.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
   checked_at: 2026-07-10
   modes:
     name:
@@ -180,8 +210,8 @@ evidence:
     content_sha256: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
     verifier:
       method: automated
-      model: example-model
-      prompt_version: evidence-v2
+      model: gpt-5.6-terra
+      prompt_version: evidence-v2-openai-codex-v1+sha256.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/123456789
     date: 2026-07-10       # omit when the source supplies no publication/update date
     retrieved: 2026-07-10
@@ -201,12 +231,17 @@ Complete provenance records all three search modes:
 - **artifact** — code/config fingerprints from working implementations.
 
 Each mode requires the exact queries and candidate count, and the combined candidate count cannot
-be smaller than the admitted evidence set. Complete runs use at most 12 queries, carry a
+be smaller than the admitted evidence set. Complete runs also record the selected research
+provider, actual model, and versioned contract identifier—even when `evidence: none found`—use at
+most 12 queries, and carry a
 `github-actions:<run-number>` ID bound to this repository's canonical Actions run URL, bind every
-verifier to that same run, and set `search.checked_at` equal to `last_checked`. The clean candidate
-job additionally binds selected files to the current run and requires exact completion of the
-deterministic worklist. `evidence: none found` is valid only with this auditable complete search
-record.
+verifier to that same run, require its model and prompt version to match the workflow-selected
+provider, and set `search.checked_at` equal to `last_checked`. The prompt version includes a SHA-256
+fingerprint of the pinned workflow, permission profile, and shared research methodology, so a
+contract change produces a new machine-checked identifier. The clean candidate job additionally
+binds selected files to the current run and requires exact completion of the deterministic
+worklist. `evidence: none found` is valid only with this auditable complete search record; its run
+URL identifies the immutable provider execution even though there are no entry-level verifiers.
 
 A legacy import uses `run_id: legacy-import`, empty query lists, and null candidate counts. It also
 records the immutable original PR in `legacy_run_url` and states precisely what was not retained in

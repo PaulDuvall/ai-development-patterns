@@ -41,6 +41,9 @@ def complete_search(**overrides):
         "run_id": "github-actions:123",
         "run_url": (
             "https://github.com/PaulDuvall/ai-development-patterns/actions/runs/123"),
+        "provider": "openai",
+        "model": "example-verifier",
+        "prompt_version": "v2",
         "checked_at": "2026-07-01",
         "modes": {
             "name": {"queries": ["example pattern"], "candidate_count": 2},
@@ -313,6 +316,30 @@ def test_actions_run_number_must_match_run_id(tmp_path):
     document["search"]["run_id"] = "github-actions:999"
     write_document(tmp_path, document)
     assert_fails(tmp_path, "run_id must match the run number in run_url")
+
+
+def test_complete_search_requires_execution_provenance(tmp_path):
+    document = evidence_document(entries=[])
+    del document["search"]["provider"]
+    document["search"]["model"] = ""
+    document["search"]["prompt_version"] = None
+    write_document(tmp_path, document)
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "missing required field 'provider'" in result.stdout
+    assert "'model' must be a non-empty string" in result.stdout
+    assert "'prompt_version' must be a non-empty string" in result.stdout
+
+
+def test_verifier_model_and_prompt_match_search_contract(tmp_path):
+    document = evidence_document()
+    document["evidence"][0]["verifier"]["model"] = "different-model"
+    document["evidence"][1]["verifier"]["prompt_version"] = "different-prompt"
+    write_document(tmp_path, document)
+    result = run_validator(tmp_path)
+    assert result.returncode == 1
+    assert "'model' must equal search.model" in result.stdout
+    assert "'prompt_version' must equal search.prompt_version" in result.stdout
 
 
 def test_admitted_evidence_requires_nonzero_candidate_pool(tmp_path):
