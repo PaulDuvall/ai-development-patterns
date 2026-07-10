@@ -137,7 +137,7 @@ def test_rejects_nonwritable_evidence_directory(tmp_path):
     lock_workspace(workspace)
     (workspace / MODULE.EVIDENCE_DIR).chmod(0o500)
     try:
-        with pytest.raises(ValueError, match="evidence directory is not writable"):
+        with pytest.raises(ValueError, match="writable directory is not writable"):
             MODULE.check_workspace(workspace, owner_of=simulated_owner(workspace))
     finally:
         unlock_workspace(workspace)
@@ -164,8 +164,40 @@ def test_rejects_symbolic_evidence_directory(tmp_path):
     evidence.rmdir()
     evidence.symlink_to(workspace / "verification", target_is_directory=True)
 
-    with pytest.raises(ValueError, match="evidence path is not a directory"):
+    with pytest.raises(ValueError, match="writable path is not a directory"):
         MODULE.check_workspace(workspace, owner_of=simulated_owner(workspace))
+
+
+def test_scoped_unit_boundary_allows_only_one_evidence_file(tmp_path):
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    make_workspace(workspace)
+    lock_workspace(workspace)
+    target = Path("verification/evidence/existing.yaml")
+    for relative in MODULE.WRITABLE_FILES:
+        (workspace / relative).chmod(0o400)
+    (workspace / MODULE.EVIDENCE_DIR).chmod(0o500)
+    (workspace / target).chmod(0o600)
+
+    research_uid = os.geteuid()
+    foreign_uid = research_uid + 1
+
+    def owner_of(path):
+        path = Path(path)
+        if path == workspace.parent:
+            return foreign_uid
+        relative = Path(".") if path == workspace else path.relative_to(workspace)
+        return research_uid if relative == target else foreign_uid
+
+    try:
+        assert MODULE.check_workspace(
+            workspace,
+            writable_files=[target.as_posix()],
+            writable_dirs=[],
+            owner_of=owner_of,
+        ) == 1
+    finally:
+        unlock_workspace(workspace)
 
 
 def test_rejects_research_owned_workspace_parent(tmp_path):

@@ -18,17 +18,18 @@ The capability deliberately separates three operations:
 2. **Check links and content** — networked, read-only checks confirm cited pages remain reachable
    and that recorded mechanism quotes remain present in fetched content. This runs weekly and can
    also be requested manually.
-3. **Refresh evidence** — bounded web research creates a candidate artifact. Research has no
-   repository mutation credential; a clean validation job checks the fixed-path artifact before a
-   separately scoped publisher opens one batched PR.
+3. **Refresh evidence** — bounded web research creates one isolated artifact per selected pattern.
+   Research has no repository mutation credential; clean matrix jobs validate every fixed-path
+   unit before trusted code assembles shared state and a scoped publisher opens one run-level PR.
 
 The flow is:
 
 ```text
 schedule/manual request
   -> deterministic catalog inventory
-  -> read-only research -> verification-candidate artifact
-  -> clean deterministic validation
+  -> one read-only research unit per pattern
+  -> exact per-unit validation
+  -> trusted all-or-nothing assembly and global validation
   -> scoped publisher -> one reviewable PR
 ```
 
@@ -36,8 +37,9 @@ schedule/manual request
 deduplication, and bounded selection. The research model receives its generated inventory and
 worklist; it does not choose or expand its own scope.
 
-The publisher writes an evidence file and removes the same slug from
-`pending-evidence.yaml` atomically. Overlaps, unknown pending slugs, duplicate pending slugs,
+The trusted assembler writes each validated evidence file, removes the same slugs from
+`pending-evidence.yaml` atomically, synchronizes evidence-derived naming signals, and regenerates
+`STATUS.md` once. Overlaps, unknown pending slugs, duplicate pending slugs,
 orphan evidence, duplicate canonical URLs, and multiple scored entries from one independence group
 all fail validation.
 
@@ -104,11 +106,18 @@ first day of each month at 06:00 UTC. Trigger it from the Actions tab or with:
 
 ```bash
 gh workflow run verify-patterns.yml                        # up to 10 stalest/missing patterns
-gh workflow run verify-patterns.yml -f mode=full           # all phases, bounded by run limits
+gh workflow run verify-patterns.yml -f mode=full           # every available main + experimental pattern
 gh workflow run verify-patterns.yml -f mode=discover-only  # discovery only
 gh workflow run verify-patterns.yml -f mode=single-pattern -f pattern="Security Sandbox"
 gh workflow run verify-patterns.yml -f provider=anthropic  # explicit alternate provider
 ```
+
+By default, preparation fails while another same-repository `verify/refresh-*` PR is open, and the
+publisher repeats that check after research. This keeps the generated status, pending list, and
+decision ledger on one review branch at a time. A maintainer may intentionally overlap a manual
+run with `-f allow_open_verification_pr=true`; evidence slugs already changed by the older PR are
+excluded, but the resulting aggregate PR may still need a rebase because both branches regenerate
+shared files.
 
 As a local alternative, Claude Code can run the same evidence methodology from the repository root:
 
@@ -119,9 +128,16 @@ As a local alternative, Claude Code can run the same evidence methodology from t
 /verify-patterns --full
 ```
 
-Research produces candidate data only. The publisher applies all accepted evidence changes,
-pending-list removals, decision-ledger data updates, and regenerated `STATUS.md` in one batched PR.
-Renames and demotions remain human decisions.
+Research produces candidate data only. Every selected pattern gets its own immutable worklist,
+research process, artifact, and fresh validation job. A run publishes nothing unless every unit
+succeeds. Trusted code then combines only the disjoint evidence files, applies pending-list
+removals, synchronizes deterministic decision-ledger signals, regenerates `STATUS.md`, and opens
+one draft PR for the run. Renames and demotions remain human decisions.
+
+The draft PR is the single review surface. Evidence-gap issues are tracking outputs, not separate
+approval requests. If the aggregate adds `Review naming signal` rows, make any naming choice in
+`verification/DECISIONS.md` on that PR (or in a follow-up PR); no response is required when no such
+row appears.
 
 Each provider has a separate `contents: read` research job, disables persisted checkout
 credentials, and disallows direct GitHub mutation tools. Keeping the jobs separate prevents the
@@ -134,10 +150,12 @@ approval-gated. No long-lived personal access token is passed to the research ag
 
 The default OpenAI path uses the official pinned
 [`openai/codex-action`](https://learn.chatgpt.com/docs/github-action) with native web search,
-one directory-scoped bubblewrap root, and a dedicated unprivileged OS account operating on a
+one directory-scoped bubblewrap root, and a dedicated unprivileged OS account per research unit
+operating on a
 private copy with no `.git` or `.beads` data (only empty, locked sandbox sentinels). Root-owned
-read-only directories restrict that account to the seven fixed candidate files plus
-`verification/evidence/`; an OS-boundary check and a keyless pinned-CLI sandbox smoke test verify
+read-only directories restrict that account to exactly one assigned evidence YAML, or to
+`experiments/NOTES.md` for the single discovery unit; an OS-boundary check and a keyless pinned-CLI
+sandbox smoke test verify
 the effective profile and immutable Python 3.11 research environment before the model starts.
 `CODEX_HOME` remains root-owned except for Codex's required `installation_id` file and
 `tmp/arg0` runtime directory; a credential-free missing-thread smoke initializes the same
@@ -145,7 +163,7 @@ in-process app server used by the model action. Its reviewed network profile per
 evidence fetches while the sandbox continues to reject local/private targets; model-run commands
 inherit only core process variables and cannot launch a login shell that rehydrates the runner
 environment. After Codex exits, the workflow kills every research-user process and the API proxy
-before trusted code from the untouched checkout exports fixed candidate paths. Configure a
+before trusted code from the untouched checkout exports that one fixed unit path. Configure a
 dedicated OpenAI Platform project or
 [service-account key](https://platform.openai.com/docs/api-reference/project-service-accounts) as
 the `OPENAI_API_KEY` Actions secret. A ChatGPT subscription/session token is not an API key, and API
@@ -163,10 +181,14 @@ Anthropic remains an explicit `provider=anthropic` option. That path prefers wor
 federation when `ANTHROPIC_FEDERATION_RULE_ID`, `ANTHROPIC_ORGANIZATION_ID`, and optional
 service-account/workspace repository variables are configured, then uses `ANTHROPIC_API_KEY` only
 when federation is absent. Provider selection never silently falls back to the other provider.
+The Anthropic job root-locks the checkout except for the assigned unit path, uses `dontAsk` mode
+with an exact project-read/one-file-edit permission rule, restricts the built-in tool set, disables
+all MCP and Bash tools, and derives retrieval hashes afterward with an immutable trusted helper.
 No provider final-message or raw execution-file artifact is retained; normal action progress remains
-in GitHub's retained Actions log. The provider stage scans fixed paths before uploading the
-untrusted candidate artifact; a fresh clean runner rejects unsafe entries and scans again after
-download, before deterministic validation or PR creation.
+in GitHub's retained Actions log. The provider stage scans each fixed unit before upload; a fresh
+clean runner rejects unsafe entries and scans again after download. The trusted assembler rejects
+missing, extra, duplicate, or mismatched units and reruns global cross-pattern validation before
+PR creation.
 
 ## Schema v2
 
@@ -356,9 +378,10 @@ assessed, verified, weak, unverified, and pending counts separately. `stale` (mo
 since a complete check) and `needs refresh` are overlapping freshness/provenance signals, not
 verdicts.
 
-[DECISIONS.md](DECISIONS.md) is the human-owned naming and rubric ledger. The pipeline may update
-evidence-derived alignment, terms, and recommendation data in its batched PR, but never the human
-Decision column. After a human edit, regenerate the status file:
+[DECISIONS.md](DECISIONS.md) is the human-owned naming and rubric ledger. Trusted aggregation
+synchronizes evidence-derived Alignment and may add a neutral review placeholder, but never edits
+an existing human Decision. Humans own detailed terms, recommendations, and decisions. After a
+human edit, regenerate the status file:
 
 ```bash
 python3 scripts/generate-verification-status.py

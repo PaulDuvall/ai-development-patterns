@@ -35,21 +35,29 @@ def open_writable_file(path):
     os.close(descriptor)
 
 
-def allowed_write(relative):
+def allowed_write(relative, writable_files=WRITABLE_FILES, writable_dirs=(EVIDENCE_DIR,)):
     """Return whether a relative path belongs to the intended candidate set."""
-    return (
-        relative.as_posix() in WRITABLE_FILES
-        or relative == EVIDENCE_DIR
-        or EVIDENCE_DIR in relative.parents
-    )
+    return relative.as_posix() in writable_files or any(
+        relative == directory or directory in relative.parents
+        for directory in writable_dirs)
 
 
-def check_workspace(workspace, *, owner_of=None, effective_uid=None):
+def check_workspace(workspace, *, writable_files=None, writable_dirs=None,
+                    owner_of=None, effective_uid=None):
     """Fail unless only fixed candidate paths are writable by this process."""
+    if writable_files is None:
+        writable_files = tuple(WRITABLE_FILES)
+    else:
+        writable_files = tuple(writable_files)
+    if writable_dirs is None:
+        writable_dirs = (EVIDENCE_DIR,)
+    else:
+        writable_dirs = tuple(Path(path) for path in writable_dirs)
     if effective_uid is None:
         effective_uid = os.geteuid()
     if owner_of is None:
-        owner_of = lambda path: path.lstat().st_uid
+        def owner_of(path):
+            return path.lstat().st_uid
 
     raw_workspace = Path(workspace)
     if raw_workspace.is_symlink():
@@ -60,7 +68,7 @@ def check_workspace(workspace, *, owner_of=None, effective_uid=None):
     if owner_of(workspace.parent) == effective_uid:
         raise ValueError("research account must not own the workspace parent")
 
-    for relative in WRITABLE_FILES:
+    for relative in writable_files:
         path = workspace / relative
         try:
             mode = path.lstat().st_mode
@@ -74,34 +82,35 @@ def check_workspace(workspace, *, owner_of=None, effective_uid=None):
             raise ValueError(f"candidate file is not writable: {relative}")
         open_writable_file(path)
 
-    evidence = workspace / EVIDENCE_DIR
-    try:
-        evidence_mode = evidence.lstat().st_mode
-    except FileNotFoundError as exc:
-        raise ValueError(f"writable evidence directory is missing: {EVIDENCE_DIR}") from exc
-    if not stat.S_ISDIR(evidence_mode):
-        raise ValueError(f"writable evidence path is not a directory: {EVIDENCE_DIR}")
-    if owner_of(evidence) != effective_uid:
-        raise ValueError(f"research account does not own evidence directory: {EVIDENCE_DIR}")
-    if not is_writable(evidence):
-        raise ValueError(f"evidence directory is not writable: {EVIDENCE_DIR}")
+    for relative in writable_dirs:
+        directory = workspace / relative
+        try:
+            directory_mode = directory.lstat().st_mode
+        except FileNotFoundError as exc:
+            raise ValueError(f"writable directory is missing: {relative}") from exc
+        if not stat.S_ISDIR(directory_mode):
+            raise ValueError(f"writable path is not a directory: {relative}")
+        if owner_of(directory) != effective_uid:
+            raise ValueError(f"research account does not own writable directory: {relative}")
+        if not is_writable(directory):
+            raise ValueError(f"writable directory is not writable: {relative}")
 
-    probe = evidence / f".research-write-probe-{os.getpid()}"
-    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
-    descriptor = None
-    try:
-        descriptor = os.open(probe, flags, 0o600)
-    finally:
-        if descriptor is not None:
-            os.close(descriptor)
-        probe.unlink(missing_ok=True)
+        probe = directory / f".research-write-probe-{os.getpid()}"
+        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
+        descriptor = None
+        try:
+            descriptor = os.open(probe, flags, 0o600)
+        finally:
+            if descriptor is not None:
+                os.close(descriptor)
+            probe.unlink(missing_ok=True)
 
     unexpected = []
     unsafe_owners = []
     wrong_candidate_owners = []
     for path in (workspace, *workspace.rglob("*")):
         relative = Path(".") if path == workspace else path.relative_to(workspace)
-        allowed = allowed_write(relative)
+        allowed = allowed_write(relative, writable_files, writable_dirs)
         owner = owner_of(path)
         if allowed and owner != effective_uid:
             wrong_candidate_owners.append(relative.as_posix())
@@ -125,15 +134,22 @@ def check_workspace(workspace, *, owner_of=None, effective_uid=None):
             + ", ".join(sorted(unexpected)[:20])
         )
 
-    return len(WRITABLE_FILES) + 1
+    return len(writable_files) + len(writable_dirs)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("workspace", help="Isolated workspace to inspect")
+    parser.add_argument("--writable-file", action="append", dest="writable_files")
+    parser.add_argument("--writable-dir", action="append", dest="writable_dirs")
     args = parser.parse_args()
+    scoped = args.writable_files is not None or args.writable_dirs is not None
     try:
-        count = check_workspace(args.workspace)
+        count = check_workspace(
+            args.workspace,
+            writable_files=(args.writable_files or ()) if scoped else None,
+            writable_dirs=(args.writable_dirs or ()) if scoped else None,
+        )
     except (OSError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
