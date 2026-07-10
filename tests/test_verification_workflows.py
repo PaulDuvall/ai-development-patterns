@@ -41,6 +41,13 @@ def test_research_has_read_only_github_token_and_exact_scope_gate():
     assert "Enforce exact research scope and current-run provenance" in text
     assert "evidence scope mismatch; missing=" in text
     assert "EVIDENCE_SCOPE_SLUGS" in text
+    guard_step = next(
+        step for step in research["steps"]
+        if step.get("name") == "Require successful Claude execution")
+    assert guard_step["env"]["CLAUDE_EXECUTION_FILE"] == (
+        "${{ steps.research.outputs.execution_file }}")
+    assert guard_step["run"] == "python3 scripts/check-claude-execution.py"
+    assert "show_full_output" not in action_step["with"]
     assert "verify-patterns-execution-log" not in text
 
 
