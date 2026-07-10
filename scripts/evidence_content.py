@@ -19,6 +19,9 @@ from bs4 import BeautifulSoup
 MAX_REDIRECTS = 5
 MAX_RESPONSE_BYTES = 5 * 1024 * 1024
 USER_AGENT = "Mozilla/5.0 (ai-development-patterns evidence verifier)"
+VOLATILE_TRACKING_QUERY_KEYS = {
+    "fbclid", "gclid", "gi", "mc_cid", "mc_eid",
+}
 
 
 class UnsafeURL(ValueError):
@@ -67,7 +70,13 @@ def canonical_url(value):
     path = re.sub(r"/{2,}", "/", parsed.path or "/")
     if path != "/":
         path = path.rstrip("/")
-    query = urlencode(sorted(parse_qsl(parsed.query, keep_blank_values=True)), doseq=True)
+    query_items = [
+        (key, value)
+        for key, value in parse_qsl(parsed.query, keep_blank_values=True)
+        if key.casefold() not in VOLATILE_TRACKING_QUERY_KEYS
+        and not key.casefold().startswith("utm_")
+    ]
+    query = urlencode(sorted(query_items), doseq=True)
     return urlunsplit((parsed.scheme.casefold(), hostname, path, query, ""))
 
 

@@ -530,6 +530,20 @@ def test_canonical_resolved_urls_are_globally_unique(tmp_path):
     assert_fails(tmp_path, "FAIL URLs: canonical URL")
 
 
+def test_tracking_query_variants_cannot_bypass_global_url_uniqueness(tmp_path):
+    first = evidence_document(entries=[
+        evidence_entry(
+            "T4", "first",
+            url="https://blog.example/source?gi=random-a&utm_source=newsletter")])
+    second = evidence_document(slug="second", pattern="Second Pattern", entries=[
+        evidence_entry(
+            "T4", "second",
+            url="https://blog.example/source?gi=random-b&utm_medium=email")])
+    write_document(tmp_path, first)
+    write_document(tmp_path, second)
+    assert_fails(tmp_path, "FAIL URLs: canonical URL")
+
+
 def test_filename_must_match_slug(tmp_path):
     write_document(tmp_path, evidence_document(), filename="wrong.yaml")
     assert_fails(tmp_path, "does not match slug")

@@ -117,7 +117,8 @@ def test_research_contract_fingerprints_methodology_and_verdict_code():
             "verification/README.md",
             "scripts/evidence_content.py",
             "scripts/hydrate-evidence-content.py",
-            "scripts/validate-evidence.py"):
+            "scripts/validate-evidence.py",
+            "tests/requirements.txt"):
         assert path in contract["run"]
 
 
@@ -439,12 +440,48 @@ def test_both_providers_export_scan_and_upload_unique_fixed_units():
         assert "activate-verification-unit.py" in activate["run"]
 
 
+def test_both_providers_hydrate_after_model_and_before_manifest_export():
+    workflow = load_workflow(VERIFY)
+    cases = (
+        (
+            "research-openai",
+            "Collect candidate evidence with OpenAI",
+            "Export isolated fixed-path research unit",
+            "/opt/evidence-python/bin/python",
+        ),
+        (
+            "research-anthropic",
+            "Collect candidate evidence with Anthropic",
+            "Export fixed-path research unit",
+            "/opt/evidence-tools/hydrate-evidence-content.py",
+        ),
+    )
+    for job_name, model_step, export_step, trusted_runtime in cases:
+        job = workflow["jobs"][job_name]
+        names = [step.get("name") for step in job["steps"]]
+        hydrate = named_step(job, "Hydrate trusted evidence retrieval metadata")
+        assert hydrate["if"] == "matrix.kind == 'evidence'"
+        assert hydrate["env"]["CHECKED_DATE"] == (
+            "${{ needs.prepare.outputs.checked_date }}")
+        assert "hydrate-evidence-content.py" in hydrate["run"]
+        assert trusted_runtime in hydrate["run"]
+        assert '--retrieved-date "$CHECKED_DATE"' in hydrate["run"]
+        assert names.index(model_step) < names.index(
+            "Hydrate trusted evidence retrieval metadata") < names.index(export_step)
+        if job_name == "research-openai":
+            assert names.index("Terminate isolated research processes and proxy") < (
+                names.index("Hydrate trusted evidence retrieval metadata"))
+
+        prompt = named_step(job, model_step)["with"]["prompt"]
+        assert "Trusted post-processing" in prompt
+        assert "populate resolved_url and content_sha256 by running" not in prompt
+
+
 def test_research_has_exact_scope_and_actual_model_provenance_gate():
     text = VERIFY.read_text(encoding="utf-8")
     assert "Enforce exact unit scope and current-run provenance" in text
     assert "Enforce complete aggregate scope and provenance" in text
     assert "evidence scope mismatch; missing=" in text
-    assert "EVIDENCE_SCOPE_SLUGS" in text
     assert "EXPECTED_MODEL: ${{ needs.prepare.outputs.model }}" in text
     assert text.count("EXPECTED_CHECKED_DATE: ${{ needs.prepare.outputs.checked_date }}") >= 3
     assert text.count('--expected-checked-date "$EXPECTED_CHECKED_DATE"') >= 3
@@ -537,22 +574,25 @@ def test_validation_matrix_is_fail_closed_and_assembly_is_single_writer():
         "validated-verification-candidate-${{ needs.prepare.outputs.plan_id }}")
 
 
-def test_strict_network_validation_is_bound_to_each_immutable_unit():
-    workflow = load_workflow(VERIFY)
-    validation = workflow["jobs"]["validate-candidate"]
-    strict = named_step(validation, "Verify unit semantic evidence content")
-    assert strict["env"]["EVIDENCE_HASH_STRICT"] == "1"
-    assert strict["env"]["EVIDENCE_SCOPE_SLUGS"] == (
-        "${{ matrix.selected_slugs_json }}")
+def test_refresh_hydrates_once_while_weekly_validation_rechecks_urls():
+    refresh = load_workflow(VERIFY)
+    validation_names = {
+        step.get("name") for step in refresh["jobs"]["validate-candidate"]["steps"]}
+    assert "Verify unit semantic evidence content" not in validation_names
+    assert "EVIDENCE_HASH_STRICT" not in VERIFY.read_text(encoding="utf-8")
 
-    assembly_names = {
-        step.get("name") for step in workflow["jobs"]["assemble-candidate"]["steps"]}
-    assert "Verify aggregate semantic evidence content" not in assembly_names
+    evidence = load_workflow(EVIDENCE)
+    links = evidence["jobs"]["evidence-links"]
+    assert "github.event_name == 'schedule'" in links["if"]
+    assert "inputs.check_links" in links["if"]
+    recheck = named_step(links, "Re-fetch evidence URLs")["run"]
+    assert "tests/test_evidence_content.py" in recheck
+    assert "-m slow" in recheck
 
     methodology = METHODOLOGY.read_text(encoding="utf-8")
-    assert "Validate every evidence unit in a clean checkout" in methodology
-    assert "unit manifest binds those checked bytes" in methodology
-    assert "without re-fetching the same URLs" in methodology
+    assert "trusted provider code hydrates" in methodology
+    assert "without immediately re-fetching the same URLs" in methodology
+    assert "weekly evidence-link workflow re-fetches" in methodology
 
 
 def test_trusted_pr_workflow_executes_only_base_branch_validation_code():

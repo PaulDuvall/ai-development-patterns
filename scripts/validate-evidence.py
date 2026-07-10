@@ -181,7 +181,16 @@ def canonical_url(value):
     path = re.sub(r"/{2,}", "/", parsed.path or "/")
     if path != "/":
         path = path.rstrip("/")
-    query = urlencode(sorted(parse_qsl(parsed.query, keep_blank_values=True)), doseq=True)
+    volatile_tracking_keys = {
+        "fbclid", "gclid", "gi", "mc_cid", "mc_eid",
+    }
+    query_items = [
+        (key, item_value)
+        for key, item_value in parse_qsl(parsed.query, keep_blank_values=True)
+        if key.casefold() not in volatile_tracking_keys
+        and not key.casefold().startswith("utm_")
+    ]
+    query = urlencode(sorted(query_items), doseq=True)
     return urlunsplit((parsed.scheme.lower(), host, path, query, ""))
 
 
