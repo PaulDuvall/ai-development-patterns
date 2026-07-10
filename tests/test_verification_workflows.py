@@ -83,6 +83,18 @@ def test_provider_jobs_are_mutually_exclusive_and_least_privilege():
     assert "research-anthropic.result == 'success'" in validation["if"]
 
 
+def test_publish_overrides_skipped_unused_provider_propagation():
+    workflow = load_workflow(VERIFY)
+    publish = workflow["jobs"]["publish"]
+    condition = publish["if"]
+
+    assert publish["needs"] == ["prepare", "validate-candidate"]
+    assert condition.startswith("!cancelled()")
+    assert "needs.prepare.result == 'success'" in condition
+    assert "needs.validate-candidate.result == 'success'" in condition
+    assert "needs.validate-candidate.outputs.has_changes == 'true'" in condition
+
+
 def test_openai_research_uses_pinned_bounded_codex_action():
     workflow = load_workflow(VERIFY)
     research = workflow["jobs"]["research-openai"]
