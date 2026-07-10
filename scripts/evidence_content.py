@@ -9,6 +9,7 @@ import json
 import re
 import socket
 import sys
+import time
 import unicodedata
 from urllib.parse import parse_qsl, urlencode, urljoin, urlsplit, urlunsplit
 
@@ -18,6 +19,9 @@ from bs4 import BeautifulSoup
 
 MAX_REDIRECTS = 5
 MAX_RESPONSE_BYTES = 5 * 1024 * 1024
+DEFAULT_TIMEOUT_SECONDS = 30
+MAX_FETCH_ATTEMPTS = 3
+RETRY_BACKOFF_SECONDS = 1
 USER_AGENT = "Mozilla/5.0 (ai-development-patterns evidence verifier)"
 VOLATILE_TRACKING_QUERY_KEYS = {
     "fbclid", "gclid", "gi", "mc_cid", "mc_eid",
@@ -145,46 +149,36 @@ def _read_bounded_text(response, max_bytes):
     return b"".join(chunks).decode(encoding, errors="replace")
 
 
-def fetch(
-        url, quote=None, timeout=20, max_redirects=MAX_REDIRECTS,
-        max_bytes=MAX_RESPONSE_BYTES, session=None):
-    """Safely fetch one public URL and return the schema provenance values."""
-    owns_session = session is None
-    session = session or requests.Session()
-    if owns_session:
-        session.trust_env = False
+def _fetch_once(url, quote, timeout, max_redirects, max_bytes, session):
+    """Perform one SSRF-checked, redirect-bounded evidence retrieval."""
     current_url = url
-    try:
-        for redirect_count in range(max_redirects + 1):
-            validate_public_url(current_url)
-            with session.get(
-                    current_url,
-                    timeout=timeout,
-                    allow_redirects=False,
-                    stream=True,
-                    headers={"User-Agent": USER_AGENT}) as response:
-                if response.is_redirect or response.is_permanent_redirect:
-                    location = response.headers.get("Location")
-                    if not location:
-                        raise requests.HTTPError(
-                            "redirect response has no Location header", response=response)
-                    if redirect_count >= max_redirects:
-                        raise requests.TooManyRedirects(
-                            f"more than {max_redirects} redirects", response=response)
-                    current_url = urljoin(current_url, location)
-                    continue
-                if not 200 <= response.status_code < 300:
-                    response.raise_for_status()
+    for redirect_count in range(max_redirects + 1):
+        validate_public_url(current_url)
+        with session.get(
+                current_url,
+                timeout=timeout,
+                allow_redirects=False,
+                stream=True,
+                headers={"User-Agent": USER_AGENT}) as response:
+            if response.is_redirect or response.is_permanent_redirect:
+                location = response.headers.get("Location")
+                if not location:
                     raise requests.HTTPError(
-                        f"unexpected HTTP status {response.status_code}", response=response)
-                content = _read_bounded_text(response, max_bytes)
-                resolved_url = response.url
-                break
-        else:  # pragma: no cover - loop either breaks or raises at its bound
-            raise requests.TooManyRedirects(f"more than {max_redirects} redirects")
-    finally:
-        if owns_session:
-            session.close()
+                        "redirect response has no Location header", response=response)
+                if redirect_count >= max_redirects:
+                    raise requests.TooManyRedirects(
+                        f"more than {max_redirects} redirects", response=response)
+                current_url = urljoin(current_url, location)
+                continue
+            if not 200 <= response.status_code < 300:
+                response.raise_for_status()
+                raise requests.HTTPError(
+                    f"unexpected HTTP status {response.status_code}", response=response)
+            content = _read_bounded_text(response, max_bytes)
+            resolved_url = response.url
+            break
+    else:  # pragma: no cover - loop either breaks or raises at its bound
+        raise requests.TooManyRedirects(f"more than {max_redirects} redirects")
     return {
         "resolved_url": resolved_url,
         "content_sha256": content_sha256(content),
@@ -193,11 +187,62 @@ def fetch(
     }
 
 
+def _is_retryable_request_error(exc):
+    """Return whether a bounded repeat can plausibly recover this request."""
+    if isinstance(exc, requests.exceptions.SSLError):
+        return False
+    transient_transport_errors = (
+        requests.Timeout,
+        requests.ConnectionError,
+        requests.exceptions.ChunkedEncodingError,
+        requests.exceptions.ContentDecodingError,
+    )
+    if isinstance(exc, transient_transport_errors):
+        return True
+    if not isinstance(exc, requests.HTTPError) or exc.response is None:
+        return False
+    status = exc.response.status_code
+    return status in {408, 425, 429, 500, 502, 503, 504}
+
+
+def fetch(
+        url, quote=None, timeout=DEFAULT_TIMEOUT_SECONDS, max_redirects=MAX_REDIRECTS,
+        max_bytes=MAX_RESPONSE_BYTES, session=None, attempts=MAX_FETCH_ATTEMPTS,
+        retry_backoff=RETRY_BACKOFF_SECONDS, sleeper=time.sleep):
+    """Safely fetch one public URL with bounded transient retries."""
+    if not isinstance(attempts, int) or attempts < 1:
+        raise ValueError("attempts must be a positive integer")
+    if retry_backoff < 0:
+        raise ValueError("retry_backoff must be non-negative")
+    owns_session = session is None
+    session = session or requests.Session()
+    if owns_session:
+        session.trust_env = False
+    try:
+        for attempt in range(1, attempts + 1):
+            try:
+                return _fetch_once(
+                    url, quote, timeout, max_redirects, max_bytes, session)
+            except requests.RequestException as exc:
+                if attempt >= attempts or not _is_retryable_request_error(exc):
+                    raise
+                delay = retry_backoff * (2 ** (attempt - 1))
+                print(
+                    f"warning: transient evidence fetch failed on attempt "
+                    f"{attempt}/{attempts}; retrying in {delay:g}s: {exc}",
+                    file=sys.stderr,
+                )
+                sleeper(delay)
+    finally:
+        if owns_session:
+            session.close()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("url")
     parser.add_argument("--quote")
-    parser.add_argument("--timeout", type=int, default=20)
+    parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT_SECONDS)
     args = parser.parse_args()
     try:
         result = fetch(args.url, args.quote, args.timeout)

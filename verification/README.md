@@ -90,7 +90,11 @@ python3 -m pytest tests/test_evidence_files.py tests/test_evidence_content.py -m
 gh workflow run evidence-validation.yml -f check_links=true
 ```
 
-Bot-protected responses are handled separately from dead links. Complete evidence also records a
+Bot-protected responses are handled separately from dead links. Trusted retrieval makes at most
+three attempts with a 30-second per-attempt timeout and bounded exponential backoff for connection
+failures, timeouts, truncated streams, 408/425/429 responses, and 500/502/503/504 server errors;
+certificate and other permanent failures still fail closed.
+Complete evidence also records a
 normalized-content SHA-256 and an exact mechanism quote so content drift is observable even when a
 URL remains live. Legacy imports have null hashes and are skipped by semantic provenance checks
 until refreshed. During refresh, trusted post-model hydration fails unless the quote is present and
