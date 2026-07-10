@@ -109,6 +109,7 @@ jobs:
               scripts/activate-verification-unit.py \
               scripts/build-verification-inventory.py \
               scripts/check-claude-execution.py \
+              scripts/check-provider-preflight.py \
               scripts/check-research-workspace.py \
               scripts/evidence_content.py \
               scripts/export-verification-unit.py \
@@ -356,11 +357,104 @@ jobs:
           retention-days: 7
           overwrite: true
 
-  research-openai:
-    name: OpenAI research (${{ matrix.unit_id }})
+  preflight-openai:
+    name: Preflight OpenAI provider
     needs: prepare
     if: >-
       needs.prepare.outputs.provider == 'openai' &&
+      needs.prepare.outputs.has_units == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout trusted base revision
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ needs.prepare.outputs.base_sha }}
+          persist-credentials: false
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+
+      - name: Verify OpenAI credential, model, and quota
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PROVIDER_MODEL: ${{ needs.prepare.outputs.model }}
+        run: >-
+          python3 scripts/check-provider-preflight.py
+          --provider openai
+          --model "$PROVIDER_MODEL"
+
+  preflight-anthropic:
+    name: Preflight Anthropic provider
+    needs: prepare
+    if: >-
+      needs.prepare.outputs.provider == 'anthropic' &&
+      needs.prepare.outputs.has_units == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write # Exchanges optional Anthropic workload identity federation credentials.
+    steps:
+      - name: Checkout trusted base revision
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ needs.prepare.outputs.base_sha }}
+          persist-credentials: false
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+
+      - name: Verify Anthropic API-key credential, model, and quota
+        if: vars.ANTHROPIC_FEDERATION_RULE_ID == ''
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PROVIDER_MODEL: ${{ needs.prepare.outputs.model }}
+        run: >-
+          python3 scripts/check-provider-preflight.py
+          --provider anthropic
+          --model "$PROVIDER_MODEL"
+
+      - name: Probe Anthropic workload identity, model, and quota
+        id: anthropic-federation-preflight
+        if: vars.ANTHROPIC_FEDERATION_RULE_ID != ''
+        uses: anthropics/claude-code-action@a6a5b60a078a0af52612aac63e05e3f95fd4ff64 # v1
+        with:
+          github_token: ${{ github.token }}
+          anthropic_api_key: >-
+            ${{ vars.ANTHROPIC_FEDERATION_RULE_ID == '' && secrets.ANTHROPIC_API_KEY || '' }}
+          anthropic_federation_rule_id: ${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}
+          anthropic_organization_id: ${{ vars.ANTHROPIC_ORGANIZATION_ID }}
+          anthropic_service_account_id: ${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}
+          anthropic_workspace_id: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          prompt: >-
+            Reply with exactly PREFLIGHT_OK. Do not inspect or modify the repository.
+          claude_args: >-
+            --model ${{ needs.prepare.outputs.model }}
+            --max-turns 1
+            --permission-mode dontAsk
+            --tools ""
+            --strict-mcp-config
+            --disallowedTools "mcp__*"
+
+      - name: Require successful Anthropic workload-identity preflight
+        if: vars.ANTHROPIC_FEDERATION_RULE_ID != ''
+        env:
+          CLAUDE_EXECUTION_FILE: ${{ steps.anthropic-federation-preflight.outputs.execution_file }}
+        run: python3 scripts/check-claude-execution.py
+
+  research-openai:
+    name: OpenAI research (${{ matrix.unit_id }})
+    needs: [prepare, preflight-openai]
+    if: >-
+      needs.prepare.outputs.provider == 'openai' &&
+      needs.preflight-openai.result == 'success' &&
       needs.prepare.outputs.has_units == 'true'
     strategy:
       fail-fast: false
@@ -406,15 +500,6 @@ jobs:
           --matrix verification/run-plan/execution-matrix.json
           --unit-id "$UNIT_ID"
           --destination verification/run-plan/worklist.txt
-
-      - name: Require OpenAI API credential
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          if [ -z "$OPENAI_API_KEY" ]; then
-            echo "::error::OPENAI_API_KEY is not configured"
-            exit 1
-          fi
 
       - name: Prepare isolated OpenAI research account
         env:
@@ -729,9 +814,10 @@ jobs:
 
   research-anthropic:
     name: Anthropic research (${{ matrix.unit_id }})
-    needs: prepare
+    needs: [prepare, preflight-anthropic]
     if: >-
       needs.prepare.outputs.provider == 'anthropic' &&
+      needs.preflight-anthropic.result == 'success' &&
       needs.prepare.outputs.has_units == 'true'
     strategy:
       fail-fast: false
@@ -1896,7 +1982,15 @@ jobs:
 
   notify-failure:
     name: Notify on scheduled failure
-    needs: [prepare, research-openai, research-anthropic, validate-candidate, assemble-candidate, publish]
+    needs:
+      - prepare
+      - preflight-openai
+      - preflight-anthropic
+      - research-openai
+      - research-anthropic
+      - validate-candidate
+      - assemble-candidate
+      - publish
     if: >-
       always() && github.event_name == 'schedule' &&
       contains(needs.*.result, 'failure')
@@ -1952,7 +2046,15 @@ jobs:
 
   close-resolved-failures:
     name: Close resolved scheduled failures
-    needs: [prepare, research-openai, research-anthropic, validate-candidate, assemble-candidate, publish]
+    needs:
+      - prepare
+      - preflight-openai
+      - preflight-anthropic
+      - research-openai
+      - research-anthropic
+      - validate-candidate
+      - assemble-candidate
+      - publish
     if: >-
       always() && github.event_name == 'schedule' &&
       !contains(needs.*.result, 'failure') &&

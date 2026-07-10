@@ -115,6 +115,7 @@ def test_research_contract_fingerprints_methodology_and_verdict_code():
             ".claude/commands/verify-patterns.md",
             "pattern-spec.md",
             "verification/README.md",
+            "scripts/check-provider-preflight.py",
             "scripts/evidence_content.py",
             "scripts/hydrate-evidence-content.py",
             "scripts/validate-evidence.py",
@@ -130,6 +131,10 @@ def test_provider_jobs_are_mutually_exclusive_and_least_privilege():
     assert anthropic["permissions"] == {"contents": "read", "id-token": "write"}
     assert "outputs.provider == 'openai'" in openai["if"]
     assert "outputs.provider == 'anthropic'" in anthropic["if"]
+    assert openai["needs"] == ["prepare", "preflight-openai"]
+    assert anthropic["needs"] == ["prepare", "preflight-anthropic"]
+    assert "needs.preflight-openai.result == 'success'" in openai["if"]
+    assert "needs.preflight-anthropic.result == 'success'" in anthropic["if"]
     for job in (openai, anthropic):
         checkout = named_step(job, "Checkout without persisted credentials")
         assert checkout["with"]["persist-credentials"] == "false"
@@ -146,6 +151,83 @@ def test_provider_jobs_are_mutually_exclusive_and_least_privilege():
     assert validation["if"].startswith("!cancelled()")
     assert "research-openai.result == 'success'" in validation["if"]
     assert "research-anthropic.result == 'success'" in validation["if"]
+
+
+def test_provider_preflights_gate_research_before_matrix_fanout():
+    workflow = load_workflow(VERIFY)
+    openai = workflow["jobs"]["preflight-openai"]
+    anthropic = workflow["jobs"]["preflight-anthropic"]
+
+    assert openai["needs"] == "prepare"
+    assert anthropic["needs"] == "prepare"
+    assert openai["permissions"] == {"contents": "read"}
+    assert anthropic["permissions"] == {
+        "contents": "read", "id-token": "write"}
+    assert "outputs.provider == 'openai'" in openai["if"]
+    assert "outputs.provider == 'anthropic'" in anthropic["if"]
+    for job in (openai, anthropic):
+        assert "outputs.has_units == 'true'" in job["if"]
+        assert job["timeout-minutes"] == "10"
+        checkout = named_step(job, "Checkout trusted base revision")
+        assert checkout["with"]["ref"] == "${{ needs.prepare.outputs.base_sha }}"
+        assert checkout["with"]["persist-credentials"] == "false"
+        assert all(
+            "actions/upload-artifact@" not in step.get("uses", "")
+            for step in job["steps"])
+
+    openai_probe = named_step(
+        openai, "Verify OpenAI credential, model, and quota")
+    assert openai_probe["env"] == {
+        "OPENAI_API_KEY": "${{ secrets.OPENAI_API_KEY }}",
+        "PROVIDER_MODEL": "${{ needs.prepare.outputs.model }}",
+    }
+    assert "scripts/check-provider-preflight.py" in openai_probe["run"]
+    assert "--provider openai" in openai_probe["run"]
+    assert '--model "$PROVIDER_MODEL"' in openai_probe["run"]
+
+    key_probe = named_step(
+        anthropic, "Verify Anthropic API-key credential, model, and quota")
+    assert key_probe["if"] == "vars.ANTHROPIC_FEDERATION_RULE_ID == ''"
+    assert key_probe["env"] == {
+        "ANTHROPIC_API_KEY": "${{ secrets.ANTHROPIC_API_KEY }}",
+        "PROVIDER_MODEL": "${{ needs.prepare.outputs.model }}",
+    }
+    assert "scripts/check-provider-preflight.py" in key_probe["run"]
+    assert "--provider anthropic" in key_probe["run"]
+    assert '--model "$PROVIDER_MODEL"' in key_probe["run"]
+
+    federation = named_step(
+        anthropic, "Probe Anthropic workload identity, model, and quota")
+    assert federation["if"] == "vars.ANTHROPIC_FEDERATION_RULE_ID != ''"
+    assert federation["uses"] == (
+        "anthropics/claude-code-action@a6a5b60a078a0af52612aac63e05e3f95fd4ff64")
+    inputs = federation["with"]
+    assert inputs["github_token"] == "${{ github.token }}"
+    assert inputs["anthropic_federation_rule_id"] == (
+        "${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}")
+    assert inputs["anthropic_organization_id"] == (
+        "${{ vars.ANTHROPIC_ORGANIZATION_ID }}")
+    assert inputs["anthropic_service_account_id"] == (
+        "${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}")
+    assert inputs["anthropic_workspace_id"] == (
+        "${{ vars.ANTHROPIC_WORKSPACE_ID }}")
+    assert "--model ${{ needs.prepare.outputs.model }}" in inputs["claude_args"]
+    assert "--max-turns 1" in inputs["claude_args"]
+    assert '--tools ""' in inputs["claude_args"]
+    guard = named_step(
+        anthropic, "Require successful Anthropic workload-identity preflight")
+    assert guard["if"] == "vars.ANTHROPIC_FEDERATION_RULE_ID != ''"
+    assert guard["env"]["CLAUDE_EXECUTION_FILE"] == (
+        "${{ steps.anthropic-federation-preflight.outputs.execution_file }}")
+    assert guard["run"] == "python3 scripts/check-claude-execution.py"
+
+    expected_observers = {
+        "prepare", "preflight-openai", "preflight-anthropic",
+        "research-openai", "research-anthropic", "validate-candidate",
+        "assemble-candidate", "publish",
+    }
+    for name in ("notify-failure", "close-resolved-failures"):
+        assert set(workflow["jobs"][name]["needs"]) == expected_observers
 
 
 def test_publish_overrides_skipped_unused_provider_propagation():
@@ -213,10 +295,9 @@ def test_discovery_docs_match_the_single_run_level_publisher():
 def test_openai_research_uses_pinned_bounded_codex_action():
     workflow = load_workflow(VERIFY)
     research = workflow["jobs"]["research-openai"]
-    credential = named_step(research, "Require OpenAI API credential")
-    assert credential["env"]["OPENAI_API_KEY"] == "${{ secrets.OPENAI_API_KEY }}"
     action = named_step(research, "Collect candidate evidence with OpenAI")
     step_names = [step.get("name") for step in research["steps"]]
+    assert "Require OpenAI API credential" not in step_names
     assert step_names.index("Prepare isolated OpenAI research account") < (
         step_names.index("Verify isolated research write boundary"))
     assert step_names.index("Verify isolated research write boundary") < (
@@ -615,4 +696,6 @@ def test_required_evidence_check_has_no_pull_request_path_filter():
     workflow = load_workflow(EVIDENCE)
     assert workflow["on"]["pull_request"] == {"branches": ["main"]}
     assert "scripts/check-claude-execution.py" in workflow["on"]["push"]["paths"]
+    assert "scripts/check-provider-preflight.py" in workflow["on"]["push"]["paths"]
     assert "scripts/hydrate-evidence-content.py" in workflow["on"]["push"]["paths"]
+    assert "tests/test_provider_preflight.py" in workflow["on"]["push"]["paths"]
