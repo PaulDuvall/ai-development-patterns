@@ -22,7 +22,6 @@ pending:
 - deployment-synthesis
 - drift-remediation
 - error-resolution
-- event-automation
 - evidence-automation
 - feedback-flywheel
 - guided-architecture

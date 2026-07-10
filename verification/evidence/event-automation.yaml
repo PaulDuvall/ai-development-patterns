@@ -1,0 +1,98 @@
+schema_version: 2
+provenance_status: complete
+pattern: Event Automation
+slug: event-automation
+last_checked: '2026-07-10'
+search:
+  run_id: 'github-actions:29113518138'
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29113518138
+  provider: openai
+  model: gpt-5.6-terra
+  prompt_version: evidence-v2-openai-codex-v1+sha256.9534676c6d39c14ea76297d9fe49af54dd212574a5c0c7c4ec639b2fad37a43c
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - '"Event Automation" AI assistant hooks'
+      candidate_count: 3
+    mechanism:
+      queries:
+      - Claude Code hooks lifecycle events automation
+      - AI coding assistant pre tool use post tool use hooks
+      candidate_count: 0
+    artifact:
+      queries:
+      - GitHub code search Claude Code hooks PreToolUse PostToolUse
+      - GitHub code search opencode plugin tool execute hooks
+      candidate_count: 0
+adoption_score: 11
+tier_counts:
+  T1: 2
+  T5: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: false
+  independence_groups: 3
+naming_alignment: weak
+terminology_variants:
+- term: hooks
+  used_by: Anthropic (Claude Code) and AI Skill Market
+  url: https://code.claude.com/docs/en/hooks
+- term: event plugins
+  used_by: OpenCode
+  url: https://opencode.ai/docs/plugins/
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: Hooks are user-defined shell commands, HTTP endpoints, or LLM prompts that execute automatically at specific points in Claude Code’s lifecycle.
+  source: 'Anthropic, Claude Code: Hooks reference'
+  source_kind: shipped_product
+  organization: Anthropic
+  independence_group: anthropic
+  url: https://code.claude.com/docs/en/hooks
+  resolved_url: https://code.claude.com/docs/en/hooks
+  content_sha256: a3aa57d79be3098fdcf54a9ebae641c6f0d10ad5eb79cd170a0ce2383dfa99c5
+  verifier:
+    method: automated
+    model: gpt-5.6-terra
+    prompt_version: evidence-v2-openai-codex-v1+sha256.9534676c6d39c14ea76297d9fe49af54dd212574a5c0c7c4ec639b2fad37a43c
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29113518138
+  date: '2026-07-09'
+  retrieved: '2026-07-10'
+  claim: Claude Code ships lifecycle-triggered hooks that automatically run command, HTTP, or prompt handlers.
+- tier: T1
+  match: aliased
+  mechanism_quote: Plugins can subscribe to events as seen below in the Examples section. Here is a list of the different events available.
+  source: 'OpenCode: Plugins documentation'
+  source_kind: shipped_product
+  organization: OpenCode
+  independence_group: opencode
+  url: https://opencode.ai/docs/plugins/
+  resolved_url: https://opencode.ai/docs/plugins/
+  content_sha256: e804bac83f7dea5cfffa9e82aa6a0c06a6ee363cefac1763a7efd2b44123602e
+  verifier:
+    method: automated
+    model: gpt-5.6-terra
+    prompt_version: evidence-v2-openai-codex-v1+sha256.9534676c6d39c14ea76297d9fe49af54dd212574a5c0c7c4ec639b2fad37a43c
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29113518138
+  retrieved: '2026-07-10'
+  claim: OpenCode ships an event-plugin interface that lets users attach custom behavior to assistant events.
+- tier: T5
+  match: named
+  mechanism_quote: Hooks are how you make an agent's behavior deterministic at specific lifecycle moments. Before a tool runs. After a response completes. When a prompt is submitted. When a skill activates.
+  source: 'Duke Harewood, AI Skill Market: Hermes Hooks and Claude Code Hooks: Event Automation Compared'
+  source_kind: opinion
+  organization: AI Skill Market
+  independence_group: ai-skill-market
+  url: https://aiskill.market/blog/hermes-hooks-vs-claude-code-hooks-compared
+  resolved_url: https://aiskill.market/blog/hermes-hooks-vs-claude-code-hooks-compared
+  content_sha256: c97ada0db77f3ea1540e8eb749edf123021194c2ea517951d482d5ea308c3eb6
+  verifier:
+    method: automated
+    model: gpt-5.6-terra
+    prompt_version: evidence-v2-openai-codex-v1+sha256.9534676c6d39c14ea76297d9fe49af54dd212574a5c0c7c4ec639b2fad37a43c
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29113518138
+  date: '2026-04-23'
+  retrieved: '2026-07-10'
+  claim: Dated independent commentary explicitly frames lifecycle hooks as event automation for agent behavior.
+verdict: weak
