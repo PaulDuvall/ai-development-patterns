@@ -198,6 +198,175 @@ def test_safe_fetch_revalidates_redirect_targets(monkeypatch):
     assert checked == ["https://public.example/start", "http://127.0.0.1/private"]
 
 
+def fake_response(status=200, content=b"A sufficiently long mechanism quote from the source."):
+    value = requests.Response()
+    value.status_code = status
+    value.url = "https://public.example/source"
+    value.headers["Content-Type"] = "text/plain"
+    value._content = content
+    value._content_consumed = True
+    value.encoding = "utf-8"
+    return value
+
+
+def test_safe_fetch_retries_transient_timeout_then_succeeds(monkeypatch):
+    class FakeSession:
+        calls = 0
+
+        def get(self, *args, **kwargs):
+            self.calls += 1
+            if self.calls == 1:
+                raise requests.ReadTimeout("temporary read timeout")
+            return fake_response()
+
+    session = FakeSession()
+    delays = []
+    monkeypatch.setattr(CONTENT, "validate_public_url", lambda url: None)
+
+    result = CONTENT.fetch(
+        "https://public.example/source",
+        quote="A sufficiently long mechanism quote from the source.",
+        session=session,
+        attempts=3,
+        retry_backoff=1,
+        sleeper=delays.append,
+    )
+
+    assert session.calls == 2
+    assert delays == [1]
+    assert result["mechanism_quote_present"] is True
+
+
+def test_safe_fetch_exhausts_bounded_transient_retries(monkeypatch):
+    class FakeSession:
+        calls = 0
+
+        def get(self, *args, **kwargs):
+            self.calls += 1
+            raise requests.ConnectionError("temporary connection failure")
+
+    session = FakeSession()
+    delays = []
+    monkeypatch.setattr(CONTENT, "validate_public_url", lambda url: None)
+
+    with pytest.raises(requests.ConnectionError, match="temporary connection failure"):
+        CONTENT.fetch(
+            "https://public.example/source",
+            session=session,
+            attempts=3,
+            retry_backoff=1,
+            sleeper=delays.append,
+        )
+
+    assert session.calls == 3
+    assert delays == [1, 2]
+
+
+@pytest.mark.parametrize("status", [408, 425, 429, 500, 502, 503, 504])
+def test_safe_fetch_retries_transient_http_status(monkeypatch, status):
+    class FakeSession:
+        calls = 0
+
+        def get(self, *args, **kwargs):
+            self.calls += 1
+            return fake_response(status if self.calls == 1 else 200)
+
+    session = FakeSession()
+    monkeypatch.setattr(CONTENT, "validate_public_url", lambda url: None)
+
+    CONTENT.fetch(
+        "https://public.example/source",
+        session=session,
+        attempts=2,
+        retry_backoff=0,
+    )
+
+    assert session.calls == 2
+
+
+@pytest.mark.parametrize("status", [403, 404, 501])
+def test_safe_fetch_does_not_retry_permanent_http_status(monkeypatch, status):
+    class FakeSession:
+        calls = 0
+
+        def get(self, *args, **kwargs):
+            self.calls += 1
+            return fake_response(status)
+
+    session = FakeSession()
+    monkeypatch.setattr(CONTENT, "validate_public_url", lambda url: None)
+
+    with pytest.raises(requests.HTTPError):
+        CONTENT.fetch(
+            "https://public.example/missing",
+            session=session,
+            attempts=3,
+            retry_backoff=0,
+        )
+
+    assert session.calls == 1
+
+
+def test_safe_fetch_retries_truncated_stream(monkeypatch):
+    class TruncatedResponse:
+        status_code = 200
+        url = "https://public.example/source"
+        headers = {"Content-Type": "text/plain"}
+        encoding = "utf-8"
+        is_redirect = False
+        is_permanent_redirect = False
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def iter_content(self, chunk_size):
+            raise requests.exceptions.ChunkedEncodingError("truncated response")
+
+    class FakeSession:
+        calls = 0
+
+        def get(self, *args, **kwargs):
+            self.calls += 1
+            return TruncatedResponse() if self.calls == 1 else fake_response()
+
+    session = FakeSession()
+    monkeypatch.setattr(CONTENT, "validate_public_url", lambda url: None)
+
+    CONTENT.fetch(
+        "https://public.example/source",
+        session=session,
+        attempts=2,
+        retry_backoff=0,
+    )
+
+    assert session.calls == 2
+
+
+def test_safe_fetch_does_not_retry_certificate_failure(monkeypatch):
+    class FakeSession:
+        calls = 0
+
+        def get(self, *args, **kwargs):
+            self.calls += 1
+            raise requests.exceptions.SSLError("certificate verify failed")
+
+    session = FakeSession()
+    monkeypatch.setattr(CONTENT, "validate_public_url", lambda url: None)
+
+    with pytest.raises(requests.exceptions.SSLError, match="certificate verify failed"):
+        CONTENT.fetch(
+            "https://public.example/source",
+            session=session,
+            attempts=3,
+            retry_backoff=0,
+        )
+
+    assert session.calls == 1
+
+
 @pytest.mark.parametrize("status", [401, 403, 429])
 def test_bot_guarded_responses_fail_strict_candidate_validation(monkeypatch, status):
     response = requests.Response()

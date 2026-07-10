@@ -121,8 +121,10 @@ at most 3 entries admitted per tier). Record what the source demonstrates; do no
 
 **Independent verify pass (producer ≠ retrieval verifier).** In GitHub Actions, trusted code
 re-fetches every model-admitted URL after the model exits, confirms the exact mechanism quote is
-present, and overwrites the resolved URL, content digest, and retrieval date. Semantic grading still
-applies the bar below according to how the source relates to our name:
+present, and overwrites the resolved URL, content digest, and retrieval date. Trusted retrieval
+retries only transient connection, timeout, throttling, and server failures within a fixed attempt
+and time budget; permanent failures still fail closed. Semantic grading still applies the bar below
+according to how the source relates to our name:
 
 - `named` entries: page live, claim supported. Default reject on doubt.
 - `aliased` / `unnamed` entries: the risk is false analogy, not fabrication. The grader gets the

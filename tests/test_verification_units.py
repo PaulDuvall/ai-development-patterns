@@ -188,6 +188,43 @@ def test_hydrate_rejects_quote_missing_from_fetched_content(tmp_path, monkeypatc
         HYDRATE.hydrate(path)
 
 
+def test_hydrate_leaves_file_unchanged_after_terminal_fetch_failure(tmp_path, monkeypatch):
+    path = tmp_path / "sample.yaml"
+    path.write_text(yaml.safe_dump({
+        "evidence": [
+            {
+                "url": "https://example.test/first",
+                "mechanism_quote": "A sufficiently specific first quote from the source.",
+            },
+            {
+                "url": "https://example.test/second",
+                "mechanism_quote": "A sufficiently specific second quote from the source.",
+            },
+        ],
+    }), encoding="utf-8")
+    original = path.read_bytes()
+    calls = 0
+
+    def fetch_then_fail(url, quote):
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise HYDRATE.requests.ReadTimeout("terminal timeout")
+        return {
+            "resolved_url": url,
+            "content_sha256": "a" * 64,
+            "mechanism_quote_present": True,
+        }
+
+    monkeypatch.setattr(HYDRATE, "fetch", fetch_then_fail)
+
+    with pytest.raises(HYDRATE.requests.ReadTimeout, match="terminal timeout"):
+        HYDRATE.hydrate(path)
+
+    assert calls == 2
+    assert path.read_bytes() == original
+
+
 def test_assemble_requires_every_unit_and_preserves_pending_comments(tmp_path):
     root = tmp_path / "root"
     artifacts = tmp_path / "artifacts"
