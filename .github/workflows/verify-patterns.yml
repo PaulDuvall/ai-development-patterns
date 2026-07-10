@@ -39,6 +39,14 @@ on:
         description: Allow a manual run beside an older open verification PR (conflicts may need rebase)
         type: boolean
         default: false
+      confirm_full_catalog:
+        description: Acknowledge that full mode may launch one paid worker for every available pattern plus discovery
+        type: boolean
+        default: false
+      allow_high_cost_model:
+        description: Allow a manual run to use an OpenAI model outside the reviewed cost-sensitive allowlist
+        type: boolean
+        default: false
   schedule:
     # Weekly evidence refresh; monthly cron switches to discovery-only mode.
     - cron: "0 5 * * 1"
@@ -129,7 +137,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           EVENT_REF: ${{ github.ref }}
           REQUESTED_PROVIDER: ${{ inputs.provider || 'openai' }}
-          OPENAI_MODEL: ${{ vars.OPENAI_EVIDENCE_MODEL || 'gpt-5.6-terra' }}
+          OPENAI_MODEL: ${{ vars.OPENAI_EVIDENCE_MODEL || 'gpt-5.6-luna' }}
           ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_EVIDENCE_MODEL || 'claude-sonnet-5' }}
           RESEARCH_CONTRACT_SHA256: ${{ steps.contract.outputs.sha256 }}
           REQUESTED_MODE: ${{ inputs.mode || 'stale-default' }}
@@ -138,6 +146,8 @@ jobs:
           REQUESTED_SINCE_DAYS: ${{ inputs.since_days || '30' }}
           REQUESTED_MAX_TURNS: ${{ inputs.max_turns }}
           REQUESTED_ALLOW_OPEN_PR: ${{ inputs.allow_open_verification_pr && 'true' || 'false' }}
+          REQUESTED_CONFIRM_FULL: ${{ inputs.confirm_full_catalog && 'true' || 'false' }}
+          REQUESTED_ALLOW_HIGH_COST_MODEL: ${{ inputs.allow_high_cost_model && 'true' || 'false' }}
           SCHEDULE: ${{ github.event.schedule }}
         run: |
           python3 - <<'PY'
@@ -215,6 +225,40 @@ jobs:
           if (allow_open_verification_pr == "true"
                   and os.environ["EVENT_NAME"] != "workflow_dispatch"):
               sys.exit("only a manual dispatch may allow an open verification PR")
+
+          confirm_full_catalog = os.environ["REQUESTED_CONFIRM_FULL"]
+          allow_high_cost_model = os.environ["REQUESTED_ALLOW_HIGH_COST_MODEL"]
+          for name, value in (
+                  ("confirm_full_catalog", confirm_full_catalog),
+                  ("allow_high_cost_model", allow_high_cost_model)):
+              if value not in {"true", "false"}:
+                  sys.exit(f"{name} must be a boolean")
+          if mode == "full" and confirm_full_catalog != "true":
+              sys.exit(
+                  "full mode requires confirm_full_catalog=true because it launches "
+                  "one paid worker per available pattern plus discovery"
+              )
+          if confirm_full_catalog == "true" and (
+                  os.environ["EVENT_NAME"] != "workflow_dispatch" or mode != "full"):
+              sys.exit("confirm_full_catalog may only acknowledge a manual full run")
+
+          cost_sensitive_openai_models = {
+              "gpt-5.6-luna",
+              "gpt-5.4-mini",
+              "gpt-5.4-nano",
+          }
+          if allow_high_cost_model == "true" and (
+                  os.environ["EVENT_NAME"] != "workflow_dispatch" or provider != "openai"):
+              sys.exit("allow_high_cost_model may only be used by a manual OpenAI run")
+          if (provider == "openai"
+                  and model not in cost_sensitive_openai_models
+                  and allow_high_cost_model != "true"):
+              allowed = ", ".join(sorted(cost_sensitive_openai_models))
+              sys.exit(
+                  f"OpenAI model {model!r} is outside the reviewed cost-sensitive "
+                  f"allowlist ({allowed}); a manual operator may explicitly set "
+                  "allow_high_cost_model=true"
+              )
 
           values = {
               "base_sha": subprocess.run(
@@ -304,6 +348,8 @@ jobs:
           MODE: ${{ steps.inputs.outputs.mode }}
           PATTERN: ${{ steps.inputs.outputs.pattern }}
           STALE_DAYS: ${{ steps.inputs.outputs.stale_days }}
+          PROVIDER: ${{ steps.inputs.outputs.provider }}
+          MODEL: ${{ steps.inputs.outputs.model }}
         run: |
           set -euo pipefail
           limit=10
@@ -346,6 +392,32 @@ jobs:
               print(f"Selected worklist JSON: {os.environ['SELECTED_SLUGS']}", file=summary)
               print(f"Execution plan SHA-256: `{plan_id}`", file=summary)
               print(f"Independent research units: {len(units)}", file=summary)
+              if os.environ["PROVIDER"] == "openai":
+                  weighted_limit = 300_000
+                  input_rates = {
+                      "gpt-5.6-luna": 1.00,
+                      "gpt-5.4-mini": 0.75,
+                      "gpt-5.4-nano": 0.20,
+                  }
+                  print(
+                      "OpenAI worker stop: 300,000 weighted tokens "
+                      "(non-cached input ×1, sampled output ×6.25), low reasoning, "
+                      "one worker at a time, fail-fast.",
+                      file=summary,
+                  )
+                  rate = input_rates.get(os.environ["MODEL"])
+                  if rate is not None:
+                      envelope = len(units) * weighted_limit / 1_000_000 * rate
+                      print(
+                          f"Approximate short-context non-cached token envelope: "
+                          f"${envelope:.2f} for {len(units)} unit(s).",
+                          file=summary,
+                      )
+                  print(
+                      "This is not a hard dollar cap: one response may cross the stop, "
+                      "and cached input, web search, and long-context premiums are separate.",
+                      file=summary,
+                  )
           PY
 
       - name: Upload deterministic research plan
@@ -457,11 +529,11 @@ jobs:
       needs.preflight-openai.result == 'success' &&
       needs.prepare.outputs.has_units == 'true'
     strategy:
-      fail-fast: false
-      max-parallel: 3
+      fail-fast: true
+      max-parallel: 1
       matrix: ${{ fromJSON(needs.prepare.outputs.execution_matrix) }}
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 45
     permissions:
       contents: read
     steps:
@@ -471,6 +543,15 @@ jobs:
           ref: ${{ needs.prepare.outputs.base_sha }}
           fetch-depth: 1
           persist-credentials: false
+
+      - name: Restore same-run fixed-path research checkpoint
+        id: research-checkpoint
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: candidate-unit
+          key: >-
+            verification-unit-${{ github.run_id }}-${{ needs.prepare.outputs.plan_id }}-${{ matrix.unit_id }}
+          fail-on-cache-miss: false
 
       - name: Set up Python 3.11
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -669,6 +750,7 @@ jobs:
       # is read-scoped; direct git/gh publication is forbidden and separate.
       - name: Collect candidate evidence with OpenAI
         id: research
+        if: steps.research-checkpoint.outputs.cache-hit != 'true'
         uses: openai/codex-action@52fe01ec70a42f454c9d2ebd47598f9fd6893d56 # v1
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
@@ -676,7 +758,7 @@ jobs:
           codex-home: /home/evidence-agent/.codex
           working-directory: /home/evidence-agent/workspace
           model: ${{ needs.prepare.outputs.model }}
-          effort: medium
+          effort: low
           permission-profile: evidence-research
           safety-strategy: unprivileged-user
           codex-user: evidence-agent
@@ -719,6 +801,9 @@ jobs:
             The active verification/run-plan/worklist.txt is immutable and is the entire scope
             for this invocation even when the parent mode is full. Do not add patterns to it.
             Do not edit any pre-existing evidence file that is not named there.
+            Make at most 12 live web-search calls for this unit. Stop searching as soon as the
+            required modes and evidence-admission decision are supported; keep tool output and
+            the final report concise.
             For every admitted source, provide a concrete public URL and an exact mechanism quote
             present on that page. Trusted post-processing, not your tools, derives resolved_url
             and content_sha256; never invent either value.
@@ -757,7 +842,9 @@ jobs:
           fi
 
       - name: Hydrate trusted evidence retrieval metadata
-        if: matrix.kind == 'evidence'
+        if: >-
+          steps.research-checkpoint.outputs.cache-hit != 'true' &&
+          matrix.kind == 'evidence'
         env:
           UNIT_SLUG: ${{ matrix.slug }}
           CHECKED_DATE: ${{ needs.prepare.outputs.checked_date }}
@@ -768,6 +855,7 @@ jobs:
           --retrieved-date "$CHECKED_DATE"
 
       - name: Export isolated fixed-path research unit
+        if: steps.research-checkpoint.outputs.cache-hit != 'true'
         env:
           UNIT_ID: ${{ matrix.unit_id }}
           UNIT_KIND: ${{ matrix.kind }}
@@ -792,6 +880,7 @@ jobs:
             --run-url "$RUN_URL"
 
       - name: Scan fixed-path research unit
+        if: steps.research-checkpoint.outputs.cache-hit != 'true'
         env:
           EXPECTED_SCANNER_SHA256: ${{ needs.prepare.outputs.scanner_sha256 }}
         run: |
@@ -802,6 +891,14 @@ jobs:
             exit 1
           fi
           python3 scripts/scan-candidate-secrets.py candidate-unit
+
+      - name: Save same-run fixed-path research checkpoint
+        if: steps.research-checkpoint.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: candidate-unit
+          key: >-
+            verification-unit-${{ github.run_id }}-${{ needs.prepare.outputs.plan_id }}-${{ matrix.unit_id }}
 
       - name: Upload fixed-path research unit
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
@@ -820,11 +917,11 @@ jobs:
       needs.preflight-anthropic.result == 'success' &&
       needs.prepare.outputs.has_units == 'true'
     strategy:
-      fail-fast: false
-      max-parallel: 3
+      fail-fast: true
+      max-parallel: 1
       matrix: ${{ fromJSON(needs.prepare.outputs.execution_matrix) }}
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 60
     permissions:
       contents: read
       id-token: write # Exchanges optional Anthropic workload identity federation credentials.
@@ -835,6 +932,15 @@ jobs:
           ref: ${{ needs.prepare.outputs.base_sha }}
           fetch-depth: 1
           persist-credentials: false
+
+      - name: Restore same-run fixed-path research checkpoint
+        id: research-checkpoint
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ runner.temp }}/candidate-unit
+          key: >-
+            verification-unit-${{ github.run_id }}-${{ needs.prepare.outputs.plan_id }}-${{ matrix.unit_id }}
+          fail-on-cache-miss: false
 
       - name: Set up Python 3.11
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -915,6 +1021,7 @@ jobs:
       # repository token; publication credentials remain in a separate job.
       - name: Collect candidate evidence with Anthropic
         id: research
+        if: steps.research-checkpoint.outputs.cache-hit != 'true'
         uses: anthropics/claude-code-action@a6a5b60a078a0af52612aac63e05e3f95fd4ff64 # v1
         with:
           github_token: ${{ github.token }}
@@ -962,6 +1069,9 @@ jobs:
             The active verification/run-plan/worklist.txt is immutable and is the entire scope
             for this invocation even when the parent mode is full. Do not add patterns to it.
             Do not edit any pre-existing evidence file that is not named there.
+            Make at most 12 live web-search calls for this unit. Stop searching as soon as the
+            required modes and evidence-admission decision are supported; keep tool output and
+            the final report concise.
             For every admitted source, provide a concrete public URL and an exact mechanism quote
             present on that page. Trusted post-processing, not your tools, derives resolved_url
             and content_sha256; never invent either value.
@@ -979,12 +1089,15 @@ jobs:
       # subtype. Fail closed on contradictory success + is_error output while
       # keeping the raw execution transcript out of logs and artifacts.
       - name: Require successful Claude execution
+        if: steps.research-checkpoint.outputs.cache-hit != 'true'
         env:
           CLAUDE_EXECUTION_FILE: ${{ steps.research.outputs.execution_file }}
         run: python3 /opt/evidence-tools/check-claude-execution.py
 
       - name: Hydrate trusted evidence retrieval metadata
-        if: matrix.kind == 'evidence'
+        if: >-
+          steps.research-checkpoint.outputs.cache-hit != 'true' &&
+          matrix.kind == 'evidence'
         env:
           UNIT_SLUG: ${{ matrix.slug }}
           CHECKED_DATE: ${{ needs.prepare.outputs.checked_date }}
@@ -994,6 +1107,7 @@ jobs:
           --retrieved-date "$CHECKED_DATE"
 
       - name: Validate proposed research unit scope
+        if: steps.research-checkpoint.outputs.cache-hit != 'true'
         env:
           UNIT_KIND: ${{ matrix.kind }}
           SELECTED_SLUGS: ${{ matrix.selected_slugs_json }}
@@ -1015,6 +1129,7 @@ jobs:
             --expected-prompt-version "$EXPECTED_PROMPT_VERSION"
 
       - name: Export fixed-path research unit
+        if: steps.research-checkpoint.outputs.cache-hit != 'true'
         env:
           UNIT_ID: ${{ matrix.unit_id }}
           UNIT_KIND: ${{ matrix.kind }}
@@ -1039,6 +1154,7 @@ jobs:
             --run-url "$RUN_URL"
 
       - name: Scan fixed-path research unit
+        if: steps.research-checkpoint.outputs.cache-hit != 'true'
         env:
           EXPECTED_SCANNER_SHA256: ${{ needs.prepare.outputs.scanner_sha256 }}
         run: |
@@ -1050,6 +1166,14 @@ jobs:
           fi
           python3 /opt/evidence-tools/scan-candidate-secrets.py \
             "$RUNNER_TEMP/candidate-unit"
+
+      - name: Save same-run fixed-path research checkpoint
+        if: steps.research-checkpoint.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ runner.temp }}/candidate-unit
+          key: >-
+            verification-unit-${{ github.run_id }}-${{ needs.prepare.outputs.plan_id }}-${{ matrix.unit_id }}
 
       - name: Upload fixed-path research unit
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
