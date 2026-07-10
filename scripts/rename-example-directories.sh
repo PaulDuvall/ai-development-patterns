@@ -13,7 +13,7 @@ echo "Renaming main example directories..."
 cd "$REPO_ROOT"
 
 # Use git mv for proper tracking
-git mv examples/ai-context-persistence examples/context-persistence
+git mv examples/ai-context-persistence examples/agent-memory
 git mv examples/ai-development-lifecycle examples/developer-lifecycle
 git mv examples/ai-driven-refactoring examples/guided-refactoring
 git mv examples/ai-driven-traceability examples/automated-traceability

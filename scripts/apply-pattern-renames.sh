@@ -28,9 +28,12 @@ apply_renames() {
     echo "Processing $file..."
 
     # Main Pattern Renames (headers and references)
-    sed_i 's/## AI Readiness Assessment/## Readiness Assessment/g' "$file"
-    sed_i 's/\[AI Readiness Assessment\](#ai-readiness-assessment)/[Readiness Assessment](#readiness-assessment)/g' "$file"
-    sed_i 's/#ai-readiness-assessment/#readiness-assessment/g' "$file"
+    sed_i 's/## AI Readiness Assessment/## Agent Readiness/g' "$file"
+    sed_i 's/\[AI Readiness Assessment\](#ai-readiness-assessment)/[Agent Readiness](#agent-readiness)/g' "$file"
+    sed_i 's/#ai-readiness-assessment/#agent-readiness/g' "$file"
+    sed_i 's/## Readiness Assessment/## Agent Readiness/g' "$file"
+    sed_i 's/\[Readiness Assessment\](#readiness-assessment)/[Agent Readiness](#agent-readiness)/g' "$file"
+    sed_i 's/#readiness-assessment/#agent-readiness/g' "$file"
 
     sed_i 's/## Rules as Code/## Codified Rules/g' "$file"
     sed_i 's/\[Rules as Code\](#rules-as-code)/[Codified Rules](#codified-rules)/g' "$file"
@@ -60,9 +63,12 @@ apply_renames() {
     sed_i 's/\[AI Plan-First Development\](#ai-plan-first-development)/[Planned Implementation](#planned-implementation)/g' "$file"
     sed_i 's/#ai-plan-first-development/#planned-implementation/g' "$file"
 
-    sed_i 's/## Progressive AI Enhancement/## Progressive Enhancement/g' "$file"
-    sed_i 's/\[Progressive AI Enhancement\](#progressive-ai-enhancement)/[Progressive Enhancement](#progressive-enhancement)/g' "$file"
-    # No anchor change needed for Progressive Enhancement
+    sed_i 's/## Progressive AI Enhancement/## Incremental Generation/g' "$file"
+    sed_i 's/\[Progressive AI Enhancement\](#progressive-ai-enhancement)/[Incremental Generation](#incremental-generation)/g' "$file"
+    sed_i 's/#progressive-ai-enhancement/#incremental-generation/g' "$file"
+    sed_i 's/## Progressive Enhancement/## Incremental Generation/g' "$file"
+    sed_i 's/\[Progressive Enhancement\](#progressive-enhancement)/[Incremental Generation](#incremental-generation)/g' "$file"
+    sed_i 's/#progressive-enhancement/#incremental-generation/g' "$file"
 
     sed_i 's/## AI Choice Generation/## Choice Generation/g' "$file"
     sed_i 's/\[AI Choice Generation\](#ai-choice-generation)/[Choice Generation](#choice-generation)/g' "$file"
@@ -76,9 +82,12 @@ apply_renames() {
     sed_i 's/\[Parallelized AI Coding Agents\](#parallelized-ai-coding-agents)/[Parallel Agents](#parallel-agents)/g' "$file"
     sed_i 's/#parallelized-ai-coding-agents/#parallel-agents/g' "$file"
 
-    sed_i 's/## AI Context Persistence/## Context Persistence/g' "$file"
-    sed_i 's/\[AI Context Persistence\](#ai-context-persistence)/[Context Persistence](#context-persistence)/g' "$file"
-    sed_i 's/#ai-context-persistence/#context-persistence/g' "$file"
+    sed_i 's/## AI Context Persistence/## Agent Memory/g' "$file"
+    sed_i 's/\[AI Context Persistence\](#ai-context-persistence)/[Agent Memory](#agent-memory)/g' "$file"
+    sed_i 's/#ai-context-persistence/#agent-memory/g' "$file"
+    sed_i 's/## Context Persistence/## Agent Memory/g' "$file"
+    sed_i 's/\[Context Persistence\](#context-persistence)/[Agent Memory](#agent-memory)/g' "$file"
+    sed_i 's/#context-persistence/#agent-memory/g' "$file"
 
     sed_i 's/## Constraint-Based AI Development/## Constrained Generation/g' "$file"
     sed_i 's/\[Constraint-Based AI Development\](#constraint-based-ai-development)/[Constrained Generation](#constrained-generation)/g' "$file"

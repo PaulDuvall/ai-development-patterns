@@ -300,7 +300,7 @@ Research provides real data for planning:
 # Planning: 2-day task to integrate cmarkgfm
 ```
 
-### With Context Persistence
+### With Agent Memory
 
 Archive research for future sessions:
 
@@ -428,7 +428,7 @@ python automation/result-parser.py research-folder/
 - **AI Development Patterns**: [Main README](../../../README.md)
 - **Related Patterns**:
   - [Parallel Agents](../../../README.md#parallel-agents)
-  - [Context Persistence](../../../README.md#context-persistence)
+  - [Agent Memory](../../../README.md#agent-memory)
   - [Adversarial Evaluator](../../../README.md#adversarial-evaluator)
 
 ## License

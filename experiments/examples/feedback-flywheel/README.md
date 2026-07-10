@@ -24,7 +24,7 @@ Feedback Flywheel enables teams to:
 **Maturity**: Intermediate
 **Description**: Systematically improve AI collaboration effectiveness by analyzing session outcomes and feeding corrections back into team rules and commands.
 
-**Related Patterns**: [Codified Rules](../../../README.md#codified-rules), [Context Persistence](../../../README.md#context-persistence), [Progressive Disclosure](../../../README.md#progressive-disclosure)
+**Related Patterns**: [Codified Rules](../../../README.md#codified-rules), [Agent Memory](../../../README.md#agent-memory), [Progressive Disclosure](../../../README.md#progressive-disclosure)
 
 ## Core Implementation
 
@@ -190,7 +190,7 @@ The Feedback Flywheel connects the pattern ecosystem into a continuous improveme
 ```
 Session Outcomes → Session Logs → Retrospective Analysis
        ↓                                    ↓
-  Context Persistence              Proposed Rule Updates
+  Agent Memory              Proposed Rule Updates
                                            ↓
                                     Codified Rules
                                            ↓

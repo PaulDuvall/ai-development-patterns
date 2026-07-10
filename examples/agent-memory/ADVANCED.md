@@ -1,6 +1,6 @@
-# AI Context Persistence - Advanced Features
+# Agent Memory - Advanced Features
 
-This document contains advanced features and enterprise-level capabilities for AI Context Persistence. For basic usage, see [README.md](README.md).
+This document contains advanced features and enterprise-level capabilities for Agent Memory. For basic usage, see [README.md](README.md).
 
 ## Success Rate Tracking
 

@@ -141,7 +141,7 @@
 graph LR
   subgraph sg_foundation["Foundation"]
     direction TB
-    readiness_assessment["Readiness Assessment"]
+    agent_readiness["Agent Readiness"]
     codified_rules["Codified Rules"]
     security_sandbox["Security Sandbox"]
     developer_lifecycle["Developer Lifecycle"]
@@ -153,11 +153,11 @@ graph LR
     spec_driven_development["Spec-Driven Development"]
     image_spec["Image Spec"]
     planned_implementation["Planned Implementation"]
-    progressive_enhancement["Progressive Enhancement"]
+    incremental_generation["Incremental Generation"]
     adversarial_evaluator["Adversarial Evaluator"]
     atomic_decomposition["Atomic Decomposition"]
     parallel_agents["Parallel Agents"]
-    context_persistence["Context Persistence"]
+    agent_memory["Agent Memory"]
     event_automation["Event Automation"]
     custom_commands["Custom Commands"]
     progressive_disclosure["Progressive Disclosure"]
@@ -172,27 +172,27 @@ graph LR
     security_orchestration["Security Orchestration"]
     centralized_rules["Centralized Rules"]
   end
-  readiness_assessment --> codified_rules
+  agent_readiness --> codified_rules
   codified_rules --> security_sandbox
   codified_rules --> developer_lifecycle
   security_sandbox --> developer_lifecycle
   security_sandbox --> tool_integration
   developer_lifecycle --> tool_integration
-  readiness_assessment --> issue_generation
+  agent_readiness --> issue_generation
   developer_lifecycle --> spec_driven_development
   spec_driven_development --> image_spec
-  progressive_enhancement --> image_spec
-  progressive_enhancement --> adversarial_evaluator
-  progressive_enhancement --> atomic_decomposition
+  incremental_generation --> image_spec
+  incremental_generation --> adversarial_evaluator
+  incremental_generation --> atomic_decomposition
   atomic_decomposition --> parallel_agents
-  codified_rules --> context_persistence
+  codified_rules --> agent_memory
   codified_rules --> event_automation
   security_sandbox --> event_automation
   event_automation --> custom_commands
   spec_driven_development --> custom_commands
   codified_rules --> custom_commands
   codified_rules --> progressive_disclosure
-  context_persistence --> progressive_disclosure
+  agent_memory --> progressive_disclosure
   developer_lifecycle --> observable_development
   codified_rules --> guided_refactoring
   developer_lifecycle --> error_resolution
@@ -208,10 +208,10 @@ graph LR
   classDef foundation fill:#e4f0e8,stroke:#2d5a3f,stroke-width:1.5px,color:#1a3a25,rx:4,ry:4;
   classDef development fill:#f7efcf,stroke:#b7950b,stroke-width:1.5px,color:#5c4a00,rx:4,ry:4;
   classDef operations fill:#f7e2df,stroke:#c0392b,stroke-width:1.5px,color:#78281f,rx:4,ry:4;
-  class readiness_assessment,codified_rules,security_sandbox,developer_lifecycle,tool_integration,issue_generation foundation;
-  class spec_driven_development,image_spec,planned_implementation,progressive_enhancement,adversarial_evaluator,atomic_decomposition,parallel_agents,context_persistence,event_automation,custom_commands,progressive_disclosure,observable_development,guided_refactoring,error_resolution,autonomous_remediation development;
+  class agent_readiness,codified_rules,security_sandbox,developer_lifecycle,tool_integration,issue_generation foundation;
+  class spec_driven_development,image_spec,planned_implementation,incremental_generation,adversarial_evaluator,atomic_decomposition,parallel_agents,agent_memory,event_automation,custom_commands,progressive_disclosure,observable_development,guided_refactoring,error_resolution,autonomous_remediation development;
   class policy_generation,security_orchestration,centralized_rules operations;
-  click readiness_assessment openPatternFromDiagram "Open Readiness Assessment"
+  click agent_readiness openPatternFromDiagram "Open Agent Readiness"
   click codified_rules openPatternFromDiagram "Open Codified Rules"
   click security_sandbox openPatternFromDiagram "Open Security Sandbox"
   click developer_lifecycle openPatternFromDiagram "Open Developer Lifecycle"
@@ -220,11 +220,11 @@ graph LR
   click spec_driven_development openPatternFromDiagram "Open Spec-Driven Development"
   click image_spec openPatternFromDiagram "Open Image Spec"
   click planned_implementation openPatternFromDiagram "Open Planned Implementation"
-  click progressive_enhancement openPatternFromDiagram "Open Progressive Enhancement"
+  click incremental_generation openPatternFromDiagram "Open Incremental Generation"
   click adversarial_evaluator openPatternFromDiagram "Open Adversarial Evaluator"
   click atomic_decomposition openPatternFromDiagram "Open Atomic Decomposition"
   click parallel_agents openPatternFromDiagram "Open Parallel Agents"
-  click context_persistence openPatternFromDiagram "Open Context Persistence"
+  click agent_memory openPatternFromDiagram "Open Agent Memory"
   click event_automation openPatternFromDiagram "Open Event Automation"
   click custom_commands openPatternFromDiagram "Open Custom Commands"
   click progressive_disclosure openPatternFromDiagram "Open Progressive Disclosure"

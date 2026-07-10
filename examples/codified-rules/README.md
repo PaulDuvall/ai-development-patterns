@@ -290,7 +290,7 @@ This example demonstrates:
 
 ## Related Patterns
 
-- [Progressive Enhancement](../../README.md#progressive-enhancement) - Gradual feature rollout
+- [Incremental Generation](../../README.md#incremental-generation) - Gradual feature rollout
 - [Security Sandbox](../../README.md#security-sandbox) - Security validation rules
 - [Developer Lifecycle](../../README.md#developer-lifecycle) - Complete workflow integration
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# AI Context Persistence - Session Resume
+# Agent Memory - Session Resume
 #
 # Display context summary for resuming work across sessions
 

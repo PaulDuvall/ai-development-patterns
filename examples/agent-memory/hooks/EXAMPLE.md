@@ -1,6 +1,6 @@
 # Hooks in Action - Example Workflow
 
-This demonstrates how Claude Code hooks automate AI Context Persistence.
+This demonstrates how Claude Code hooks automate Agent Memory.
 
 ## Initial Setup
 
@@ -8,9 +8,9 @@ This demonstrates how Claude Code hooks automate AI Context Persistence.
 # Clone/setup your project
 cd my-project
 
-# Install AI Context Persistence
-cp -r examples/ai-context-persistence/hooks .ai/
-./ai-context-persistence/hooks/setup-hooks.sh
+# Install Agent Memory
+cp -r examples/agent-memory/hooks .ai/
+./.ai/hooks/setup-hooks.sh
 
 # Start Claude Code
 claude

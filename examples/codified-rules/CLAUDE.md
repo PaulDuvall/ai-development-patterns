@@ -63,7 +63,7 @@ Per DEVELOPMENT_RULES.md requirements:
 2. **Traceability**: Complete mapping from spec → test → implementation
 3. **Test-First**: Write failing tests before any implementation
 4. **Atomic Tasks**: Break work into 1-3 hour chunks
-5. **Progressive Enhancement**: Deploy incrementally, not all at once
+5. **Incremental Generation**: Deploy incrementally, not all at once
 
 ### Quality Standards
 Per QUALITY_RULES.md requirements:

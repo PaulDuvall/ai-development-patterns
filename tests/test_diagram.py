@@ -36,7 +36,7 @@ class TestMermaidDiagram:
     @pytest.fixture
     def diagram_patterns(self, mermaid_diagram):
         """Extract pattern names from diagram node definitions"""
-        # Match patterns like: RA([Readiness<br/>Assessment])
+        # Match patterns like: RDY([Agent<br/>Readiness])
         # or: CR([Codified<br/>Rules])
         pattern = r'\[\(([^)]+)\)\]|\[([^\]]+)\]'
         matches = re.findall(pattern, mermaid_diagram)
@@ -60,9 +60,9 @@ class TestMermaidDiagram:
         return dict(re.findall(pattern, mermaid_diagram))
 
     REQUIRED_DIAGRAM_PATTERNS = [
-        "Readiness Assessment", "Codified Rules", "Security Sandbox",
+        "Agent Readiness", "Codified Rules", "Security Sandbox",
         "Developer Lifecycle", "Tool Integration", "Issue Generation",
-        "Context Persistence", "Progressive Enhancement", "Spec-Driven Development",
+        "Agent Memory", "Incremental Generation", "Spec-Driven Development",
         "Atomic Decomposition", "Parallel Agents", "Observable Development",
         "Guided Refactoring", "Policy Generation", "Security Orchestration",
     ]

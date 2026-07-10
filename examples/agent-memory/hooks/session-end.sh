@@ -1,5 +1,5 @@
 #!/bin/bash
-# AI Context Persistence - SessionEnd Hook
+# Agent Memory - SessionEnd Hook
 #
 # Automatically saves session state when ending a Claude Code session
 # Configure in .claude/settings.json:

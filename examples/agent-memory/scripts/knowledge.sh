@@ -1,5 +1,5 @@
 #!/bin/bash
-# AI Context Persistence - Knowledge Management (Simplified)
+# Agent Memory - Knowledge Management (Simplified)
 #
 # Capture successful patterns and failures for reuse
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# AI Context Persistence - PreCompact Hook
+# Agent Memory - PreCompact Hook
 #
 # Reminds you to create a recap before context compaction
 # Configure in .claude/settings.json:

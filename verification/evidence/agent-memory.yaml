@@ -4,8 +4,8 @@ legacy_run_url: https://github.com/PaulDuvall/ai-development-patterns/pull/28
 legacy_limitations: The PR records 9 aggregate queries, all three search modes, and an independent URL
   re-fetch. Exact query strings, per-mode candidate counts, normalized content hashes, and verifier metadata
   were not retained.
-pattern: Context Persistence
-slug: context-persistence
+pattern: Agent Memory
+slug: agent-memory
 last_checked: '2026-07-02'
 search:
   run_id: legacy-import
@@ -30,7 +30,7 @@ adoption_dimensions:
   implementation_available: true
   independent_adoption: true
   independence_groups: 5
-naming_alignment: weak
+naming_alignment: strong
 terminology_variants:
 - term: structured note-taking / agentic memory
   used_by: Anthropic (Effective context engineering for AI agents)
@@ -55,7 +55,7 @@ terminology_variants:
   url: https://docs.letta.com/memory
 evidence:
 - tier: T1
-  match: aliased
+  match: named
   mechanism_quote: The memory tool lets Claude store and retrieve information across conversations in
     a directory of memory files. Claude can create, read, update, and delete files that persist between
     sessions, building up knowledge over time without keeping everything in the context window.
@@ -96,7 +96,7 @@ evidence:
   claim: A runnable MCP server (128 stars, latest release v0.12.1 on 2026-03-25) that provides persistent
     context management for Claude Code and carries the exact repository topic tag 'context-persistence'
 - tier: T2
-  match: aliased
+  match: named
   mechanism_quote: Memory Bank is a documentation methodology that transforms Cline from a stateless assistant
     into a persistent development partner. Through structured markdown files, Cline can "remember" your
     project details across sessions.
@@ -118,7 +118,7 @@ evidence:
     must read at the start of every session to restore project context after memory resets (undated page;
     date = retrieval date)
 - tier: T4
-  match: aliased
+  match: named
   mechanism_quote: After each reset, I rely ENTIRELY on my Memory Bank to understand the project and continue
     work effectively. I MUST read ALL memory bank files at the start of EVERY task - this is not optional.
   source: Gitpod - .clinerules/memory-bank.md in gitpod-io/gitpod (production repo config)
@@ -140,7 +140,7 @@ evidence:
     same instruction fingerprint ('memory resets completely between sessions') returns 1,326 files across
     repositories, and a search for HANDOFF.md files mentioning 'context window' returns 3,576 files
 - tier: T5
-  match: aliased
+  match: named
   mechanism_quote: Works across sessions, projects, even machines (if you use cloud Redis)
   source: 'elfenleid - Show HN: Recall: Give Claude memory with Redis-backed persistent context (Hacker
     News)'
