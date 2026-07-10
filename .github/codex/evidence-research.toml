@@ -6,6 +6,18 @@ web_search = "live"
 default_permissions = "evidence-research"
 allow_login_shell = false
 
+# Bound one worker's non-cached input plus sampled output before Codex can
+# continue another model turn. The 6.25 output weight is the highest output /
+# input price ratio in the reviewed cost-sensitive OpenAI model allowlist.
+# This is a token-cost envelope, not a dollar cap: cached input, web-search
+# calls, and long-context premiums are billed separately by the provider.
+[features.rollout_budget]
+enabled = true
+limit_tokens = 300000
+reminder_at_remaining_tokens = [100000, 50000, 25000]
+sampling_token_weight = 6.25
+prefill_token_weight = 1.0
+
 [shell_environment_policy]
 inherit = "core"
 ignore_default_excludes = false

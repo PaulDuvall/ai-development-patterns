@@ -116,7 +116,7 @@ first day of each month at 06:00 UTC. Trigger it from the Actions tab or with:
 
 ```bash
 gh workflow run verify-patterns.yml                        # up to 10 stalest/missing patterns
-gh workflow run verify-patterns.yml -f mode=full           # every available main + experimental pattern
+gh workflow run verify-patterns.yml -f mode=full -f confirm_full_catalog=true  # all available patterns + discovery
 gh workflow run verify-patterns.yml -f mode=discover-only  # discovery only
 gh workflow run verify-patterns.yml -f mode=single-pattern -f pattern="Security Sandbox"
 gh workflow run verify-patterns.yml -f provider=anthropic  # explicit alternate provider
@@ -150,6 +150,25 @@ an inaccessible model, or already exhausted quota therefore fails one job instea
 49 doomed workers. This request is billable and proves provider availability at the start of the
 run; it cannot reserve enough capacity for every later research unit. Provider selection remains
 explicit, and a failed preflight never falls back to the other provider.
+
+Paid research is bounded independently of provider availability. Research matrices run one worker
+at a time and stop the remaining queue on the first failure. OpenAI workers use low reasoning and a
+Codex rollout budget of 300,000 weighted tokens: non-cached input counts once and sampled output
+counts 6.25 times, matching the highest output/input price ratio in the reviewed cost-sensitive
+model allowlist (`gpt-5.6-luna`, `gpt-5.4-mini`, and `gpt-5.4-nano`). Each unit is also instructed
+to make at most 12 live searches. This is a model-turn stop, not a hard dollar cap: one response can
+cross it, and cached input, web-search calls, and long-context premiums are billed separately. The
+run summary shows the unit count and approximate short-context non-cached token envelope before the
+matrix starts. Manual `full` mode therefore also requires `confirm_full_catalog=true`; a model
+outside the reviewed allowlist requires a separate manual `allow_high_cost_model=true` override.
+
+After trusted hydration, fixed-path export, and secret scanning, each completed unit is cached under
+the source run ID, plan hash, and unit ID. Re-running the same GitHub Actions run can reuse that
+exact artifact without another provider call. A new run never rebinds an old artifact to new
+provenance. OpenAI project budgets are alert thresholds rather than enforced spending caps, so use a
+dedicated project/key, conservative per-model rate limits, and the
+[Usage Dashboard export](https://help.openai.com/en/articles/20001072-how-do-i-export-monthly-usage-details-from-the-api-usage-dashboard)
+to reconcile costs by API key and model.
 
 The draft PR is the single review surface. Evidence-gap issues are tracking outputs, not separate
 approval requests. If the aggregate adds `Review naming signal` rows, make any naming choice in
@@ -186,14 +205,14 @@ dedicated OpenAI Platform project or
 [service-account key](https://platform.openai.com/docs/api-reference/project-service-accounts) as
 the `OPENAI_API_KEY` Actions secret. A ChatGPT subscription/session token is not an API key, and API
 usage is billed to the Platform project. The default model is
-[`gpt-5.6-terra`](https://developers.openai.com/api/docs/guides/latest-model) at medium reasoning
-effort; set the optional `OPENAI_EVIDENCE_MODEL` repository variable to another permitted model
-identifier. For cost-sensitive full-catalog runs, `gpt-5.6-luna` is the documented high-volume
-option. The OpenAI preflight calls the configured model once before the first isolated worker starts.
+[`gpt-5.6-luna`](https://developers.openai.com/api/docs/models/gpt-5.6-luna) at low reasoning
+effort. Set the optional `OPENAI_EVIDENCE_MODEL` repository variable to another reviewed
+cost-sensitive model identifier; higher-cost models require the explicit manual override described
+above. The OpenAI preflight calls the configured model once before the first isolated worker starts.
 
 ```bash
 gh secret set OPENAI_API_KEY       # prompts without echoing the key
-gh variable set OPENAI_EVIDENCE_MODEL --body gpt-5.6-luna  # optional high-volume setting
+gh variable set OPENAI_EVIDENCE_MODEL --body gpt-5.6-luna  # optional explicit default
 ```
 
 Anthropic remains an explicit `provider=anthropic` option. That path prefers workload-identity
@@ -233,7 +252,7 @@ search:
   run_id: "github-actions:123456789"
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/123456789
   provider: openai
-  model: gpt-5.6-terra
+  model: gpt-5.6-luna
   prompt_version: evidence-v2-openai-codex-v1+sha256.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
   checked_at: 2026-07-10
   modes:
@@ -267,7 +286,7 @@ evidence:
     content_sha256: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
     verifier:
       method: automated
-      model: gpt-5.6-terra
+      model: gpt-5.6-luna
       prompt_version: evidence-v2-openai-codex-v1+sha256.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/123456789
     date: 2026-07-10       # omit when the source supplies no publication/update date

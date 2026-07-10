@@ -115,6 +115,12 @@ Source universe: vendor docs (Anthropic, OpenAI, Cursor, GitHub), engineering bl
 (martinfowler.com, company eng blogs), conference talks (AI Engineer, QCon, KubeCon), arxiv,
 high-star GitHub repos, podcast transcripts.
 
+Under GitHub Actions, each isolated unit may make at most 12 live web-search calls. Stop as soon as
+the three required modes and the evidence-admission decision are supported; do not spend the
+remaining search or token allowance merely to fill it. The OpenAI worker additionally runs with a
+trusted weighted rollout budget and must return the strongest valid bounded result before that
+budget is exhausted.
+
 Score every admitted hit against the evidence-tier rubric in `verification/README.md`
 (**the single human-readable copy** — T1–T5 with weights 5/4/3/2/1, admission tests per tier,
 at most 3 entries admitted per tier). Record what the source demonstrates; do not editorialize.
@@ -218,6 +224,12 @@ The research process never mutates the remote repository. GitHub Actions fans th
 worklist out to one writer per pattern. Each worker may edit only its assigned evidence file; a
 separate discovery unit may edit only `experiments/NOTES.md`. Fresh jobs validate each unit, and
 trusted code publishes nothing unless the exact complete unit set passes aggregate validation.
+Paid workers execute serially and the queue fails fast. After trusted hydration, fixed-path export,
+and secret scanning, a run-scoped checkpoint may be reused only by another attempt of that same
+GitHub run; its run ID, plan hash, unit ID, manifest, and provenance remain unchanged. New runs never
+rewrite an older checkpoint to claim new provenance. Manual full-catalog dispatches require the
+operator's explicit `confirm_full_catalog=true` acknowledgement before preparation can expand the
+matrix.
 Preparation and publication fail closed while an older same-repository verification PR remains
 open. A maintainer may explicitly override that gate on a manual run; in-flight evidence slugs stay
 excluded, and any shared generated-file conflict must be resolved by rebasing the aggregate PR.

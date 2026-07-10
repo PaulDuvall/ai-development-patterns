@@ -62,6 +62,30 @@ def test_openai_is_the_explicit_default_provider():
     assert "evidence-v2-openai-codex-v1" in inputs["run"]
     assert "evidence-v2-anthropic-claude-v1" in inputs["run"]
     assert "+sha256.{contract_sha256}" in inputs["run"]
+    assert inputs["env"]["OPENAI_MODEL"] == (
+        "${{ vars.OPENAI_EVIDENCE_MODEL || 'gpt-5.6-luna' }}")
+
+
+def test_paid_scope_and_model_overrides_require_explicit_manual_acknowledgement():
+    workflow = load_workflow(VERIFY)
+    dispatch = workflow["on"]["workflow_dispatch"]["inputs"]
+    for name in ("confirm_full_catalog", "allow_high_cost_model"):
+        assert dispatch[name]["type"] == "boolean"
+        assert dispatch[name]["default"] == "false"
+
+    inputs = named_step(
+        workflow["jobs"]["prepare"], "Validate and normalize inputs")
+    assert inputs["env"]["REQUESTED_CONFIRM_FULL"] == (
+        "${{ inputs.confirm_full_catalog && 'true' || 'false' }}")
+    assert inputs["env"]["REQUESTED_ALLOW_HIGH_COST_MODEL"] == (
+        "${{ inputs.allow_high_cost_model && 'true' || 'false' }}")
+    script = inputs["run"]
+    assert "full mode requires confirm_full_catalog=true" in script
+    assert "confirm_full_catalog may only acknowledge a manual full run" in script
+    for model in ("gpt-5.6-luna", "gpt-5.4-mini", "gpt-5.4-nano"):
+        assert model in script
+    assert "outside the reviewed cost-sensitive" in script
+    assert "allow_high_cost_model=true" in script
 
 
 def test_optional_claude_review_is_opt_in_and_skips_without_a_key():
@@ -135,12 +159,12 @@ def test_provider_jobs_are_mutually_exclusive_and_least_privilege():
     assert anthropic["needs"] == ["prepare", "preflight-anthropic"]
     assert "needs.preflight-openai.result == 'success'" in openai["if"]
     assert "needs.preflight-anthropic.result == 'success'" in anthropic["if"]
-    for job in (openai, anthropic):
+    for job, timeout_minutes in ((openai, "45"), (anthropic, "60")):
         checkout = named_step(job, "Checkout without persisted credentials")
         assert checkout["with"]["persist-credentials"] == "false"
-        assert job["timeout-minutes"] == "120"
-        assert job["strategy"]["fail-fast"] == "false"
-        assert job["strategy"]["max-parallel"] == "3"
+        assert job["timeout-minutes"] == timeout_minutes
+        assert job["strategy"]["fail-fast"] == "true"
+        assert job["strategy"]["max-parallel"] == "1"
         assert job["strategy"]["matrix"] == (
             "${{ fromJSON(needs.prepare.outputs.execution_matrix) }}")
         assert "outputs.has_units == 'true'" in job["if"]
@@ -304,6 +328,14 @@ def test_openai_research_uses_pinned_bounded_codex_action():
         step_names.index("Smoke-test pinned Codex permission profile without credentials"))
     assert step_names.index("Smoke-test pinned Codex permission profile without credentials") < (
         step_names.index("Collect candidate evidence with OpenAI"))
+    checkpoint = named_step(
+        research, "Restore same-run fixed-path research checkpoint")
+    assert checkpoint["uses"] == (
+        "actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830")
+    assert checkpoint["with"]["path"] == "candidate-unit"
+    assert "${{ github.run_id }}" in checkpoint["with"]["key"]
+    assert "${{ needs.prepare.outputs.plan_id }}" in checkpoint["with"]["key"]
+    assert "${{ matrix.unit_id }}" in checkpoint["with"]["key"]
     isolation = named_step(research, "Prepare isolated OpenAI research account")
     assert "-m 0750" in isolation["run"]
     assert "/home/evidence-agent/workspace" in isolation["run"]
@@ -379,11 +411,13 @@ def test_openai_research_uses_pinned_bounded_codex_action():
     assert inputs["codex-home"] == "/home/evidence-agent/.codex"
     assert inputs["working-directory"] == "/home/evidence-agent/workspace"
     assert inputs["model"] == "${{ needs.prepare.outputs.model }}"
-    assert inputs["effort"] == "medium"
+    assert inputs["effort"] == "low"
     assert inputs["permission-profile"] == "evidence-research"
     assert inputs["safety-strategy"] == "unprivileged-user"
     assert inputs["codex-user"] == "evidence-agent"
     assert inputs["codex-args"] == '["--ephemeral", "--strict-config"]'
+    assert action["if"] == "steps.research-checkpoint.outputs.cache-hit != 'true'"
+    assert "Make at most 12 live web-search calls" in inputs["prompt"]
     assert "output-file" not in inputs
     assert "allow-bots" not in inputs
     assert "Do not inspect environment variables" in inputs["prompt"]
@@ -396,6 +430,13 @@ def test_codex_research_profile_is_candidate_scoped_and_network_guarded():
     assert config["web_search"] == "live"
     assert config["default_permissions"] == "evidence-research"
     assert config["allow_login_shell"] is False
+    assert config["features"]["rollout_budget"] == {
+        "enabled": True,
+        "limit_tokens": 300000,
+        "reminder_at_remaining_tokens": [100000, 50000, 25000],
+        "sampling_token_weight": 6.25,
+        "prefill_token_weight": 1.0,
+    }
     shell_environment = config["shell_environment_policy"]
     assert shell_environment["inherit"] == "core"
     assert shell_environment["ignore_default_excludes"] is False
@@ -490,7 +531,8 @@ def test_anthropic_research_retains_wif_and_fail_closed_guard():
     assert all(tool not in action["with"]["claude_args"] for tool in (
         "Write", "Glob", "Grep", "Task"))
     hydrate = named_step(research, "Hydrate trusted evidence retrieval metadata")
-    assert hydrate["if"] == "matrix.kind == 'evidence'"
+    assert "matrix.kind == 'evidence'" in hydrate["if"]
+    assert "research-checkpoint.outputs.cache-hit != 'true'" in hydrate["if"]
     assert "/opt/evidence-tools/hydrate-evidence-content.py" in hydrate["run"]
     scope = named_step(research, "Validate proposed research unit scope")
     assert "/opt/evidence-tools/validate-research-scope.py" in scope["run"]
@@ -521,6 +563,37 @@ def test_both_providers_export_scan_and_upload_unique_fixed_units():
         assert "activate-verification-unit.py" in activate["run"]
 
 
+def test_both_providers_reuse_only_same_run_fixed_path_checkpoints():
+    workflow = load_workflow(VERIFY)
+    for job_name, expected_path in (
+            ("research-openai", "candidate-unit"),
+            ("research-anthropic", "${{ runner.temp }}/candidate-unit")):
+        job = workflow["jobs"][job_name]
+        restore = named_step(job, "Restore same-run fixed-path research checkpoint")
+        save = named_step(job, "Save same-run fixed-path research checkpoint")
+        expected_key = (
+            "verification-unit-${{ github.run_id }}-"
+            "${{ needs.prepare.outputs.plan_id }}-${{ matrix.unit_id }}")
+        assert restore["uses"] == (
+            "actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830")
+        assert save["uses"] == (
+            "actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830")
+        assert restore["with"]["path"] == expected_path
+        assert save["with"]["path"] == expected_path
+        assert restore["with"]["key"] == expected_key
+        assert save["with"]["key"] == expected_key
+        assert restore["with"]["fail-on-cache-miss"] == "false"
+        assert save["if"] == (
+            "steps.research-checkpoint.outputs.cache-hit != 'true'")
+
+        model_name = (
+            "Collect candidate evidence with OpenAI"
+            if job_name == "research-openai"
+            else "Collect candidate evidence with Anthropic")
+        assert named_step(job, model_name)["if"] == (
+            "steps.research-checkpoint.outputs.cache-hit != 'true'")
+
+
 def test_both_providers_hydrate_after_model_and_before_manifest_export():
     workflow = load_workflow(VERIFY)
     cases = (
@@ -541,7 +614,8 @@ def test_both_providers_hydrate_after_model_and_before_manifest_export():
         job = workflow["jobs"][job_name]
         names = [step.get("name") for step in job["steps"]]
         hydrate = named_step(job, "Hydrate trusted evidence retrieval metadata")
-        assert hydrate["if"] == "matrix.kind == 'evidence'"
+        assert "matrix.kind == 'evidence'" in hydrate["if"]
+        assert "research-checkpoint.outputs.cache-hit != 'true'" in hydrate["if"]
         assert hydrate["env"]["CHECKED_DATE"] == (
             "${{ needs.prepare.outputs.checked_date }}")
         assert "hydrate-evidence-content.py" in hydrate["run"]
