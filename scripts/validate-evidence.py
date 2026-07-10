@@ -32,6 +32,7 @@ TIER_SOURCE_KINDS = {
 MATCH_VALUES = {"named", "aliased", "unnamed"}
 PROVENANCE_VALUES = {"complete", "legacy-import"}
 SEARCH_MODES = {"name", "mechanism", "artifact"}
+RESEARCH_PROVIDERS = {"openai", "anthropic"}
 MAX_ENTRIES_PER_TIER = 3
 MAX_QUERIES = 12
 MIN_MECHANISM_QUOTE_LENGTH = 20
@@ -282,8 +283,10 @@ def validate_search(data, errors):
     search = data.get("search")
     provenance = data.get("provenance_status")
     base = {"run_id", "checked_at", "modes"}
-    allowed = base | {"run_url"}
-    if not _require_mapping_keys(search, base, allowed, "search", errors):
+    execution = {"provider", "model", "prompt_version"}
+    required = base | execution if provenance == "complete" else base
+    allowed = base | execution | {"run_url"}
+    if not _require_mapping_keys(search, required, allowed, "search", errors):
         return
     if not isinstance(search.get("run_id"), str) or not search.get("run_id", "").strip():
         errors.append("search: 'run_id' must be a non-empty string")
@@ -338,6 +341,9 @@ def validate_search(data, errors):
             errors.append("search: legacy-import requires run_id: legacy-import")
         if "run_url" in search:
             errors.append("search: legacy-import must use top-level legacy_run_url")
+        for field in sorted(execution):
+            if field in search:
+                errors.append(f"search: legacy-import must omit {field}")
     elif provenance == "complete":
         run_id = search.get("run_id")
         run_id_match = RUN_ID_RE.fullmatch(run_id) if isinstance(run_id, str) else None
@@ -351,11 +357,19 @@ def validate_search(data, errors):
                 "Actions run_url")
         if run_id_match and run_number and run_id_match.group(1) != run_number:
             errors.append("search: run_id must match the run number in run_url")
+        if search.get("provider") not in RESEARCH_PROVIDERS:
+            errors.append(
+                f"search: provider must be one of {sorted(RESEARCH_PROVIDERS)}")
+        for field in ("model", "prompt_version"):
+            if not isinstance(search.get(field), str) or not search.get(field, "").strip():
+                errors.append(f"search: '{field}' must be a non-empty string")
         if total_queries > MAX_QUERIES:
             errors.append(f"search: {total_queries} queries exceeds max {MAX_QUERIES}")
 
 
-def validate_verifier(verifier, index, provenance, search_run_url, errors):
+def validate_verifier(
+        verifier, index, provenance, search_run_url, search_model,
+        search_prompt_version, errors):
     label = f"evidence[{index}].verifier"
     fields = {"method", "model", "prompt_version", "run_url"}
     if not _require_mapping_keys(verifier, fields, fields, label, errors):
@@ -378,10 +392,15 @@ def validate_verifier(verifier, index, provenance, search_run_url, errors):
         errors.append(f"{label}: 'run_url' must be this repository's canonical Actions URL")
     elif canonical_url(verifier_url) != canonical_url(search_run_url):
         errors.append(f"{label}: 'run_url' must equal search.run_url")
+    if verifier.get("model") != search_model:
+        errors.append(f"{label}: 'model' must equal search.model")
+    if verifier.get("prompt_version") != search_prompt_version:
+        errors.append(f"{label}: 'prompt_version' must equal search.prompt_version")
 
 
 def validate_entry(
-        entry, index, errors, provenance, last_checked, search_run_url, today):
+        entry, index, errors, provenance, last_checked, search_run_url,
+        search_model, search_prompt_version, today):
     label = f"evidence[{index}]"
     allowed = REQUIRED_ENTRY_FIELDS | OPTIONAL_ENTRY_FIELDS
     if not _require_mapping_keys(entry, REQUIRED_ENTRY_FIELDS, allowed, label, errors):
@@ -443,7 +462,8 @@ def validate_entry(
     elif not isinstance(digest, str) or SHA256_RE.fullmatch(digest) is None:
         errors.append(f"{label}: content_sha256 must be 64 lowercase hex characters")
     validate_verifier(
-        entry.get("verifier"), index, provenance, search_run_url, errors)
+        entry.get("verifier"), index, provenance, search_run_url,
+        search_model, search_prompt_version, errors)
 
 
 def validate_terminology_variants(data, errors):
@@ -559,13 +579,14 @@ def validate_evidence_entries(data, errors, today):
     if is_none_found(evidence) and data.get("provenance_status") != "complete":
         errors.append("'none found' requires complete three-mode search provenance")
     entries = []
+    search = data.get("search") if isinstance(data.get("search"), dict) else {}
     for index, item in enumerate(evidence if isinstance(evidence, list) else []):
         if isinstance(item, dict):
             validate_entry(
                 item, index, errors, data.get("provenance_status"),
                 data.get("last_checked"),
-                data.get("search", {}).get("run_url")
-                if isinstance(data.get("search"), dict) else None,
+                search.get("run_url"), search.get("model"),
+                search.get("prompt_version"),
                 today)
             entries.append(item)
         else:

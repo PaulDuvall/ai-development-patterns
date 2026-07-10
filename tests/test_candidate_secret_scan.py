@@ -14,7 +14,8 @@ def test_scanner_allows_evidence_hashes_and_secret_references(tmp_path):
     path = tmp_path / "candidate.yaml"
     path.write_text(
         "content_sha256: " + "a" * 64 + "\n"
-        "credential: ${{ secrets.ANTHROPIC_API_KEY }}\n",
+        "anthropic: ${{ secrets.ANTHROPIC_API_KEY }}\n"
+        "openai: ${{ secrets.OPENAI_API_KEY }}\n",
         encoding="utf-8",
     )
     assert MODULE.scan_file(path) == []
@@ -28,6 +29,17 @@ def test_scanner_redacts_detected_anthropic_key(tmp_path):
     findings = MODULE.scan_file(path)
 
     assert findings == [f"{path}:1: possible Anthropic API key"]
+    assert secret not in findings[0]
+
+
+def test_scanner_redacts_detected_openai_project_key(tmp_path):
+    path = tmp_path / "candidate.md"
+    secret = "sk-proj-" + "B" * 48
+    path.write_text(f"accidental value: {secret}\n", encoding="utf-8")
+
+    findings = MODULE.scan_file(path)
+
+    assert findings == [f"{path}:1: possible OpenAI API key"]
     assert secret not in findings[0]
 
 

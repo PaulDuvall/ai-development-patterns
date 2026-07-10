@@ -3,6 +3,13 @@ name: Pattern Verification & Discovery
 on:
   workflow_dispatch:
     inputs:
+      provider:
+        description: Evidence research provider
+        type: choice
+        options:
+          - openai
+          - anthropic
+        default: openai
       mode:
         description: Run mode
         type: choice
@@ -25,7 +32,7 @@ on:
         type: string
         default: "30"
       max_turns:
-        description: Optional agent turn ceiling, 1-500 (blank uses the mode default)
+        description: Anthropic-only turn ceiling, 1-500 (blank uses the mode default)
         type: string
         required: false
   schedule:
@@ -49,6 +56,10 @@ jobs:
       pull-requests: read
     outputs:
       base_sha: ${{ steps.inputs.outputs.base_sha }}
+      provider: ${{ steps.inputs.outputs.provider }}
+      model: ${{ steps.inputs.outputs.model }}
+      prompt_version: ${{ steps.inputs.outputs.prompt_version }}
+      contract_sha256: ${{ steps.contract.outputs.sha256 }}
       mode: ${{ steps.inputs.outputs.mode }}
       pattern: ${{ steps.inputs.outputs.pattern }}
       stale_days: ${{ steps.inputs.outputs.stale_days }}
@@ -60,7 +71,7 @@ jobs:
       - name: Checkout trusted base revision
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
-          ref: ${{ github.event.repository.default_branch }}
+          ref: ${{ github.sha }}
           persist-credentials: false
 
       - name: Set up Python 3.11
@@ -75,12 +86,28 @@ jobs:
         id: scanner
         run: echo "sha256=$(sha256sum scripts/scan-candidate-secrets.py | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
 
+      - name: Fingerprint reviewed research contract
+        id: contract
+        run: |
+          sha256=$(
+            sha256sum \
+              .github/workflows/verify-patterns.yml \
+              .github/codex/evidence-research.toml \
+              .claude/commands/verify-patterns.md \
+              | sha256sum | cut -d ' ' -f 1
+          )
+          echo "sha256=$sha256" >> "$GITHUB_OUTPUT"
+
       - name: Validate and normalize inputs
         id: inputs
         env:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           EVENT_NAME: ${{ github.event_name }}
           EVENT_REF: ${{ github.ref }}
+          REQUESTED_PROVIDER: ${{ inputs.provider || 'openai' }}
+          OPENAI_MODEL: ${{ vars.OPENAI_EVIDENCE_MODEL || 'gpt-5.6-terra' }}
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_EVIDENCE_MODEL || 'claude-sonnet-5' }}
+          RESEARCH_CONTRACT_SHA256: ${{ steps.contract.outputs.sha256 }}
           REQUESTED_MODE: ${{ inputs.mode || 'stale-default' }}
           REQUESTED_PATTERN: ${{ inputs.pattern }}
           REQUESTED_STALE_DAYS: ${{ inputs.stale_days || '90' }}
@@ -96,6 +123,23 @@ jobs:
           from pathlib import Path
 
           import yaml
+
+          providers = {"openai", "anthropic"}
+          provider = os.environ["REQUESTED_PROVIDER"]
+          if provider not in providers:
+              sys.exit(f"unsupported provider: {provider!r}")
+          model = os.environ[
+              "OPENAI_MODEL" if provider == "openai" else "ANTHROPIC_MODEL"
+          ].strip()
+          if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:/-]{0,99}", model):
+              sys.exit("research model must be a safe, non-empty model identifier")
+          contract_sha256 = os.environ["RESEARCH_CONTRACT_SHA256"]
+          if not re.fullmatch(r"[0-9a-f]{64}", contract_sha256):
+              sys.exit("research contract fingerprint must be a SHA-256 digest")
+          prompt_versions = {
+              "openai": "evidence-v2-openai-codex-v1",
+              "anthropic": "evidence-v2-anthropic-claude-v1",
+          }
 
           modes = {"stale-default", "full", "discover-only", "single-pattern"}
           if os.environ["EVENT_NAME"] == "workflow_dispatch" \
@@ -149,6 +193,11 @@ jobs:
                   ["git", "rev-parse", "HEAD"], check=True,
                   capture_output=True, text=True,
               ).stdout.strip(),
+              "provider": provider,
+              "model": model,
+              "prompt_version": (
+                  f"{prompt_versions[provider]}+sha256.{contract_sha256}"
+              ),
               "mode": mode,
               "pattern": pattern,
               "stale_days": stale_days,
@@ -228,18 +277,210 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  research:
-    name: Read-only evidence research
+  research-openai:
+    name: Read-only evidence research (OpenAI)
     needs: prepare
     if: >-
-      needs.prepare.outputs.mode == 'discover-only' ||
-      needs.prepare.outputs.selected_slugs != '[]'
+      needs.prepare.outputs.provider == 'openai' &&
+      (needs.prepare.outputs.mode == 'discover-only' ||
+      needs.prepare.outputs.selected_slugs != '[]')
     runs-on: ubuntu-latest
     timeout-minutes: 120
     permissions:
       contents: read
-      # Used only for optional Anthropic workload-identity federation. The
-      # explicit GitHub token below remains read-only.
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ needs.prepare.outputs.base_sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+
+      - name: Install local validation dependencies
+        run: python3 -m pip install --requirement tests/requirements.txt
+
+      - name: Download deterministic research plan
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: verification-research-plan
+          path: verification/run-plan
+
+      - name: Require OpenAI API credential
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::OPENAI_API_KEY is not configured"
+            exit 1
+          fi
+
+      - name: Prepare isolated OpenAI research account
+        run: |
+          set -euo pipefail
+          sudo adduser \
+            --system --home /home/evidence-agent --shell /bin/bash \
+            --group evidence-agent
+          sudo install -d -o evidence-agent -g evidence-agent -m 0750 \
+            /home/evidence-agent/workspace
+          # The runner-owned API proxy must traverse CODEX_HOME while Codex
+          # itself runs as evidence-agent.
+          sudo install -d -o evidence-agent -g evidence-agent -m 0755 \
+            /home/evidence-agent/.codex
+          /usr/bin/tar \
+            --exclude='./.git' --exclude='./.beads' -cf - . \
+            | sudo -u evidence-agent /usr/bin/tar \
+                -xf - -C /home/evidence-agent/workspace
+          sudo install -o evidence-agent -g evidence-agent -m 0644 \
+            .github/codex/evidence-research.toml \
+            /home/evidence-agent/.codex/config.toml
+          sudo install -o evidence-agent -g evidence-agent -m 0666 \
+            /dev/null "/home/evidence-agent/.codex/${GITHUB_RUN_ID}.json"
+
+      # This is the only OpenAI model step. The action's internal GitHub token
+      # is read-scoped; direct git/gh publication is forbidden and separate.
+      - name: Collect candidate evidence with OpenAI
+        id: research
+        uses: openai/codex-action@52fe01ec70a42f454c9d2ebd47598f9fd6893d56 # v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          codex-version: "0.144.1"
+          codex-home: /home/evidence-agent/.codex
+          working-directory: /home/evidence-agent/workspace
+          model: ${{ needs.prepare.outputs.model }}
+          effort: medium
+          permission-profile: evidence-research
+          safety-strategy: unprivileged-user
+          codex-user: evidence-agent
+          codex-args: '["--ephemeral", "--strict-config"]'
+          prompt: |
+            Use .claude/commands/verify-patterns.md as the research and evidence methodology.
+
+            This is candidate-only mode. GitHub Actions, not the agent, owns publication.
+            Do not create branches, commits, pull requests, labels, or issues. Do not invoke
+            git or gh. Do not inspect environment variables, process memory/metadata, or runner
+            credential files. Make proposed repository edits only in this checkout. Do not modify
+            workflows, scripts, tests, or patterns.yaml. Update
+            verification/pending-evidence.yaml whenever adding an evidence file so a slug can
+            never be both pending and evidenced.
+            Regenerate verification/STATUS.md when evidence or decisions change, and keep
+            README.md/index.html/assets/js/patterns-data.js synchronized when source lines change.
+
+            Requested mode: ${{ needs.prepare.outputs.mode }}
+            Exact pattern (empty unless single-pattern): ${{ needs.prepare.outputs.pattern }}
+            Stale threshold: ${{ needs.prepare.outputs.stale_days }} days
+            Discovery lookback: ${{ needs.prepare.outputs.since_days }} days
+            Deterministically selected slugs: ${{ needs.prepare.outputs.selected_slugs }}
+            Actual research provider: ${{ needs.prepare.outputs.provider }}
+            Actual research model: ${{ needs.prepare.outputs.model }}
+            Required evidence run_id: github-actions:${{ github.run_id }}
+            Required search and verifier run_url:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Every complete file must set search.provider to exactly
+            ${{ needs.prepare.outputs.provider }}, search.model to exactly
+            ${{ needs.prepare.outputs.model }}, and search.prompt_version to exactly
+            ${{ needs.prepare.outputs.prompt_version }}.
+            Every admitted entry must set verifier.method to automated,
+            verifier.model to exactly ${{ needs.prepare.outputs.model }}, and
+            verifier.prompt_version to exactly ${{ needs.prepare.outputs.prompt_version }}.
+
+            For stale-default, full, and single-pattern modes, research only the slugs in
+            verification/run-plan/worklist.txt. The complete derived inventory is at
+            verification/run-plan/pattern-inventory.yaml. Do not add patterns to the worklist.
+            For every admitted source, populate resolved_url and content_sha256 by running
+            `python3 scripts/evidence_content.py URL --quote QUOTE`; never invent either value.
+
+      - name: Terminate isolated research processes and proxy
+        if: always()
+        run: |
+          set -euo pipefail
+          if id evidence-agent >/dev/null 2>&1; then
+            research_uid=$(id -u evidence-agent)
+            sudo pkill -KILL -u "$research_uid" 2>/dev/null || true
+            for _ in {1..20}; do
+              if ! sudo pgrep -u "$research_uid" >/dev/null 2>&1; then break; fi
+              sleep 0.1
+            done
+            if sudo pgrep -u "$research_uid" >/dev/null 2>&1; then
+              echo "::error::Untrusted research processes survived cleanup"
+              exit 1
+            fi
+          fi
+          runner_uid=$(id -u runner)
+          sudo pkill -KILL -u "$runner_uid" -f '[c]odex-responses-api-proxy' \
+            2>/dev/null || true
+          for _ in {1..20}; do
+            if ! sudo pgrep -u "$runner_uid" -f '[c]odex-responses-api-proxy' \
+                >/dev/null 2>&1; then break; fi
+            sleep 0.1
+          done
+          if sudo pgrep -u "$runner_uid" -f '[c]odex-responses-api-proxy' \
+              >/dev/null 2>&1; then
+            echo "::error::Codex Responses API proxy survived cleanup"
+            exit 1
+          fi
+          if [ -e /home/evidence-agent/workspace ]; then
+            sudo chown -hR runner:runner /home/evidence-agent/workspace
+          fi
+
+      - name: Export isolated fixed-path candidate bundle
+        run: >-
+          python3 scripts/export-research-candidate.py
+          /home/evidence-agent/workspace
+          "$GITHUB_WORKSPACE"
+
+      - name: Scan fixed-path candidate bundle
+        env:
+          EXPECTED_SCANNER_SHA256: ${{ needs.prepare.outputs.scanner_sha256 }}
+        run: |
+          set -euo pipefail
+          actual=$(sha256sum scripts/scan-candidate-secrets.py | cut -d ' ' -f 1)
+          if [ "$actual" != "$EXPECTED_SCANNER_SHA256" ]; then
+            echo "::error::Research modified the trusted candidate scanner"
+            exit 1
+          fi
+          python3 scripts/scan-candidate-secrets.py \
+            README.md \
+            index.html \
+            assets/js/patterns-data.js \
+            experiments/NOTES.md \
+            verification/DECISIONS.md \
+            verification/STATUS.md \
+            verification/pending-evidence.yaml \
+            verification/evidence
+
+      - name: Upload fixed-path candidate bundle
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: verification-candidate
+          path: |
+            README.md
+            index.html
+            assets/js/patterns-data.js
+            experiments/NOTES.md
+            verification/DECISIONS.md
+            verification/STATUS.md
+            verification/pending-evidence.yaml
+            verification/evidence/
+          if-no-files-found: error
+          retention-days: 7
+
+  research-anthropic:
+    name: Read-only evidence research (Anthropic)
+    needs: prepare
+    if: >-
+      needs.prepare.outputs.provider == 'anthropic' &&
+      (needs.prepare.outputs.mode == 'discover-only' ||
+      needs.prepare.outputs.selected_slugs != '[]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      # Available only to the explicit Anthropic path for optional WIF.
       id-token: write
     steps:
       - name: Checkout without persisted credentials
@@ -263,9 +504,9 @@ jobs:
           name: verification-research-plan
           path: verification/run-plan
 
-      # This is the only LLM step. It receives only a read-scoped repository
-      # token; direct git/gh tools are disallowed and publication is separate.
-      - name: Collect candidate evidence
+      # This is the only Anthropic model step. It receives only a read-scoped
+      # repository token; publication credentials remain in a separate job.
+      - name: Collect candidate evidence with Anthropic
         id: research
         uses: anthropics/claude-code-action@a6a5b60a078a0af52612aac63e05e3f95fd4ff64 # v1
         with:
@@ -281,7 +522,8 @@ jobs:
 
             This is candidate-only mode. GitHub Actions, not the agent, owns publication.
             Do not create branches, commits, pull requests, labels, or issues. Do not invoke
-            git or gh. Make proposed repository edits only in this checkout. Do not modify
+            git or gh. Do not inspect environment variables, process memory/metadata, or runner
+            credential files. Make proposed repository edits only in this checkout. Do not modify
             workflows, scripts, tests, or patterns.yaml. Update
             verification/pending-evidence.yaml whenever adding an evidence file so a slug can
             never be both pending and evidenced.
@@ -293,9 +535,18 @@ jobs:
             Stale threshold: ${{ needs.prepare.outputs.stale_days }} days
             Discovery lookback: ${{ needs.prepare.outputs.since_days }} days
             Deterministically selected slugs: ${{ needs.prepare.outputs.selected_slugs }}
+            Actual research provider: ${{ needs.prepare.outputs.provider }}
+            Actual research model: ${{ needs.prepare.outputs.model }}
             Required evidence run_id: github-actions:${{ github.run_id }}
             Required search and verifier run_url:
             ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Every complete file must set search.provider to exactly
+            ${{ needs.prepare.outputs.provider }}, search.model to exactly
+            ${{ needs.prepare.outputs.model }}, and search.prompt_version to exactly
+            ${{ needs.prepare.outputs.prompt_version }}.
+            Every admitted entry must set verifier.method to automated,
+            verifier.model to exactly ${{ needs.prepare.outputs.model }}, and
+            verifier.prompt_version to exactly ${{ needs.prepare.outputs.prompt_version }}.
 
             For stale-default, full, and single-pattern modes, research only the slugs in
             verification/run-plan/worklist.txt. The complete derived inventory is at
@@ -303,14 +554,14 @@ jobs:
             For every admitted source, populate resolved_url and content_sha256 by running
             `python3 scripts/evidence_content.py URL --quote QUOTE`; never invent either value.
           claude_args: >-
-            --model claude-sonnet-5
+            --model ${{ needs.prepare.outputs.model }}
             --max-turns ${{ needs.prepare.outputs.max_turns }}
             --allowedTools
             "Bash(python3 scripts/evidence_content.py:*),Bash(python3 scripts/validate-evidence.py:*),Bash(python3 scripts/generate-verification-status.py:*),Bash(python3 scripts/generate-patterns-data.py:*),Bash(date -I),Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Task"
 
       # claude-code-action currently keys its conclusion only off the result
-      # subtype. Fail closed on the contradictory success + is_error result and
-      # keep raw model output out of the public Actions log and artifacts.
+      # subtype. Fail closed on contradictory success + is_error output while
+      # keeping the raw execution transcript out of logs and artifacts.
       - name: Require successful Claude execution
         env:
           CLAUDE_EXECUTION_FILE: ${{ steps.research.outputs.execution_file }}
@@ -354,7 +605,13 @@ jobs:
 
   validate-candidate:
     name: Validate untrusted candidate
-    needs: [prepare, research]
+    needs: [prepare, research-openai, research-anthropic]
+    if: >-
+      !cancelled() && needs.prepare.result == 'success' &&
+      ((needs.prepare.outputs.provider == 'openai' &&
+      needs.research-openai.result == 'success') ||
+      (needs.prepare.outputs.provider == 'anthropic' &&
+      needs.research-anthropic.result == 'success'))
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -522,6 +779,9 @@ jobs:
           SELECTED_SLUGS: ${{ needs.prepare.outputs.selected_slugs }}
           EXPECTED_RUN_ID: github-actions:${{ github.run_id }}
           EXPECTED_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EXPECTED_PROVIDER: ${{ needs.prepare.outputs.provider }}
+          EXPECTED_MODEL: ${{ needs.prepare.outputs.model }}
+          EXPECTED_PROMPT_VERSION: ${{ needs.prepare.outputs.prompt_version }}
         run: |
           python3 - <<'PY'
           import datetime
@@ -605,6 +865,31 @@ jobs:
                   raise SystemExit(f"{slug}: search.run_id does not identify this run")
               if search.get("run_url") != os.environ["EXPECTED_RUN_URL"]:
                   raise SystemExit(f"{slug}: search.run_url does not identify this run")
+              if search.get("provider") != os.environ["EXPECTED_PROVIDER"]:
+                  raise SystemExit(f"{slug}: search.provider does not match this run")
+              if search.get("model") != os.environ["EXPECTED_MODEL"]:
+                  raise SystemExit(f"{slug}: search.model does not match this run")
+              if search.get("prompt_version") != os.environ["EXPECTED_PROMPT_VERSION"]:
+                  raise SystemExit(f"{slug}: search.prompt_version does not match this run")
+              entries = data.get("evidence")
+              if entries == "none found":
+                  continue
+              if not isinstance(entries, list):
+                  raise SystemExit(f"{slug}: evidence must be a list or 'none found'")
+              for index, entry in enumerate(entries):
+                  verifier = entry.get("verifier") if isinstance(entry, dict) else None
+                  if not isinstance(verifier, dict):
+                      raise SystemExit(f"{slug}: evidence[{index}] lacks verifier metadata")
+                  if verifier.get("method") != "automated":
+                      raise SystemExit(
+                          f"{slug}: evidence[{index}] verifier.method must be automated")
+                  if verifier.get("model") != os.environ["EXPECTED_MODEL"]:
+                      raise SystemExit(
+                          f"{slug}: evidence[{index}] verifier.model does not match this run")
+                  if verifier.get("prompt_version") != os.environ["EXPECTED_PROMPT_VERSION"]:
+                      raise SystemExit(
+                          f"{slug}: evidence[{index}] verifier.prompt_version does not match "
+                          "this run")
           print(f"Validated exact completion of {len(selected)} selected evidence record(s)")
           PY
 
@@ -716,6 +1001,9 @@ jobs:
           PUBLISH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RESEARCH_PROVIDER: ${{ needs.prepare.outputs.provider }}
+          RESEARCH_MODEL: ${{ needs.prepare.outputs.model }}
+          RESEARCH_PROMPT_VERSION: ${{ needs.prepare.outputs.prompt_version }}
         run: |
           set -euo pipefail
           branch="verify/refresh-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
@@ -742,8 +1030,11 @@ jobs:
           pr_url=$(gh pr list --head "$branch" --state open --json url --jq '.[0].url // empty')
           if [ -z "$pr_url" ]; then
             body_file="$RUNNER_TEMP/evidence-pr-body.md"
-            printf '%s\n\nSource run: %s\n' \
+            printf '%s\n\nResearch provider: %s\nResearch model: %s\nResearch contract: %s\nSource run: %s\n' \
               'Candidate evidence collected without repository write credentials, then deterministically validated before publication.' \
+              "$RESEARCH_PROVIDER" \
+              "$RESEARCH_MODEL" \
+              "$RESEARCH_PROMPT_VERSION" \
               "$RUN_URL" > "$body_file"
             pr_url=$(gh pr create \
               --base "$DEFAULT_BRANCH" \
@@ -758,7 +1049,11 @@ jobs:
             echo "pr_url=$pr_url"
             echo "pr_number=$pr_number"
           } >> "$GITHUB_OUTPUT"
-          echo "Published candidate PR: $pr_url" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "Published candidate PR: $pr_url"
+            echo "Research provider/model: $RESEARCH_PROVIDER / $RESEARCH_MODEL"
+            echo "Research contract: $RESEARCH_PROMPT_VERSION"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Reconcile main-catalog evidence-gap issues
         env:
@@ -857,7 +1152,7 @@ jobs:
 
   notify-failure:
     name: Notify on scheduled failure
-    needs: [prepare, research, validate-candidate, publish]
+    needs: [prepare, research-openai, research-anthropic, validate-candidate, publish]
     if: >-
       always() && github.event_name == 'schedule' &&
       contains(needs.*.result, 'failure')
@@ -913,7 +1208,7 @@ jobs:
 
   close-resolved-failures:
     name: Close resolved scheduled failures
-    needs: [prepare, research, validate-candidate, publish]
+    needs: [prepare, research-openai, research-anthropic, validate-candidate, publish]
     if: >-
       always() && github.event_name == 'schedule' &&
       !contains(needs.*.result, 'failure') &&

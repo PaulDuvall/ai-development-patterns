@@ -1,0 +1,38 @@
+# The Actions prompt is the complete instruction contract for this disposable
+# candidate producer. Do not auto-load repository agent instructions that
+# require commits or pushes.
+project_doc_max_bytes = 0
+web_search = "live"
+default_permissions = "evidence-research"
+allow_login_shell = false
+
+[shell_environment_policy]
+inherit = "core"
+ignore_default_excludes = false
+
+[permissions.evidence-research]
+description = "Read the repository, write only verification candidate paths, and fetch public evidence."
+extends = ":workspace"
+
+[permissions.evidence-research.filesystem]
+"/home/runner/work/_temp/_runner_file_commands" = "deny"
+"/home/runner/work/_actions" = "deny"
+
+[permissions.evidence-research.filesystem.":workspace_roots"]
+"." = "read"
+"README.md" = "write"
+"index.html" = "write"
+"assets/js/patterns-data.js" = "write"
+"experiments/NOTES.md" = "write"
+"verification/DECISIONS.md" = "write"
+"verification/STATUS.md" = "write"
+"verification/pending-evidence.yaml" = "write"
+"verification/evidence" = "write"
+".git" = "deny"
+".beads" = "deny"
+
+[permissions.evidence-research.network]
+enabled = true
+
+[permissions.evidence-research.network.domains]
+"*" = "allow"
