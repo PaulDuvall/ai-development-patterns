@@ -1,5 +1,5 @@
 # Runtime dependencies
-beautifulsoup4==4.14.3
+beautifulsoup4==4.15.0
 certifi==2026.6.17
 charset-normalizer==3.4.9
 idna==3.18
