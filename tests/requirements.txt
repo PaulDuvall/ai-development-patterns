@@ -3,7 +3,7 @@ beautifulsoup4==4.14.3
 certifi==2026.6.17
 charset-normalizer==3.4.9
 idna==3.18
-PyYAML==6.0.2
+PyYAML==6.0.3
 requests==2.32.3
 soupsieve==2.8.4
 typing_extensions==4.16.0
