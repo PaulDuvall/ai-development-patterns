@@ -156,6 +156,10 @@ def test_optional_claude_review_is_opt_in_and_skips_without_a_key():
         action["if"])
     assert action["with"]["anthropic_api_key"] == (
         "${{ secrets.CLAUDE_REVIEW_API_KEY }}")
+    assert "direct_prompt" not in action["with"]
+    assert "REPO: ${{ github.repository }}" in action["with"]["prompt"]
+    assert "PR NUMBER: ${{ github.event.pull_request.number }}" in (
+        action["with"]["prompt"])
 
 
 def test_no_workflow_can_restore_a_legacy_shared_provider_secret():
