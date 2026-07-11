@@ -88,6 +88,89 @@ def test_paid_scope_and_model_overrides_require_explicit_manual_acknowledgement(
     assert "allow_high_cost_model=true" in script
 
 
+def test_paid_provider_calls_require_protected_human_approval():
+    workflow = load_workflow(VERIFY)
+    prepare = workflow["jobs"]["prepare"]
+    approval = workflow["jobs"]["authorize-paid-research"]
+
+    assert approval["name"] == "Human approval for paid research"
+    assert approval["needs"] == "prepare"
+    assert "needs.prepare.result == 'success'" in approval["if"]
+    assert "needs.prepare.outputs.has_units == 'true'" in approval["if"]
+    assert approval["environment"] == {
+        "name": "evidence-paid-research",
+        "deployment": "false",
+    }
+    assert approval["permissions"] == {"actions": "read"}
+    assert approval["outputs"] == {
+        "approved_attempt": "${{ steps.authorization.outputs.approved_attempt }}",
+        "approved_plan_id": "${{ steps.authorization.outputs.approved_plan_id }}",
+    }
+    protection = named_step(
+        approval, "Verify approval environment remains protected")["run"]
+    assert "required_reviewers" in protection
+    assert ".reviewer.login | ascii_downcase" in protection
+    assert '$owner | ascii_downcase' in protection
+    assert ".deployment_branch_policy.protected_branches == true" in protection
+    assert "custom_branch_policies == false" in protection
+    assert ".can_admins_bypass == false" in protection
+    assert "must require the repository owner, protected branches" in protection
+    authorization = named_step(
+        approval, "Bind human authorization to this plan and run attempt")
+    assert authorization["id"] == "authorization"
+    assert "approved_attempt=attempt-${GITHUB_RUN_ATTEMPT}" in authorization["run"]
+    assert "approved_plan_id=$PLAN_ID" in authorization["run"]
+    assert authorization["env"]["PLAN_ID"] == "${{ needs.prepare.outputs.plan_id }}"
+
+    summary = named_step(prepare, "Build deterministic inventory and worklist")["run"]
+    assert "Human approval required before paid research" in summary
+    assert "No OpenAI or Anthropic preflight or research call will start" in summary
+    assert "evidence-paid-research" in summary
+    assert "Provider/model" in summary
+    assert "one billable provider preflight" in summary
+    assert "No reviewed dollar estimate is available for this OpenAI model" in summary
+    assert "Anthropic worker bounds" in summary
+    assert "No reviewed dollar estimate is available for Anthropic" in summary
+    assert "No paid research selected" in summary
+    assert "No environment approval, provider preflight, or research call" in summary
+
+    for provider in ("openai", "anthropic"):
+        preflight = workflow["jobs"][f"preflight-{provider}"]
+        assert preflight["needs"] == ["prepare", "authorize-paid-research"]
+        assert "needs.authorize-paid-research.result == 'success'" in preflight["if"]
+        assert "approved_plan_id == needs.prepare.outputs.plan_id" in preflight["if"]
+        assert "approved_attempt == format('attempt-{0}', github.run_attempt)" in preflight["if"]
+
+        research = workflow["jobs"][f"research-{provider}"]
+        assert research["needs"] == [
+            "prepare", "authorize-paid-research", f"preflight-{provider}"]
+        assert "needs.authorize-paid-research.result == 'success'" in research["if"]
+        assert "approved_plan_id == needs.prepare.outputs.plan_id" in research["if"]
+        assert "approved_attempt == format('attempt-{0}', github.run_attempt)" in research["if"]
+
+    workflow_text = VERIFY.read_text(encoding="utf-8")
+    assert "secrets.EVIDENCE_OPENAI_API_KEY" in workflow_text
+    assert "secrets.OPENAI_API_KEY" not in workflow_text
+
+    paid_markers = (
+        "secrets.EVIDENCE_OPENAI_API_KEY",
+        "secrets.ANTHROPIC_API_KEY",
+        "ANTHROPIC_FEDERATION_RULE_ID",
+        "openai/codex-action@",
+        "anthropics/claude-code-action@",
+    )
+    jobs_with_provider_access = {
+        name for name, job in workflow["jobs"].items()
+        if any(marker in str(job) for marker in paid_markers)
+    }
+    assert jobs_with_provider_access == {
+        "preflight-openai",
+        "preflight-anthropic",
+        "research-openai",
+        "research-anthropic",
+    }
+
+
 def test_optional_claude_review_is_opt_in_and_skips_without_a_key():
     workflow = load_workflow(CLAUDE_REVIEW)
     job = workflow["jobs"]["claude-review"]
@@ -155,8 +238,10 @@ def test_provider_jobs_are_mutually_exclusive_and_least_privilege():
     assert anthropic["permissions"] == {"contents": "read", "id-token": "write"}
     assert "outputs.provider == 'openai'" in openai["if"]
     assert "outputs.provider == 'anthropic'" in anthropic["if"]
-    assert openai["needs"] == ["prepare", "preflight-openai"]
-    assert anthropic["needs"] == ["prepare", "preflight-anthropic"]
+    assert openai["needs"] == [
+        "prepare", "authorize-paid-research", "preflight-openai"]
+    assert anthropic["needs"] == [
+        "prepare", "authorize-paid-research", "preflight-anthropic"]
     assert "needs.preflight-openai.result == 'success'" in openai["if"]
     assert "needs.preflight-anthropic.result == 'success'" in anthropic["if"]
     for job, timeout_minutes in ((openai, "45"), (anthropic, "60")):
@@ -182,8 +267,10 @@ def test_provider_preflights_gate_research_before_matrix_fanout():
     openai = workflow["jobs"]["preflight-openai"]
     anthropic = workflow["jobs"]["preflight-anthropic"]
 
-    assert openai["needs"] == "prepare"
-    assert anthropic["needs"] == "prepare"
+    assert openai["needs"] == ["prepare", "authorize-paid-research"]
+    assert anthropic["needs"] == ["prepare", "authorize-paid-research"]
+    assert "needs.authorize-paid-research.result == 'success'" in openai["if"]
+    assert "needs.authorize-paid-research.result == 'success'" in anthropic["if"]
     assert openai["permissions"] == {"contents": "read"}
     assert anthropic["permissions"] == {
         "contents": "read", "id-token": "write"}
@@ -202,7 +289,7 @@ def test_provider_preflights_gate_research_before_matrix_fanout():
     openai_probe = named_step(
         openai, "Verify OpenAI credential, model, and quota")
     assert openai_probe["env"] == {
-        "OPENAI_API_KEY": "${{ secrets.OPENAI_API_KEY }}",
+        "OPENAI_API_KEY": "${{ secrets.EVIDENCE_OPENAI_API_KEY }}",
         "PROVIDER_MODEL": "${{ needs.prepare.outputs.model }}",
     }
     assert "scripts/check-provider-preflight.py" in openai_probe["run"]
@@ -246,7 +333,7 @@ def test_provider_preflights_gate_research_before_matrix_fanout():
     assert guard["run"] == "python3 scripts/check-claude-execution.py"
 
     expected_observers = {
-        "prepare", "preflight-openai", "preflight-anthropic",
+        "prepare", "authorize-paid-research", "preflight-openai", "preflight-anthropic",
         "research-openai", "research-anthropic", "validate-candidate",
         "assemble-candidate", "publish",
     }
@@ -406,7 +493,7 @@ def test_openai_research_uses_pinned_bounded_codex_action():
     assert action["uses"] == (
         "openai/codex-action@52fe01ec70a42f454c9d2ebd47598f9fd6893d56")
     inputs = action["with"]
-    assert inputs["openai-api-key"] == "${{ secrets.OPENAI_API_KEY }}"
+    assert inputs["openai-api-key"] == "${{ secrets.EVIDENCE_OPENAI_API_KEY }}"
     assert inputs["codex-version"] == "0.144.1"
     assert inputs["codex-home"] == "/home/evidence-agent/.codex"
     assert inputs["working-directory"] == "/home/evidence-agent/workspace"

@@ -350,6 +350,7 @@ jobs:
           STALE_DAYS: ${{ steps.inputs.outputs.stale_days }}
           PROVIDER: ${{ steps.inputs.outputs.provider }}
           MODEL: ${{ steps.inputs.outputs.model }}
+          MAX_TURNS: ${{ steps.inputs.outputs.max_turns }}
         run: |
           set -euo pipefail
           limit=10
@@ -389,10 +390,34 @@ jobs:
               print(f"has_units={'true' if units else 'false'}", file=output)
               print(f"unit_count={len(units)}", file=output)
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
+              if units:
+                  print("## Human approval required before paid research", file=summary)
+                  print(
+                      "No OpenAI or Anthropic preflight or research call will start until a "
+                      "required reviewer approves the protected `evidence-paid-research` "
+                      "environment. Reject the request, or leave it waiting, if the selected "
+                      "work or cost envelope is not acceptable.",
+                      file=summary,
+                  )
+                  print(
+                      f"Provider/model: `{os.environ['PROVIDER']}` / `{os.environ['MODEL']}`",
+                      file=summary,
+                  )
+                  print(
+                      f"Approval authorizes one billable provider preflight and up to "
+                      f"{len(units)} sequential paid worker(s) for this exact plan and attempt.",
+                      file=summary,
+                  )
+              else:
+                  print("## No paid research selected", file=summary)
+                  print(
+                      "No environment approval, provider preflight, or research call will occur.",
+                      file=summary,
+                  )
               print(f"Selected worklist JSON: {os.environ['SELECTED_SLUGS']}", file=summary)
               print(f"Execution plan SHA-256: `{plan_id}`", file=summary)
               print(f"Independent research units: {len(units)}", file=summary)
-              if os.environ["PROVIDER"] == "openai":
+              if units and os.environ["PROVIDER"] == "openai":
                   weighted_limit = 300_000
                   input_rates = {
                       "gpt-5.6-luna": 1.00,
@@ -413,9 +438,26 @@ jobs:
                           f"${envelope:.2f} for {len(units)} unit(s).",
                           file=summary,
                       )
+                  else:
+                      print(
+                          "No reviewed dollar estimate is available for this OpenAI model; "
+                          "verify current pricing before approval.",
+                          file=summary,
+                      )
                   print(
                       "This is not a hard dollar cap: one response may cross the stop, "
                       "and cached input, web search, and long-context premiums are separate.",
+                      file=summary,
+                  )
+              elif units:
+                  print(
+                      f"Anthropic worker bounds: at most {os.environ['MAX_TURNS']} turns and "
+                      "12 requested live searches per unit, one worker at a time, fail-fast.",
+                      file=summary,
+                  )
+                  print(
+                      "No reviewed dollar estimate is available for Anthropic; verify current "
+                      "model and tool pricing before approval.",
                       file=summary,
                   )
           PY
@@ -429,11 +471,69 @@ jobs:
           retention-days: 7
           overwrite: true
 
-  preflight-openai:
-    name: Preflight OpenAI provider
+  authorize-paid-research:
+    name: Human approval for paid research
     needs: prepare
     if: >-
+      needs.prepare.result == 'success' &&
+      needs.prepare.outputs.has_units == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment:
+      name: evidence-paid-research
+      deployment: false
+    permissions:
+      actions: read # Reads the environment rule to fail closed before paid calls.
+    outputs:
+      approved_attempt: ${{ steps.authorization.outputs.approved_attempt }}
+      approved_plan_id: ${{ steps.authorization.outputs.approved_plan_id }}
+    steps:
+      - name: Verify approval environment remains protected
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          environment=$(gh api \
+            "repos/${GITHUB_REPOSITORY}/environments/evidence-paid-research")
+          if ! jq -e --arg owner "$GITHUB_REPOSITORY_OWNER" '
+            any(.protection_rules[]?;
+              .type == "required_reviewers" and
+              any(.reviewers[]?;
+                .type == "User" and
+                (.reviewer.login | ascii_downcase) == ($owner | ascii_downcase)))
+            and .deployment_branch_policy.protected_branches == true
+            and .deployment_branch_policy.custom_branch_policies == false
+            and .can_admins_bypass == false
+          ' <<< "$environment" > /dev/null; then
+            echo "::error::evidence-paid-research must require the repository owner, protected branches, and no admin bypass"
+            exit 1
+          fi
+
+      - name: Bind human authorization to this plan and run attempt
+        id: authorization
+        env:
+          PROVIDER: ${{ needs.prepare.outputs.provider }}
+          MODEL: ${{ needs.prepare.outputs.model }}
+          PLAN_ID: ${{ needs.prepare.outputs.plan_id }}
+          UNIT_COUNT: ${{ needs.prepare.outputs.unit_count }}
+        run: |
+          echo "approved_attempt=attempt-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
+          echo "approved_plan_id=$PLAN_ID" >> "$GITHUB_OUTPUT"
+          {
+            echo "## Paid research authorized"
+            echo "A required reviewer approved \`evidence-paid-research\`."
+            echo "Provider/model: \`$PROVIDER\` / \`$MODEL\`"
+            echo "Independent research units: $UNIT_COUNT"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  preflight-openai:
+    name: Preflight OpenAI provider
+    needs: [prepare, authorize-paid-research]
+    if: >-
       needs.prepare.outputs.provider == 'openai' &&
+      needs.authorize-paid-research.result == 'success' &&
+      needs.authorize-paid-research.outputs.approved_plan_id == needs.prepare.outputs.plan_id &&
+      needs.authorize-paid-research.outputs.approved_attempt == format('attempt-{0}', github.run_attempt) &&
       needs.prepare.outputs.has_units == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -453,7 +553,7 @@ jobs:
 
       - name: Verify OpenAI credential, model, and quota
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.EVIDENCE_OPENAI_API_KEY }}
           PROVIDER_MODEL: ${{ needs.prepare.outputs.model }}
         run: >-
           python3 scripts/check-provider-preflight.py
@@ -462,9 +562,12 @@ jobs:
 
   preflight-anthropic:
     name: Preflight Anthropic provider
-    needs: prepare
+    needs: [prepare, authorize-paid-research]
     if: >-
       needs.prepare.outputs.provider == 'anthropic' &&
+      needs.authorize-paid-research.result == 'success' &&
+      needs.authorize-paid-research.outputs.approved_plan_id == needs.prepare.outputs.plan_id &&
+      needs.authorize-paid-research.outputs.approved_attempt == format('attempt-{0}', github.run_attempt) &&
       needs.prepare.outputs.has_units == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -523,9 +626,12 @@ jobs:
 
   research-openai:
     name: OpenAI research (${{ matrix.unit_id }})
-    needs: [prepare, preflight-openai]
+    needs: [prepare, authorize-paid-research, preflight-openai]
     if: >-
       needs.prepare.outputs.provider == 'openai' &&
+      needs.authorize-paid-research.result == 'success' &&
+      needs.authorize-paid-research.outputs.approved_plan_id == needs.prepare.outputs.plan_id &&
+      needs.authorize-paid-research.outputs.approved_attempt == format('attempt-{0}', github.run_attempt) &&
       needs.preflight-openai.result == 'success' &&
       needs.prepare.outputs.has_units == 'true'
     strategy:
@@ -753,7 +859,7 @@ jobs:
         if: steps.research-checkpoint.outputs.cache-hit != 'true'
         uses: openai/codex-action@52fe01ec70a42f454c9d2ebd47598f9fd6893d56 # v1
         with:
-          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          openai-api-key: ${{ secrets.EVIDENCE_OPENAI_API_KEY }}
           codex-version: "0.144.1"
           codex-home: /home/evidence-agent/.codex
           working-directory: /home/evidence-agent/workspace
@@ -911,9 +1017,12 @@ jobs:
 
   research-anthropic:
     name: Anthropic research (${{ matrix.unit_id }})
-    needs: [prepare, preflight-anthropic]
+    needs: [prepare, authorize-paid-research, preflight-anthropic]
     if: >-
       needs.prepare.outputs.provider == 'anthropic' &&
+      needs.authorize-paid-research.result == 'success' &&
+      needs.authorize-paid-research.outputs.approved_plan_id == needs.prepare.outputs.plan_id &&
+      needs.authorize-paid-research.outputs.approved_attempt == format('attempt-{0}', github.run_attempt) &&
       needs.preflight-anthropic.result == 'success' &&
       needs.prepare.outputs.has_units == 'true'
     strategy:
@@ -2108,6 +2217,7 @@ jobs:
     name: Notify on scheduled failure
     needs:
       - prepare
+      - authorize-paid-research
       - preflight-openai
       - preflight-anthropic
       - research-openai
@@ -2172,6 +2282,7 @@ jobs:
     name: Close resolved scheduled failures
     needs:
       - prepare
+      - authorize-paid-research
       - preflight-openai
       - preflight-anthropic
       - research-openai

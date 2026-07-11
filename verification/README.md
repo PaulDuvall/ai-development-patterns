@@ -28,6 +28,7 @@ The flow is:
 ```text
 schedule/manual request
   -> deterministic catalog inventory
+  -> protected-environment human approval for this plan and run attempt
   -> selected-provider credential/model/quota preflight
   -> one read-only research unit per pattern
   -> trusted URL/quote hydration -> content-bound unit artifact
@@ -74,7 +75,8 @@ gh workflow run evidence-validation.yml
 ```
 
 After this workflow exists on the default branch, an administrator can idempotently install its
-required-check ruleset and the scoped Actions publisher setting. The command is a dry run unless
+required-check ruleset, scoped Actions publisher setting, and protected paid-research environment.
+The authenticated GitHub user becomes the required reviewer; the command is a dry run unless
 `--apply` is supplied:
 
 ```bash
@@ -121,6 +123,31 @@ gh workflow run verify-patterns.yml -f mode=discover-only  # discovery only
 gh workflow run verify-patterns.yml -f mode=single-pattern -f pattern="Security Sandbox"
 gh workflow run verify-patterns.yml -f provider=anthropic  # explicit alternate provider
 ```
+
+Every run with selected work stops after the free deterministic planning job and waits at the
+protected `evidence-paid-research` environment. The planning summary shows the provider, model,
+selected units, and approximate OpenAI token-cost envelope before anything billable happens. In the
+Actions run, select **Review deployments**, select `evidence-paid-research`, and choose **Approve and
+deploy** only after reviewing that summary. Choosing **Reject**, leaving the request waiting, or
+cancelling the run before approval makes zero provider calls. This approval applies to both manual dispatches and
+the weekly schedule; neither provider preflight nor research can start first.
+
+Approval is bound to the exact plan hash and `GITHUB_RUN_ATTEMPT`. **Re-run failed jobs** cannot
+reuse an approval from an earlier attempt; use **Re-run all jobs**, review the newly generated plan,
+and approve again. This intentionally makes every paid retry another explicit spending decision.
+
+The environment is an external safety control and must retain at least one required reviewer plus
+its protected-branches-only policy. The authorization job verifies both settings and fails closed if
+they drift. For this single-owner repository, self-review remains allowed so the maintainer can
+approve a run they initiated, while administrator bypass is disabled. Adding a second reviewer
+would allow stronger two-person approval.
+The manual `confirm_full_catalog` acknowledgement is an additional full-run warning, not a
+substitute for environment approval.
+
+This gate protects the paid provider path in `.github/workflows/verify-patterns.yml`. Local
+`/verify-patterns` commands and separate opt-in assistant/review workflows are outside this gate and
+must be authorized independently. One environment approval authorizes the entire displayed plan,
+not each individual worker, so review the unit count and bounds before approving.
 
 By default, preparation fails while another same-repository `verify/refresh-*` PR is open, and the
 publisher repeats that check after research. This keeps the generated status, pending list, and
@@ -203,7 +230,10 @@ trusted code from the untouched checkout then hydrates retrieval metadata and ex
 unit path. Configure a
 dedicated OpenAI Platform project or
 [service-account key](https://platform.openai.com/docs/api-reference/project-service-accounts) as
-the `OPENAI_API_KEY` Actions secret. A ChatGPT subscription/session token is not an API key, and API
+the `EVIDENCE_OPENAI_API_KEY` Actions secret. The evidence-specific name intentionally differs from
+the retired `OPENAI_API_KEY`: historical workflow attempts retain their old YAML for 30 days, so
+leaving the old secret deleted prevents those ungated attempts from regaining a credential. A
+ChatGPT subscription/session token is not an API key, and API
 usage is billed to the Platform project. The default model is
 [`gpt-5.6-luna`](https://developers.openai.com/api/docs/models/gpt-5.6-luna) at low reasoning
 effort. Set the optional `OPENAI_EVIDENCE_MODEL` repository variable to another reviewed
@@ -211,7 +241,7 @@ cost-sensitive model identifier; higher-cost models require the explicit manual 
 above. The OpenAI preflight calls the configured model once before the first isolated worker starts.
 
 ```bash
-gh secret set OPENAI_API_KEY       # prompts without echoing the key
+gh secret set EVIDENCE_OPENAI_API_KEY  # prompts without echoing the key
 gh variable set OPENAI_EVIDENCE_MODEL --body gpt-5.6-luna  # optional explicit default
 ```
 
