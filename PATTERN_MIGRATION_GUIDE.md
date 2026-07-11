@@ -343,7 +343,7 @@ All GitHub markdown anchor links have changed. Update your hyperlinks:
 | `#specification-driven-development` | `#spec-driven-development` |
 | `#ai-plan-first-development` | `#planned-implementation` |
 | `#progressive-ai-enhancement` | `#incremental-generation` |
-| `#ai-choice-generation` | `#choice-generation` |
+| `#ai-choice-generation` | `#adversarial-evaluator` |
 | `#choice-generation` | `#cross-model-validation` |
 | `#question-generation` | `#planned-implementation` (merged) |
 | `#constrained-generation` | `#planned-implementation` (merged) |
@@ -353,14 +353,14 @@ All GitHub markdown anchor links have changed. Update your hyperlinks:
 | `#atomic-task-decomposition` | `#atomic-decomposition` |
 | `#parallelized-ai-coding-agents` | `#parallel-agents` |
 | `#ai-context-persistence` | `#agent-memory` |
-| `#constraint-based-ai-development` | `#constrained-generation` |
+| `#constraint-based-ai-development` | `#planned-implementation` (merged) |
 | `#observable-ai-development` | `#agent-observability` |
 | `#ai-driven-refactoring` | `#guided-refactoring` |
-| `#ai-driven-architecture-design` | `#guided-architecture` |
-| `#ai-driven-traceability` | `#automated-traceability` |
+| `#ai-driven-architecture-design` | `experiments/README.md#guided-architecture` (demoted) |
+| `#ai-driven-traceability` | `#spec-driven-development` (merged) |
 | `#policy-as-code-generation` | `#policy-generation` |
 | `#security-scanning-orchestration` | `#security-orchestration` |
-| `#performance-baseline-management` | `#baseline-management` |
+| `#performance-baseline-management` | (archived, no replacement) |
 
 ### Experimental Pattern Anchors
 

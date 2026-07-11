@@ -27,4 +27,4 @@ This directory contains working implementations of selected experimental pattern
 2. Pick an experimental example directory from the table above.
 3. Follow the `README.md` in that directory.
 
-Examples for promoted patterns now live in the main [examples directory](../../examples/), including [Bounded Autonomy](../../examples/bounded-autonomy/), [Code Research](../../examples/code-research/), [Debt Forecasting](../../examples/debt-forecasting/), and [Drift Remediation](../../examples/drift-remediation/).
+Examples for promoted patterns live in the main [examples directory](../../examples/), including [Bounded Autonomy](../../examples/bounded-autonomy/), [Code Research](../../examples/code-research/), [Debt Forecasting](../../examples/debt-forecasting/), and [Drift Remediation](../../examples/drift-remediation/).

@@ -480,7 +480,7 @@ class ReviewAutomationAnalytics:
 
 ## Integration with Other Patterns
 
-### Parallelized AI Coding Agents
+### [Parallel Agents](../../../README.md#parallel-agents)
 - Automatically review outputs from parallel agent workflows
 - Detect conflicts between specialized agent domains
 - Coordinate merge timing with agent completion

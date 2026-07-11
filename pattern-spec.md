@@ -21,6 +21,7 @@ The main documentation MUST include a comprehensive reference table at the begin
 - Ensure all internal links work correctly throughout the document
 - Pattern names in "Related Patterns" sections MUST always be hyperlinked
 - Pattern references inside code blocks and inline code (for example `examples/pattern-name/`) are exempt from hyperlink requirements
+- Historical documents (for example `PATTERN_MIGRATION_GUIDE.md`) are exempt from hyperlink requirements: they record naming history as plain text and are not navigational catalog content
 
 ## Pattern Structure
 
