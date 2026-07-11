@@ -16,13 +16,14 @@ WRAPPERS = (
     "check_traceability.sh",
     "run_orr_checklist.sh",
 )
+PYTHON_BIN = os.environ.get("PYTHON", "python3")
 
 
 def run(*command, cwd=EXAMPLE):
     """Run one bounded local-only example command."""
     environment = {
         **os.environ,
-        "PYTHON_BIN": os.environ.get("PYTHON", "python3"),
+        "PYTHON_BIN": PYTHON_BIN,
     }
     return subprocess.run(
         command,
@@ -52,7 +53,7 @@ def test_checked_in_enforcement_and_sample_project_are_runnable():
         assert message in result.stdout
 
     tests = run(
-        "python3", "-m", "unittest", "discover",
+        PYTHON_BIN, "-m", "unittest", "discover",
         "-s", "sample-project/tests", "-t", "sample-project", "-v",
     )
     assert tests.returncode == 0, tests.stderr
