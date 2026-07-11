@@ -1,3 +1,7 @@
+<!-- Annotated worked example. retro-analysis.py generates the metrics, root-cause table,
+proposed-rule checklist, and next steps. The explicit no-repeat note and Analysis section below are
+human-authored additions and are not analyzer output. -->
+
 # Feedback Flywheel Retrospective (7-Day)
 
 **Period**: Last 7 days
@@ -39,11 +43,3 @@ This single rules file would have prevented all three corrections in this sessio
 2. Add validated rules to `.ai/rules/api-conventions.md`
 3. Address repeated corrections first (highest impact)
 4. Re-run retro next period to measure improvement
-
-## Expected Impact
-
-If these rules had been in place, the session acceptance rate would have been:
-- Actual: 4/7 = 57%
-- Projected: 7/7 = 100%
-
-Target: achieve 75%+ acceptance rate within 2 retrospective cycles.

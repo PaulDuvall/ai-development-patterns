@@ -73,7 +73,7 @@ def emit_exhaustion_notice(file_path: str, blocks: int) -> None:
     message = (
         f"auto-remediate: {file_path} has been blocked {blocks} times. "
         "Suggested actions: raise the rule threshold in thresholds.yml, "
-        "add the file to skip_directories, or add an inline '# rule: ignore' marker."
+        "or add the file to skip_directories after human review."
     )
     print(message, file=sys.stderr)
     clear_block(file_path)

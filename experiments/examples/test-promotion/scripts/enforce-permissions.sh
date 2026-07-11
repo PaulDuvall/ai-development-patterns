@@ -11,10 +11,10 @@ count=0
 while IFS= read -r -d '' file; do
     chmod 444 "$file"
     echo "   ✓ $file → 444 (read-only)"
-    ((count++))
+    count=$((count + 1))
 done < <(find tests/golden -type f -name "*.py" -print0)
 
 echo ""
 echo "✅ Protected $count golden test(s)"
-echo "   AI cannot modify these files"
-echo "   Human edits require promotion workflow"
+echo "   This advisory mode prevents accidental edits in this checkout"
+echo "   CI and required CODEOWNERS review remain the binding controls"

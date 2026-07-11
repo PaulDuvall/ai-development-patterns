@@ -1,8 +1,8 @@
 """
 Simple Payment Processing System
 
-Demonstrates the Test Promotion pattern with immutable golden tests
-protecting critical business logic.
+Demonstrates the Test Promotion pattern with human-reviewed golden tests
+protecting critical business logic when repository controls are installed.
 """
 
 # In-memory transaction registry (simulates database)

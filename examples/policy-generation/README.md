@@ -1,22 +1,23 @@
-# Policy Generation Implementation
+# Policy Generation Example
 
-This directory contains a complete implementation of the Policy Generation pattern, transforming compliance requirements into executable Cedar/OPA policy files using AI assistance.
+This directory provides a runnable generator wrapper, written requirements, and example Cedar,
+Rego, and AWS Config artifacts for the [Policy Generation](../../README.md#policy-generation)
+pattern. Generated output is a review candidate, not an approved or semantically validated policy.
 
 ## Overview
 
-This implementation demonstrates how to:
-- Transform written compliance requirements into executable policy code
-- Generate Cedar and OPA (Open Policy Agent) policies using AI
-- Test and validate generated policies
-- Integrate policy generation into CI/CD pipelines
+This example demonstrates how to:
+- Transform written compliance requirements into candidate policy code
+- Generate Cedar and OPA (Open Policy Agent) text through an `ai` CLI
+- Syntax-parse generated candidates with the official CLIs
+- Compare candidates with reviewed policy files before a human-owned adoption decision
 
-## Files in this Implementation
+## Files in this Example
 
 - `iam_permissions.cedar` - Example Cedar IAM policy
 - `network_policy.rego` - Example OPA network policy
-- `config_rules.yml` - Configuration rules and compliance requirements
+- `config_rules.yml` - AWS Config rules (CloudFormation) generated from compliance requirements
 - `generate-policies.sh` - AI-powered policy generation script
-- `test-policies.sh` - Policy testing and validation script
 - `compliance-requirements.md` - Written requirements for transformation
 
 ## Quick Start
@@ -25,22 +26,26 @@ This implementation demonstrates how to:
 
 ```bash
 # Transform written requirements into Cedar policies
-./generate-policies.sh requirements/encryption.md cedar > policies/encryption.cedar
+./generate-policies.sh compliance-requirements.md cedar > generated.cedar
 
-# Generate OPA policies for network access
-./generate-policies.sh requirements/network.md opa > policies/network.rego
+# Generate OPA policies from the same requirements
+./generate-policies.sh compliance-requirements.md opa > generated.rego
 
-# Test generated policies
-./test-policies.sh
+# Validate the generated policies with the Cedar and OPA CLIs
+cedar check-parse --policies generated.cedar
+opa check generated.rego
 ```
+
+The generation script requires an `ai` CLI on your PATH; validation requires the [Cedar CLI](https://github.com/cedar-policy/cedar) and [OPA](https://www.openpolicyagent.org/docs/latest/#running-opa).
 
 ### Example Transformation
 
-**Input (compliance-requirements.md):**
+**Input (from compliance-requirements.md):**
 ```markdown
-## SOC 2 Data Encryption Requirement
-Data at rest must be AES-256 encrypted in transit and at rest per SOC 2.
-All database connections must use TLS 1.2 or higher.
+## REQ-001: Data Encryption at Rest
+**Authority**: SOC 2 Type II
+**Description**: All sensitive data must be encrypted at rest using AES-256 encryption or stronger
+**Implementation**: Database encryption, file system encryption, automated key rotation every 90 days
 ```
 
 **Generated Cedar Policy:**
@@ -79,11 +84,11 @@ permit(
 # .github/workflows/cedar-policy-validation.yml
 - name: Generate Cedar Policies
   run: |
-    ai "Convert docs/compliance/*.md into Cedar policies" > policies/generated.cedar
+    ./generate-policies.sh compliance-requirements.md cedar > generated.cedar
 
 - name: Validate Cedar Policies
   run: |
-    cedar validate --schema schema.cedarschema policies/generated.cedar
+    cedar check-parse --policies generated.cedar
 ```
 
 **OPA/Rego Pipeline:**
@@ -91,38 +96,39 @@ permit(
 # .github/workflows/opa-policy-validation.yml
 - name: Generate OPA Policies
   run: |
-    ai "Convert docs/compliance/*.md into OPA Rego policies" > policies/generated.rego
+    ./generate-policies.sh compliance-requirements.md opa > generated.rego
 
-- name: Test OPA Policies
+- name: Parse OPA Policies
   run: |
-    opa test policies/ data/test-cases/
+    opa check generated.rego
 ```
 
 ### Compliance Automation
 ```bash
-# Weekly compliance policy update
-cron_job() {
-    ai "Review compliance-requirements.md for changes, update policies accordingly"
-    git add policies/
-    git commit -m "feat: update compliance policies based on requirement changes"
-}
+# Generate candidates; validation and human review decide whether to adopt them
+./generate-policies.sh compliance-requirements.md cedar > candidate.cedar
+./generate-policies.sh compliance-requirements.md opa > candidate.rego
+cedar check-parse --policies candidate.cedar
+opa check candidate.rego
+git diff --no-index iam_permissions.cedar candidate.cedar || true
+git diff --no-index network_policy.rego candidate.rego || true
 ```
 
 ## Testing and Validation
 
-### Policy Testing Framework
-- Unit tests for individual policy rules
-- Integration tests with sample data
-- Compliance verification tests
-- Performance testing for policy evaluation
+### Validation Boundary
+
+The shipped commands parse syntax only. An adopter must add unit cases for each authorization rule,
+integration inputs, compliance traceability, conflict analysis, and performance tests before
+deployment; those test suites and schemas are not included here.
 
 ### Test Examples
 ```bash
-# Test Cedar policies
-cedar validate --schema schema.cedarschema policies/*.cedar
+# Parse the shipped Cedar policy
+cedar check-parse --policies iam_permissions.cedar
 
-# Test OPA policies with sample data
-opa test policies/ data/test-cases/
+# Parse the shipped Rego policy
+opa check network_policy.rego
 ```
 
 ## Compliance Requirements Format
@@ -142,13 +148,13 @@ Requirements should be written in a consistent format:
 **Implementation**: Database encryption, file system encryption, key rotation
 ```
 
-## Advanced Features
+## Possible Extensions (Not Shipped)
 
-### AI-Powered Policy Generation
+### Generation Workflow
 - Natural language to policy transformation
 - Compliance framework mapping
-- Automated policy updates
-- Conflict detection and resolution
+- Reviewed policy-update proposals
+- Schema- and test-backed conflict analysis supplied by the adopter
 
 ### Policy Optimization
 - Performance optimization for policy evaluation
@@ -160,20 +166,21 @@ Requirements should be written in a consistent format:
 
 ### Common Issues
 - **Syntax Errors**: Validate policy syntax before deployment
-- **Conflicting Rules**: Use policy analyzers to detect conflicts
+- **Conflicting Rules**: Syntax checks cannot detect semantic conflicts; add an application schema,
+  authorization test cases, and a reviewed analyzer before making conflict-detection claims
 - **Performance Issues**: Profile policy evaluation times
 - **Compliance Gaps**: Regular audit against requirements
 
 ### Debug Commands
 ```bash
 # Validate Cedar policy syntax
-cedar validate policies/generated.cedar
+cedar check-parse --policies generated.cedar
 
-# Test OPA policy evaluation
-opa eval -d policies/ "data.authz.allow"
+# Validate OPA policy syntax
+opa check generated.rego
 
-# Check for policy conflicts
-./analyze-conflicts.sh policies/
+# No conflict analyzer or Cedar schema ships in this example.
+# Add project-specific schemas and authorization tests for semantic validation.
 ```
 
 ## Contributing

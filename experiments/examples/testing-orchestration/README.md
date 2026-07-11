@@ -1,221 +1,64 @@
-# Testing Orchestration Implementation
+# Testing Orchestration Example
 
-This directory contains a complete implementation of the Testing Orchestration pattern, providing a unified approach combining test-first development, automated test generation, and quality assurance patterns to ensure AI-generated code meets quality and behavioral specifications.
+This example implements the experimental [Testing Orchestration](../../README.md#testing-orchestration) pattern: a coordination layer generates candidate tests from human-owned specifications, evaluates them against quality gates, and promotes only reviewed tests into a protected baseline.
 
-## Overview
+## Current Status
 
-Testing Orchestration enables teams to:
-- Implement test-first development with AI-generated tests
-- Create unified testing frameworks across unit, integration, and acceptance levels
-- Automate test generation from specifications and requirements
-- Establish quality gates and coverage thresholds for AI-generated code
+What ships here is declarative test-specification content, not an executable harness:
 
-For complete pattern documentation, see: [Testing Orchestration](../../README.md#testing-orchestration)
+- Two machine-parsable configuration files — [`pipeline_tests/pipeline_tests.yaml`](pipeline_tests/pipeline_tests.yaml) and [`unit_tests/unit_tests.yml`](unit_tests/unit_tests.yml) — defining CI pipeline validation rules and function-to-test contracts for a sample authentication service.
+- A human-readable catalog of acceptance test scenarios in [`acceptance_tests/README.md`](acceptance_tests/README.md).
 
-## Files in this Implementation
+The orchestration machinery the pattern describes — AI test generation, quality-gate enforcement, flake analysis, promotion review — is documented concept only. No script, runner, or pipeline in this directory executes these specifications; adopters supply their own runner (a CI job, an agent workflow, or a test-framework plugin) that consumes these files.
 
-- `acceptance_tests/` - End-to-end acceptance test scenarios and examples
-- `pipeline_tests/` - CI/CD pipeline validation rules and testing automation
-- `unit_tests/` - Unit test configuration mappings and coverage tracking
-- `test_generators/` - AI-powered test generation tools and scripts
-- `quality_gates/` - Automated quality validation and threshold enforcement
+## Files
 
-## Testing Framework Components
-
-### Acceptance Testing
-- **Complete user journey testing** with realistic scenarios
-- **API contract validation** with request/response verification
-- **Authentication flow testing** including token management
-- **End-to-end workflow validation** across system boundaries
-
-### Pipeline Testing
-- **CI/CD pipeline validation** with automated rule checking
-- **Build process verification** including security scans
-- **Deployment pipeline testing** with rollback procedures
-- **Quality gate enforcement** with configurable thresholds
-
-### Unit Testing
-- **Function-to-test mapping** with automated discovery
-- **Test fixture management** with reusable components
-- **Mock and stub configuration** for isolated testing
-- **Coverage tracking** with detailed reporting
-
-### AI Test Generation
-- **Specification-driven test creation** from requirements
-- **Edge case identification** using AI analysis
-- **Test data generation** with realistic scenarios
-- **Regression test automation** based on change analysis
-
-## Integration with AI Development Patterns
-
-### Spec-Driven Development
-- Tests generated from machine-readable specifications
-- Acceptance criteria converted to executable tests
-- Traceability maintained between specs and tests
-- Requirements linked to test cases
-- Coverage tracking across requirement lifecycle
-- Impact analysis for specification changes
-
-### [Agent Observability](../../../README.md#agent-observability)
-- Test execution monitoring and analysis
-- Performance testing with baseline comparison
-- Failure pattern recognition and prevention
+- [`acceptance_tests/README.md`](acceptance_tests/README.md) — acceptance test scenarios for a sample authentication API: end-to-end login/refresh/logout journeys, profile CRUD and input-validation cases, JWT and HTTPS security checks, performance targets, and failure-recovery scenarios, each with explicit steps and success criteria.
+- [`pipeline_tests/pipeline_tests.yaml`](pipeline_tests/pipeline_tests.yaml) — machine-parsable CI pipeline validation rules: build success criteria, test-execution commands with coverage thresholds, lint and complexity quality gates, security scans, performance benchmarks, deployment checks, environment-specific overrides, and failure-handling policy.
+- [`unit_tests/unit_tests.yml`](unit_tests/unit_tests.yml) — machine-parsable unit-test contract mapping source functions to test files, fixtures, mocks, named test cases, and per-function coverage targets, plus fixture, mock, and factory definitions and execution settings.
 
 ## Quick Start
 
-### Generate Test Suite from Specifications
+The specification files are input contracts for whatever executes the tests. Confirm they parse before wiring them into a runner (requires PyYAML):
+
 ```bash
-# Generate comprehensive test suite from specifications
-ai "Create test suite from specification file:
-- Unit tests for all public functions
-- Integration tests for API endpoints
-- Acceptance tests for user workflows
-- Performance tests with baseline comparison"
-
-# Run generated tests with coverage
-pytest --cov=src --cov-report=html --spec-coverage
+python -c "import yaml, sys; [yaml.safe_load(open(f)) for f in sys.argv[1:]]" \
+  pipeline_tests/pipeline_tests.yaml unit_tests/unit_tests.yml
 ```
 
-### Validate CI/CD Pipeline
+An illustrative generation step — the `ai` command stands in for your AI assistant; no generator ships with this example:
+
 ```bash
-# Test pipeline configuration
-./validate-pipeline.sh --config pipeline_tests/pipeline_tests.yaml
-
-# Run pipeline tests locally
-docker compose -f pipeline_tests/test-pipeline.yml up --abort-on-container-exit
+# Illustrative — generate candidate unit tests from the declarative contract
+ai "Using unit_tests/unit_tests.yml as the authoritative contract, generate pytest
+tests for src.auth.service.authenticate_user covering the listed test cases,
+fixtures, and mocks. Treat coverage targets as minimums, not goals to relax."
 ```
 
-### Configure Test Automation
-```bash
-# Set up automated test generation
-python test_generators/setup_automation.py \
-  --source-dir src/ \
-  --spec-file specifications/ \
-  --output-dir tests/generated/
-```
+Generated tests remain candidates: your runner evaluates them against the gates in `pipeline_tests/pipeline_tests.yaml` and a human reviews them before they join the protected baseline.
 
-## Testing Strategy Workflow
+## Integration with AI Development Patterns
 
-### 1. Specification Analysis
-- Parse requirements and specifications
-- Identify testable behaviors and edge cases
-- Generate test matrices for comprehensive coverage
+### [Spec-Driven Development](../../../README.md#spec-driven-development)
+- The YAML files are human-owned specifications; generated tests are checked against them rather than redefining expected behavior
+- `unit_tests/unit_tests.yml` links each function to named test cases and coverage targets, preserving traceability between contract and tests
+- Acceptance criteria in `acceptance_tests/README.md` are written as concrete steps with explicit success criteria, ready for conversion to executable tests
 
-### 2. Test Generation
-- Create unit tests for individual functions
-- Generate integration tests for component interactions
-- Build acceptance tests for user scenarios
+### [Agent Observability](../../../README.md#agent-observability)
+- The pattern calls for recording prompts, test commands, coverage deltas, and promotion decisions; the reporting section of `pipeline_tests/pipeline_tests.yaml` defines the output formats and directories for that record
+- Failure-handling and retry policy in the pipeline rules give an observability layer defined events to capture and analyze
 
-### 3. Quality Validation
-- Execute all test levels with coverage tracking
-- Validate against quality gates and thresholds
-- Generate reports and metrics for analysis
+## Known Limitations
 
-### 4. Continuous Improvement
-- Analyze test failures and patterns
-- Update test generation based on learnings
-- Refine quality gates based on project needs
+- No executable orchestration ships here: nothing in this directory generates, runs, or gates tests. The specifications describe what a runner must enforce.
+- The specifications target a fictional Python authentication service using pytest, Docker, and GitHub Actions; other stacks must translate the commands and tool names.
+- Tool references inside the YAML files (trivy, bandit, radon, safety, trufflehog) are examples, not pinned dependencies of this repository.
+- Coverage thresholds and performance targets are illustrative defaults, not calibrated recommendations.
 
-## Configuration Examples
+## Promotion Path
 
-### Test Coverage Thresholds
-```yaml
-# unit_tests/coverage_config.yml
-coverage_requirements:
-  overall: 90%
-  individual_files: 85%
-  new_code: 95%
-  critical_paths: 100%
-```
+Promotion requires a working reference runner that consumes these specifications end to end (candidate generation, gate evaluation, promotion review), evidence that gated promotion catches weakened or self-serving assertions in practice, and independent practitioner adoption beyond a single language stack.
 
-### Pipeline Validation Rules
-```yaml
-# pipeline_tests/validation_rules.yml
-pipeline_validation:
-  build_time_max: 300s
-  test_execution_max: 600s
-  security_scan_required: true
-  deployment_approval_required: true
-```
+## Anti-pattern: Scattered Testing
 
-### Acceptance Test Configuration
-```yaml
-# acceptance_tests/test_config.yml
-test_environments:
-  staging:
-    base_url: "https://staging.example.com"
-    test_data: "staging_fixtures.json"
-  production:
-    base_url: "https://api.example.com"
-    test_data: "production_safe_fixtures.json"
-```
-
-## Advanced Features
-
-### AI-Powered Test Analysis
-- **Flaky test detection** with automated stabilization
-- **Test performance optimization** with execution analysis
-- **Gap analysis** for missing test scenarios
-- **Risk assessment** for untested code paths
-
-### Quality Gate Automation
-- **Automated threshold adjustment** based on project maturity
-- **Context-aware quality rules** for different code types
-- **Progressive quality improvement** with ratcheting thresholds
-- **Exception handling** for special cases and technical debt
-
-## Integration with Development Workflow
-
-### Pre-commit Hooks
-```bash
-# .git/hooks/pre-commit
-#!/bin/bash
-# Ensure new code has corresponding tests
-python test_generators/validate_test_coverage.py --staged-files
-```
-
-### CI/CD Integration
-```yaml
-# .github/workflows/comprehensive-testing.yml
-- name: Generate and Run Comprehensive Tests
-  run: |
-    python test_generators/generate_from_changes.py
-    pytest --comprehensive --coverage --performance
-    python quality_gates/validate_thresholds.py
-```
-
-## Troubleshooting
-
-### Common Issues
-- **Low Test Coverage**: Use AI to generate missing tests for uncovered code
-- **Flaky Tests**: Analyze execution patterns and stabilize with better assertions
-- **Slow Test Execution**: Optimize test parallelization and mock usage
-- **Quality Gate Failures**: Review thresholds and adjust based on project context
-
-### Debug Commands
-```bash
-# Analyze test execution patterns
-python test_analyzers/execution_analysis.py --timeframe 30days
-
-# Generate missing tests for low coverage areas
-python test_generators/coverage_gap_filler.py --threshold 90%
-
-# Validate test quality and effectiveness
-python quality_gates/test_effectiveness_analysis.py
-```
-
-## Contributing
-
-When extending the testing strategy:
-1. Add new test generation patterns for emerging code patterns
-2. Update quality gates based on project evolution
-3. Enhance AI analysis capabilities for better test recommendations
-4. Improve integration with development tools and workflows
-
-## Security Considerations
-
-⚠️ **Important Security Notes**
-- Sanitize test data to avoid exposing sensitive information
-- Use separate test environments with isolated data
-- Validate that tests don't create security vulnerabilities
-- Regular audit of test credentials and access permissions
+Generating tests ad hoc — without a specification contract, an execution record, or a promotion gate — produces duplicated coverage and false confidence. Keep human-owned specifications like the files in this directory authoritative, and treat every generated test as a candidate until it passes review.

@@ -1,24 +1,19 @@
-# Drift Remediation Implementation
+# Drift Remediation Example
 
-This directory contains a complete implementation of the [Drift Remediation](../../README.md#drift-remediation) pattern: detect infrastructure configuration drift, generate a reviewable corrective patch, and require approval before apply.
+Supporting material for the [Drift Remediation](../../README.md#drift-remediation) pattern: detect infrastructure configuration drift, generate a reviewable corrective patch, and require approval before apply.
 
-## Overview
+## Files in This Directory
 
-Drift Remediation enables teams to:
-- Deterministically detect infrastructure configuration drift
-- Generate corrective Terraform/CloudFormation patches
-- Assess drift risk levels and prioritize remediation
-- Preserve a human approval gate before infrastructure changes
-
-## Files in this Implementation
+- **[`infrastructure_drift.md`](infrastructure_drift.md)** - Drift detection and remediation reference covering Terraform drift scanning, scheduled drift monitoring in CI, AWS Config rules, AI-generated corrective patch workflows with risk classification, drift prevention (pre-commit validation and policy-as-code), monitoring and alerting, and emergency response procedures. Its scripts, workflows, and policies are illustrative implementations to adapt, not tooling shipped in this directory.
 
 For complete pattern documentation, see: [Drift Remediation](../../README.md#drift-remediation)
 
-- `infrastructure_drift.md` - Complete drift detection pattern documentation
-- `drift_scanners/` - Automated drift detection tools for various platforms
-- `remediation_scripts/` - AI-generated corrective patch generators
-- `risk_assessment/` - Drift impact analysis and prioritization tools
-- `continuous_monitoring/` - Scheduled drift detection automation
+## What Drift Remediation Provides
+
+- Deterministic detection of infrastructure configuration drift
+- Reviewable corrective Terraform/CloudFormation patches
+- Drift risk classification to prioritize remediation
+- A human approval gate preserved before infrastructure changes
 
 ## Types of Infrastructure Drift
 
@@ -37,21 +32,19 @@ For complete pattern documentation, see: [Drift Remediation](../../README.md#dri
 - Missing resources (in state but not in cloud)
 - Import required (resources exist but not managed)
 
-## Quick Start
+## Illustrative Workflow
+
+Keep detection deterministic and remediation reviewable. Capture the declared state, observed state, provider plan, and risk classification before generating a candidate correction:
 
 ```bash
-# Detect drift across infrastructure
-./detect-drift.sh --platform aws --scan-all
+terraform plan -detailed-exitcode -out=drift.tfplan || rc=$?
+[ "${rc:-0}" -eq 2 ] || exit "${rc:-0}"
+terraform show -json drift.tfplan > drift.json
 
-# Generate remediation plan
-ai "Compare current AWS infrastructure against Terraform state:
-1. Identify configuration drift in EC2, RDS, S3
-2. Generate corrective Terraform plan
-3. Assess drift risk level (critical/medium/low)
-4. Create automated remediation script with approval gates"
+ai "Propose the smallest Terraform patch for drift.json.
+Do not apply it. Identify destructive changes and required approvals." > remediation.md
 
-# Produce a candidate plan; a separate human-approved job performs apply
-./remediate-drift.sh --plan-only --output candidate.tfplan
+terraform plan -out=candidate.tfplan  # deterministic re-check after review
 ```
 
-**Complete Implementation**: This directory contains the full drift detection and remediation system with automated scanning, AI-powered analysis, and corrective patch generation.
+Only a human-approved pipeline applies the resulting plan. The agent that proposes a patch cannot approve or apply it. [`infrastructure_drift.md`](infrastructure_drift.md) expands this approach with scan scripts, a scheduled detection workflow, remediation risk gates, and prevention policies to adapt to your own environment.

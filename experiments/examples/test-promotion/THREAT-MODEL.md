@@ -1,174 +1,96 @@
 # Test Promotion Threat Model
 
-## Attack Vectors and Mitigations
+Golden tests are valuable only when the actor generating code cannot also weaken, delete, or approve
+the contracts used to grade that code. This example provides templates; it does not establish the
+repository controls merely by storing them under this nested example directory.
 
-### Attack Vector 1: AI Weakens Test Assertions
+## Required Trust Assumptions
 
-**Threat**: AI generates buggy code, then weakens test to make it pass (self-grading student).
+Before treating promotion as a binding control, an adopter must:
 
-```python
-# AI writes buggy code
-def process_payment(id, amount):
-    return {"status": "success"}  # BUG: No idempotency check
+1. Copy the workflow to the repository-root `.github/workflows/` directory and require its check.
+2. Merge the sample rule into the active root CODEOWNERS file, replace placeholder owners, and
+   require code-owner review.
+3. Protect the workflow, CODEOWNERS file, and branch/ruleset configuration from unreviewed candidate
+   changes, for example with a trusted-base validation workflow and owner approval.
+4. Prevent the generating agent from approving its own pull request or changing repository rules.
+5. Review changes to the golden-test harness and production code; a protected assertion can still
+   be meaningless or grade the wrong behavior.
 
-# AI weakens test to pass
-def test_payment_idempotency():
-    process_payment("123", 100)
-    process_payment("123", 100)  # Missing duplicate check!
-```
+Without these assumptions, the files in this example are documentation and local guardrails, not
+an unbypassable security boundary.
 
-**Mitigation**: Golden tests are immutable - AI cannot modify them.
-**Enforcement**: CI/CD detects changes, CODEOWNERS requires approval.
+## Threats and Controls
 
----
+### Assertion weakening
 
-### Attack Vector 2: AI Uses Edit/Write Tools on Golden Tests
+**Threat:** The generator changes an existing assertion so buggy production code passes.
 
-**Threat**: AI attempts to modify golden test directly using Edit or Write tools.
+**Binding control:** The required root workflow rejects modifications, renames, and deletions under
+`tests/golden/`. Required CODEOWNERS review is still needed for changes to the control itself.
 
-```python
-# AI tries:
-# Edit(file="tests/golden/test_payment.py", ...)
-```
+### Contract deletion
 
-**Mitigation**: AI hooks block Edit/Write tools on `tests/golden/**` paths.
-**Enforcement**: `.ai/hooks/protect-golden.sh` returns exit code 2 (BLOCK).
-**Reliability**: ✅ High (blocks tool before execution)
+**Threat:** The generator deletes a failing golden test.
 
----
+**Binding control:** Deletion is a non-addition and the required workflow rejects it.
 
-### Attack Vector 3: AI Bypasses Permissions via Bash
+### Unreviewed test addition
 
-**Threat**: AI uses Bash to bypass file permissions, modifies golden test, restores permissions.
+**Threat:** The generator adds a weak or irrelevant test and labels it golden.
 
-```bash
-# AI could run:
-chmod 644 tests/golden/test_payment.py
-echo "# weakened" >> tests/golden/test_payment.py
-chmod 444 tests/golden/test_payment.py
-```
+**Binding control:** A `test-promotion` label makes an addition structurally eligible; it does not
+approve it. Required CODEOWNERS review owns the semantic promotion decision.
 
-**Why File Permissions Alone Fail**: AI with bash access can change permissions.
+### Shell or file-mode bypass
 
-**Mitigation**: CI/CD detects **ANY** modification via git diff.
-**Enforcement**: `.github/workflows/test-protection.yml` checks:
-```yaml
-git diff --name-only | grep '^tests/golden/' && exit 1
-```
-**Reliability**: ✅ High (catches all git changes regardless of method)
+**Threat:** A shell-capable agent changes `444` to `644`, edits a contract, then restores the mode.
 
----
+**Control:** Git does not preserve `444`, so file mode is only an accidental-edit guard in one
+checkout. The commit-bound diff check, not the local mode, detects the content change.
 
-### Attack Vector 4: AI Commits Modified Golden Tests
+### Hook bypass
 
-**Threat**: AI successfully modifies and commits golden test changes.
+**Threat:** The agent bypasses a normal Edit/Write hook through shell commands or another tool.
 
-**Mitigation**: CODEOWNERS requires human approval before merge.
-**Enforcement**: `.github/CODEOWNERS`:
-```
-tests/golden/**  @tech-leads @qa-leads
-```
-**Reliability**: ✅ Very High (human gate cannot be automated away)
+**Control:** The hook reduces accidental and tool-mediated edits but is advisory. Required CI and
+human review remain authoritative.
 
----
+### Trust-root modification
 
-### Attack Vector 5: AI Deletes Golden Tests
+**Threat:** The same pull request weakens the workflow, CODEOWNERS, or rules that protect golden
+tests.
 
-**Threat**: AI deletes golden test file to remove failing assertions.
+**Control:** An owner-approved trusted-base policy must protect those files. The sample workflow
+does not solve this threat by itself.
 
-```bash
-rm tests/golden/test_payment.py
-```
+### Human approval failure
 
-**Mitigation**: CI/CD detects deletion in git diff, CODEOWNERS requires approval.
-**Enforcement**: Same as modification (git diff + CODEOWNERS).
-**Reliability**: ✅ High
+**Threat:** An approver accepts a misleading, flaky, or self-serving golden test.
 
----
+**Control:** Review checklists, separation of duties, deterministic test execution, flake analysis,
+and multiple owners for high-impact contracts. Technical controls cannot eliminate social
+engineering or careless approval.
 
-## Defense Layers Summary
+## Control Summary
 
-| Layer | Purpose | Blocks | Reliability | Can Be Bypassed? |
-|-------|---------|--------|-------------|------------------|
-| 1. File Permissions (444) | Prevent accidental edits | Direct file writes | Medium | ✅ Yes (chmod) |
-| 2. AI Hooks | Block Edit/Write tools | Tool-based edits | Medium | ✅ Yes (Bash) |
-| 3. CI/CD Git Diff | Detect all modifications | Any git change | **High** | ❌ No |
-| 4. CODEOWNERS | Human approval gate | Merge to main | **Very High** | ❌ No |
+| Layer | Purpose | Binding? | Principal limitation |
+|---|---|---:|---|
+| Local `444` mode | Discourage accidental writes | No | Not preserved by Git; shell can change it |
+| Assistant hook | Block ordinary Edit/Write tools | No | Other tools and shell can bypass it |
+| Required root diff check | Reject non-addition golden changes | Yes, when protected | Same-PR trust-root changes must be gated |
+| Required CODEOWNERS review | Human decision on additions | Yes, when configured | Approvers can make mistakes |
+| Branch/ruleset protection | Protect checks and ownership | Yes, when configured | Repository administrators retain authority |
 
-## Primary vs. Defense-in-Depth
+## Validation Exercises
 
-**Primary Enforcement** (Cannot be bypassed):
-- ✅ **CI/CD git diff detection** - Catches all changes
-- ✅ **CODEOWNERS approval** - Human gate
+After installing and protecting the root controls, use a disposable branch to verify:
 
-**Defense-in-Depth** (Reduces attack surface):
-- File permissions (444) - Prevents accidents
-- AI hooks - Makes intent explicit
+1. An unlabeled golden addition fails the required check.
+2. A labeled addition passes the structural check but still requires CODEOWNERS review.
+3. A labeled modification, rename, or deletion fails.
+4. A proposed change to the protection workflow or CODEOWNERS requires owner review.
+5. Removing local `444` mode does not bypass the commit-bound diff check.
 
-## What If AI Becomes More Sophisticated?
-
-**Scenario**: AI learns to hide changes from git diff.
-
-**Answer**: Not possible. Git diff operates at filesystem level, comparing tree objects. AI cannot modify git's internal state without access to `.git/` directory, which should be blocked by repository permissions.
-
-**Scenario**: AI social engineers human approvers.
-
-**Answer**: Out of scope for technical controls. This is a human process issue requiring:
-- Review checklist enforcement
-- Multiple approvers (2+ required)
-- Separation of duties (AI cannot approve own PRs)
-
-## Security Principle
-
-The pattern follows **defense-in-depth**:
-- Multiple independent layers
-- Failure of one layer doesn't compromise security
-- Primary enforcement (CI/CD + CODEOWNERS) is robust
-- Permissions and hooks make attacks explicit and detectable
-
-## Recommended Configuration
-
-```bash
-# Minimum viable protection
-✅ CI/CD git diff check (required)
-✅ CODEOWNERS approval (required)
-
-# Defense-in-depth
-✅ File permissions 444 (recommended)
-✅ AI hooks (recommended)
-✅ Branch protection rules (recommended)
-```
-
-## Monitoring and Alerts
-
-Track attempted bypasses:
-```yaml
-# Alert on promotion workflow usage
-- name: Track Test Promotions
-  if: contains(github.event.pull_request.labels.*.name, 'test-promotion')
-  run: |
-    echo "Test promotion attempted by: ${{ github.actor }}"
-    # Send to monitoring system
-```
-
-## Testing the Threat Model
-
-Verify enforcement by attempting each attack vector:
-
-```bash
-# Test 1: Try to edit golden test directly
-echo "test" >> tests/golden/test_payment.py
-# Expected: Permission denied (444)
-
-# Test 2: Try to use chmod bypass
-chmod 644 tests/golden/test_payment.py && echo "test" >> tests/golden/test_payment.py
-git add tests/golden/test_payment.py
-git push
-# Expected: CI blocks PR
-
-# Test 3: Try to merge without approval
-# Create PR with golden test changes
-# Expected: CODEOWNERS blocks merge
-```
-
-All attack vectors should be blocked by at least one enforcement layer.
+Record the resulting check URLs and ruleset configuration in the adopting repository. Do not infer
+protection from a local permission error or from the presence of these template files.

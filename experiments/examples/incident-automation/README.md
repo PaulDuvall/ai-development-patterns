@@ -1,62 +1,45 @@
-# Incident Automation Implementation
+# Incident Automation Example
 
-This directory contains a complete implementation of the Incident Automation pattern, generating actionable incident response playbooks from historical incident data.
+This example supports the experimental [Incident Automation](../../README.md#incident-automation) pattern: derive and execute governed incident-response workflows from telemetry, current system state, and historical incidents. It provides a worked incident response playbook showing what pattern outputs look like — severity classification, per-incident runbooks, AI analysis prompts, and communication templates.
 
-## Overview
+## Current Status
 
-Incident Automation enables teams to:
-- Generate step-by-step incident response runbooks
-- Create automated triage rules from historical patterns
-- Suggest preventive monitoring alerts
-- Continuously improve response procedures based on actual incidents
+This example ships two files: this README and [`incident_playbook.md`](incident_playbook.md), a reference playbook document. The automation itself — runbook generation from incident history, automated triage and routing, historical pattern analysis, and alert optimization — is described in the pattern but has no executable implementation here. The kubectl, psql, and `ai` commands inside the playbook are illustrative templates targeting a fictional Kubernetes environment; adapt them to your infrastructure before use.
 
-## Files in this Implementation
+## Pattern Boundary
 
-For complete pattern documentation, see: [Incident Automation](../../README.md#incident-automation)
+Static runbooks already tell responders what to do for known failures. This pattern begins when response procedures are derived from evidence and kept current:
 
-- `incident_playbook.md` - Complete incident response automation documentation
-- `runbook_generators/` - AI-powered runbook generation from incident history
-- `triage_automation/` - Automated incident classification and routing
-- `historical_analysis/` - Incident pattern analysis and learning tools
-- `alert_optimization/` - Preventive monitoring and alerting improvements
+- classify incidents by severity with explicit response and escalation times;
+- generate runbook steps from telemetry, deployment history, and prior incidents;
+- separate reversible automated actions from actions requiring human approval;
+- feed post-incident findings back into the playbooks; and
+- record which evidence justified each step.
 
-## Incident Response Workflow
+## Files
 
-### 1. Incident Detection
-- Automated monitoring alerts
-- Manual incident reporting
-- Third-party service notifications
+- [`incident_playbook.md`](incident_playbook.md) — reference playbook containing a P1–P4 severity classification scheme, five worked incident runbooks (database connection pool exhaustion, authentication service degradation, production memory leak, API gateway overload, data inconsistency), a health-check script template, AI prompts for root-cause analysis and incident summaries, communication templates, and post-incident procedures.
 
-### 2. Automated Triage
-- Classify incident severity and type
-- Route to appropriate response team
-- Generate initial response checklist
+## Using the Playbook
 
-### 3. Response Execution
-- AI-generated step-by-step runbooks
-- Real-time guidance and documentation
-- Escalation procedures and contacts
+Treat `incident_playbook.md` as a starting structure, not a drop-in artifact:
 
-### 4. Learning and Improvement
-- Post-incident analysis and documentation
-- Pattern recognition for future prevention
-- Runbook refinement based on outcomes
+1. Replace the illustrative namespaces, deployment names, and connection details with your own.
+2. Wire the AI prompts into whatever assistant or CLI your team uses.
+3. Test each runbook's steps in a sandbox before an incident, as the pattern requires.
+4. After each real incident, update the affected runbook so procedures reflect observed failure modes.
 
-## Quick Start
+## Known Limitations
 
-```bash
-# Analyze historical incidents
-./analyze-incidents.sh --source pagerduty --timeframe 6months
+- No triage automation, historical-analysis tooling, or alert-optimization code is included; those capabilities exist only as pattern description.
+- The playbook's commands assume a specific fictional Kubernetes setup and will not run unmodified.
+- The `ai "..."` invocations assume an AI CLI wrapper that adopters must supply.
+- The playbook is a static document; the pattern's continuous-improvement loop must be operated manually until generation tooling exists.
 
-# Generate response playbooks
-ai "Analyze last 50 incidents in PagerDuty/AWS CloudWatch to:
-1. Identify common failure patterns
-2. Generate step-by-step runbooks
-3. Create automated triage rules
-4. Suggest preventive monitoring alerts"
+## Promotion Path
 
-# Deploy automated response system
-./deploy-automation.sh --enable-triage --update-runbooks
-```
+Promotion requires an executable workflow that generates triage documents and runbooks from real incident history, sandbox verification of generated steps, demonstrated separation of reversible actions from approval-gated actions, and independent practitioner adoption with evidence that derived runbooks outperform static ones.
 
-**Complete Implementation**: This directory contains the full incident response automation system with historical analysis, AI-generated runbooks, and continuous improvement capabilities.
+## Anti-pattern: Static Runbooks
+
+Maintaining response procedures that never incorporate observed failure modes causes responders to repeat obsolete or unsafe steps during an incident. A playbook like this one only delivers the pattern's value when post-incident learnings flow back into it.

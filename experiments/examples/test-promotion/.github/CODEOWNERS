@@ -1,6 +1,7 @@
 # Golden Test Protection via CODEOWNERS
 #
-# This is the PRIMARY enforcement mechanism for immutable golden tests.
+# Template ownership rule. It binds only after installation at the repository root
+# with required code-owner review and protected trust-root configuration.
 # File permissions (444) and AI hooks provide defense-in-depth but can be
 # bypassed by AI using bash commands like chmod.
 #

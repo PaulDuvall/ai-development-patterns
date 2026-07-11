@@ -1,6 +1,6 @@
 #!/bin/bash
 # AI Protection Hook for Golden Tests
-# Blocks AI tools from modifying immutable golden tests
+# Advisory hook template for blocking ordinary tool edits to protected golden tests
 
 # This hook executes before Edit/Write tool use
 # Exit code 0 = ALLOW
@@ -11,13 +11,13 @@ TOOL="$TOOL_NAME"
 
 # Block any Edit or Write operations on tests/golden/**
 if [[ "$FILE" =~ ^tests/golden/ ]] && [[ "$TOOL" =~ (Edit|Write) ]]; then
-    echo "❌ BLOCKED: Golden tests are immutable"
+    echo "❌ BLOCKED: Golden tests are protected from this tool"
     echo ""
     echo "   File: $FILE"
     echo "   Tool: $TOOL"
     echo ""
-    echo "Golden tests are read-only behavioral contracts."
-    echo "AI cannot modify these files to prevent weakening assertions."
+    echo "This configured hook reserves golden edits for the human-owned promotion path."
+    echo "Shell access can bypass the hook, so required CI and CODEOWNERS remain authoritative."
     echo ""
     echo "Instead:"
     echo "  1. Create test in tests/generated/$( basename "$FILE")"

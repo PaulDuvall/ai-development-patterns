@@ -2,9 +2,9 @@
 set -euo pipefail
 
 # Test Promotion Script
-# Promotes AI-generated tests to immutable golden status
+# Proposes an AI-generated test as a protected golden contract for human review
 
-GENERATED_TEST="$1"
+GENERATED_TEST="${1:-}"
 
 if [[ -z "$GENERATED_TEST" ]]; then
     echo "Usage: ./scripts/promote-test.sh <path-to-generated-test>"
@@ -41,25 +41,25 @@ echo "Step 2: Quality Review Checklist"
 echo "   Please review the test and answer the following:"
 echo ""
 
-read -p "   Does this test capture critical behavior? (y/n): " critical
+read -r -p "   Does this test capture critical behavior? (y/n): " critical
 if [[ "$critical" != "y" ]]; then
     echo "❌ Promotion cancelled - test not critical"
     exit 1
 fi
 
-read -p "   Is the test stable (not flaky)? (y/n): " stable
+read -r -p "   Is the test stable (not flaky)? (y/n): " stable
 if [[ "$stable" != "y" ]]; then
     echo "❌ Promotion cancelled - test may be flaky"
     exit 1
 fi
 
-read -p "   Does it have clear, specific assertions? (y/n): " assertions
+read -r -p "   Does it have clear, specific assertions? (y/n): " assertions
 if [[ "$assertions" != "y" ]]; then
     echo "❌ Promotion cancelled - assertions not clear"
     exit 1
 fi
 
-read -p "   Is it properly documented? (y/n): " documented
+read -r -p "   Is it properly documented? (y/n): " documented
 if [[ "$documented" != "y" ]]; then
     echo "❌ Promotion cancelled - needs documentation"
     exit 1
@@ -75,14 +75,10 @@ GOLDEN_PATH="tests/golden/${BASENAME}"
 
 # Check if golden test already exists
 if [[ -f "$GOLDEN_PATH" ]]; then
-    echo "⚠️  Warning: Golden test already exists: $GOLDEN_PATH"
-    read -p "   Overwrite? This requires special approval (y/n): " overwrite
-    if [[ "$overwrite" != "y" ]]; then
-        echo "❌ Promotion cancelled"
-        exit 1
-    fi
-    # Remove read-only protection temporarily for overwrite
-    chmod 644 "$GOLDEN_PATH"
+    echo "❌ Error: Golden test already exists: $GOLDEN_PATH"
+    echo "   This promotion path only adds new contracts; modify an existing"
+    echo "   contract through a separately reviewed policy exception."
+    exit 1
 fi
 
 # Step 4: Copy to golden with read-only permissions
@@ -122,7 +118,7 @@ echo "   ✓ Committed to git"
 echo ""
 echo "Next steps:"
 echo "  1. Create PR: git push origin HEAD"
-echo "  2. Request 2+ reviews from team"
+echo "  2. Request review from the configured CODEOWNERS"
 echo "  3. Label PR with 'test-promotion'"
 echo "  4. Merge after approval"
 echo ""
