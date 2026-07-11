@@ -1,195 +1,153 @@
 schema_version: 2
-provenance_status: legacy-import
-legacy_run_url: https://github.com/PaulDuvall/ai-development-patterns/pull/21
-legacy_limitations: The PR records 10 aggregate queries, all three search modes, and an independent URL
-  re-fetch. Exact query strings, per-mode candidate counts, normalized content hashes, and verifier metadata
-  were not retained.
+provenance_status: complete
 pattern: Security Sandbox
 slug: security-sandbox
-last_checked: '2026-07-02'
+last_checked: 2026-07-10
 search:
-  run_id: legacy-import
-  checked_at: '2026-07-02'
+  run_id: github-actions:29123202495
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
   modes:
     name:
-      queries: []
-      candidate_count: null
+      queries:
+        - Security Sandbox AI coding agent sandbox-runtime Anthropic GitHub
+        - OpenAI Codex sandboxing network access disabled workspace-write read-only
+        - Kubernetes agent-sandbox AI agent sandbox GitHub
+      candidate_count: 4
     mechanism:
-      queries: []
-      candidate_count: null
+      queries:
+        - AI agent sandbox coding agent isolated container no network credentials devcontainer
+        - run coding agent in container without access to home directory SSH keys credentials
+        - limit blast radius coding agents secured dev containers credentials
+      candidate_count: 3
     artifact:
-      queries: []
-      candidate_count: null
-adoption_score: 24
+      queries:
+        - network_mode none AI coding agent sandbox docker compose credentials
+        - sandbox-runtime bubblewrap network namespace filesystem restrictions arbitrary processes
+      candidate_count: 2
+adoption_score: 18
 tier_counts:
-  T1: 3
+  T1: 2
   T2: 1
   T4: 2
-  T5: 1
 adoption_dimensions:
   implementation_available: true
   independent_adoption: true
-  independence_groups: 7
+  independence_groups: 5
 naming_alignment: strong
 terminology_variants:
-- term: sandboxing / sandboxed Bash tool
-  used_by: Anthropic (Claude Code official docs)
-  url: https://code.claude.com/docs/en/sandboxing
-- term: sandbox (read-only / workspace-write / danger-full-access modes)
-  used_by: OpenAI (Codex official docs)
-  url: https://developers.openai.com/codex/concepts/sandboxing
-- term: dev container / devcontainer isolation
-  used_by: Anthropic docs and practitioners (Mark Phelps)
-  url: https://markphelps.me/posts/running-ai-agents-in-devcontainers/
-- term: execution isolation
-  used_by: Docker (company blog)
-  url: https://www.docker.com/blog/how-to-secure-ai-agents/
-- term: microVM sandbox
-  used_by: E2B (product site)
-  url: https://e2b.dev
-- term: agent sandbox / agent-sandbox
-  used_by: Kubernetes SIGs project
-  url: https://github.com/kubernetes-sigs/agent-sandbox
-- term: action-sandboxing
-  used_by: Beurer-Kellner et al. (arXiv design-patterns paper)
-  url: https://arxiv.org/html/2506.08837v2
+  - term: sandboxing tool
+    used_by: Anthropic sandbox-runtime
+    url: https://raw.githubusercontent.com/anthropic-experimental/sandbox-runtime/refs/heads/main/README.md
+  - term: agent-sandbox
+    used_by: Kubernetes SIGs
+    url: https://raw.githubusercontent.com/kubernetes-sigs/agent-sandbox/refs/heads/main/README.md
+  - term: devcontainers
+    used_by: Mark Phelps
+    url: https://markphelps.me/posts/running-ai-agents-in-devcontainers/
+  - term: secured VS Code dev containers
+    used_by: Daniel Demmel
+    url: https://www.danieldemmel.me/blog/coding-agents-in-secured-vscode-dev-containers
 evidence:
-- tier: T1
-  match: named
-  source: Anthropic (anthropic-experimental), sandbox-runtime GitHub repository
-  source_kind: open_source_implementation
-  organization: Anthropic
-  independence_group: anthropic
-  url: https://github.com/anthropic-experimental/sandbox-runtime
-  resolved_url: https://github.com/anthropic-experimental/sandbox-runtime
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-07-02'
-  retrieved: '2026-07-02'
-  claim: Anthropic ships an open-source sandboxing tool (4,557 stars, last updated 2026-07-02 per GitHub
-    API) that enforces filesystem and network restrictions on agent processes at the OS level; it is also
-    installable as @anthropic-ai/sandbox-runtime to back Claude Code's sandbox.
-- tier: T1
-  match: named
-  source: Kubernetes SIGs, agent-sandbox project
-  source_kind: open_source_implementation
-  organization: Kubernetes SIGs
-  independence_group: kubernetes
-  url: https://github.com/kubernetes-sigs/agent-sandbox
-  resolved_url: https://github.com/kubernetes-sigs/agent-sandbox
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-07-02'
-  retrieved: '2026-07-02'
-  claim: A Kubernetes SIG project (3,046 stars, created 2025-08-12, last updated 2026-07-02 per GitHub
-    API) provides isolated sandbox workloads for AI agent runtimes, showing the practice standardized
-    at platform level under the name 'agent-sandbox'.
-- tier: T1
-  match: named
-  source: E2B, product site
-  source_kind: shipped_product
-  organization: E2B
-  independence_group: e2b
-  url: https://e2b.dev
-  resolved_url: https://e2b.dev
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  retrieved: '2026-07-02'
-  claim: E2B is a shipped commercial product providing Firecracker microVM sandboxes so AI agents can
-    execute code in full isolation from the host (undated page; date = retrieval date).
-- tier: T2
-  match: named
-  source: 'OpenAI, Codex docs: Sandbox concepts page'
-  source_kind: official_documentation
-  organization: OpenAI
-  independence_group: openai
-  url: https://developers.openai.com/codex/concepts/sandboxing
-  resolved_url: https://learn.chatgpt.com/docs/sandboxing
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  retrieved: '2026-07-02'
-  claim: OpenAI's official Codex documentation describes an OS-enforced sandbox (Seatbelt, bubblewrap,
-    Windows Sandbox) with network access disabled by default and read-only/workspace-write filesystem
-    modes so the agent can act autonomously without unrestricted machine access (undated page; date =
-    retrieval date).
-- tier: T4
-  match: aliased
-  mechanism_quote: The agent runs in the container. It can’t touch your home directory, your SSH keys,
-    or that one file you really shouldn’t have left in `/tmp`.
-  source: Mark Phelps, blog post 'Running AI Agents in Devcontainers'
-  source_kind: practitioner_report
-  organization: Mark Phelps
-  independence_group: independent:mark-phelps
-  url: https://markphelps.me/posts/running-ai-agents-in-devcontainers/
-  resolved_url: https://markphelps.me/posts/running-ai-agents-in-devcontainers/
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-02-19'
-  retrieved: '2026-07-02'
-  claim: Practitioner blog post (2026-02-19) shows complete .devcontainer/Dockerfile and devcontainer.json
-    configurations for running AI agents in containers isolated from the host home directory and SSH keys,
-    calling the practice 'devcontainers'.
-- tier: T4
-  match: aliased
-  mechanism_quote: The goal isn't to eliminate risk entirely – it's to limit the blast radius. If something
-    goes wrong, we want it contained to the sandbox rather than having full access to your machine, credentials,
-    and the ability to push malicious code to your repositories.
-  source: Daniel Demmel, blog post 'Coding agents in secured VS Code dev containers'
-  source_kind: practitioner_report
-  organization: Daniel Demmel
-  independence_group: independent:daniel-demmel
-  url: https://www.danieldemmel.me/blog/coding-agents-in-secured-vscode-dev-containers
-  resolved_url: https://www.danieldemmel.me/blog/coding-agents-in-secured-vscode-dev-containers
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-01-24'
-  retrieved: '2026-07-02'
-  claim: Practitioner blog post (2026-01-24) provides a complete working implementation (devcontainer.json,
-    docker-compose.yml, Dockerfile) for containing coding agents away from host credentials, framing it
-    as 'secured dev containers' that limit blast radius.
-- tier: T5
-  match: aliased
-  mechanism_quote: The most effective pattern is to run each agent in its own isolated, disposable environment.
-    This could be a microVM, a hardened container, or a dedicated sandbox.
-  source: 'Srini Sekaran (Docker), blog post ''How to Secure AI Agents: A Practical Overview'''
-  source_kind: opinion
-  organization: Docker
-  independence_group: docker
-  url: https://www.docker.com/blog/how-to-secure-ai-agents/
-  resolved_url: https://www.docker.com/blog/how-to-secure-ai-agents/
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-06-02'
-  retrieved: '2026-07-02'
-  claim: Docker company blog post (2026-06-02, named author, conceptual guidance without code) names 'execution
-    isolation' as one of four domains of agent security and recommends running each agent in an isolated,
-    disposable environment.
-verdict: weak
+  - tier: T1
+    match: named
+    mechanism_quote: A lightweight sandboxing tool for enforcing filesystem and network restrictions on arbitrary
+      processes at the OS level, without requiring a container.
+    source: Anthropic sandbox-runtime README
+    source_kind: open_source_implementation
+    organization: Anthropic
+    independence_group: anthropic
+    url: https://raw.githubusercontent.com/anthropic-experimental/sandbox-runtime/refs/heads/main/README.md
+    resolved_url: https://raw.githubusercontent.com/anthropic-experimental/sandbox-runtime/refs/heads/main/README.md
+    content_sha256: 2f72275edbb568cc08b124eff78ba499540722b9ebb2f7472a9a6250b4aef95a
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Anthropic provides a runnable open-source sandbox runtime that enforces OS-level filesystem and
+      network restrictions around arbitrary agent processes.
+  - tier: T1
+    match: named
+    mechanism_quote: agent-sandbox enables easy management of isolated, stateful, singleton workloads, ideal
+      for use cases like AI agent runtimes.
+    source: Kubernetes SIGs agent-sandbox README
+    source_kind: open_source_implementation
+    organization: Kubernetes SIGs
+    independence_group: kubernetes-sigs
+    url: https://raw.githubusercontent.com/kubernetes-sigs/agent-sandbox/refs/heads/main/README.md
+    resolved_url: https://raw.githubusercontent.com/kubernetes-sigs/agent-sandbox/refs/heads/main/README.md
+    content_sha256: a3e6673b574d2f671fb58b67665f0b738a8205f864a3fe251ded336aee52fc06
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Kubernetes SIGs provides a runnable open-source agent-sandbox implementation for isolated
+      AI agent runtime workloads.
+  - tier: T2
+    match: named
+    mechanism_quote: The sandbox is the boundary that lets the agent act autonomously without giving it unrestricted
+      access to your machine.
+    source: OpenAI Codex sandboxing documentation
+    source_kind: official_documentation
+    organization: OpenAI
+    independence_group: openai
+    url: https://developers.openai.com/codex/concepts/sandboxing
+    resolved_url: https://learn.chatgpt.com/docs/sandboxing
+    content_sha256: 854421632e359cff2f3ade276bc8aba8c702beb698ff5b7c75a34608ffdf2dad
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: OpenAI's Codex documentation presents sandboxing as canonical guidance for allowing agent
+      autonomy without unrestricted machine access.
+  - tier: T4
+    match: aliased
+    mechanism_quote: The agent runs in the container. It can't touch your home directory, your SSH keys,
+      or that one file you really shouldn't have left in /tmp.
+    source: Mark Phelps, Running AI Agents in Devcontainers
+    source_kind: practitioner_report
+    organization: Mark Phelps
+    independence_group: independent:mark-phelps
+    url: https://markphelps.me/posts/running-ai-agents-in-devcontainers/
+    resolved_url: https://markphelps.me/posts/running-ai-agents-in-devcontainers/
+    content_sha256: 295c7321934ed0c3dacfd888857b513a8a8a4020a9ee884522b357d4ae3f4f83
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2026-02-19
+    retrieved: 2026-07-10
+    claim: A practitioner report provides a devcontainer-based implementation that isolates AI agents
+      from the host home directory and SSH keys.
+  - tier: T4
+    match: aliased
+    mechanism_quote: The goal isn't to eliminate risk entirely - it's to limit the blast radius. If something
+      goes wrong, we want it contained to the sandbox rather than having full access to your machine,
+      credentials, and the ability to push malicious code to your repositories.
+    source: Daniel Demmel, Coding agents in secured VS Code dev containers
+    source_kind: practitioner_report
+    organization: Daniel Demmel
+    independence_group: independent:daniel-demmel
+    url: https://www.danieldemmel.me/blog/coding-agents-in-secured-vscode-dev-containers
+    resolved_url: https://www.danieldemmel.me/blog/coding-agents-in-secured-vscode-dev-containers
+    content_sha256: f243444136cd855f81c56a1a6a31ac539f300f95d0dd0b66f01eb22c31371113
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2026-01-24
+    retrieved: 2026-07-10
+    claim: A practitioner report documents secured VS Code dev container configuration to contain coding
+      agents away from host credentials and repository privileges.
+verdict: verified

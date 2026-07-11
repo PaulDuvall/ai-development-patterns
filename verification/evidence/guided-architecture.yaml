@@ -1,0 +1,114 @@
+schema_version: 2
+provenance_status: complete
+pattern: Guided Architecture
+slug: guided-architecture
+last_checked: '2026-07-10'
+search:
+  run_id: github-actions:29123202495
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - Guided Architecture AI software architecture
+      - AI assisted architecture design DDD Well-Architected ADR
+      - AI architecture assistant domain driven design
+      candidate_count: 6
+    mechanism:
+      queries:
+      - LLM domain driven design bounded contexts architecture prompt
+      - generative AI Well-Architected review architecture documents recommendations
+      - large language model generate architectural design decisions ADR
+      - AI assistant apply 12-factor app architecture review
+      candidate_count: 9
+    artifact:
+      queries:
+      - '"ddd-* Skills" "AI Agents"'
+      - '"sample-well-architected-acceleration-with-generative-ai"'
+      - '"architecture decision record" "zero-shot" "few-shot" "fine-tuning"'
+      candidate_count: 5
+adoption_score: 10
+tier_counts:
+  T1: 1
+  T3: 1
+  T4: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: aliased
+terminology_variants:
+- term: Domain modeling backbone pipeline
+  used_by: ForceInjection domain-driven-design-skills
+  url: https://github.com/ForceInjection/domain-driven-design-skills/blob/main/README.en.md
+- term: AWS Well-Architected reviews with Generative AI
+  used_by: Amazon Web Services
+  url: https://aws.amazon.com/blogs/machine-learning/accelerate-aws-well-architected-reviews-with-generative-ai/
+- term: Architectural design decisions
+  used_by: Dhar, Vaidhyanathan, and Varma at IEEE ICSA 2024
+  url: https://arxiv.org/html/2403.01709
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: This repository centers on self-developed ddd-* Skills, providing a domain modeling
+    backbone pipeline for AI Agents
+  source: ForceInjection, domain-driven-design-skills README
+  source_kind: open_source_implementation
+  organization: ForceInjection
+  independence_group: forceinjection
+  url: https://github.com/ForceInjection/domain-driven-design-skills/blob/main/README.en.md
+  resolved_url: https://github.com/ForceInjection/domain-driven-design-skills/blob/main/README.en.md
+  content_sha256: a3c51e746d30dc10097ecfb485c2b18ff8fc3831adbe0268ffe3ee34d2e65682
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Runnable GitHub repository provides DDD skills for AI agents, organizing domain modeling
+    guidance across discovery, strategic, tactical, validation, and specification-bridging steps.
+- tier: T3
+  match: aliased
+  mechanism_quote: Can LLMs be successfully employed to generate architectural design decisions
+    from a given context in a zero-shot setting?
+  source: 'Dhar, Vaidhyanathan, and Varma, Can LLMs Generate Architectural Design Decisions?
+    (IEEE ICSA 2024)'
+  source_kind: peer_reviewed_research
+  organization: International Institute of Information Technology Hyderabad
+  independence_group: iiit-hyderabad
+  url: https://arxiv.org/html/2403.01709
+  resolved_url: https://arxiv.org/html/2403.01709
+  content_sha256: c5bcd4232bf110b0e93bece3769234eb6acb64d6094267d824837d1913c55352
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2024-03-04'
+  retrieved: '2026-07-10'
+  claim: Peer-reviewed ICSA 2024 research evaluates LLMs generating architectural design decisions
+    from context, matching the ADR portion of AI-guided architecture work.
+- tier: T4
+  match: aliased
+  mechanism_quote: Uses Amazon Bedrock to rapidly analyze architecture documents against AWS Well-Architected
+    best practices, generating detailed assessments and recommendations.
+  source: AWS Machine Learning Blog, Accelerate AWS Well-Architected reviews with Generative AI
+  source_kind: practitioner_report
+  organization: Amazon Web Services
+  independence_group: amazon
+  url: https://aws.amazon.com/blogs/machine-learning/accelerate-aws-well-architected-reviews-with-generative-ai/
+  resolved_url: https://aws.amazon.com/blogs/machine-learning/accelerate-aws-well-architected-reviews-with-generative-ai/
+  content_sha256: 265bd16ec355d0f7b7141b085ef22598d2d8aa82b0b493a60fb04e8c6a560091
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2025-03-04'
+  retrieved: '2026-07-10'
+  claim: AWS practitioner report describes a generative AI workflow that applies the AWS Well-Architected
+    Framework to architecture documents and produces assessments and recommendations.
+verdict: verified

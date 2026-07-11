@@ -150,6 +150,56 @@ This file tracks patterns under exploration that may eventually be formalized in
 
 ---
 
+### Mention Delegation
+
+**Status**: Early exploration
+**Date Added**: 2026-07-10
+
+**Description**: Delegating asynchronous agent work by mentioning or tagging an agent in existing collaboration surfaces so the agent inherits thread context, performs code or workflow actions, and reports results back where the work was requested.
+
+**Potential Use Cases**:
+- Assigning repository tasks from Slack threads without leaving team discussion context
+- Turning incident, support, or product conversations into agent-executed follow-up work
+- Letting non-IDE collaborators request pull requests, tickets, analysis, or documentation updates
+- Preserving visible delegation trails in channels, issue threads, and team workspaces
+
+**Tools to Evaluate**:
+- [Claude Tag](https://www.anthropic.com/news/introducing-claude-tag) - Slack-based shared Claude agent that responds to `@Claude`, uses connected tools, and works asynchronously
+- [GitHub Copilot cloud agent for Slack](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/integrate-cloud-agent-with-slack) - Slack integration for initiating Copilot cloud agent sessions and opening pull requests from conversation context
+- [ChatGPT workspace agents](https://help.openai.com/en/articles/20001143-chatgpt-workspace-agents-for-enterprise-and-business) - Shared agents that can be created, used, shared, and managed in ChatGPT and Slack under organization controls
+
+**Discovery Sources**:
+- Anthropic introduced Claude Tag on June 23, 2026, describing Slack tagging as a way to assign tasks, use connected tools, respond in-thread, and run asynchronously over hours or days.
+- GitHub documents a Copilot cloud agent Slack integration where users mention the GitHub app or send direct messages to initiate cloud agent sessions, capture thread context, and open pull requests.
+- OpenAI documents ChatGPT workspace agents for Business and Enterprise workspaces, including creating, using, sharing, and managing agents in ChatGPT and Slack.
+
+**Research Questions**:
+1. What permission model prevents a channel mention from accidentally granting broader repository or business-tool access?
+2. How should thread context be summarized or redacted before it becomes pull request or ticket context?
+3. What visible status markers help humans know whether an agent accepted, queued, blocked, or completed delegated work?
+4. When should mention-based delegation create a durable issue or PR versus replying only in the original thread?
+5. How do teams measure whether channel-based delegation improves throughput without burying accountability?
+
+**Next Steps**:
+- [ ] Test Slack-to-agent delegation with a repository task that opens a pull request
+- [ ] Compare channel mention, direct message, issue assignment, and scheduled-agent triggers
+- [ ] Document required safeguards for identity, approval, and thread-context retention
+- [ ] Evaluate how mention delegation overlaps with asynchronous research and event automation
+- [ ] Capture failure modes where casual mentions trigger unintended agent work
+
+**Related Patterns**:
+- [Event Automation](../README.md#event-automation) - Mentions can act as human-triggered events
+- [Developer Lifecycle](../README.md#developer-lifecycle) - Delegation becomes part of daily team workflow
+- [Asynchronous Research](README.md#asynchronous-research) - Mentioned agents can run background investigations or implementation tasks
+
+**Anti-patterns to Avoid**:
+- Treating every mention as authorization to write code or open pull requests
+- Letting private or sensitive thread context leak into persistent PR descriptions or ticket bodies
+- Hiding agent work in side threads without clear status, ownership, or review handoff
+- Routing critical incident actions through mention-only workflows without explicit approvals
+
+---
+
 ## Notes Template
 
 When adding new pattern explorations, copy this template:

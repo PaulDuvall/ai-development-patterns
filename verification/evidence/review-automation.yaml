@@ -1,0 +1,109 @@
+schema_version: 2
+provenance_status: complete
+pattern: Review Automation
+slug: review-automation
+last_checked: '2026-07-10'
+search:
+  run_id: github-actions:29123202495
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - '"Review Automation" "AI code review" "pull request"'
+      - '"automated code review" "AI" "pull request" "GitHub"'
+      candidate_count: 5
+    mechanism:
+      queries:
+      - '"AI code review" "merge request" "coordinator agent"'
+      - '"AI code review" "automatically review pull requests"'
+      - '"LLM" "pull request" "code review" "blocks merges"'
+      candidate_count: 6
+    artifact:
+      queries:
+      - '"uses: the-pr-agent/pr-agent@main" "pull_request"'
+      - '"Automatically request Copilot code review" "branch ruleset"'
+      candidate_count: 3
+adoption_score: 11
+tier_counts:
+  T1: 1
+  T2: 1
+  T4: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: aliased
+terminology_variants:
+- term: automated PR reviews
+  used_by: PR-Agent README
+  url: https://github.com/The-PR-Agent/pr-agent
+- term: automatic code review
+  used_by: GitHub Copilot documentation
+  url: https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-automatic-review
+- term: AI code review
+  used_by: Cloudflare engineering blog
+  url: https://blog.cloudflare.com/ai-code-review/
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: 'Add automated PR reviews to your repository with a simple workflow file:'
+  source: PR-Agent open-source PR reviewer
+  source_kind: open_source_implementation
+  organization: PR-Agent
+  independence_group: pr-agent
+  url: https://github.com/The-PR-Agent/pr-agent
+  resolved_url: https://github.com/The-PR-Agent/pr-agent
+  content_sha256: 87d281037ecd460ccbea6eda3dc0e7f98b754aa4a80c5f743b00ebef4b798b75
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Runnable open-source GitHub Action and CLI implementation automates pull-request review on opened
+    and synchronized pull requests.
+- tier: T2
+  match: aliased
+  mechanism_quote: You can configure Copilot code review to review pull requests automatically.
+  source: GitHub Docs, Configuring automatic code review by GitHub Copilot
+  source_kind: official_documentation
+  organization: GitHub
+  independence_group: github
+  url: https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-automatic-review
+  resolved_url: https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-automatic-review
+  content_sha256: 4c76117a62f3ab2ed09639b0086a344190fc40f98eef0314be2020ae5ad47ebd
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Official product documentation describes configuring Copilot to automatically review pull requests,
+    including repository and organization ruleset options.
+- tier: T4
+  match: aliased
+  mechanism_quote: Rather than relying on one model with a massive, generic prompt, we launch up to seven
+    specialised reviewers covering security, performance, code quality, documentation, release management,
+    and compliance with our internal Engineering Codex.
+  source: Cloudflare Blog, Orchestrating AI Code Review at scale
+  source_kind: practitioner_report
+  organization: Cloudflare
+  independence_group: cloudflare
+  url: https://blog.cloudflare.com/ai-code-review/
+  resolved_url: https://blog.cloudflare.com/ai-code-review/
+  content_sha256: af598ae77f738a5897a9bdce1f0714fc2bd79f22bfa9af728734b4753eccb1df
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2026-04-20'
+  retrieved: '2026-07-10'
+  claim: Cloudflare reports an internally deployed CI-native AI review orchestration system with specialized
+    reviewers, coordinator deduplication and severity judgment, structured review comments, approvals, and
+    merge blocking for serious findings.
+verdict: verified

@@ -1,176 +1,120 @@
 schema_version: 2
-provenance_status: legacy-import
-legacy_run_url: https://github.com/PaulDuvall/ai-development-patterns/pull/27
-legacy_limitations: The PR records 9 aggregate queries, all three search modes, and an independent URL
-  re-fetch. Exact query strings, per-mode candidate counts, normalized content hashes, and verifier metadata
-  were not retained.
+provenance_status: complete
 pattern: Incremental Generation
 slug: incremental-generation
-last_checked: '2026-07-02'
+last_checked: 2026-07-10
 search:
-  run_id: legacy-import
-  checked_at: '2026-07-02'
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
   modes:
     name:
-      queries: []
-      candidate_count: null
+      queries:
+        - "incremental generation AI coding small deployable iterations"
+        - "\"Incremental Generation\" \"AI coding\""
+      candidate_count: 3
     mechanism:
-      queries: []
-      candidate_count: null
+      queries:
+        - "AI coding assistant break complex task into small tasks one at a time"
+        - "AI coding workflow small iterative chunks"
+        - "coding agent break goal into bite sized steps"
+      candidate_count: 8
     artifact:
-      queries: []
-      candidate_count: null
-adoption_score: 21
+      queries:
+        - "\"Single-tick build-loop conductor\" \"one pipeline stage\""
+        - "\"small, iterative chunks that build on each other\" \".claude/commands/plan.md\""
+      candidate_count: 4
+adoption_score: 15
 tier_counts:
-  T1: 2
+  T1: 1
   T2: 2
   T4: 1
-  T5: 1
 adoption_dimensions:
   implementation_available: true
   independent_adoption: true
-  independence_groups: 6
+  independence_groups: 4
 naming_alignment: aliased
 terminology_variants:
-- term: Progressive Enhancement
-  used_by: Rakia Ben Sassi (The Engineering Wisdom)
-  url: https://rakiabensassi.substack.com/p/stop-just-prompting-your-ai-coder
-- term: Break complex tasks into simpler tasks
-  used_by: GitHub Docs (Copilot prompt engineering)
-  url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
-- term: bite sized steps
-  used_by: Aider official docs
-  url: https://aider.chat/docs/usage/tips.html
-- term: prompt plan / small, iterative chunks
-  used_by: Harper Reed (harper.blog), copied verbatim into 161+ GitHub files
-  url: https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
-- term: Incremental Development Rules
-  used_by: Rakia Ben Sassi (The Engineering Wisdom)
-  url: https://rakiabensassi.substack.com/p/stop-just-prompting-your-ai-coder
+  - term: break complex tasks into smaller tasks
+    used_by: GitHub Docs
+    url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
+  - term: bite sized steps
+    used_by: Aider
+    url: https://aider.chat/docs/usage/tips.html
+  - term: small, iterative chunks
+    used_by: Addy Osmani
+    url: https://addyosmani.com/blog/ai-coding-workflow/
 evidence:
-- tier: T2
-  match: aliased
-  mechanism_quote: If you want Copilot to complete a complex or large task, break the task into multiple
-    simple, small tasks.
-  source: GitHub Docs, "Prompt engineering for GitHub Copilot Chat"
-  source_kind: official_documentation
-  organization: GitHub
-  independence_group: github
-  url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
-  resolved_url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  retrieved: '2026-07-02'
-  claim: GitHub's official Copilot documentation instructs users to complete complex or large tasks by
-    breaking them into multiple simple, small tasks accomplished one by one, with a worked word-search
-    example decomposed into four sequential prompts (undated page; date = retrieval date)
-- tier: T2
-  match: aliased
-  mechanism_quote: Break your goal down into bite sized steps. Do them one at a time.
-  source: Aider (Paul Gauthier), official usage docs "Tips"
-  source_kind: official_documentation
-  organization: Aider
-  independence_group: aider
-  url: https://aider.chat/docs/usage/tips.html
-  resolved_url: https://aider.chat/docs/usage/tips.html
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  retrieved: '2026-07-02'
-  claim: Aider's official documentation tells users to break their goal into bite-sized steps done one
-    at a time, adjusting the files in the chat between steps, and to discuss a plan first for complex
-    changes (undated page; date = retrieval date)
-- tier: T1
-  match: unnamed
-  mechanism_quote: '**Single-tick build-loop conductor** — advances one ready spec by one pipeline stage
-    (plan → plan-review → work → make-pr, plus an optional `qa` stage when `pipeline.qa==on`) per tick,
-    ends with a `PILOT_VERDICT` line; drive it with `/loop` or `/goal`'
-  source: gmickel/flow-next (Claude Code/Codex workflow plugin, 648 stars)
-  source_kind: open_source_implementation
-  organization: gmickel
-  independence_group: independent:gmickel
-  url: https://github.com/gmickel/flow-next
-  resolved_url: https://github.com/gmickel/flow-next
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  retrieved: '2026-07-02'
-  claim: Shipped plugin whose pilot loop advances one ready spec by one pipeline stage per tick (plan,
-    plan-review, work, make-pr), producing a draft PR per small increment instead of one large generation;
-    Ralph mode drives a fresh session per iteration (README undated; date = repo last-push date, retrieved
-    this run)
-- tier: T1
-  match: unnamed
-  mechanism_quote: Then, once you have a solid plan, break it down into small, iterative chunks that build
-    on each other.
-  source: harperreed/dotfiles, shipped .claude/commands/plan.md (representative of GitHub-wide artifact
-    fingerprint)
-  source_kind: open_source_implementation
-  organization: Harper Reed
-  independence_group: independent:harper-reed
-  url: https://github.com/harperreed/dotfiles/blob/master/.claude/commands/plan.md
-  resolved_url: https://github.com/harperreed/dotfiles/blob/master/.claude/commands/plan.md
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-07-02'
-  retrieved: '2026-07-02'
-  claim: Runnable Claude Code command that plans a project as small iterative chunks implemented step-by-step;
-    GitHub code search this run found 519 files named prompt_plan.md and 161 files containing this exact
-    prompt sentence across repos, including Amazon Q prompt configs and Claude Code plugins (undated file)
-- tier: T4
-  match: aliased
-  mechanism_quote: Progressive enhancement - Add complexity only when requirements demand it
-  source: Rakia Ben Sassi, "Stop Just Prompting Your AI Coder. Start Context Engineering." (The Engineering
-    Wisdom, Substack)
-  source_kind: practitioner_report
-  organization: Rakia Ben Sassi
-  independence_group: independent:rakia-ben-sassi
-  url: https://rakiabensassi.substack.com/p/stop-just-prompting-your-ai-coder
-  resolved_url: https://rakiabensassi.substack.com/p/stop-just-prompting-your-ai-coder
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2025-11-26'
-  retrieved: '2026-07-10'
-  claim: 'Practitioner post showing a full claude.md config whose "Incremental Development Rules" section
-    names "Progressive enhancement" as a rule alongside "Start minimal", "Iterate with purpose - Each
-    iteration should be reviewable and deployable", "No ''big bang'' commits", and "NEVER Generate: Entire
-    features in one response"'
-- tier: T5
-  match: unnamed
-  mechanism_quote: Work in smaller steps and get more feedback.
-  source: 'Kent Beck (guest), O11ycast Ep. #80 "Augmented Coding with Kent Beck" (Heavybit podcast, transcript)'
-  source_kind: podcast
-  organization: Heavybit
-  independence_group: heavybit
-  url: https://www.heavybit.com/library/podcasts/o11ycast/ep-80-augmented-coding-with-kent-beck
-  resolved_url: https://www.heavybit.com/library/podcasts/o11ycast/ep-80-augmented-coding-with-kent-beck
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2025-04-30'
-  retrieved: '2026-07-02'
-  claim: Kent Beck, discussing AI-assisted ("augmented") coding, states the core wisdom he would impart
-    is working in smaller steps with more feedback, with co-host describing the discipline of going back
-    and redoing work in smaller increments when a big swing fails
-verdict: weak
+  - tier: T1
+    match: unnamed
+    mechanism_quote: "Single-tick build-loop conductor — advances one ready spec by one pipeline stage (plan → plan-review → work → make-pr, plus an optional `qa` stage when `pipeline.qa==on`) per tick"
+    source: gmickel/flow-next
+    source_kind: open_source_implementation
+    organization: gmickel
+    independence_group: independent:gmickel
+    url: https://github.com/gmickel/flow-next
+    resolved_url: https://github.com/gmickel/flow-next
+    content_sha256: 8dd5f792ad666591cfb3b2bfcfaea34b99676db304fa4dd8f685317b0617248a
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Open source Claude Code/Codex workflow plugin advances one ready specification by one pipeline stage per tick instead of generating the full change in one pass.
+  - tier: T2
+    match: aliased
+    mechanism_quote: "break the process down into smaller tasks, and ask Copilot to accomplish them one by one"
+    source: GitHub Docs, "Prompt engineering for GitHub Copilot Chat"
+    source_kind: official_documentation
+    organization: GitHub
+    independence_group: github
+    url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
+    resolved_url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
+    content_sha256: 503525f40bab90be8532834893eff9386d791469373f40ebd47f7d5b022f910a
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Official Copilot guidance tells users to handle complex coding work by decomposing it into smaller tasks and asking Copilot to complete them one by one.
+  - tier: T2
+    match: aliased
+    mechanism_quote: "Do them one at a time. Adjust the files added to the chat as you go"
+    source: Aider official documentation, "Tips"
+    source_kind: official_documentation
+    organization: Aider
+    independence_group: aider
+    url: https://aider.chat/docs/usage/tips.html
+    resolved_url: https://aider.chat/docs/usage/tips.html
+    content_sha256: edc45b0796288519b6d9911bd8e5611870aca5c5c500f476efc33db52ff5e95e
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Aider's official usage guidance directs users to break a goal into bite-sized steps, complete them one at a time, and adjust the chat context between steps.
+  - tier: T4
+    match: aliased
+    mechanism_quote: "Instead, we break the project into iterative steps or tickets and tackle them one by one."
+    source: Addy Osmani, "AI Coding Workflow"
+    source_kind: practitioner_report
+    organization: Addy Osmani
+    independence_group: independent:addy-osmani
+    url: https://addyosmani.com/blog/ai-coding-workflow/
+    resolved_url: https://addyosmani.com/blog/ai-coding-workflow/
+    content_sha256: 746d31e964680b8a6430f05cea15acfa29bb4d96c9f1c1479af30fcf070cedd8
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2026-01-04
+    retrieved: 2026-07-10
+    claim: Practitioner workflow report describes avoiding one-shot AI coding by planning iterative tickets and tackling them one by one.
+verdict: verified

@@ -1,0 +1,108 @@
+schema_version: 2
+provenance_status: complete
+pattern: Parallel Agents
+slug: parallel-agents
+last_checked: 2026-07-10
+search:
+  run_id: github-actions:29123202495
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+      - '"Parallel Agents" "AI coding"'
+      - '"parallel agents" "git worktree"'
+      candidate_count: 8
+    mechanism:
+      queries:
+      - '"Run multiple Claude Code sessions simultaneously without conflicts"'
+      - '"Isolate parallel Claude Code sessions in separate git worktrees"'
+      - '"When we tried worktrees for parallel Claude Code sessions"'
+      candidate_count: 4
+    artifact:
+      queries:
+      - '"Run Codex, ClaudeCode, OpenCode or Pi side-by-side"'
+      - '"each in its own worktree" "stablyai/orca"'
+      candidate_count: 3
+adoption_score: 11
+tier_counts:
+  T1: 1
+  T2: 1
+  T4: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: strong
+terminology_variants:
+- term: parallel Claude Code sessions
+  used_by: Anthropic Claude Code docs and Trigger.dev
+  url: https://code.claude.com/docs/en/worktrees
+- term: git worktrees
+  used_by: Anthropic Claude Code docs
+  url: https://code.claude.com/docs/en/worktrees
+evidence:
+- tier: T1
+  match: named
+  mechanism_quote: Run Codex, ClaudeCode, OpenCode or Pi side-by-side — each in its own worktree,
+    tracked in one place.
+  source: StablyAI, Orca
+  source_kind: open_source_implementation
+  organization: StablyAI
+  independence_group: stablyai
+  url: https://raw.githubusercontent.com/stablyai/orca/main/README.md
+  resolved_url: https://raw.githubusercontent.com/stablyai/orca/main/README.md
+  content_sha256: ac55d5bddb1aeb500e51154c5b79800de9e8b0f9e92578ae1b5d921ec9bb2dd0
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: 2026-07-10
+  claim: Orca is a runnable open-source agent desktop environment that runs multiple coding agents
+    side-by-side, each isolated in its own worktree while tracked from one interface.
+- tier: T2
+  match: aliased
+  mechanism_quote: Isolate parallel Claude Code sessions in separate git worktrees so changes don’t
+    collide.
+  source: Anthropic, Claude Code worktrees documentation
+  source_kind: official_documentation
+  organization: Anthropic
+  independence_group: anthropic
+  url: https://code.claude.com/docs/en/worktrees
+  resolved_url: https://code.claude.com/docs/en/worktrees
+  content_sha256: f0afce0ee76c59b8448e330af91c16568ad0552de5cd5be8b2c88e3d7e9e3272
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: 2026-07-09
+  retrieved: 2026-07-10
+  claim: Claude Code's canonical workflow documentation prescribes git worktrees for parallel agent
+    sessions, using separate branches and working directories to prevent conflicting edits.
+- tier: T4
+  match: named
+  mechanism_quote: claude --worktree feature-auth gives you an isolated copy, a fresh branch, a scoped
+    session. Spin up a second with claude --worktree bugfix-123 and both agents work independently.
+  source: Trigger.dev, Parallel agents at Trigger.dev
+  source_kind: practitioner_report
+  organization: Trigger.dev
+  independence_group: trigger-dev
+  url: https://trigger.dev/blog/parallel-agents-gitbutler
+  resolved_url: https://trigger.dev/blog/parallel-agents-gitbutler
+  content_sha256: 0270f8b9180fde4d65d7d5dd3824202ec1f894a944c0de14e85322be13f278ab
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: 2026-04-16
+  retrieved: 2026-07-10
+  claim: Trigger.dev reports applying parallel Claude Code sessions to a large TypeScript monorepo,
+    evaluating isolated worktree sessions and documenting how multiple agent work streams remain
+    independently branch-scoped.
+verdict: verified

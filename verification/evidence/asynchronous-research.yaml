@@ -1,0 +1,123 @@
+schema_version: 2
+provenance_status: complete
+pattern: Asynchronous Research
+slug: asynchronous-research
+last_checked: '2026-07-10'
+search:
+  run_id: 'github-actions:29123202495'
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - asynchronous research coding agents fire and forget code research
+      - async coding agents code research projects
+      candidate_count: 5
+    mechanism:
+      queries:
+      - coding agent works in background creates pull request isolated cloud environment
+      - ask coding agent to research repository create plan make code changes before pull request
+      - coding agents answer code questions by writing executing code experiments
+      candidate_count: 8
+    artifact:
+      queries:
+      - site:github.com/simonw/research "Each directory in this repo is a separate research project carried out by an LLM tool"
+      - site:github.com "async coding agent" "AGENTS.md" "research"
+      candidate_count: 2
+adoption_score: 17
+tier_counts:
+  T1: 3
+  T4: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 4
+naming_alignment: aliased
+terminology_variants:
+- term: code research
+  used_by: Simon Willison
+  url: https://simonwillison.net/2025/Nov/6/async-code-research/
+- term: async coding agents
+  used_by: Simon Willison
+  url: https://simonwillison.net/2025/Nov/6/async-code-research/
+- term: cloud-based software engineering agent
+  used_by: OpenAI
+  url: https://openai.com/index/introducing-codex/
+- term: coding agent / cloud agent
+  used_by: GitHub Copilot
+  url: https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-cloud-agent
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: 'Today we’re launching a research preview of Codex: a cloud-based software engineering agent that can work on many tasks in parallel.'
+  source: 'OpenAI: Introducing Codex'
+  source_kind: shipped_product
+  organization: OpenAI
+  independence_group: openai
+  url: https://openai.com/index/introducing-codex/
+  resolved_url: https://openai.com/index/introducing-codex/
+  content_sha256: 80ad070c999195a64ac3ad9d998bb2759dedfe68de3f74dc3951f90e40ba0067
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2025-05-16'
+  retrieved: '2026-07-10'
+  claim: OpenAI ships Codex as a cloud software-engineering agent that can run multiple delegated coding tasks asynchronously.
+- tier: T1
+  match: aliased
+  mechanism_quote: Claude Code on the web lets you delegate tasks to Claude that run without your active supervision.
+  source: 'Anthropic Support: Claude Code on the web'
+  source_kind: shipped_product
+  organization: Anthropic
+  independence_group: anthropic
+  url: https://support.claude.com/en/articles/12618689-claude-code-on-the-web
+  resolved_url: https://support.claude.com/en/articles/12618689-claude-code-on-the-web
+  content_sha256: c81ad91eb38d64c4913f90b67133a75c581080f8e00eeaabb0509589a1262176
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Anthropic ships Claude Code on the web for unattended delegated coding tasks.
+- tier: T1
+  match: aliased
+  mechanism_quote: You can ask Copilot to research a repository, create a plan, and make code changes on a branch—all before opening a pull request.
+  source: 'GitHub Docs: About Copilot coding agent'
+  source_kind: shipped_product
+  organization: GitHub
+  independence_group: github
+  url: https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-cloud-agent
+  resolved_url: https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-cloud-agent
+  content_sha256: 5418a60dc696351371611ab9b13a00a5251ec159b7ef1f2dcc94ae108cb9821c
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: GitHub ships Copilot coding agent support for asynchronous repository research, planning, branch work, and pull request preparation.
+- tier: T4
+  match: aliased
+  mechanism_quote: Pick a research question, spin up an asynchronous coding agent and let it go and run some experiments and report back when it’s done.
+  source: 'Simon Willison: Code research projects with async coding agents'
+  source_kind: practitioner_report
+  organization: Simon Willison
+  independence_group: simon-willison
+  url: https://simonwillison.net/2025/Nov/6/async-code-research/
+  resolved_url: https://simonwillison.net/2025/Nov/6/async-code-research/
+  content_sha256: fa4f6ee814f533a9b1713b2502421092aa701bd158660b71f8530f32ee690b20
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2025-11-06'
+  retrieved: '2026-07-10'
+  claim: Simon Willison reports using asynchronous coding agents to run executable code experiments against research questions and return results later.
+verdict: verified

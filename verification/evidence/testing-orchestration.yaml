@@ -1,0 +1,104 @@
+schema_version: 2
+provenance_status: complete
+pattern: Testing Orchestration
+slug: testing-orchestration
+last_checked: 2026-07-10
+search:
+  run_id: github-actions:29123202495
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - '"Testing Orchestration" "AI" "quality gates"'
+        - '"Testing Orchestration" AI test generation quality gates'
+      candidate_count: 4
+    mechanism:
+      queries:
+        - AI generate tests from requirements acceptance criteria unit integration quality gates
+        - '"TestGen-LLM" "Meta" "test-a-thons"'
+        - '"GitHub Copilot" "generate tests" "verify the results"'
+      candidate_count: 7
+    artifact:
+      queries:
+        - 'site:github.com "Test Runner:" "Coverage Parser:" "AI Caller:"'
+        - open source AI test generation agent runs tests improves coverage GitHub
+        - '"Qodo Cover" "Coverage Parser" "AI Caller"'
+        - '"Qodo Cover" AI test generation coverage run tests'
+      candidate_count: 4
+adoption_score: 12
+tier_counts:
+  T1: 1
+  T2: 1
+  T3: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: aliased
+terminology_variants:
+  - term: automated unit test generation
+    used_by: Qodo Cover
+    url: https://raw.githubusercontent.com/qodo-ai/qodo-cover/main/README.md
+  - term: writing tests with GitHub Copilot
+    used_by: GitHub Docs
+    url: https://docs.github.com/en/copilot/tutorials/write-tests
+  - term: automated unit test improvement
+    used_by: Meta TestGen-LLM
+    url: https://discovery.ucl.ac.uk/id/eprint/10199775/
+evidence:
+  - tier: T1
+    match: aliased
+    mechanism_quote: 'The system comprises several components: 1. **Test Runner:** Executes the command or scripts to run the test suite and generate code coverage reports. 2. **Coverage Parser:** Validates that code coverage increases as tests are added, ensuring that new tests contribute to the overall test effectiveness. 3. **Prompt Builder:** Gathers necessary data from the codebase and constructs the prompt to be passed to the Large Language Model (LLM). 4. **AI Caller:** Interacts with the LLM to generate tests based on the prompt provided.'
+    source: Qodo Cover README
+    source_kind: open_source_implementation
+    organization: Qodo
+    independence_group: qodo
+    url: https://raw.githubusercontent.com/qodo-ai/qodo-cover/main/README.md
+    resolved_url: https://raw.githubusercontent.com/qodo-ai/qodo-cover/main/README.md
+    content_sha256: 7135ad070989e8426ef28d91955d0fad5caf05ca415cec2f93046f406c5b8fe7
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable open-source tool chains test execution, coverage parsing, prompt construction, and LLM-generated tests to extend a suite while checking that coverage increases.
+  - tier: T2
+    match: aliased
+    mechanism_quote: This example demonstrates how you can use Copilot to create unit tests for a class like BankAccount. We will show you how to prompt Copilot to generate tests, execute them, and verify the results.
+    source: GitHub Docs, "Writing tests with GitHub Copilot"
+    source_kind: official_documentation
+    organization: GitHub
+    independence_group: github
+    url: https://docs.github.com/en/copilot/tutorials/write-tests
+    resolved_url: https://docs.github.com/en/copilot/tutorials/write-tests
+    content_sha256: 0142fdd2c847c33796e6492c56db68fe75526d6600070627c5aefa7ba0921881
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Official Copilot documentation describes prompting the assistant to generate tests, execute them, and verify results, including unit and integration testing workflows.
+  - tier: T3
+    match: aliased
+    mechanism_quote: This paper describes Meta’s TestGen-LLM tool, which uses LLMs to automatically improve existing human-written tests. TestGen-LLM verifies that its generated test classes successfully clear a set of filters that assure measurable improvement over the original test suite, thereby eliminating problems due to LLM hallucination.
+    source: UCL Discovery record for "Automated Unit Test Improvement using Large Language Models at Meta"
+    source_kind: peer_reviewed_research
+    organization: Meta
+    independence_group: meta
+    url: https://discovery.ucl.ac.uk/id/eprint/10199775/
+    resolved_url: https://discovery.ucl.ac.uk/id/eprint/10199775/
+    content_sha256: 955bff5fe5d7b149bd3d27b502ebc1c67469600ee5720ea456329f450f85f457
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: FSE 2024 proceedings record documents Meta's TestGen-LLM deployment, where LLM-generated tests were filtered for measurable suite improvement before production acceptance during Instagram and Facebook test-a-thons.
+verdict: verified

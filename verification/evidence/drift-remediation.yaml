@@ -1,0 +1,118 @@
+schema_version: 2
+provenance_status: complete
+pattern: Drift Remediation
+slug: drift-remediation
+last_checked: 2026-07-10
+search:
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - "drift remediation Terraform pull request"
+        - "automated drift remediation Terraform infrastructure drift"
+        - "site:docs.cloudposse.com github-action-atmos-terraform-drift-remediation drift remediation"
+        - "site:docs.envzero.com drift detection automatic remediation pull request"
+      candidate_count: 8
+    mechanism:
+      queries:
+        - "configuration drift automated remediation Terraform plan"
+        - "infrastructure drift auto remediation Terraform code change"
+        - "detect configuration drift generate corrective Terraform plan"
+        - "infrastructure as code drift automatically create pull request"
+      candidate_count: 9
+    artifact:
+      queries:
+        - "github action atmos terraform drift remediation"
+        - "github terraform drift remediation action apply label"
+        - "github infrastructure drift remediation terraform pull request"
+        - "github \"drift will be remediated\" \"apply\" issue"
+      candidate_count: 5
+adoption_score: 16
+tier_counts: {T1: 1, T2: 2, T3: 1}
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 4
+naming_alignment: strong
+terminology_variants:
+  - term: automatic drift remediation
+    used_by: env0
+    url: https://docs.envzero.com/guides/admin-guide/environments/drift-detection/automatic-drift-remediation
+  - term: automated remediation
+    used_by: Conf42
+    url: https://www.conf42.com/DevOps_2026_Imran_Abdul_sdwan_networking_automation
+evidence:
+  - tier: T1
+    match: named
+    mechanism_quote: "In this example drift will be remediated when user sets label `apply` to an issue."
+    source: Cloud Posse GitHub Action for Atmos Terraform Drift Remediation
+    source_kind: open_source_implementation
+    organization: Cloud Posse
+    independence_group: cloudposse
+    url: https://github.com/cloudposse/github-action-atmos-terraform-drift-remediation
+    resolved_url: https://github.com/cloudposse/github-action-atmos-terraform-drift-remediation
+    content_sha256: 501dafc74a31e458afd0716a42b05ec5c5a57bd33d434dc9b2210f02b3b367b0
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable GitHub Action workflow detects Terraform drift and remediates it through an explicit apply-labeled issue workflow.
+  - tier: T2
+    match: named
+    mechanism_quote: "If drift is detected, env zero will automatically attempt to remediate it by running an env zero deployment with the latest configuration from your connected version control system (VCS)."
+    source: env0 Automatic Drift Remediation
+    source_kind: official_documentation
+    organization: env0
+    independence_group: env0
+    url: https://docs.envzero.com/guides/admin-guide/environments/drift-detection/automatic-drift-remediation
+    resolved_url: https://docs.envzero.com/guides/admin-guide/environments/drift-detection/automatic-drift-remediation
+    content_sha256: b6931c035ef9aaa923f44304960961ceb490cf713ab88957087b050533a4e7f6
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Official documentation describes detecting drift and automatically running a deployment from version-controlled configuration to remediate it.
+  - tier: T2
+    match: named
+    mechanism_quote: "Firefly will generate a code change in your IaC repository to align the code with the asset's current configuration."
+    source: Firefly Remediating Drifts
+    source_kind: official_documentation
+    organization: Firefly
+    independence_group: firefly
+    url: https://docs.firefly.ai/detailed-guides/cloud-asset-inventory/remediating-drifts
+    resolved_url: https://docs.firefly.ai/detailed-guides/cloud-asset-inventory/remediating-drifts
+    content_sha256: 7035729c09ad2edf3854137d462f2eeaacd7159531a925e73f1e9341dc4c920c
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Official documentation describes generating an IaC repository code change to bring code and detected asset configuration back into alignment.
+  - tier: T3
+    match: aliased
+    mechanism_quote: "If configuration drift occur, the alert trigger and automated remediation can be reapplied to the correct configuration."
+    source: Conf42 DevOps 2026 SD-WAN Networking Automation Talk
+    source_kind: conference_talk
+    organization: Conf42
+    independence_group: conf42
+    url: https://www.conf42.com/DevOps_2026_Imran_Abdul_sdwan_networking_automation
+    resolved_url: https://www.conf42.com/DevOps_2026_Imran_Abdul_sdwan_networking_automation
+    content_sha256: 1247707bbf30a3a3eaf92345d1acdf5c536aae1caab668be8fcb7e9735fbf6c1
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Conference talk record describes detecting configuration drift and automatically reapplying the correct configuration as remediation.
+verdict: verified

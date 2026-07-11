@@ -5,42 +5,4 @@
 # --registry). When a pattern gains evidence, remove its slug atomically in the
 # same PR: overlaps, duplicate slugs, and unknown catalog slugs are validation errors.
 #
-pending:
-- adversarial-evaluator
-- asynchronous-research
-- atomic-decomposition
-- autonomous-acceptance
-- autonomous-defense
-- autonomous-remediation
-- bounded-autonomy
-- centralized-rules
-- chaos-engineering
-- chatops-security
-- context-optimization
-- custom-commands
-- debt-forecasting
-- deployment-synthesis
-- drift-remediation
-- error-resolution
-- evidence-automation
-- feedback-flywheel
-- guided-architecture
-- guided-refactoring
-- handoff-automation
-- handoff-protocols
-- image-spec
-- incident-automation
-- long-running-orchestration
-- observable-development
-- parallel-agents
-- pipeline-synthesis
-- policy-generation
-- progressive-disclosure
-- release-synthesis
-- review-automation
-- security-orchestration
-- suite-health
-- test-promotion
-- testing-orchestration
-- upgrade-advisor
-- workflow-orchestration
+pending: []

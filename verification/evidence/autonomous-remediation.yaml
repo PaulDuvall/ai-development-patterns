@@ -1,0 +1,118 @@
+schema_version: 2
+provenance_status: complete
+pattern: Autonomous Remediation
+slug: autonomous-remediation
+last_checked: 2026-07-10
+search:
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - "\"Autonomous Remediation\" coding agent"
+        - "\"AI autofix\" code scanning LLM remediation"
+        - "\"automated program repair\" LLM agent"
+      candidate_count: 9
+    mechanism:
+      queries:
+        - "run lint tests after AI edits automatically fix problems"
+        - "code scanning analysis large language model generate fixes"
+        - "coding agent hook blocks edit with violation report"
+      candidate_count: 10
+    artifact:
+      queries:
+        - "\"--test-cmd\" \"aider\" \"fix\""
+        - "\"PostToolUse\" \"lint\" \"Claude Code\" hook"
+        - "\"RepairAgent\" \"test it\" \"iterate\""
+      candidate_count: 7
+adoption_score: 16
+tier_counts: {T1: 1, T2: 2, T3: 1}
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 4
+naming_alignment: aliased
+terminology_variants:
+  - term: Copilot Autofix
+    used_by: GitHub
+    url: https://docs.github.com/en/code-security/concepts/code-scanning/copilot-autofix-for-code-scanning
+  - term: Autofix
+    used_by: Harness
+    url: https://developer.harness.io/3k-docs/platform/getting-started/agents/code-quality/
+  - term: automated program repair
+    used_by: ICSE 2025 research track
+    url: https://conf.researchr.org/details/icse-2025/icse-2025-research-track/160/RepairAgent-An-Autonomous-LLM-Based-Agent-for-Program-Repair
+evidence:
+  - tier: T1
+    match: unnamed
+    mechanism_quote: "Aider can automatically lint and test your code every time it makes changes. This helps identify and repair any problems introduced by the AI edits."
+    source: Aider lint and test documentation
+    source_kind: open_source_implementation
+    organization: Aider
+    independence_group: aider
+    url: https://aider.chat/docs/usage/lint-test.html
+    resolved_url: https://aider.chat/docs/usage/lint-test.html
+    content_sha256: 158a220553a109338789ce500f5dcf9cf6fe45c0bff9458f689d8bb190b434fc
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable open-source coding agent can run lint and test checks after AI edits and use the results to repair introduced problems.
+  - tier: T2
+    match: aliased
+    mechanism_quote: "The potential fixes are generated automatically by large language models (LLMs) using data from the codebase and from code scanning analysis."
+    source: GitHub Docs Copilot Autofix for code scanning
+    source_kind: official_documentation
+    organization: GitHub
+    independence_group: github
+    url: https://docs.github.com/en/code-security/concepts/code-scanning/copilot-autofix-for-code-scanning
+    resolved_url: https://docs.github.com/en/code-security/concepts/code-scanning/copilot-autofix-for-code-scanning
+    content_sha256: 00a601a9b97a5bfe1e8e3ac5c67a287cdb6a8f7f94121d51b6657019152f30d6
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Official documentation describes an LLM-generated fix workflow driven by code scanning analysis.
+  - tier: T2
+    match: aliased
+    mechanism_quote: "Harness provides three AI-powered agents focused on code quality: Code Review for intelligent PR feedback, Code Coverage for automated test generation, and Autofix for automatic CI failure remediation."
+    source: Harness Code Quality Agents documentation
+    source_kind: official_documentation
+    organization: Harness
+    independence_group: harness
+    url: https://developer.harness.io/3k-docs/platform/getting-started/agents/code-quality
+    resolved_url: https://developer.harness.io/3k-docs/platform/getting-started/agents/code-quality/
+    content_sha256: 3bca554a22bcf8abf3b379d4705b4ce721d74327e3ff7cac1822d1dfbdec5bca
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Official documentation describes an AI Autofix agent for automatic CI failure remediation.
+  - tier: T3
+    match: aliased
+    mechanism_quote: "This paper introduces RepairAgent, the first work to address the program repair challenge through an autonomous agent based on a large language model (LLM)."
+    source: ICSE 2025 RepairAgent research-track entry
+    source_kind: peer_reviewed_research
+    organization: Software Lab, University of Stuttgart
+    independence_group: software-lab-stuttgart
+    url: https://conf.researchr.org/details/icse-2025/icse-2025-research-track/160/RepairAgent-An-Autonomous-LLM-Based-Agent-for-Program-Repair
+    resolved_url: https://conf.researchr.org/details/icse-2025/icse-2025-research-track/160/RepairAgent-An-Autonomous-LLM-Based-Agent-for-Program-Repair
+    content_sha256: 62be9da9533091f293894a5e79fa9fcd78561a682e0fdd6a9e6809c300506963
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Peer-reviewed ICSE research records an autonomous LLM-based agent for program repair.
+verdict: verified

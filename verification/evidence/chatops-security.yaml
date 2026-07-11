@@ -1,0 +1,109 @@
+schema_version: 2
+provenance_status: complete
+pattern: ChatOps Security
+slug: chatops-security
+last_checked: '2026-07-10'
+search:
+  run_id: 'github-actions:29123202495'
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - ChatOps security scanning Slack command vulnerability scan
+      - DevSecOps ChatOps security scan Slack bot
+      - ChatOps for Security Operations
+      candidate_count: 5
+    mechanism:
+      queries:
+      - Slack slash command vulnerability scan security operations
+      - Slack command query VirusTotal security operations
+      - automated ChatOps solution SAST scan results Slack
+      candidate_count: 6
+    artifact:
+      queries:
+      - site:github.com Slack slash command security scan vulnerability
+      - site:github.com slack virustotal slash command security bot
+      - site:github.com slack security bot slash command virustotal
+      - site:github.com trivy slack slash command scan
+      candidate_count: 6
+adoption_score: 9
+tier_counts:
+  T1: 1
+  T4: 2
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: aliased
+terminology_variants:
+- term: ChatOps solution
+  used_by: Amazon Web Services
+  url: https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/deploy-chatops-solution-to-manage-sast-scan-results.html
+- term: ChatOps for Security Operations
+  used_by: Rapid7
+  url: https://www.rapid7.com/blog/post/2017/05/07/chatops-for-security-operations/
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: 'There is a pressing need for a solution that can streamline SAST result management,
+    enhance team collaboration, and automate infrastructure provisioning to address these challenges
+    effectively.'
+  source: AWS Samples, chatops-slack GitHub repository
+  source_kind: open_source_implementation
+  organization: Amazon Web Services
+  independence_group: amazon
+  url: https://github.com/aws-samples/chatops-slack
+  resolved_url: https://github.com/aws-samples/chatops-slack
+  content_sha256: dc61bf435154aaa9ccbb1eece5af2c681f856cf03247e81038877893c3a9651f
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Runnable AWS sample repository implements a Slack ChatOps workflow for managing SAST scan results.
+- tier: T4
+  match: aliased
+  mechanism_quote: Similar to the integration above, this one adds a new slash command to Slack to
+    query VirusTotal for a hash or URL.
+  source: Recon InfoSec, Slacking at Security Operations
+  source_kind: practitioner_report
+  organization: Recon InfoSec
+  independence_group: reconinfosec
+  url: https://blog.reconinfosec.com/slacking-at-security-operations
+  resolved_url: https://blog.reconinfosec.com/slacking-at-security-operations
+  content_sha256: d923b782429fd0a1b5f7a4f69c8abfcaae46a30096627575efa9f71dfbabc218
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Practitioner security-operations write-up describes Slack slash commands that run immediate
+    VirusTotal checks for hashes or URLs.
+- tier: T4
+  match: aliased
+  mechanism_quote: Configure ChatOps with custom commands and link it to the script to run. Script
+    would then take the command and convert it to the system command to be executed on the target
+    system
+  source: Rapid7, ChatOps for Security Operations
+  source_kind: practitioner_report
+  organization: Rapid7
+  independence_group: rapid7
+  url: https://www.rapid7.com/blog/post/2017/05/07/chatops-for-security-operations/
+  resolved_url: https://www.rapid7.com/blog/post/2017/05/07/chatops-for-security-operations/
+  content_sha256: 3c24757fcadb62fafbea21a69b454718fb72c445acd5cf3f71bb48b18e4754f1
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2017-05-07'
+  retrieved: '2026-07-10'
+  claim: Practitioner article describes security operations ChatOps custom commands wired to scripts
+    for immediate execution from chat.
+verdict: verified

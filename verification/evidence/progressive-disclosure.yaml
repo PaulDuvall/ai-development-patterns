@@ -1,0 +1,107 @@
+schema_version: 2
+provenance_status: complete
+pattern: Progressive Disclosure
+slug: progressive-disclosure
+last_checked: 2026-07-10
+search:
+  run_id: github-actions:29123202495
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - progressive disclosure AI coding assistant rules context loading
+        - site:docs.anthropic.com Claude Skills progressive disclosure skill instructions
+        - Anthropic effective context engineering for AI agents progressive disclosure
+      candidate_count: 7
+    mechanism:
+      queries:
+        - Cursor rules Auto Attached Agent Requested documentation
+        - Claude Code memory imports CLAUDE.md path scoped rules context documentation
+        - AI coding assistant project rules split files load relevant context blog
+      candidate_count: 6
+    artifact:
+      queries:
+        - site:github.com path:.cursor/rules alwaysApply false globs
+        - '"alwaysApply: false" ".cursor/rules" "description:"'
+        - '"path-scoped rules" "Claude Code" ".claude"'
+      candidate_count: 4
+adoption_score: 9
+tier_counts:
+  T1: 1
+  T4: 2
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: strong
+terminology_variants:
+  - term: Project Rules
+    used_by: Cursor
+    url: https://cursor.com/docs/rules.md
+  - term: context management
+    used_by: MindStudio
+    url: https://www.mindstudio.ai/blog/progressive-disclosure-ai-agents-context-management
+evidence:
+  - tier: T1
+    match: aliased
+    mechanism_quote: Project rules live in .cursor/rules as .mdc files and are version-controlled.
+      They are scoped using path patterns, invoked manually, or included based on relevance.
+    source: Cursor Rules documentation
+    source_kind: shipped_product
+    organization: Cursor
+    independence_group: cursor
+    url: https://cursor.com/docs/rules.md
+    resolved_url: https://cursor.com/docs/rules.md
+    content_sha256: 96d227602d4c83eefeac580bd4209dcf62d674b0194ee6317e974ee8c9aa0ad6
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Cursor ships project rules that can be version-controlled in .cursor/rules and loaded
+      by path pattern, manual invocation, or relevance, matching incremental rule loading for the
+      current task context.
+  - tier: T4
+    match: named
+    mechanism_quote: Applied to AI agents, it means loading reference material into context only when
+      the current task actually requires it, rather than preloading everything at initialization.
+    source: MindStudio, Progressive Disclosure for AI Agents
+    source_kind: practitioner_report
+    organization: MindStudio
+    independence_group: mindstudio
+    url: https://www.mindstudio.ai/blog/progressive-disclosure-ai-agents-context-management
+    resolved_url: https://www.mindstudio.ai/blog/progressive-disclosure-ai-agents-context-management
+    content_sha256: 3d0d00b102d73d96896a3b5a4f1c2322eb2fde97a92c53bb32db3b99884f6a39
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: MindStudio describes progressive disclosure for AI agents as loading reference material
+      only when the current task requires it, preventing all context from being preloaded.
+  - tier: T4
+    match: named
+    mechanism_quote: Focused, actionable instructions for the current context. Pointers to additional
+      detail that it can retrieve only when needed.
+    source: Ardalis, Optimizing AI Agents with Progressive Disclosure
+    source_kind: practitioner_report
+    organization: Ardalis
+    independence_group: ardalis
+    url: https://ardalis.com/optimizing-ai-agents-with-progressive-disclosure/
+    resolved_url: https://ardalis.com/optimizing-ai-agents-with-progressive-disclosure/
+    content_sha256: d442fa558b11cb916f43be2249f46cb96e01a7044cd2f2abe03f66b949232d2f
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Ardalis describes progressive disclosure as giving AI agents concise current-context
+      instructions plus retrievable detail only when needed.
+verdict: verified

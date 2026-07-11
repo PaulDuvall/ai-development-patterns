@@ -1,0 +1,105 @@
+schema_version: 2
+provenance_status: complete
+pattern: Atomic Decomposition
+slug: atomic-decomposition
+last_checked: 2026-07-10
+search:
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - "\"Atomic Decomposition\" \"AI\" \"coding agents\""
+        - "\"Atomic Decomposition\" \"parallel agents\""
+      candidate_count: 0
+    mechanism:
+      queries:
+        - AI coding agents break tasks into small independent parallel subtasks documentation
+        - parallel AI coding agents decompose tasks independent worktrees
+        - Claude Code parallel subagents break down tasks independent implementation
+        - OpenAI Codex split large tasks into smaller verifiable tasks coding agent
+        - parallelcode.app splitting work for parallel AI agents
+      candidate_count: 6
+    artifact:
+      queries:
+        - GitHub Batty AI coding agents parallel architect breaks into subtasks
+        - site:github.com AI coding agents parallel subtasks worktree task assignment
+        - site:github.com parallel AI agents worktree tasks Claude Code Codex
+        - site:github.com "breaks it into subtasks" "AI coding agents"
+      candidate_count: 3
+adoption_score: 11
+tier_counts: {T1: 1, T2: 1, T4: 1}
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: aliased
+terminology_variants:
+  - term: Task splitting and ownership
+    used_by: b0qi skill-multi-agent
+    url: https://github.com/b0qi/skill-multi-agent
+  - term: Sectioning
+    used_by: Anthropic
+    url: https://www.anthropic.com/engineering/building-effective-agents
+  - term: Contract-first fan-out
+    used_by: ParallelCode
+    url: https://parallelcode.app/blog/splitting-work-for-parallel-ai-agents/
+evidence:
+  - tier: T1
+    match: aliased
+    mechanism_quote: "Split the task into subtasks with file ownership."
+    source: b0qi skill-multi-agent
+    source_kind: open_source_implementation
+    organization: b0qi
+    independence_group: b0qi
+    url: https://github.com/b0qi/skill-multi-agent
+    resolved_url: https://github.com/b0qi/skill-multi-agent
+    content_sha256: 1fc54a4bc78f2da4ee376957892c3a60dc6c99664a83a7e816525f375507cdd3
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable open-source orchestration skill decomposes work into owned subtasks before dispatching multiple coding agents.
+  - tier: T2
+    match: aliased
+    mechanism_quote: "Sectioning: Breaking a task into independent subtasks run in parallel."
+    source: Building Effective Agents
+    source_kind: official_documentation
+    organization: Anthropic
+    independence_group: anthropic
+    url: https://www.anthropic.com/engineering/building-effective-agents
+    resolved_url: https://www.anthropic.com/engineering/building-effective-agents
+    content_sha256: abce80b40c5124e43e2ae985904ea9f6a653ab6c4299376fc6a66ef019917dfc
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2024-12-19
+    retrieved: 2026-07-10
+    claim: Official agent-building guidance names sectioning as the workflow of breaking a task into independent parallel subtasks.
+  - tier: T4
+    match: aliased
+    mechanism_quote: "So the goal of decomposition is independence at merge time, not just at edit time."
+    source: Splitting Work for Parallel AI Agents
+    source_kind: practitioner_report
+    organization: ParallelCode
+    independence_group: parallelcode
+    url: https://parallelcode.app/blog/splitting-work-for-parallel-ai-agents/
+    resolved_url: https://parallelcode.app/blog/splitting-work-for-parallel-ai-agents/
+    content_sha256: 5e66ca1b9bfa800951283b73c4814c6abd3d4e62711e4afa3363dd75e9347024
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2026-05-22
+    retrieved: 2026-07-10
+    claim: Practitioner guidance reports using contract-first task splits so parallel coding agents can work independently and merge without conflicts.
+verdict: verified

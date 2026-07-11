@@ -1,25 +1,34 @@
 schema_version: 2
-provenance_status: legacy-import
-legacy_run_url: https://github.com/PaulDuvall/ai-development-patterns/pull/22
-legacy_limitations: The PR records 10 aggregate queries, all three search modes, and an independent URL
-  re-fetch. Exact query strings, per-mode candidate counts, normalized content hashes, and verifier metadata
-  were not retained.
+provenance_status: complete
 pattern: Developer Lifecycle
 slug: developer-lifecycle
-last_checked: '2026-07-02'
+last_checked: 2026-07-10
 search:
-  run_id: legacy-import
-  checked_at: '2026-07-02'
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
   modes:
     name:
-      queries: []
-      candidate_count: null
+      queries:
+        - '"Developer Lifecycle" "AI" development pattern plan first coding agent'
+        - '"AI-Driven Development Life Cycle" AI-DLC workflows'
+        - '"Explore first, then plan, then code" Claude Code'
+      candidate_count: 3
     mechanism:
-      queries: []
-      candidate_count: null
+      queries:
+        - plan first then implement code agent requirements design tasks workflow
+        - specification plan tasks AI coding agent workflow requirements design implementation
+        - AI coding agent workflow research plan implement commit
+      candidate_count: 4
     artifact:
-      queries: []
-      candidate_count: null
+      queries:
+        - site:github.com/awslabs/aidlc-workflows ".aidlc" "Inception" "Construction"
+        - site:github.com/github/spec-kit "/specify" "/plan" "/tasks"
+        - site:github.com "RESEARCH.md" "PLAN.md" "PLAN-CHECKLIST.md" coding agent
+      candidate_count: 3
 adoption_score: 11
 tier_counts:
   T1: 1
@@ -31,79 +40,63 @@ adoption_dimensions:
   independence_groups: 3
 naming_alignment: aliased
 terminology_variants:
-- term: Spec-Driven Development
-  used_by: GitHub (Spec Kit) and Amazon Kiro
-  url: https://github.com/github/spec-kit
-- term: AI-DLC (AI-Driven Development Life Cycle)
-  used_by: AWS (DevOps blog methodology + awslabs/aidlc-workflows)
-  url: https://aws.amazon.com/blogs/devops/ai-driven-development-life-cycle/
-- term: 'Explore, Plan, Code, Commit (docs heading: ''Explore first, then plan, then code''; feature:
-    plan mode)'
-  used_by: Anthropic (Claude Code official docs)
-  url: https://code.claude.com/docs/en/best-practices
-- term: Specs / Three-Phase Workflow (Requirements -> Design -> Tasks)
-  used_by: AWS Kiro IDE
-  url: https://kiro.dev/docs/specs/
+  - term: AI-DLC (AI-Driven Development Life Cycle)
+    used_by: AWS Labs
+    url: https://github.com/awslabs/aidlc-workflows
+  - term: Explore, Plan, Implement, Commit
+    used_by: Anthropic Claude Code docs
+    url: https://code.claude.com/docs/en/best-practices
 evidence:
-- tier: T1
-  match: aliased
-  mechanism_quote: 'AI-DLC follows a structured three-phase approach that adapts to your project''s complexity:'
-  source: AWS Labs, aidlc-workflows repository
-  source_kind: open_source_implementation
-  organization: Amazon Web Services
-  independence_group: amazon
-  url: https://github.com/awslabs/aidlc-workflows
-  resolved_url: https://github.com/awslabs/aidlc-workflows
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-07-02'
-  retrieved: '2026-07-02'
-  claim: 'AWS Labs ships AI-DLC workflow steering rules (3,278 stars per GitHub API this run) installable
-    into Kiro, Amazon Q Developer, Cursor, Cline, Claude Code, GitHub Copilot, and OpenAI Codex, running
-    features through Inception (WHAT/WHY), Construction (HOW), and Operations phases. Repo last-updated
-    date shown by GitHub API: 2026-07-02.'
-- tier: T2
-  match: aliased
-  mechanism_quote: Letting Claude jump straight to coding can produce code that solves the wrong problem.
-    Use plan mode to separate exploration from execution.
-  source: Anthropic, Claude Code docs 'Best practices' (Explore first, then plan, then code)
-  source_kind: official_documentation
-  organization: Anthropic
-  independence_group: anthropic
-  url: https://code.claude.com/docs/en/best-practices
-  resolved_url: https://code.claude.com/docs/en/best-practices
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  retrieved: '2026-07-02'
-  claim: Anthropic's canonical Claude Code docs prescribe a four-phase Explore -> Plan -> Implement ->
-    Commit workflow using plan mode to separate research/planning from code generation (undated page;
-    date = retrieval date).
-- tier: T4
-  match: unnamed
-  mechanism_quote: Brainstorm spec, then plan a plan, then execute using LLM codegen. Discrete loops.
-  source: Harper Reed, 'My LLM codegen workflow atm' (harper.blog)
-  source_kind: practitioner_report
-  organization: Harper Reed
-  independence_group: independent:harper-reed
-  url: https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
-  resolved_url: https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2025-02-16'
-  retrieved: '2026-07-02'
-  claim: Practitioner post with full prompts and file conventions (spec.md, prompt_plan.md, todo.md) describing
-    a staged spec -> plan -> incremental execution workflow for building features with LLM codegen, explicitly
-    crediting the planning step with keeping projects under control.
-verdict: weak
+  - tier: T1
+    match: aliased
+    mechanism_quote: "AI-DLC follows a structured three-phase approach that adapts to your project's complexity:"
+    source: AWS Labs, aidlc-workflows repository README
+    source_kind: open_source_implementation
+    organization: Amazon Web Services
+    independence_group: amazon
+    url: https://raw.githubusercontent.com/awslabs/aidlc-workflows/main/README.md
+    resolved_url: https://raw.githubusercontent.com/awslabs/aidlc-workflows/main/README.md
+    content_sha256: 3a33a3bf0a70a42f8347cf9f8aa7584311af6b0fce20e7f3a3b0230620fa33d1
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: AWS Labs ships runnable AI-DLC workflow rules for coding agents that guide work through Inception, Construction, and Operations phases.
+  - tier: T2
+    match: aliased
+    mechanism_quote: Use plan mode to separate exploration from execution
+    source: Anthropic, Claude Code docs 'Best practices'
+    source_kind: official_documentation
+    organization: Anthropic
+    independence_group: anthropic
+    url: https://code.claude.com/docs/en/best-practices
+    resolved_url: https://code.claude.com/docs/en/best-practices
+    content_sha256: a59512f63b1bb061c8e7edf5225c271773a6ed91d21b69a4e0c1c2f904573952
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Anthropic's Claude Code documentation prescribes a staged Explore, Plan, Implement, Commit workflow that separates planning from code generation.
+  - tier: T4
+    match: unnamed
+    mechanism_quote: Brainstorm spec, then plan a plan, then execute using LLM codegen. Discrete loops.
+    source: Harper Reed, 'My LLM codegen workflow atm'
+    source_kind: practitioner_report
+    organization: Harper Reed
+    independence_group: independent:harper-reed
+    url: https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
+    resolved_url: https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
+    content_sha256: 14fb1d68844d9fce7e63ede16bd7b25e71f7e67d7a2a13692637c4b555e3a3b5
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2025-02-16
+    retrieved: 2026-07-10
+    claim: Practitioner report describes using separate spec, planning, and execution loops with LLM code generation for building software.
+verdict: verified
