@@ -12,6 +12,16 @@ bd close <id>         # Complete work
 bd sync               # Sync with git
 ```
 
+## Pattern Adoption Evaluation
+
+Run model-backed pattern-adoption research only through the repository-local
+`$evaluate-pattern-adoption` skill in an interactive, signed-in local Codex client.
+Never run it in GitHub Actions, expose evaluator API keys to the repository, or bypass either the
+exact plan approval or the separate draft-PR publication approval. Use no more than three
+read-only research subagents at once, keep the root task as the sole writer, and use a fresh
+read-only verifier for every batch. GitHub Actions is limited to deterministic validation and
+read-only link/content checks for this capability.
+
 ## Landing the Plane (Session Completion)
 
 **When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
@@ -37,4 +47,3 @@ bd sync               # Sync with git
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
-

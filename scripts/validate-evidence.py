@@ -19,6 +19,12 @@ import yaml
 from yaml.constructor import ConstructorError
 from yaml.events import AliasEvent
 
+from local_verification import (
+    LOCAL_RUN_ID_RE,
+    LOCAL_RUN_REF_RE,
+    load_manifest,
+)
+
 
 SCHEMA_VERSION = 2
 TIER_WEIGHTS = {"T1": 5, "T2": 4, "T3": 3, "T4": 2, "T5": 1}
@@ -294,7 +300,7 @@ def validate_search(data, errors):
     base = {"run_id", "checked_at", "modes"}
     execution = {"provider", "model", "prompt_version"}
     required = base | execution if provenance == "complete" else base
-    allowed = base | execution | {"run_url"}
+    allowed = base | execution | {"run_url", "run_ref", "run_manifest_sha256"}
     if not _require_mapping_keys(search, required, allowed, "search", errors):
         return
     if not isinstance(search.get("run_id"), str) or not search.get("run_id", "").strip():
@@ -350,22 +356,52 @@ def validate_search(data, errors):
             errors.append("search: legacy-import requires run_id: legacy-import")
         if "run_url" in search:
             errors.append("search: legacy-import must use top-level legacy_run_url")
+        for field in ("run_ref", "run_manifest_sha256"):
+            if field in search:
+                errors.append(f"search: legacy-import must omit {field}")
         for field in sorted(execution):
             if field in search:
                 errors.append(f"search: legacy-import must omit {field}")
     elif provenance == "complete":
         run_id = search.get("run_id")
         run_id_match = RUN_ID_RE.fullmatch(run_id) if isinstance(run_id, str) else None
-        run_number = pipeline_run_number(search.get("run_url"))
-        if not run_id_match:
+        local_run_match = (
+            LOCAL_RUN_ID_RE.fullmatch(run_id) if isinstance(run_id, str) else None)
+        if not run_id_match and not local_run_match:
             errors.append(
-                "search: complete provenance requires run_id 'github-actions:<run-number>'")
-        if not run_number:
-            errors.append(
-                "search: complete provenance requires this repository's canonical "
-                "Actions run_url")
-        if run_id_match and run_number and run_id_match.group(1) != run_number:
-            errors.append("search: run_id must match the run number in run_url")
+                "search: complete provenance requires run_id "
+                "'github-actions:<run-number>' or 'codex-local:<UUIDv4>'")
+        if local_run_match:
+            if "run_url" in search:
+                errors.append("search: local provenance must omit run_url")
+            run_ref = search.get("run_ref")
+            ref_match = (
+                LOCAL_RUN_REF_RE.fullmatch(run_ref)
+                if isinstance(run_ref, str) else None)
+            if ref_match is None:
+                errors.append(
+                    "search: local provenance requires a safe canonical run_ref")
+            elif ref_match.group(1) != local_run_match.group(1):
+                errors.append("search: run_ref must match the UUID in run_id")
+            manifest_digest = search.get("run_manifest_sha256")
+            if not isinstance(manifest_digest, str) \
+                    or SHA256_RE.fullmatch(manifest_digest) is None:
+                errors.append(
+                    "search: local provenance requires run_manifest_sha256 as "
+                    "64 lowercase hex characters")
+            if search.get("provider") != "openai":
+                errors.append("search: local Codex provenance requires provider: openai")
+        else:
+            run_number = pipeline_run_number(search.get("run_url"))
+            if not run_number:
+                errors.append(
+                    "search: complete provenance requires this repository's canonical "
+                    "Actions run_url")
+            if run_id_match and run_number and run_id_match.group(1) != run_number:
+                errors.append("search: run_id must match the run number in run_url")
+            for field in ("run_ref", "run_manifest_sha256"):
+                if field in search:
+                    errors.append(f"search: Actions provenance must omit {field}")
         if search.get("provider") not in RESEARCH_PROVIDERS:
             errors.append(
                 f"search: provider must be one of {sorted(RESEARCH_PROVIDERS)}")
@@ -376,14 +412,12 @@ def validate_search(data, errors):
             errors.append(f"search: {total_queries} queries exceeds max {MAX_QUERIES}")
 
 
-def validate_verifier(
-        verifier, index, provenance, search_run_url, search_model,
-        search_prompt_version, errors):
+def validate_verifier(verifier, index, provenance, search, errors):
     label = f"evidence[{index}].verifier"
-    fields = {"method", "model", "prompt_version", "run_url"}
-    if not _require_mapping_keys(verifier, fields, fields, label, errors):
-        return
     if provenance == "legacy-import":
+        fields = {"method", "model", "prompt_version", "run_url"}
+        if not _require_mapping_keys(verifier, fields, fields, label, errors):
+            return
         expected = {
             "method": "legacy-import", "model": None,
             "prompt_version": None, "run_url": None,
@@ -391,25 +425,41 @@ def validate_verifier(
         if verifier != expected:
             errors.append(f"{label}: legacy-import metadata must be {expected}")
         return
+    search_run_id = search.get("run_id")
+    local_run = isinstance(search_run_id, str) \
+        and LOCAL_RUN_ID_RE.fullmatch(search_run_id) is not None
+    run_fields = (
+        {"run_ref", "run_manifest_sha256"} if local_run else {"run_url"})
+    fields = {"method", "model", "prompt_version"} | run_fields
+    if not _require_mapping_keys(verifier, fields, fields, label, errors):
+        return
     if verifier.get("method") not in {"automated", "human"}:
         errors.append(f"{label}: method must be 'automated' or 'human'")
     for field in ("model", "prompt_version"):
         if not isinstance(verifier.get(field), str) or not verifier.get(field, "").strip():
             errors.append(f"{label}: '{field}' must be a non-empty string")
-    verifier_url = verifier.get("run_url")
-    if not pipeline_run_number(verifier_url):
-        errors.append(f"{label}: 'run_url' must be this repository's canonical Actions URL")
-    elif canonical_url(verifier_url) != canonical_url(search_run_url):
-        errors.append(f"{label}: 'run_url' must equal search.run_url")
-    if verifier.get("model") != search_model:
+    if local_run:
+        if verifier.get("run_ref") != search.get("run_ref"):
+            errors.append(f"{label}: 'run_ref' must equal search.run_ref")
+        if verifier.get("run_manifest_sha256") != search.get("run_manifest_sha256"):
+            errors.append(
+                f"{label}: 'run_manifest_sha256' must equal "
+                "search.run_manifest_sha256")
+    else:
+        verifier_url = verifier.get("run_url")
+        if not pipeline_run_number(verifier_url):
+            errors.append(
+                f"{label}: 'run_url' must be this repository's canonical Actions URL")
+        elif canonical_url(verifier_url) != canonical_url(search.get("run_url")):
+            errors.append(f"{label}: 'run_url' must equal search.run_url")
+    if verifier.get("model") != search.get("model"):
         errors.append(f"{label}: 'model' must equal search.model")
-    if verifier.get("prompt_version") != search_prompt_version:
+    if verifier.get("prompt_version") != search.get("prompt_version"):
         errors.append(f"{label}: 'prompt_version' must equal search.prompt_version")
 
 
 def validate_entry(
-        entry, index, errors, provenance, last_checked, search_run_url,
-        search_model, search_prompt_version, today):
+        entry, index, errors, provenance, last_checked, search, today):
     label = f"evidence[{index}]"
     allowed = REQUIRED_ENTRY_FIELDS | OPTIONAL_ENTRY_FIELDS
     if not _require_mapping_keys(entry, REQUIRED_ENTRY_FIELDS, allowed, label, errors):
@@ -470,9 +520,7 @@ def validate_entry(
             errors.append(f"{label}: legacy-import content_sha256 must be null")
     elif not isinstance(digest, str) or SHA256_RE.fullmatch(digest) is None:
         errors.append(f"{label}: content_sha256 must be 64 lowercase hex characters")
-    validate_verifier(
-        entry.get("verifier"), index, provenance, search_run_url,
-        search_model, search_prompt_version, errors)
+    validate_verifier(entry.get("verifier"), index, provenance, search, errors)
 
 
 def validate_terminology_variants(data, errors):
@@ -593,14 +641,58 @@ def validate_evidence_entries(data, errors, today):
         if isinstance(item, dict):
             validate_entry(
                 item, index, errors, data.get("provenance_status"),
-                data.get("last_checked"),
-                search.get("run_url"), search.get("model"),
-                search.get("prompt_version"),
-                today)
+                data.get("last_checked"), search, today)
             entries.append(item)
         else:
             errors.append(f"evidence[{index}]: entry must be a mapping")
     return entries
+
+
+def validate_local_run_binding(data, path, errors):
+    """Bind complete local evidence to one approved, byte-identical run plan."""
+    if data.get("provenance_status") != "complete":
+        return
+    search = data.get("search")
+    run_id = search.get("run_id") if isinstance(search, dict) else None
+    if not isinstance(search, dict) \
+            or not isinstance(run_id, str) \
+            or LOCAL_RUN_ID_RE.fullmatch(run_id) is None:
+        return
+    run_ref = search.get("run_ref")
+    manifest_digest = search.get("run_manifest_sha256")
+    if not isinstance(run_ref, str) or LOCAL_RUN_REF_RE.fullmatch(run_ref) is None \
+            or not isinstance(manifest_digest, str) \
+            or SHA256_RE.fullmatch(manifest_digest) is None:
+        return
+    evidence_path = Path(path)
+    if evidence_path.parent.name != "evidence" \
+            or evidence_path.parent.parent.name != "verification":
+        errors.append(
+            "search: local evidence must be stored under verification/evidence")
+        return
+    repo_root = evidence_path.parent.parent.parent
+    try:
+        manifest, _, _ = load_manifest(
+            repo_root, run_ref, expected_sha256=manifest_digest,
+            require_approved=True)
+    except (OSError, ValueError, yaml.YAMLError) as exc:
+        errors.append(f"search: local run manifest is invalid: {exc}")
+        return
+    expected = {
+        "run_id": manifest["run_id"],
+        "checked_at": date_string(manifest["checked_date"]),
+        "provider": manifest["execution"]["provider"],
+        "model": manifest["execution"]["model"],
+        "prompt_version": manifest["execution"]["prompt_version"],
+    }
+    for field, value in expected.items():
+        if date_string(search.get(field)) != value:
+            errors.append(
+                f"search: '{field}' must match the approved local run manifest")
+    slug = data.get("slug")
+    if slug not in manifest["selected_slugs"]:
+        errors.append(
+            "search: evidence slug must be selected by the approved local run manifest")
 
 
 def validate_tier_caps_and_groups(entries, errors):
@@ -690,6 +782,7 @@ def validate_file(path, today=None, max_age_days=None):
     validate_top_fields(data, Path(path), errors, today, max_age_days)
     validate_search(data, errors)
     entries = validate_evidence_entries(data, errors, today)
+    validate_local_run_binding(data, path, errors)
     validate_tier_caps_and_groups(entries, errors)
     validate_search_entry_consistency(data, entries, errors)
     validate_computed_fields(data, entries, errors)

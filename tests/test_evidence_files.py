@@ -21,6 +21,16 @@ CONTENT_SPEC = importlib.util.spec_from_file_location(
     "evidence_content_for_links", REPO_ROOT / "scripts" / "evidence_content.py")
 CONTENT = importlib.util.module_from_spec(CONTENT_SPEC)
 CONTENT_SPEC.loader.exec_module(CONTENT)
+LOCAL_SPEC = importlib.util.spec_from_file_location(
+    "local_verification", REPO_ROOT / "scripts" / "local_verification.py")
+LOCAL = importlib.util.module_from_spec(LOCAL_SPEC)
+LOCAL_SPEC.loader.exec_module(LOCAL)
+
+LOCAL_UUID = "123e4567-e89b-42d3-a456-426614174000"
+LOCAL_RUN_ID = f"codex-local:{LOCAL_UUID}"
+LOCAL_RUN_REF = f"verification/local-runs/codex-local-{LOCAL_UUID}.yaml"
+LOCAL_MODEL = "codex-managed"
+LOCAL_PROMPT_VERSION = f"evidence-v2-codex-local-v1+sha256.{'a' * 64}"
 
 
 def run_validator(directory, *extra_args):
@@ -193,6 +203,79 @@ def write_allowlist(directory, slugs):
     return path
 
 
+def local_manifest(slugs=("example",)):
+    manifest = {
+        "schema_version": 1,
+        "run_id": LOCAL_RUN_ID,
+        "plan_id": "",
+        "base_sha": "b" * 40,
+        "checked_date": "2026-07-01",
+        "scope": "single" if len(slugs) == 1 else "all",
+        "selected_slugs": list(slugs),
+        "include_discovery": False,
+        "execution": {
+            "provider": "openai",
+            "surface": "codex-app",
+            "auth_mode": "chatgpt-operator-attested",
+            "model": LOCAL_MODEL,
+            "prompt_version": LOCAL_PROMPT_VERSION,
+        },
+        "approval": {
+            "status": "approved",
+            "approved_at": "2026-07-01T12:00:00Z",
+            "plan_id": "",
+        },
+    }
+    manifest["plan_id"] = LOCAL.compute_plan_id(manifest)
+    manifest["approval"]["plan_id"] = manifest["plan_id"]
+    return manifest
+
+
+def bind_document_to_local_run(document, manifest_path):
+    digest = LOCAL.manifest_sha256(manifest_path)
+    search = document["search"]
+    search.update({
+        "run_id": LOCAL_RUN_ID,
+        "provider": "openai",
+        "model": LOCAL_MODEL,
+        "prompt_version": LOCAL_PROMPT_VERSION,
+        "run_ref": LOCAL_RUN_REF,
+        "run_manifest_sha256": digest,
+    })
+    search.pop("run_url", None)
+    for entry in document["evidence"] if isinstance(document["evidence"], list) else []:
+        verifier = entry["verifier"]
+        verifier.update({
+            "model": LOCAL_MODEL,
+            "prompt_version": LOCAL_PROMPT_VERSION,
+            "run_ref": LOCAL_RUN_REF,
+            "run_manifest_sha256": digest,
+        })
+        verifier.pop("run_url", None)
+    return document
+
+
+def write_local_fixture(tmp_path, *, slugs=("example",)):
+    repo = tmp_path / "repo"
+    evidence_dir = repo / "verification" / "evidence"
+    evidence_dir.mkdir(parents=True)
+    manifest_path = repo / LOCAL_RUN_REF
+    manifest = local_manifest(slugs)
+    LOCAL.write_manifest(manifest_path, manifest)
+    document = bind_document_to_local_run(evidence_document(), manifest_path)
+    evidence_path = write_document(evidence_dir, document)
+    return repo, evidence_dir, evidence_path, manifest_path, document, manifest
+
+
+def rewrite_manifest_and_rebind(manifest_path, document, manifest):
+    manifest_path.write_text(
+        yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
+    digest = LOCAL.manifest_sha256(manifest_path)
+    document["search"]["run_manifest_sha256"] = digest
+    for entry in document["evidence"] if isinstance(document["evidence"], list) else []:
+        entry["verifier"]["run_manifest_sha256"] = digest
+
+
 def registry_args(directory, registry):
     return "--registry", str(registry), "--experiments", str(directory / "missing.md")
 
@@ -226,6 +309,146 @@ def test_complete_v2_fixture_passes(tmp_path):
     write_document(tmp_path, evidence_document())
     result = run_validator(tmp_path)
     assert result.returncode == 0, result.stdout
+
+
+def test_complete_local_codex_fixture_binds_to_approved_manifest(tmp_path):
+    _, evidence_dir, _, _, _, _ = write_local_fixture(tmp_path)
+
+    result = run_validator(evidence_dir)
+
+    assert result.returncode == 0, result.stdout
+
+
+def test_local_codex_manifest_must_exist(tmp_path):
+    _, evidence_dir, _, manifest_path, _, _ = write_local_fixture(tmp_path)
+    manifest_path.unlink()
+
+    assert_fails(evidence_dir, "local run manifest is invalid")
+
+
+def test_local_codex_run_ref_must_be_safe_and_canonical(tmp_path):
+    _, evidence_dir, evidence_path, _, document, _ = write_local_fixture(tmp_path)
+    document["search"]["run_ref"] = "../outside.yaml"
+    write_document(evidence_dir, document)
+
+    result = run_validator(evidence_dir)
+
+    assert result.returncode == 1
+    assert "requires a safe canonical run_ref" in result.stdout
+    assert "Traceback" not in result.stderr
+
+
+def test_local_codex_manifest_cannot_be_a_symlink(tmp_path):
+    _, evidence_dir, _, manifest_path, _, _ = write_local_fixture(tmp_path)
+    target = tmp_path / "manifest-target.yaml"
+    target.write_bytes(manifest_path.read_bytes())
+    manifest_path.unlink()
+    manifest_path.symlink_to(target)
+
+    assert_fails(evidence_dir, "regular non-symlink file")
+
+
+def test_local_codex_manifest_parent_cannot_be_a_symlink(tmp_path):
+    repo, evidence_dir, _, manifest_path, _, _ = write_local_fixture(tmp_path)
+    target_dir = tmp_path / "external-local-runs"
+    target_dir.mkdir()
+    target = target_dir / manifest_path.name
+    target.write_bytes(manifest_path.read_bytes())
+    manifest_path.unlink()
+    manifest_path.parent.rmdir()
+    manifest_path.parent.symlink_to(target_dir, target_is_directory=True)
+
+    assert_fails(evidence_dir, "parent must be a real directory")
+    assert not target.is_relative_to(repo)
+
+
+def test_local_codex_manifest_hash_must_match_exact_bytes(tmp_path):
+    _, evidence_dir, evidence_path, _, document, _ = write_local_fixture(tmp_path)
+    document["search"]["run_manifest_sha256"] = "c" * 64
+    for entry in document["evidence"]:
+        entry["verifier"]["run_manifest_sha256"] = "c" * 64
+    write_document(evidence_dir, document)
+
+    assert_fails(evidence_dir, "does not match the local run manifest")
+
+
+def test_local_codex_manifest_must_be_human_approved(tmp_path):
+    _, evidence_dir, _, manifest_path, document, manifest = write_local_fixture(tmp_path)
+    manifest["approval"]["status"] = "pending"
+    manifest["approval"]["approved_at"] = None
+    rewrite_manifest_and_rebind(manifest_path, document, manifest)
+    write_document(evidence_dir, document)
+
+    assert_fails(evidence_dir, "has not been human-approved")
+
+
+def test_local_codex_manifest_plan_id_must_bind_immutable_plan(tmp_path):
+    _, evidence_dir, _, manifest_path, document, manifest = write_local_fixture(tmp_path)
+    manifest["base_sha"] = "c" * 40
+    rewrite_manifest_and_rebind(manifest_path, document, manifest)
+    write_document(evidence_dir, document)
+
+    assert_fails(evidence_dir, "plan_id does not match its immutable plan")
+
+
+def test_local_codex_manifest_must_select_evidence_slug(tmp_path):
+    _, evidence_dir, _, manifest_path, document, manifest = write_local_fixture(tmp_path)
+    manifest["selected_slugs"] = ["other"]
+    manifest["plan_id"] = LOCAL.compute_plan_id(manifest)
+    manifest["approval"]["plan_id"] = manifest["plan_id"]
+    rewrite_manifest_and_rebind(manifest_path, document, manifest)
+    write_document(evidence_dir, document)
+
+    assert_fails(evidence_dir, "evidence slug must be selected")
+
+
+@pytest.mark.parametrize(
+    ("manifest_section", "field", "value", "search_field"),
+    [
+        (None, "checked_date", "2026-06-30", "checked_at"),
+        ("execution", "model", "different-local-model", "model"),
+        (
+            "execution", "prompt_version",
+            f"evidence-v2-codex-local-v1+sha256.{'d' * 64}",
+            "prompt_version",
+        ),
+    ],
+)
+def test_local_codex_evidence_must_match_manifest_contract(
+        tmp_path, manifest_section, field, value, search_field):
+    _, evidence_dir, _, manifest_path, document, manifest = write_local_fixture(tmp_path)
+    target = manifest if manifest_section is None else manifest[manifest_section]
+    target[field] = value
+    manifest["plan_id"] = LOCAL.compute_plan_id(manifest)
+    manifest["approval"]["plan_id"] = manifest["plan_id"]
+    rewrite_manifest_and_rebind(manifest_path, document, manifest)
+    write_document(evidence_dir, document)
+
+    assert_fails(
+        evidence_dir,
+        f"'{search_field}' must match the approved local run manifest")
+
+
+def test_local_codex_verifier_must_match_manifest_binding(tmp_path):
+    _, evidence_dir, _, _, document, _ = write_local_fixture(tmp_path)
+    document["evidence"][0]["verifier"]["run_manifest_sha256"] = "d" * 64
+    write_document(evidence_dir, document)
+
+    assert_fails(
+        evidence_dir,
+        "'run_manifest_sha256' must equal search.run_manifest_sha256")
+
+
+def test_local_codex_provenance_requires_openai_provider(tmp_path):
+    _, evidence_dir, _, _, document, _ = write_local_fixture(tmp_path)
+    document["search"]["provider"] = "anthropic"
+    write_document(evidence_dir, document)
+
+    result = run_validator(evidence_dir)
+
+    assert result.returncode == 1
+    assert "local Codex provenance requires provider: openai" in result.stdout
+    assert "'provider' must match the approved local run manifest" in result.stdout
 
 
 def test_legacy_import_is_explicit_and_cannot_verify(tmp_path):

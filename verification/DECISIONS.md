@@ -15,8 +15,9 @@ row. Humans refine Industry terms and Recommendation and exclusively own Decisio
 **After editing this file** (recording a decision, adjusting a recommendation):
 run `python3 scripts/generate-verification-status.py` — [STATUS.md](STATUS.md) embeds the
 Recommendation and Decision columns and CI fails while it is stale. To gather fresh evidence
-behind a recommendation, run the pipeline instead: see "Running a verification" in
-[README.md](README.md) (`gh workflow run verify-patterns.yml` or `/verify-patterns`).
+behind a recommendation, invoke `$evaluate-pattern-adoption` in a signed-in local Codex session;
+see "Local evidence evaluation" in [README.md](README.md). GitHub Actions validates evidence but
+never performs model-backed research.
 
 ## Naming-decision ledger
 

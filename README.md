@@ -11,7 +11,7 @@
 
 A comprehensive collection of patterns based on my experience for building software with AI assistance, organized by implementation maturity and development lifecycle phases. These patterns are subject to change as the field evolves.
 
-Adoption verdicts are mechanically recomputed from structured, tiered evidence; the status report distinguishes complete machine-verifiable provenance from legacy evidence that still needs refresh. Complete assessments record all search modes, source independence, retrieval hashes, and verifier metadata so CI can reject unsupported or stale claims. See [verification/STATUS.md](verification/STATUS.md) for every pattern's assessed, pending, and freshness state, and [verification/](verification/README.md) for the trust model.
+Adoption verdicts are mechanically recomputed from structured, tiered evidence. Model-backed evidence research runs only on demand in a signed-in local Codex session with an explicit plan approval; GitHub Actions never calls an evaluator model or receives an evaluator API key. CI performs deterministic schema, provenance, derivation, status-drift, link, and content checks, including a weekly read-only freshness check. See [verification/STATUS.md](verification/STATUS.md) for every stable and exploratory pattern's assessed, pending, and freshness state, and [verification/](verification/README.md) for the local-agent workflow and trust model.
 
 ```mermaid
 graph TB

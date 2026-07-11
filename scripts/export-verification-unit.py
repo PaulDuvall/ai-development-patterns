@@ -61,7 +61,10 @@ def main():
     parser.add_argument("--model", required=True)
     parser.add_argument("--prompt-version", required=True)
     parser.add_argument("--run-id", required=True)
-    parser.add_argument("--run-url", required=True)
+    provenance = parser.add_mutually_exclusive_group(required=True)
+    provenance.add_argument("--run-url")
+    provenance.add_argument("--run-ref")
+    parser.add_argument("--run-manifest-sha256")
     args = parser.parse_args()
     metadata = {
         "unit_id": args.unit_id,
@@ -73,8 +76,18 @@ def main():
         "model": args.model,
         "prompt_version": args.prompt_version,
         "run_id": args.run_id,
-        "run_url": args.run_url,
     }
+    if args.run_ref:
+        if not args.run_manifest_sha256:
+            parser.error("--run-manifest-sha256 is required with --run-ref")
+        metadata.update({
+            "run_ref": args.run_ref,
+            "run_manifest_sha256": args.run_manifest_sha256,
+        })
+    else:
+        if args.run_manifest_sha256:
+            parser.error("--run-manifest-sha256 requires --run-ref")
+        metadata["run_url"] = args.run_url
     try:
         manifest = export_unit(args.source_root, args.destination, metadata)
     except (OSError, ValueError) as exc:
