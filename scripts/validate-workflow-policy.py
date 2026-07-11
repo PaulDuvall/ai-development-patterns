@@ -40,7 +40,6 @@ REQUIRED_TRUST_ROOT_FILES = (
     "scripts/build-verification-inventory.py",
     "scripts/configure-repository-rules.py",
     "scripts/evidence_content.py",
-    "scripts/export-research-candidate.py",
     "scripts/finalize-local-verification.py",
     "scripts/generate-verification-status.py",
     "scripts/hydrate-evidence-content.py",

@@ -421,6 +421,7 @@ def test_workflow_policy_changes_run_in_deterministic_evidence_validation():
     watched = set(workflow["on"]["push"]["paths"])
     assert {
         ".github/requirements.txt",
+        "scripts/configure-repository-rules.py",
         "scripts/validate-workflow-policy.py",
         "tests/test_workflow_policy.py",
     } <= watched
@@ -428,3 +429,31 @@ def test_workflow_policy_changes_run_in_deterministic_evidence_validation():
         workflow["jobs"]["deterministic-evidence"],
         "Run fast evidence tests")["run"]
     assert "tests/test_workflow_policy.py" in command
+    assert "tests/test_repository_rules.py" in command
+
+
+def test_retired_hosted_fanout_helpers_are_absent():
+    retired = (
+        "scripts/activate-verification-unit.py",
+        "scripts/assemble-verification-units.py",
+        "scripts/export-research-candidate.py",
+        "scripts/export-verification-unit.py",
+        "tests/test_research_candidate_export.py",
+        "tests/test_verification_units.py",
+    )
+    assert all(not (ROOT / relative).exists() for relative in retired)
+
+    workflow = load_workflow(EVIDENCE)
+    watched = set(workflow["on"]["push"]["paths"])
+    command = named_step(
+        workflow["jobs"]["deterministic-evidence"],
+        "Run fast evidence tests")["run"]
+    assert not watched.intersection(retired)
+    assert all(relative not in command for relative in retired)
+
+
+def test_generated_repair_prompt_reproduces_the_non_network_suite():
+    source = (ROOT / "scripts" / "generate-audit-prompt.py").read_text(
+        encoding="utf-8")
+    assert 'python3 -m pytest -m \\"not slow\\" -x -q' in source
+    assert "python3 -m pytest -x -q" not in source

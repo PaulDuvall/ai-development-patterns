@@ -159,7 +159,6 @@ def finalize(root, run_ref, manifest_sha):
             "tests/test_candidate_secret_scan.py",
             "tests/test_local_research_scope.py",
             "tests/test_local_verification.py",
-            "tests/test_verification_units.py",
             "-m", "not slow", "--tb=short",
         ], root)
     except Exception:

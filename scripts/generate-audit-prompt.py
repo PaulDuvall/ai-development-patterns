@@ -71,7 +71,7 @@ def build_prompt(failures: list[dict]) -> str:
         "The CI audit found issues that need fixing. "
         "For each failure below, read the referenced files, "
         "diagnose the root cause, and fix it directly. "
-        "Run `cd tests && python3 -m pytest -x -q` after each fix to verify.",
+        "Run `python3 -m pytest -m \"not slow\" -x -q` after each fix to verify.",
         "",
     ]
 
