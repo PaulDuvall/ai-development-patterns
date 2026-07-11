@@ -134,7 +134,7 @@ cd /workspace/mocks && python -m http.server 8000 &
 **Solution**: Pre-install packages:
 ```bash
 # Edit examples/security-sandbox/requirements-sandbox.txt
-echo "requests==2.31.0" >> examples/security-sandbox/requirements-sandbox.txt
+echo "requests==2.34.2" >> examples/security-sandbox/requirements-sandbox.txt
 
 # Rebuild sandbox
 ./examples/security-sandbox/ai-sandbox.sh stop

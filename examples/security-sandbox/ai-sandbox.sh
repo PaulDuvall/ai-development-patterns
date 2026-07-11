@@ -306,17 +306,18 @@ create_sandbox_files() {
         log_info "Creating requirements-sandbox.txt..."
         cat > "$req_file" << 'EOF'
 # AI Security Sandbox Dependencies
-black==23.11.0
-flake8==6.1.0
-mypy==1.7.0
-pytest==7.4.3
-pytest-cov==4.1.0
-requests==2.31.0
-pydantic==2.5.0
-ipython==8.17.2
-jinja2==3.1.2
-rich==13.7.0
-click==8.1.7
+# Floors set to versions with known CVE fixes; bump as advisories land.
+black>=24.3.0
+flake8>=7.0.0
+mypy>=1.11.0
+pytest>=9.0.3
+pytest-cov>=5.0.0
+requests>=2.33.0
+pydantic>=2.7.4
+ipython>=8.26.0
+jinja2>=3.1.6
+rich>=13.7.1
+click>=8.1.7
 EOF
         log_success "Created requirements-sandbox.txt"
     fi

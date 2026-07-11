@@ -1,10 +1,10 @@
 # Runtime dependencies
-beautifulsoup4==4.14.3
+beautifulsoup4==4.15.0
 certifi==2026.6.17
 charset-normalizer==3.4.9
 idna==3.18
-PyYAML==6.0.2
-requests==2.32.3
+PyYAML==6.0.3
+requests==2.34.2
 soupsieve==2.8.4
 typing_extensions==4.16.0
 urllib3==2.7.0
@@ -17,8 +17,8 @@ MarkupSafe==3.0.3
 packaging==26.2
 pluggy==1.6.0
 Pygments==2.20.0
-pytest==8.4.2
-pytest-cov==7.0.0
+pytest==9.1.1
+pytest-cov==7.1.0
 pytest-html==4.2.0
 pytest-json-report==1.5.0
 pytest-metadata==3.1.1

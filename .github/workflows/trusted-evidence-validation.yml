@@ -47,7 +47,7 @@ jobs:
 
       - name: Checkout trusted base
         id: checkout-base
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ steps.resolve.outputs.base_sha }}
           path: trusted
@@ -55,12 +55,15 @@ jobs:
 
       - name: Checkout candidate as inert data
         id: checkout-candidate
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           repository: ${{ steps.resolve.outputs.head_repo }}
           ref: ${{ steps.resolve.outputs.head_sha }}
           path: candidate
           persist-credentials: false
+          # This is the sole v7 fork opt-in. Candidate files remain inert data:
+          # no candidate script, action, or executable is ever invoked below.
+          allow-unsafe-pr-checkout: true
 
       - name: Reject unsafe candidate filesystem entries
         id: filesystem
