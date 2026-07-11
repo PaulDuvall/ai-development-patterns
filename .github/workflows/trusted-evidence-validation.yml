@@ -112,9 +112,35 @@ jobs:
 
       - name: Recompute candidate status with trusted generator
         id: status
-        run: >-
-          python3 trusted/scripts/generate-verification-status.py
-          --root candidate --check
+        env:
+          SUBMITTED_STATUS: ${{ runner.temp }}/submitted-verification-status.md
+        run: |
+          set -euo pipefail
+          cp candidate/verification/STATUS.md "$SUBMITTED_STATUS"
+          python3 trusted/scripts/generate-verification-status.py --root candidate
+          python3 - "$SUBMITTED_STATUS" candidate/verification/STATUS.md <<'PY'
+          import difflib
+          import sys
+          from pathlib import Path
+
+          marker = "\n## How to refresh\n"
+          submitted = Path(sys.argv[1]).read_text(encoding="utf-8")
+          recomputed = Path(sys.argv[2]).read_text(encoding="utf-8")
+          if marker not in submitted or marker not in recomputed:
+              raise SystemExit("verification status is missing its guidance marker")
+          submitted_derived = submitted.split(marker, 1)[0]
+          recomputed_derived = recomputed.split(marker, 1)[0]
+          if submitted_derived != recomputed_derived:
+              print("Machine-derived verification status is out of date.", file=sys.stderr)
+              print("".join(difflib.unified_diff(
+                  submitted_derived.splitlines(keepends=True),
+                  recomputed_derived.splitlines(keepends=True),
+                  fromfile="submitted/verification/STATUS.md",
+                  tofile="trusted-recomputed/verification/STATUS.md",
+              )), file=sys.stderr)
+              raise SystemExit(1)
+          print("Machine-derived verification status is up to date")
+          PY
 
       - name: Publish trusted result on the candidate revision
         if: ${{ always() && steps.resolve.outputs.head_sha != '' }}
