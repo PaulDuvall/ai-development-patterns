@@ -65,8 +65,7 @@ Rules: [README.md](README.md) · recommendations and decisions: [DECISIONS.md](D
 - **Refresh evidence** (new evidence, new verdicts): run the pipeline — see
   "Running a verification" in [README.md](README.md). Quick versions:
   `/verify-patterns` in Claude Code from the repo root, or
-  `gh workflow run verify-patterns.yml` (GitHub Actions plans weekly; every paid run attempt waits
-  for protected-environment human approval before provider preflight or research).
+  `gh workflow run verify-patterns.yml` (GitHub Actions, runs weekly on its own).
 """
 
 
