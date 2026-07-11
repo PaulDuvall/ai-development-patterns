@@ -13,6 +13,7 @@ VERIFY = WORKFLOWS / "verify-patterns.yml"
 TRUSTED = WORKFLOWS / "trusted-evidence-validation.yml"
 EVIDENCE = WORKFLOWS / "evidence-validation.yml"
 CLAUDE_REVIEW = WORKFLOWS / "claude-code-review.yml"
+CLAUDE_ASSISTANT = WORKFLOWS / "claude.yml"
 CODEX_CONFIG = ROOT / ".github" / "codex" / "evidence-research.toml"
 METHODOLOGY = ROOT / ".claude" / "commands" / "verify-patterns.md"
 
@@ -150,12 +151,21 @@ def test_paid_provider_calls_require_protected_human_approval():
 
     workflow_text = VERIFY.read_text(encoding="utf-8")
     assert "secrets.EVIDENCE_OPENAI_API_KEY" in workflow_text
+    assert "secrets.EVIDENCE_ANTHROPIC_API_KEY" in workflow_text
     assert "secrets.OPENAI_API_KEY" not in workflow_text
+    assert "secrets.ANTHROPIC_API_KEY" not in workflow_text
+    for legacy_variable in (
+        "ANTHROPIC_FEDERATION_RULE_ID",
+        "ANTHROPIC_ORGANIZATION_ID",
+        "ANTHROPIC_SERVICE_ACCOUNT_ID",
+        "ANTHROPIC_WORKSPACE_ID",
+    ):
+        assert f"vars.{legacy_variable}" not in workflow_text
 
     paid_markers = (
         "secrets.EVIDENCE_OPENAI_API_KEY",
-        "secrets.ANTHROPIC_API_KEY",
-        "ANTHROPIC_FEDERATION_RULE_ID",
+        "secrets.EVIDENCE_ANTHROPIC_API_KEY",
+        "EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID",
         "openai/codex-action@",
         "anthropics/claude-code-action@",
     )
@@ -177,11 +187,39 @@ def test_optional_claude_review_is_opt_in_and_skips_without_a_key():
     assert job["if"] == "vars.ENABLE_ANTHROPIC_REVIEW == 'true'"
     credential = named_step(job, "Detect optional Anthropic credential")
     assert credential["env"]["ANTHROPIC_API_KEY"] == (
-        "${{ secrets.ANTHROPIC_API_KEY }}")
+        "${{ secrets.CLAUDE_REVIEW_API_KEY }}")
     assert 'if [ -n "$ANTHROPIC_API_KEY" ]' in credential["run"]
     assert "configured=$configured" in credential["run"]
     action = named_step(job, "Run Claude Code Review")
     assert "steps.anthropic-credential.outputs.configured == 'true'" in action["if"]
+    assert action["with"]["anthropic_api_key"] == (
+        "${{ secrets.CLAUDE_REVIEW_API_KEY }}")
+
+
+def test_optional_claude_assistant_skips_without_its_dedicated_key():
+    workflow = load_workflow(CLAUDE_ASSISTANT)
+    job = workflow["jobs"]["claude"]
+    assert "vars.ENABLE_ANTHROPIC_ASSISTANT == 'true'" in job["if"]
+    assert "github.actor == github.repository_owner" in job["if"]
+    credential = named_step(job, "Detect optional Claude assistant credential")
+    assert credential["env"]["ANTHROPIC_API_KEY"] == (
+        "${{ secrets.CLAUDE_ASSISTANT_API_KEY }}")
+    assert 'if [ -n "$ANTHROPIC_API_KEY" ]' in credential["run"]
+    assert "configured=$configured" in credential["run"]
+    checkout = named_step(job, "Checkout repository")
+    action = named_step(job, "Run Claude Code")
+    expected_if = "steps.anthropic-credential.outputs.configured == 'true'"
+    assert checkout["if"] == expected_if
+    assert action["if"] == expected_if
+    assert action["with"]["anthropic_api_key"] == (
+        "${{ secrets.CLAUDE_ASSISTANT_API_KEY }}")
+
+
+def test_no_workflow_can_restore_a_legacy_shared_provider_secret():
+    workflow_text = "\n".join(
+        path.read_text(encoding="utf-8") for path in WORKFLOWS.glob("*.yml"))
+    assert "secrets.OPENAI_API_KEY" not in workflow_text
+    assert "secrets.ANTHROPIC_API_KEY" not in workflow_text
 
 
 def test_open_verification_pr_gate_is_default_closed_and_rechecked_before_publish():
@@ -298,9 +336,9 @@ def test_provider_preflights_gate_research_before_matrix_fanout():
 
     key_probe = named_step(
         anthropic, "Verify Anthropic API-key credential, model, and quota")
-    assert key_probe["if"] == "vars.ANTHROPIC_FEDERATION_RULE_ID == ''"
+    assert key_probe["if"] == "vars.EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID == ''"
     assert key_probe["env"] == {
-        "ANTHROPIC_API_KEY": "${{ secrets.ANTHROPIC_API_KEY }}",
+        "ANTHROPIC_API_KEY": "${{ secrets.EVIDENCE_ANTHROPIC_API_KEY }}",
         "PROVIDER_MODEL": "${{ needs.prepare.outputs.model }}",
     }
     assert "scripts/check-provider-preflight.py" in key_probe["run"]
@@ -309,25 +347,25 @@ def test_provider_preflights_gate_research_before_matrix_fanout():
 
     federation = named_step(
         anthropic, "Probe Anthropic workload identity, model, and quota")
-    assert federation["if"] == "vars.ANTHROPIC_FEDERATION_RULE_ID != ''"
+    assert federation["if"] == "vars.EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID != ''"
     assert federation["uses"] == (
         "anthropics/claude-code-action@a6a5b60a078a0af52612aac63e05e3f95fd4ff64")
     inputs = federation["with"]
     assert inputs["github_token"] == "${{ github.token }}"
     assert inputs["anthropic_federation_rule_id"] == (
-        "${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}")
+        "${{ vars.EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID }}")
     assert inputs["anthropic_organization_id"] == (
-        "${{ vars.ANTHROPIC_ORGANIZATION_ID }}")
+        "${{ vars.EVIDENCE_ANTHROPIC_ORGANIZATION_ID }}")
     assert inputs["anthropic_service_account_id"] == (
-        "${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}")
+        "${{ vars.EVIDENCE_ANTHROPIC_SERVICE_ACCOUNT_ID }}")
     assert inputs["anthropic_workspace_id"] == (
-        "${{ vars.ANTHROPIC_WORKSPACE_ID }}")
+        "${{ vars.EVIDENCE_ANTHROPIC_WORKSPACE_ID }}")
     assert "--model ${{ needs.prepare.outputs.model }}" in inputs["claude_args"]
     assert "--max-turns 1" in inputs["claude_args"]
     assert '--tools ""' in inputs["claude_args"]
     guard = named_step(
         anthropic, "Require successful Anthropic workload-identity preflight")
-    assert guard["if"] == "vars.ANTHROPIC_FEDERATION_RULE_ID != ''"
+    assert guard["if"] == "vars.EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID != ''"
     assert guard["env"]["CLAUDE_EXECUTION_FILE"] == (
         "${{ steps.anthropic-federation-preflight.outputs.execution_file }}")
     assert guard["run"] == "python3 scripts/check-claude-execution.py"
@@ -586,7 +624,10 @@ def test_anthropic_research_retains_wif_and_fail_closed_guard():
     research = workflow["jobs"]["research-anthropic"]
     action = named_step(research, "Collect candidate evidence with Anthropic")
     assert action["with"]["github_token"] == "${{ github.token }}"
-    assert "ANTHROPIC_FEDERATION_RULE_ID" in action["with"]["anthropic_api_key"]
+    assert "EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID" in (
+        action["with"]["anthropic_api_key"])
+    assert action["with"]["anthropic_federation_rule_id"] == (
+        "${{ vars.EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID }}")
     guard = named_step(research, "Require successful Claude execution")
     assert guard["env"]["CLAUDE_EXECUTION_FILE"] == (
         "${{ steps.research.outputs.execution_file }}")

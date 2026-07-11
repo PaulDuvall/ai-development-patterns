@@ -587,9 +587,9 @@ jobs:
           python-version: "3.11"
 
       - name: Verify Anthropic API-key credential, model, and quota
-        if: vars.ANTHROPIC_FEDERATION_RULE_ID == ''
+        if: vars.EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID == ''
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.EVIDENCE_ANTHROPIC_API_KEY }}
           PROVIDER_MODEL: ${{ needs.prepare.outputs.model }}
         run: >-
           python3 scripts/check-provider-preflight.py
@@ -598,16 +598,16 @@ jobs:
 
       - name: Probe Anthropic workload identity, model, and quota
         id: anthropic-federation-preflight
-        if: vars.ANTHROPIC_FEDERATION_RULE_ID != ''
+        if: vars.EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID != ''
         uses: anthropics/claude-code-action@a6a5b60a078a0af52612aac63e05e3f95fd4ff64 # v1
         with:
           github_token: ${{ github.token }}
           anthropic_api_key: >-
-            ${{ vars.ANTHROPIC_FEDERATION_RULE_ID == '' && secrets.ANTHROPIC_API_KEY || '' }}
-          anthropic_federation_rule_id: ${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}
-          anthropic_organization_id: ${{ vars.ANTHROPIC_ORGANIZATION_ID }}
-          anthropic_service_account_id: ${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}
-          anthropic_workspace_id: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+            ${{ vars.EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID == '' && secrets.EVIDENCE_ANTHROPIC_API_KEY || '' }}
+          anthropic_federation_rule_id: ${{ vars.EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID }}
+          anthropic_organization_id: ${{ vars.EVIDENCE_ANTHROPIC_ORGANIZATION_ID }}
+          anthropic_service_account_id: ${{ vars.EVIDENCE_ANTHROPIC_SERVICE_ACCOUNT_ID }}
+          anthropic_workspace_id: ${{ vars.EVIDENCE_ANTHROPIC_WORKSPACE_ID }}
           prompt: >-
             Reply with exactly PREFLIGHT_OK. Do not inspect or modify the repository.
           claude_args: >-
@@ -619,7 +619,7 @@ jobs:
             --disallowedTools "mcp__*"
 
       - name: Require successful Anthropic workload-identity preflight
-        if: vars.ANTHROPIC_FEDERATION_RULE_ID != ''
+        if: vars.EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID != ''
         env:
           CLAUDE_EXECUTION_FILE: ${{ steps.anthropic-federation-preflight.outputs.execution_file }}
         run: python3 scripts/check-claude-execution.py
@@ -1135,11 +1135,11 @@ jobs:
         with:
           github_token: ${{ github.token }}
           anthropic_api_key: >-
-            ${{ vars.ANTHROPIC_FEDERATION_RULE_ID == '' && secrets.ANTHROPIC_API_KEY || '' }}
-          anthropic_federation_rule_id: ${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}
-          anthropic_organization_id: ${{ vars.ANTHROPIC_ORGANIZATION_ID }}
-          anthropic_service_account_id: ${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}
-          anthropic_workspace_id: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+            ${{ vars.EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID == '' && secrets.EVIDENCE_ANTHROPIC_API_KEY || '' }}
+          anthropic_federation_rule_id: ${{ vars.EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID }}
+          anthropic_organization_id: ${{ vars.EVIDENCE_ANTHROPIC_ORGANIZATION_ID }}
+          anthropic_service_account_id: ${{ vars.EVIDENCE_ANTHROPIC_SERVICE_ACCOUNT_ID }}
+          anthropic_workspace_id: ${{ vars.EVIDENCE_ANTHROPIC_WORKSPACE_ID }}
           prompt: |
             Use .claude/commands/verify-patterns.md as the research and evidence methodology.
 

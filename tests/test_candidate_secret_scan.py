@@ -14,8 +14,8 @@ def test_scanner_allows_evidence_hashes_and_secret_references(tmp_path):
     path = tmp_path / "candidate.yaml"
     path.write_text(
         "content_sha256: " + "a" * 64 + "\n"
-        "anthropic: ${{ secrets.ANTHROPIC_API_KEY }}\n"
-        "openai: ${{ secrets.OPENAI_API_KEY }}\n",
+        "anthropic: ${{ secrets.EVIDENCE_ANTHROPIC_API_KEY }}\n"
+        "openai: ${{ secrets.EVIDENCE_OPENAI_API_KEY }}\n",
         encoding="utf-8",
     )
     assert MODULE.scan_file(path) == []

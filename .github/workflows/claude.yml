@@ -16,10 +16,12 @@ jobs:
   claude:
     name: Respond to Claude request
     if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
-      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+      vars.ENABLE_ANTHROPIC_ASSISTANT == 'true' &&
+      github.actor == github.repository_owner &&
+      ((github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+       (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude'))))
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -27,17 +29,33 @@ jobs:
       issues: read
       id-token: write
     steps:
+      - name: Detect optional Claude assistant credential
+        id: anthropic-credential
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.CLAUDE_ASSISTANT_API_KEY }}
+        run: |
+          configured=false
+          if [ -n "$ANTHROPIC_API_KEY" ]; then
+            configured=true
+          else
+            echo "Claude assistant skipped: CLAUDE_ASSISTANT_API_KEY is not configured." \
+              >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "configured=$configured" >> "$GITHUB_OUTPUT"
+
       - name: Checkout repository
+        if: steps.anthropic-credential.outputs.configured == 'true'
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
           fetch-depth: 1
           persist-credentials: false
 
       - name: Run Claude Code
+        if: steps.anthropic-credential.outputs.configured == 'true'
         id: claude
         uses: anthropics/claude-code-action@28f83620103c48a57093dcc2837eec89e036bb9f # beta
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          anthropic_api_key: ${{ secrets.CLAUDE_ASSISTANT_API_KEY }}
           
           # Optional: Specify model (defaults to Claude Sonnet 4, uncomment for Claude Opus 4)
           # model: "claude-opus-4-20250514"

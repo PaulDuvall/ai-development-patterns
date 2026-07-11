@@ -60,6 +60,42 @@ def test_paid_research_environment_requires_human_review_on_protected_branches()
     }
 
 
+def test_retired_generic_provider_credentials_are_deleted(monkeypatch):
+    calls = []
+
+    def fake_gh_json(*args, input_data=None):
+        calls.append(args)
+        endpoint = args[-1]
+        if endpoint.endswith("actions/secrets?per_page=100"):
+            return {
+                "secrets": [
+                    {"name": "ANTHROPIC_API_KEY"},
+                    {"name": "UNRELATED_SECRET"},
+                ]
+            }
+        if endpoint.endswith("actions/variables?per_page=100"):
+            return {
+                "variables": [
+                    {"name": "ANTHROPIC_FEDERATION_RULE_ID"},
+                    {"name": "OPENAI_EVIDENCE_MODEL"},
+                ]
+            }
+        return None
+
+    monkeypatch.setattr(MODULE, "gh_json", fake_gh_json)
+
+    assert MODULE.delete_retired_actions_credentials("owner/repo") == {
+        "secrets": ["ANTHROPIC_API_KEY"],
+        "variables": ["ANTHROPIC_FEDERATION_RULE_ID"],
+    }
+    delete_endpoints = [
+        call[-1] for call in calls if "DELETE" in call]
+    assert delete_endpoints == [
+        "repos/owner/repo/actions/secrets/ANTHROPIC_API_KEY",
+        "repos/owner/repo/actions/variables/ANTHROPIC_FEDERATION_RULE_ID",
+    ]
+
+
 def test_apply_configures_approval_before_other_repository_controls(monkeypatch):
     calls = []
     monkeypatch.setattr(
@@ -67,6 +103,10 @@ def test_apply_configures_approval_before_other_repository_controls(monkeypatch)
     monkeypatch.setattr(
         MODULE, "authenticated_user",
         lambda: {"login": "PaulDuvall", "id": 1619259, "type": "User"})
+    monkeypatch.setattr(
+        MODULE, "delete_retired_actions_credentials",
+        lambda repo: calls.append(("credentials", repo, None)) or {
+            "secrets": [], "variables": []})
     monkeypatch.setattr(
         MODULE, "apply_paid_research_environment",
         lambda repo, payload: calls.append(("environment", repo, payload)))
@@ -83,7 +123,7 @@ def test_apply_configures_approval_before_other_repository_controls(monkeypatch)
 
     assert MODULE.main() == 0
     assert [call[0] for call in calls] == [
-        "environment", "permissions", "ruleset"]
+        "credentials", "environment", "permissions", "ruleset"]
 
 
 def test_apply_fails_before_other_controls_when_environment_setup_fails(
@@ -91,6 +131,10 @@ def test_apply_fails_before_other_controls_when_environment_setup_fails(
     calls = []
     monkeypatch.setattr(
         MODULE, "repository_name", lambda: "PaulDuvall/ai-development-patterns")
+    monkeypatch.setattr(
+        MODULE, "delete_retired_actions_credentials",
+        lambda repo: calls.append("credentials") or {
+            "secrets": [], "variables": []})
     monkeypatch.setattr(
         MODULE, "authenticated_user",
         lambda: {"login": "PaulDuvall", "id": 1619259, "type": "User"})
@@ -106,5 +150,34 @@ def test_apply_fails_before_other_controls_when_environment_setup_fails(
     monkeypatch.setattr(MODULE.sys, "argv", [str(SCRIPT), "--apply"])
 
     assert MODULE.main() == 1
-    assert calls == ["environment"]
+    assert calls == ["credentials", "environment"]
     assert "environment rejected" in capsys.readouterr().err
+
+
+def test_apply_fails_before_controls_when_credential_cleanup_fails(
+        monkeypatch, capsys):
+    calls = []
+    monkeypatch.setattr(
+        MODULE, "repository_name", lambda: "PaulDuvall/ai-development-patterns")
+    monkeypatch.setattr(
+        MODULE, "authenticated_user",
+        lambda: {"login": "PaulDuvall", "id": 1619259, "type": "User"})
+
+    def fail_cleanup(repo):
+        calls.append("credentials")
+        raise RuntimeError("credential cleanup rejected")
+
+    monkeypatch.setattr(MODULE, "delete_retired_actions_credentials", fail_cleanup)
+    monkeypatch.setattr(
+        MODULE, "apply_paid_research_environment",
+        lambda *args: calls.append("environment"))
+    monkeypatch.setattr(
+        MODULE, "apply_workflow_permissions",
+        lambda *args: calls.append("permissions"))
+    monkeypatch.setattr(
+        MODULE, "apply_ruleset", lambda *args: calls.append("ruleset"))
+    monkeypatch.setattr(MODULE.sys, "argv", [str(SCRIPT), "--apply"])
+
+    assert MODULE.main() == 1
+    assert calls == ["credentials"]
+    assert "credential cleanup rejected" in capsys.readouterr().err

@@ -16,6 +16,13 @@ RULESET_NAME = "Protect main with adoption evidence validation"
 REQUIRED_CHECK = "Trusted evidence checks"
 GITHUB_ACTIONS_INTEGRATION_ID = 15368
 PAID_RESEARCH_ENVIRONMENT = "evidence-paid-research"
+RETIRED_ACTIONS_SECRETS = ("OPENAI_API_KEY", "ANTHROPIC_API_KEY")
+RETIRED_ACTIONS_VARIABLES = (
+    "ANTHROPIC_FEDERATION_RULE_ID",
+    "ANTHROPIC_ORGANIZATION_ID",
+    "ANTHROPIC_SERVICE_ACCOUNT_ID",
+    "ANTHROPIC_WORKSPACE_ID",
+)
 
 
 def gh_json(*args, input_data=None):
@@ -154,9 +161,44 @@ def apply_paid_research_environment(repo, payload):
     )
 
 
+def delete_retired_actions_credentials(repo):
+    """Remove generic credentials that historical workflow definitions can read."""
+    secret_data = gh_json(
+        "api", f"repos/{repo}/actions/secrets?per_page=100") or {}
+    variable_data = gh_json(
+        "api", f"repos/{repo}/actions/variables?per_page=100") or {}
+    configured_secrets = {
+        item["name"] for item in secret_data.get("secrets", [])}
+    configured_variables = {
+        item["name"] for item in variable_data.get("variables", [])}
+    removed = {"secrets": [], "variables": []}
+
+    for name in RETIRED_ACTIONS_SECRETS:
+        if name not in configured_secrets:
+            continue
+        gh_json(
+            "api", "--method", "DELETE",
+            f"repos/{repo}/actions/secrets/{name}")
+        removed["secrets"].append(name)
+
+    for name in RETIRED_ACTIONS_VARIABLES:
+        if name not in configured_variables:
+            continue
+        gh_json(
+            "api", "--method", "DELETE",
+            f"repos/{repo}/actions/variables/{name}")
+        removed["variables"].append(name)
+
+    return removed
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--apply", action="store_true", help="write the ruleset to GitHub")
+    parser.add_argument(
+        "--apply",
+        action="store_true",
+        help="write controls and remove retired generic provider credentials",
+    )
     args = parser.parse_args()
 
     try:
@@ -183,12 +225,17 @@ def main():
                             "required_reviewer": reviewer,
                             "configuration": paid_research_environment,
                         },
+                        "retired_actions_credentials": {
+                            "secrets": list(RETIRED_ACTIONS_SECRETS),
+                            "variables": list(RETIRED_ACTIONS_VARIABLES),
+                        },
                     },
                     indent=2,
                 )
             )
             print("Dry run only; pass --apply to update GitHub.")
             return 0
+        removed_credentials = delete_retired_actions_credentials(repo)
         apply_paid_research_environment(repo, paid_research_environment)
         apply_workflow_permissions(repo, workflow_permissions)
         result = apply_ruleset(repo, payload)
@@ -197,7 +244,8 @@ def main():
         return 1
 
     print(
-        f"Configured paid-research approval for {reviewer['login']!r}, Actions "
+        f"Removed {sum(map(len, removed_credentials.values()))} retired provider "
+        f"credential(s); configured paid-research approval for {reviewer['login']!r}, Actions "
         f"publisher permission, and ruleset {result['name']!r} (id {result['id']}) "
         f"for {repo}"
     )
