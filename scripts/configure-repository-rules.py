@@ -15,6 +15,7 @@ import sys
 RULESET_NAME = "Protect main with adoption evidence validation"
 REQUIRED_CHECK = "Trusted evidence checks"
 GITHUB_ACTIONS_INTEGRATION_ID = 15368
+PAID_RESEARCH_ENVIRONMENT = "evidence-paid-research"
 
 
 def gh_json(*args, input_data=None):
@@ -36,6 +37,12 @@ def repository_name():
     """Return the authenticated checkout's ``owner/name``."""
     data = gh_json("repo", "view", "--json", "nameWithOwner")
     return data["nameWithOwner"]
+
+
+def authenticated_user():
+    """Return the authenticated GitHub user selected as the required reviewer."""
+    data = gh_json("api", "user")
+    return {"login": data["login"], "id": data["id"], "type": data["type"]}
 
 
 def ruleset_payload():
@@ -85,6 +92,24 @@ def workflow_permissions_payload():
     }
 
 
+def paid_research_environment_payload(reviewer_id):
+    """Require one explicit human approval before a protected-branch paid run."""
+    return {
+        "wait_timer": 0,
+        # This repository currently has one maintainer. Keep self-review available
+        # so that maintainer can approve their own manual or scheduled run.
+        "prevent_self_review": False,
+        # GitHub accepts this field even though older REST reference versions
+        # omitted it. It removes the administrator bypass from the approval UI.
+        "can_admins_bypass": False,
+        "reviewers": [{"type": "User", "id": reviewer_id}],
+        "deployment_branch_policy": {
+            "protected_branches": True,
+            "custom_branch_policies": False,
+        },
+    }
+
+
 def find_existing(repo):
     """Return the matching ruleset, if one is already configured."""
     rulesets = gh_json("api", f"repos/{repo}/rulesets") or []
@@ -116,6 +141,19 @@ def apply_workflow_permissions(repo, payload):
     )
 
 
+def apply_paid_research_environment(repo, payload):
+    """Create or replace the protected paid-research approval environment."""
+    return gh_json(
+        "api",
+        "--method",
+        "PUT",
+        f"repos/{repo}/environments/{PAID_RESEARCH_ENVIRONMENT}",
+        "--input",
+        "-",
+        input_data=payload,
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--apply", action="store_true", help="write the ruleset to GitHub")
@@ -123,8 +161,16 @@ def main():
 
     try:
         repo = repository_name()
+        reviewer = authenticated_user()
+        owner = repo.split("/", 1)[0]
+        if reviewer["type"] != "User" or reviewer["login"].casefold() != owner.casefold():
+            raise RuntimeError(
+                "the authenticated gh user must be the personal repository owner "
+                "before configuring paid-research approval"
+            )
         payload = ruleset_payload()
         workflow_permissions = workflow_permissions_payload()
+        paid_research_environment = paid_research_environment_payload(reviewer["id"])
         if not args.apply:
             print(
                 json.dumps(
@@ -132,12 +178,18 @@ def main():
                         "repository": repo,
                         "ruleset": payload,
                         "workflow_permissions": workflow_permissions,
+                        "paid_research_environment": {
+                            "name": PAID_RESEARCH_ENVIRONMENT,
+                            "required_reviewer": reviewer,
+                            "configuration": paid_research_environment,
+                        },
                     },
                     indent=2,
                 )
             )
             print("Dry run only; pass --apply to update GitHub.")
             return 0
+        apply_paid_research_environment(repo, paid_research_environment)
         apply_workflow_permissions(repo, workflow_permissions)
         result = apply_ruleset(repo, payload)
     except (OSError, RuntimeError, KeyError, json.JSONDecodeError) as exc:
@@ -145,8 +197,9 @@ def main():
         return 1
 
     print(
-        f"Configured Actions publisher permission and ruleset {result['name']!r} "
-        f"(id {result['id']}) for {repo}"
+        f"Configured paid-research approval for {reviewer['login']!r}, Actions "
+        f"publisher permission, and ruleset {result['name']!r} (id {result['id']}) "
+        f"for {repo}"
     )
     return 0
 

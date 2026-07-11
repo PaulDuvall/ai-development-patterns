@@ -42,3 +42,69 @@ def test_workflow_token_defaults_to_read_and_can_open_publisher_prs():
         "default_workflow_permissions": "read",
         "can_approve_pull_request_reviews": True,
     }
+
+
+def test_paid_research_environment_requires_human_review_on_protected_branches():
+    payload = MODULE.paid_research_environment_payload(1619259)
+
+    assert MODULE.PAID_RESEARCH_ENVIRONMENT == "evidence-paid-research"
+    assert payload == {
+        "wait_timer": 0,
+        "prevent_self_review": False,
+        "can_admins_bypass": False,
+        "reviewers": [{"type": "User", "id": 1619259}],
+        "deployment_branch_policy": {
+            "protected_branches": True,
+            "custom_branch_policies": False,
+        },
+    }
+
+
+def test_apply_configures_approval_before_other_repository_controls(monkeypatch):
+    calls = []
+    monkeypatch.setattr(
+        MODULE, "repository_name", lambda: "PaulDuvall/ai-development-patterns")
+    monkeypatch.setattr(
+        MODULE, "authenticated_user",
+        lambda: {"login": "PaulDuvall", "id": 1619259, "type": "User"})
+    monkeypatch.setattr(
+        MODULE, "apply_paid_research_environment",
+        lambda repo, payload: calls.append(("environment", repo, payload)))
+    monkeypatch.setattr(
+        MODULE, "apply_workflow_permissions",
+        lambda repo, payload: calls.append(("permissions", repo, payload)))
+    monkeypatch.setattr(
+        MODULE, "apply_ruleset",
+        lambda repo, payload: (
+            calls.append(("ruleset", repo, payload)) or
+            {"name": MODULE.RULESET_NAME, "id": 18778612}
+        ))
+    monkeypatch.setattr(MODULE.sys, "argv", [str(SCRIPT), "--apply"])
+
+    assert MODULE.main() == 0
+    assert [call[0] for call in calls] == [
+        "environment", "permissions", "ruleset"]
+
+
+def test_apply_fails_before_other_controls_when_environment_setup_fails(
+        monkeypatch, capsys):
+    calls = []
+    monkeypatch.setattr(
+        MODULE, "repository_name", lambda: "PaulDuvall/ai-development-patterns")
+    monkeypatch.setattr(
+        MODULE, "authenticated_user",
+        lambda: {"login": "PaulDuvall", "id": 1619259, "type": "User"})
+
+    def fail_environment(repo, payload):
+        calls.append("environment")
+        raise RuntimeError("environment rejected")
+
+    monkeypatch.setattr(MODULE, "apply_paid_research_environment", fail_environment)
+    monkeypatch.setattr(
+        MODULE, "apply_workflow_permissions", lambda *args: calls.append("permissions"))
+    monkeypatch.setattr(MODULE, "apply_ruleset", lambda *args: calls.append("ruleset"))
+    monkeypatch.setattr(MODULE.sys, "argv", [str(SCRIPT), "--apply"])
+
+    assert MODULE.main() == 1
+    assert calls == ["environment"]
+    assert "environment rejected" in capsys.readouterr().err
