@@ -1,166 +1,141 @@
 schema_version: 2
-provenance_status: legacy-import
-legacy_run_url: https://github.com/PaulDuvall/ai-development-patterns/pull/23
-legacy_limitations: The PR records 5 aggregate queries, all three search modes, and an independent URL
-  re-fetch. Exact query strings, per-mode candidate counts, normalized content hashes, and verifier metadata
-  were not retained.
+provenance_status: complete
 pattern: Tool Integration
 slug: tool-integration
-last_checked: '2026-07-02'
+last_checked: 2026-07-10
 search:
-  run_id: legacy-import
-  checked_at: '2026-07-02'
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
   modes:
     name:
-      queries: []
-      candidate_count: null
+      queries:
+        - Tool Integration AI systems external tools APIs function calling tool use Model Context Protocol
+        - OpenAI function calling tool calling external systems access data outside training data
+        - Anthropic tool use Claude external tools APIs documentation
+      candidate_count: 9
     mechanism:
-      queries: []
-      candidate_count: null
+      queries:
+        - Connect AI systems external tools APIs data sources function calling tool use
+        - LLMs interact with external tools APIs functions based on user input
+        - language models use external tools via simple APIs
+      candidate_count: 8
     artifact:
-      queries: []
-      candidate_count: null
-adoption_score: 23
+      queries:
+        - npx @modelcontextprotocol/server-filesystem mcp servers tools data sources GitHub
+        - site:github.com/modelcontextprotocol/servers MCP servers repository controlled access tools data sources
+        - site:github.com/openai/openai-cookbook function calling external APIs tools example
+      candidate_count: 6
+adoption_score: 18
 tier_counts:
-  T1: 2
+  T1: 1
   T2: 2
   T3: 1
   T4: 1
 adoption_dimensions:
   implementation_available: true
   independent_adoption: true
-  independence_groups: 6
+  independence_groups: 5
 naming_alignment: aliased
 terminology_variants:
-- term: function calling / tool calling
-  used_by: OpenAI (API documentation)
-  url: https://developers.openai.com/api/docs/guides/function-calling
-- term: tool use
-  used_by: Anthropic (Claude API documentation)
-  url: https://platform.claude.com/docs/en/docs/build-with-claude/tool-use
-- term: Model Context Protocol (MCP)
-  used_by: Anthropic and the MCP open-source ecosystem
-  url: https://www.anthropic.com/news/model-context-protocol
+  - term: Model Context Protocol
+    used_by: Model Context Protocol project and Anthropic
+    url: https://modelcontextprotocol.io/docs/getting-started/intro
+  - term: function calling / tool calling
+    used_by: OpenAI
+    url: https://developers.openai.com/api/docs/guides/function-calling
+  - term: tool use
+    used_by: Anthropic
+    url: https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview
 evidence:
-- tier: T1
-  match: aliased
-  mechanism_quote: The servers in this repository showcase the versatility and extensibility of MCP, demonstrating
-    how it can be used to give Large Language Models (LLMs) secure, controlled access to tools and data
-    sources.
-  source: Model Context Protocol steering group, modelcontextprotocol/servers GitHub repository
-  source_kind: open_source_implementation
-  organization: Model Context Protocol project
-  independence_group: model-context-protocol
-  url: https://github.com/modelcontextprotocol/servers
-  resolved_url: https://github.com/modelcontextprotocol/servers
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-07-02'
-  retrieved: '2026-07-02'
-  claim: Reference implementations of MCP servers (filesystem, fetch, etc.) with 87,974 stars, runnable
-    today via npx — including @modelcontextprotocol/server-filesystem, the exact package named in this
-    pattern's own config example (repo last updated 2026-07-02; created 2024-11-19)
-- tier: T1
-  match: aliased
-  mechanism_quote: Model Context Protocol (MCP) enables Cursor to connect to external tools and data sources.
-  source: Cursor, MCP documentation
-  source_kind: shipped_product
-  organization: Cursor
-  independence_group: cursor
-  url: https://cursor.com/docs/context/mcp
-  resolved_url: https://cursor.com/docs/context/mcp
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  retrieved: '2026-07-02'
-  claim: Cursor ships built-in MCP support letting users connect the IDE's AI to external tools and data
-    sources today (undated page; date = retrieval date)
-- tier: T2
-  match: aliased
-  mechanism_quote: It provides a universal, open standard for connecting AI systems with data sources,
-    replacing fragmented integrations with a single protocol.
-  source: Anthropic, Model Context Protocol announcement
-  source_kind: official_documentation
-  organization: Anthropic
-  independence_group: anthropic
-  url: https://www.anthropic.com/news/model-context-protocol
-  resolved_url: https://www.anthropic.com/news/model-context-protocol
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2024-11-25'
-  retrieved: '2026-07-02'
-  claim: 'Anthropic announced MCP as an open standard for exactly this pattern''s mechanism: standardized
-    two-way connections between AI systems and external data sources and tools'
-- tier: T2
-  match: aliased
-  mechanism_quote: Function calling (also known as tool calling) provides a powerful and flexible way
-    for OpenAI models to interface with external systems and access data outside their training data.
-  source: OpenAI, Function calling guide (API documentation)
-  source_kind: official_documentation
-  organization: OpenAI
-  independence_group: openai
-  url: https://developers.openai.com/api/docs/guides/function-calling
-  resolved_url: https://developers.openai.com/api/docs/guides/function-calling
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  retrieved: '2026-07-02'
-  claim: OpenAI's canonical API docs describe function calling (also called tool calling) as the way models
-    interface with external systems and access data beyond training data (undated page; date = retrieval
-    date)
-- tier: T3
-  match: aliased
-  mechanism_quote: we show that LMs can teach themselves to use external tools via simple APIs and achieve
-    the best of both worlds.
-  source: 'Schick et al. (Meta AI), Toolformer: Language Models Can Teach Themselves to Use Tools (arXiv
-    2302.04761)'
-  source_kind: peer_reviewed_research
-  organization: Meta AI
-  independence_group: meta
-  url: https://arxiv.org/abs/2302.04761
-  resolved_url: https://arxiv.org/abs/2302.04761
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2023-02-09'
-  retrieved: '2026-07-02'
-  claim: Research paper demonstrating language models learning to call external tools (calculator, search,
-    QA, calendar) via APIs to overcome limits of prompt-only generation
-- tier: T4
-  match: aliased
-  mechanism_quote: Function calling allows large language models (LLMs) to interact with external tools,
-    APIs, and functions based on user input.
-  source: Saurabh Rai (Apideck), An introduction to function calling and tool use
-  source_kind: practitioner_report
-  organization: Apideck
-  independence_group: apideck
-  url: https://www.apideck.com/blog/llm-tool-use-and-function-calling
-  resolved_url: https://www.apideck.com/blog/llm-tool-use-and-function-calling
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2025-01-28'
-  retrieved: '2026-07-02'
-  claim: Practitioner blog with full working Python/Ollama implementation of tool definitions, orchestration
-    loop, and an external search-API tool (published 2025-01-28, page shows updated 2026-05-05)
-verdict: weak
+  - tier: T1
+    match: aliased
+    mechanism_quote: The servers in this repository showcase the versatility and extensibility of MCP, demonstrating how it can be used to give Large Language Models (LLMs) secure, controlled access to tools and data sources.
+    source: modelcontextprotocol/servers GitHub repository
+    source_kind: open_source_implementation
+    organization: Model Context Protocol project
+    independence_group: model-context-protocol
+    url: https://github.com/modelcontextprotocol/servers
+    resolved_url: https://github.com/modelcontextprotocol/servers
+    content_sha256: f109a9ff43a0ed162639b6054eecbc2bf7728574a0ac966bee2d48a2d9348a25
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable MCP server implementations give large language models controlled access to external tools and data sources.
+  - tier: T2
+    match: aliased
+    mechanism_quote: Function calling (also known as tool calling) provides a powerful and flexible way for OpenAI models to interface with external systems and access data outside their training data.
+    source: OpenAI Function Calling Guide
+    source_kind: official_documentation
+    organization: OpenAI
+    independence_group: openai
+    url: https://developers.openai.com/api/docs/guides/function-calling
+    resolved_url: https://developers.openai.com/api/docs/guides/function-calling
+    content_sha256: 00b21ec8063d9793a7655aa39cc7faf921fd0e9c6b3b971755e71458ea219afa
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: OpenAI documents function calling/tool calling as the canonical way for models to interface with external systems and outside data.
+  - tier: T2
+    match: aliased
+    mechanism_quote: The Model Context Protocol is an open standard that enables developers to build secure, two-way connections between their data sources and AI-powered tools.
+    source: Anthropic Model Context Protocol announcement
+    source_kind: official_documentation
+    organization: Anthropic
+    independence_group: anthropic
+    url: https://www.anthropic.com/news/model-context-protocol
+    resolved_url: https://www.anthropic.com/news/model-context-protocol
+    content_sha256: cce89ac4026b89f8ac074cf5260206aed315372cef56c4e852f8a58fec791364
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2024-11-25
+    retrieved: 2026-07-10
+    claim: Anthropic presents MCP as official guidance for standardized two-way connections between AI-powered tools and external data sources.
+  - tier: T3
+    match: aliased
+    mechanism_quote: In this paper, we show that LMs can teach themselves to use external tools via simple APIs and achieve the best of both worlds.
+    source: "NeurIPS proceedings, Toolformer: Language Models Can Teach Themselves to Use Tools"
+    source_kind: peer_reviewed_research
+    organization: Meta AI
+    independence_group: meta
+    url: https://papers.nips.cc/paper_files/paper/2023/hash/d842425e4bf79ba039352da0f658a906-Abstract-Conference.html
+    resolved_url: https://papers.nips.cc/paper_files/paper/2023/hash/d842425e4bf79ba039352da0f658a906-Abstract-Conference.html
+    content_sha256: f0a83b6d9372aedf8454b0daeec373bee706ebb140dfa8746cbefb987364bd28
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Peer-reviewed research demonstrates language models using external tools through APIs to improve capability beyond prompt-only generation.
+  - tier: T4
+    match: aliased
+    mechanism_quote: Function calling allows large language models (LLMs) to interact with external tools, APIs, and functions based on user input.
+    source: Apideck, An introduction to function calling and tool use
+    source_kind: practitioner_report
+    organization: Apideck
+    independence_group: apideck
+    url: https://www.apideck.com/blog/llm-tool-use-and-function-calling
+    resolved_url: https://www.apideck.com/blog/llm-tool-use-and-function-calling
+    content_sha256: 7959b95bed0cae9644c6c64833c99ef19a71153d0c60d9ae83ca5b0b564dad12
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2025-01-28
+    retrieved: 2026-07-10
+    claim: Practitioner implementation guidance shows function/tool calling used to connect LLMs with external tools, APIs, and functions.
+verdict: verified

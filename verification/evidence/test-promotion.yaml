@@ -1,0 +1,81 @@
+schema_version: 2
+provenance_status: complete
+pattern: Test Promotion
+slug: test-promotion
+last_checked: 2026-07-10
+search:
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - "\"test promotion\" \"AI-generated tests\""
+        - "\"AI-generated tests\" \"golden\" tests human approval"
+        - "\"generated tests\" \"promote\" \"golden\" tests"
+        - "\"generated tests\" \"CODEOWNERS\" \"AI\""
+      candidate_count: 2
+    mechanism:
+      queries:
+        - "ApprovalTests approved received files human approve generated output regression tests"
+        - "approval testing approved received human approval golden master tests"
+        - "pytest-regressions data regression tests force regen generated baseline approve"
+        - "\"golden files\" \"review\" \"generated\" tests \"approve\""
+      candidate_count: 5
+    artifact:
+      queries:
+        - "site:github.com \"tests/generated\" \"tests/golden\""
+        - "site:github.com \"promote-test.sh\" \"tests/golden\""
+        - "site:github.com \"AI-generated tests\" \"CODEOWNERS\""
+        - "site:github.com \"--force-regen\" \"Make sure to diff the files\" pytest-regressions"
+      candidate_count: 3
+adoption_score: 7
+tier_counts: {T1: 1, T4: 1}
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 2
+naming_alignment: aliased
+terminology_variants:
+  - term: golden tests
+    used_by: Betterment Alchemist
+    url: https://github.com/Betterment/alchemist
+evidence:
+  - tier: T1
+    match: aliased
+    mechanism_quote: "One is platform tests, which generate golden files with human readable text. These can be considered regular golden tests and are usually only run on a local machine."
+    source: Betterment Alchemist
+    source_kind: open_source_implementation
+    organization: Betterment
+    independence_group: betterment
+    url: https://github.com/Betterment/alchemist
+    resolved_url: https://github.com/Betterment/alchemist
+    content_sha256: 4fe0a343824bee9c336fbc4190ddeb22642a2bd657df5f286c672e1f4c8102c7
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Open-source Flutter tooling generates golden-file test baselines that are treated as accepted golden tests.
+  - tier: T4
+    match: unnamed
+    mechanism_quote: "Every AI-generated test requires human review before entering a test suite. The QA engineer’s understanding of what the application should do under real conditions is the quality gate that separates AI-accelerated testing from AI-amplified noise."
+    source: "Generative AI in Software Testing: A Complete Guide"
+    source_kind: practitioner_report
+    organization: Ranorex
+    independence_group: ranorex
+    url: https://www.ranorex.com/blog/generative-ai-in-software-testing/
+    resolved_url: https://www.ranorex.com/blog/generative-ai-in-software-testing/
+    content_sha256: 8be1dcaeccc970e367062005de4c126e981e176b69901a900add7ee7719f577b
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Practitioner guidance says AI-generated tests should remain review candidates until human QA accepts them into the suite.
+verdict: weak

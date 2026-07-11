@@ -1,0 +1,125 @@
+schema_version: 2
+provenance_status: complete
+pattern: Release Synthesis
+slug: release-synthesis
+last_checked: 2026-07-10
+search:
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - Release Synthesis automatically generate release notes from git commit history AI
+      candidate_count: 0
+    mechanism:
+      queries:
+        - generate release notes from git commit history conventional commits release notes generator
+        - practitioner report automated release notes semantic-release conventional commits company engineering blog
+        - GitHub automatically generated release notes pull requests commits release notes
+        - release-please generate release notes from conventional commits GitHub Action
+        - release-drafter generate release notes based on pull request labels GitHub Action
+        - '"generate release notes" "commit messages" "GitHub Actions" "semantic-release" company blog'
+        - '"automated release notes" "commit history" "GitHub Actions" engineering blog'
+      candidate_count: 14
+    artifact:
+      queries:
+        - '"@semantic-release/release-notes-generator" "generateNotes" GitHub workflow'
+        - '"release-please-action" "CHANGELOG.md" "github-token"'
+        - '"@release-drafter/release-drafter" "template" "change-template"'
+        - '"release.yml" "release-please-action" "conventional commits"'
+      candidate_count: 27
+adoption_score: 16
+tier_counts: {T1: 2, T2: 1, T4: 1}
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 4
+naming_alignment: aliased
+terminology_variants:
+  - term: release-please
+    used_by: Google
+    url: https://raw.githubusercontent.com/googleapis/release-please/main/README.md
+  - term: release-notes-generator
+    used_by: semantic-release
+    url: https://raw.githubusercontent.com/semantic-release/release-notes-generator/master/README.md
+  - term: automatically generated release notes
+    used_by: GitHub
+    url: https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes
+  - term: Semantic Release
+    used_by: Agoda Engineering
+    url: https://medium.com/agoda-engineering/automating-versioning-and-releases-using-semantic-release-6ed355ede742
+evidence:
+  - tier: T1
+    match: aliased
+    mechanism_quote: "Release Please automates CHANGELOG generation, the creation of GitHub releases, and version bumps for your projects."
+    source: Release Please
+    source_kind: open_source_implementation
+    organization: Google
+    independence_group: google
+    url: https://raw.githubusercontent.com/googleapis/release-please/main/README.md
+    resolved_url: https://raw.githubusercontent.com/googleapis/release-please/main/README.md
+    content_sha256: 5377fb19136fcdf29704c2ee6e6d1a12c7003d576c66ee31aba3422fde0aa3e9
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable open source tool parses git history and creates changelog and GitHub release artifacts from Conventional Commit messages.
+  - tier: T1
+    match: aliased
+    mechanism_quote: "Generate release notes for the commits added since the last release with conventional-changelog."
+    source: semantic-release release-notes-generator
+    source_kind: open_source_implementation
+    organization: semantic-release
+    independence_group: semantic-release
+    url: https://raw.githubusercontent.com/semantic-release/release-notes-generator/master/README.md
+    resolved_url: https://raw.githubusercontent.com/semantic-release/release-notes-generator/master/README.md
+    content_sha256: f7003ce1e0c33f7056f3c8350bdaf9a52c219b11c419cd504d7e2c66ef811f79
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable semantic-release plugin generates changelog content from commits added since the previous release.
+  - tier: T2
+    match: aliased
+    mechanism_quote: "Automatically generated release notes provide an automated alternative to manually writing release notes for your GitHub releases."
+    source: GitHub Docs - Automatically Generated Release Notes
+    source_kind: official_documentation
+    organization: GitHub
+    independence_group: github
+    url: https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes
+    resolved_url: https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes
+    content_sha256: cfdf21a7ee3921d791f8c444983c3b8bad8b9209a59bf37f889dc0fdae264ae8
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Official GitHub documentation describes automated release notes that summarize merged pull requests, contributors, and a full changelog link.
+  - tier: T4
+    match: aliased
+    mechanism_quote: "semantic-release uses the commit messages to determine the type of changes in the codebase."
+    source: Automating Versioning and Releases Using Semantic Release
+    source_kind: practitioner_report
+    organization: Agoda Engineering
+    independence_group: agoda
+    url: https://medium.com/agoda-engineering/automating-versioning-and-releases-using-semantic-release-6ed355ede742
+    resolved_url: https://medium.com/agoda-engineering/automating-versioning-and-releases-using-semantic-release-6ed355ede742
+    content_sha256: 5d696df4558c5006d055cbd42ec94d21d0b99f21305e66995093dabe22ccf9ee
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2021-02-22
+    retrieved: 2026-07-10
+    claim: Agoda Engineering reports using Semantic Release to automate release notes and changelogs from commit messages across projects.
+verdict: verified

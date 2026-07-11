@@ -1,0 +1,79 @@
+schema_version: 2
+provenance_status: complete
+pattern: Security Orchestration
+slug: security-orchestration
+last_checked: 2026-07-10
+search:
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - '"Security Testing Orchestration" AI aggregated security findings'
+        - '"Harness AI" "aggregated security findings"'
+        - '"security orchestration" "AI" "security findings"'
+        - '"AI" "summarize security findings" "pipeline"'
+      candidate_count: 7
+    mechanism:
+      queries:
+        - AI summarize security findings multiple security tools vulnerability management orchestration
+        - security copilot integrates multiple security products summarize incidents generative AI
+        - AI vulnerability management aggregate scanner findings summarize prioritize security tools
+        - GitHub security AI summarize CodeQL Dependabot secret scanning alerts
+      candidate_count: 8
+    artifact:
+      queries:
+        - site:github.com "Summarize security findings with AI" "Bedrock" "GuardDuty"
+        - site:github.com "snyk test --json" "bandit" "trivy" "Summarize security findings"
+        - site:github.com "security findings" "OpenAI" "trivy" "bandit" "snyk"
+        - site:github.com "GuardDuty" "Bedrock" "Summarize" "findings" "Step Functions"
+      candidate_count: 5
+adoption_score: 7
+tier_counts: {T1: 1, T4: 1}
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 2
+naming_alignment: none
+terminology_variants: []
+evidence:
+  - tier: T1
+    match: unnamed
+    mechanism_quote: "The Lambda function invokes the Amazon Bedrock service to summarize the finding. The finding details are updated in Security Hub with a simplified summary for the user to review."
+    source: AWS Samples generative-ai-summarize-securityhub
+    source_kind: open_source_implementation
+    organization: AWS Samples
+    independence_group: aws-samples
+    url: https://github.com/aws-samples/generative-ai-summarize-securityhub
+    resolved_url: https://github.com/aws-samples/generative-ai-summarize-securityhub
+    content_sha256: 059abff5a0ed17c5e30f02de751af747449766a10950d8a260a5121292eef3fd
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable sample routes Security Hub findings through Lambda and Amazon Bedrock, then writes AI-generated summaries back for security review.
+  - tier: T4
+    match: unnamed
+    mechanism_quote: "CGR is integrated into the Microsoft Defender XDR product and deployed worldwide, generating millions of recommendations across thousands of customers."
+    source: Microsoft Copilot for Security Generates Contextual Guided Responses for Incident Response
+    source_kind: practitioner_report
+    organization: Microsoft
+    independence_group: microsoft
+    url: https://arxiv.org/abs/2407.09017
+    resolved_url: https://arxiv.org/abs/2407.09017
+    content_sha256: b3fbd7ccccda6e1a3edca605a6a0b58f1d383a936e356e641b9139f8565bbcc5
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2024-07-12
+    retrieved: 2026-07-10
+    claim: Practitioner report describes a production Microsoft Defender XDR capability that generates contextual guided response recommendations at worldwide customer scale.
+verdict: weak

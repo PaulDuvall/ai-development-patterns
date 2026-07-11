@@ -1,0 +1,101 @@
+schema_version: 2
+provenance_status: complete
+pattern: Error Resolution
+slug: error-resolution
+last_checked: 2026-07-10
+search:
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - '"Error Resolution" "AI" "root cause" "fix" "logs"'
+        - '"AI root cause analysis" "test failures" "logs" "fix"'
+        - '"AI debugging" "collect logs" "code diffs" "suggest fixes"'
+      candidate_count: 19
+    mechanism:
+      queries:
+        - AI coding agent fix failing tests collect test output retry automatically open source
+        - GitHub Copilot coding agent fix failing tests pull request CI errors documentation
+        - AI debugging root cause analysis collect logs generate fix developer tool
+      candidate_count: 27
+    artifact:
+      queries:
+        - '"rp inspect" "rp fix" "reproducer.sh"'
+        - '"/test <test-command>" "Aider will try and fix any errors"'
+        - '"Fix with Copilot" "investigate the cause" "push a fix"'
+      candidate_count: 4
+adoption_score: 11
+tier_counts: {T1: 1, T2: 1, T4: 1}
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: aliased
+terminology_variants:
+  - term: Repairing Programs
+    used_by: rp
+    url: https://github.com/penberg/rp
+  - term: Fix with Copilot
+    used_by: GitHub
+    url: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/use-cloud-agent-on-github
+  - term: AI Root Cause Analysis
+    used_by: Ranger
+    url: https://www.ranger.net/post/ai-root-cause-analysis-test-failures-how-it-works
+evidence:
+  - tier: T1
+    match: aliased
+    mechanism_quote: "AI coding agents are versatile, but reproducing and fixing bugs requires structure to keep them on track. `rp` provides that structure. Use `rp inspect <prompt>` to analyze a GitHub issue or local test failure and generate a reproducer. Then run `rp fix` to automatically patch it — powered by your AI coding agent of choice."
+    source: rp
+    source_kind: open_source_implementation
+    organization: rp
+    independence_group: penberg-rp
+    url: https://github.com/penberg/rp
+    resolved_url: https://github.com/penberg/rp
+    content_sha256: 61275c2e6f2ed8141031fa89b975d0193b9681506701420c67d8c8cb050f9c62
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable open-source tool turns an issue or test failure into a reproducer, checks it, asks an AI coding agent to patch the repository, and validates the fix.
+  - tier: T2
+    match: aliased
+    mechanism_quote: "When an GitHub Actions workflow run fails on a pull request branch, you can ask Copilot to investigate and fix the failure."
+    source: Using Copilot cloud agent on GitHub
+    source_kind: official_documentation
+    organization: GitHub
+    independence_group: github
+    url: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/use-cloud-agent-on-github
+    resolved_url: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/use-cloud-agent-on-github
+    content_sha256: 85692a72666a7899ddfc1dabe4e5530368ef0fb5a7c1c8678e9ec77dde58ee13
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Official documentation describes a workflow where Copilot investigates a failed GitHub Actions run and pushes a branch fix.
+  - tier: T4
+    match: aliased
+    mechanism_quote: "Your CI pipelines play a crucial role in gathering the data AI needs. Set them up to capture logs, screenshots, DOM snapshots, network traffic, system metrics, and any code changes at the time of failure."
+    source: AI Root Cause Analysis for Test Failures
+    source_kind: practitioner_report
+    organization: Ranger
+    independence_group: ranger
+    url: https://www.ranger.net/post/ai-root-cause-analysis-test-failures-how-it-works
+    resolved_url: https://www.ranger.net/post/ai-root-cause-analysis-test-failures-how-it-works
+    content_sha256: f95b3425263be95fa17245acdb8a733ddebe5df4e2eec90e461c21db36b5cb04
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Practitioner guidance describes CI failure context capture across logs, screenshots, network traces, metrics, and code changes so AI can diagnose test failure root causes.
+verdict: verified

@@ -1,0 +1,101 @@
+schema_version: 2
+provenance_status: complete
+pattern: Debt Forecasting
+slug: debt-forecasting
+last_checked: 2026-07-10
+search:
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - "\"Debt Forecasting\" \"technical debt\" AI code analysis"
+        - "\"technical debt forecasting\" \"machine learning\""
+        - "\"CodeScene\" \"technical debt\" \"Hotspot analysis\""
+      candidate_count: 4
+    mechanism:
+      queries:
+        - "AI code analysis prioritize technical debt maintenance cost business impact"
+        - "code health hotspots technical debt prioritize maintenance burden"
+        - "machine learning predict technical debt evolution maintenance planning"
+      candidate_count: 7
+    artifact:
+      queries:
+        - "GitHub \"CodeHealth\" \"technical debt\" repository"
+        - "GitHub \"cyclomatic complexity\" \"technical debt\" prioritize AI"
+        - "GitHub \"hotspot analysis\" \"technical debt\""
+      candidate_count: 0
+adoption_score: 11
+tier_counts: {T1: 1, T3: 2}
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: strong
+terminology_variants:
+  - term: Code Health
+    used_by: CodeScene
+    url: https://codescene.com/manage-and-reduce-technical-debt
+  - term: Hotspot analysis
+    used_by: CodeScene
+    url: https://codescene.com/manage-and-reduce-technical-debt
+  - term: technical debt forecasting
+    used_by: Technical Debt Forecasting research
+    url: https://sites.google.com/view/technical-debt-forecasting/main
+evidence:
+  - tier: T1
+    match: aliased
+    mechanism_quote: "Use Hotspot analysis to identify and visualize high-impact technical debt, so your team can focus on what matters the most."
+    source: CodeScene Manage and Reduce Technical Debt
+    source_kind: shipped_product
+    organization: CodeScene
+    independence_group: codescene
+    url: https://codescene.com/manage-and-reduce-technical-debt
+    resolved_url: https://codescene.com/manage-and-reduce-technical-debt
+    content_sha256: dd021f73ad49cf68e9f6fb1fbc8bb9f33765ba24a1ca1c642cc54c3823bcb021
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable product analyzes code hotspots and Code Health signals to identify and prioritize high-impact technical debt.
+  - tier: T3
+    match: named
+    mechanism_quote: "Subsequently, based on the identified TD predictors, a set of TD forecasting models are produced using popular machine learning algorithms and validated for various forecasting horizons."
+    source: "Technical Debt Forecasting: A large-scale empirical study on open-source repositories"
+    source_kind: peer_reviewed_research
+    organization: University of Macedonia
+    independence_group: university-of-macedonia
+    url: https://sites.google.com/view/technical-debt-forecasting/main
+    resolved_url: https://sites.google.com/view/technical-debt-forecasting/main
+    content_sha256: 57922becb1c5e14d631648d6b56ab4452fb1ffb6758e05e0defc920b255965d7
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Peer-reviewed research support material describes machine-learning models that forecast technical debt evolution from software metrics for maintenance planning.
+  - tier: T3
+    match: named
+    mechanism_quote: "Although recent research endeavors have showcased the feasibility of building accurate project-specific TD forecasting models, there is a gap in the field regarding cross-project TD forecasting."
+    source: "Technical Debt Forecasting Based on the Temporal Properties of Software Metrics"
+    source_kind: peer_reviewed_research
+    organization: OpenAIRE
+    independence_group: openaire
+    url: https://explore.openaire.eu/search/result?pid=10.1007%2Fs42979-020-00408-4
+    resolved_url: https://explore.openaire.eu/search/result?pid=10.1007%2Fs42979-020-00408-4
+    content_sha256: f406b6265cb87daff65e595b26bc822bf67e32983fe5e57d4be87479d33fce93
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Peer-reviewed research record describes technical debt forecasting models that use temporal software-metric properties to predict technical debt across projects.
+verdict: verified

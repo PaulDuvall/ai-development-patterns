@@ -1,157 +1,131 @@
 schema_version: 2
-provenance_status: legacy-import
-legacy_run_url: https://github.com/PaulDuvall/ai-development-patterns/pull/26
-legacy_limitations: The PR records 7 aggregate queries, all three search modes, and an independent URL
-  re-fetch. Exact query strings, per-mode candidate counts, normalized content hashes, and verifier metadata
-  were not retained.
+provenance_status: complete
 pattern: Planned Implementation
 slug: planned-implementation
-last_checked: '2026-07-02'
+last_checked: '2026-07-10'
 search:
-  run_id: legacy-import
-  checked_at: '2026-07-02'
+  run_id: github-actions:29123202495
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
   modes:
     name:
-      queries: []
-      candidate_count: null
+      queries:
+      - Planned Implementation AI coding agent plan before implementation
+      - Cursor Plan Mode creates detailed implementation plans before writing code
+      - Claude Code plan mode proposes a plan before edits approve
+      - VS Code plan agent detailed implementation plans before starting implementation
+      candidate_count: 4
     mechanism:
-      queries: []
-      candidate_count: null
+      queries:
+      - AI coding agent asks clarifying questions before generating code
+      - LLM code generation workflow detailed spec plan execute small steps
+      - coding assistant reviewable implementation plan before editing files
+      - code generation ambiguous requirements clarifying questions before implementation
+      candidate_count: 5
     artifact:
-      queries: []
-      candidate_count: null
-adoption_score: 20
+      queries:
+      - 'site:github.com "claude --permission-mode plan"'
+      - 'site:github.com "Shift+Tab" "plan mode" "Claude Code"'
+      - 'site:github.com "Plan agent" "session/plan.md"'
+      - 'site:github.com "docs/plans" "Relentless Plan Interview"'
+      candidate_count: 0
+adoption_score: 17
 tier_counts:
   T1: 3
-  T3: 1
   T4: 1
 adoption_dimensions:
   implementation_available: true
   independent_adoption: true
-  independence_groups: 5
+  independence_groups: 4
 naming_alignment: aliased
 terminology_variants:
 - term: Plan Mode
-  used_by: Cursor (product feature) and Anthropic Claude Code (permission mode)
-  url: https://cursor.com/docs/agent/plan-mode
-- term: Explore first, then plan, then code (Explore, plan, code, commit)
-  used_by: Anthropic Claude Code best-practices docs
-  url: https://code.claude.com/docs/en/best-practices
-- term: Let Claude interview you
-  used_by: Anthropic Claude Code best-practices docs
-  url: https://code.claude.com/docs/en/best-practices
-- term: grill-me / clarify-first skill
-  used_by: Matt Pocock (skills.sh) and bswen.com practitioner writeup
-  url: https://skills.sh/mattpocock/skills/grill-me
-- term: intention clarification
-  used_by: Mu et al., ClarifyGPT (arXiv/ACM FSE)
-  url: https://arxiv.org/abs/2310.10996
-- term: brainstorm spec, then plan a plan, then execute
-  used_by: Harper Reed (harper.blog)
-  url: https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
+  used_by: Cursor and Anthropic Claude Code
+  url: https://cursor.com/blog/plan-mode
+- term: Plan agent
+  used_by: Microsoft Visual Studio Code
+  url: https://code.visualstudio.com/docs/agents/planning
+- term: AI-assisted development workflow
+  used_by: Equal Experts
+  url: https://www.equalexperts.com/blog/our-thinking/ai-assisted-development-workflow/
 evidence:
 - tier: T1
   match: aliased
-  mechanism_quote: Plan Mode creates detailed implementation plans before writing any code. Agent researches
-    your codebase, asks clarifying questions, and generates a reviewable plan you can edit before building.
-  source: Cursor - Plan Mode documentation
+  mechanism_quote: When you prompt Agent to create a plan, Cursor researches your codebase to find
+    relevant files, review docs, and ask clarifying questions.
+  source: Cursor Plan Mode
   source_kind: shipped_product
   organization: Cursor
   independence_group: cursor
-  url: https://cursor.com/docs/agent/plan-mode
-  resolved_url: https://cursor.com/docs/agent/plan-mode
-  content_sha256: null
+  url: https://cursor.com/blog/plan-mode
+  resolved_url: https://cursor.com/blog/plan-mode
+  content_sha256: ff92bc9e1a5c48a27f4452cb399994624302653c50f9ef54b487f5f2d4c817c1
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  retrieved: '2026-07-02'
-  claim: 'Cursor ships Plan Mode as a product feature (Shift+Tab): the agent asks clarifying questions,
-    researches the codebase, and generates a reviewable, editable implementation plan before any code
-    is written (undated page; date = retrieval date)'
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Cursor ships Plan Mode as an agent workflow where the agent researches the codebase,
+    asks clarifying questions, and produces a plan before implementation.
 - tier: T1
   match: aliased
   mechanism_quote: For changes you want to review before they touch disk, switch to plan mode. Claude
     reads files and proposes a plan but makes no edits until you approve.
-  source: Anthropic - Claude Code docs, Common workflows (plan mode)
+  source: Anthropic Claude Code plan mode
   source_kind: shipped_product
   organization: Anthropic
   independence_group: anthropic
-  url: https://code.claude.com/docs/en/common-workflows
+  url: https://docs.anthropic.com/en/docs/claude-code/common-workflows
   resolved_url: https://code.claude.com/docs/en/common-workflows
-  content_sha256: null
+  content_sha256: 19eeacdd00dfe3c62d2d863a94ae3829777f60c86381ae136baaa479d06191d4
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  retrieved: '2026-07-02'
-  claim: Claude Code ships a runnable plan mode (claude --permission-mode plan, Shift+Tab toggle) that
-    restricts the agent to read-only analysis and plan generation until the user approves (undated page;
-    date = retrieval date)
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Claude Code ships plan mode for review-before-edit workflows where the agent reads files
+    and proposes a plan without modifying files until approval.
 - tier: T1
   match: aliased
-  mechanism_quote: Conducts deep-dive questioning across all aspects of a plan, walking through decision
-    trees branch-by-branch until shared understanding is reached
-  source: Matt Pocock - 'grill-me' skill on skills.sh (mattpocock/skills)
-  source_kind: open_source_implementation
-  organization: Matt Pocock
-  independence_group: independent:matt-pocock
-  url: https://skills.sh/mattpocock/skills/grill-me
-  resolved_url: https://skills.sh/mattpocock/skills/grill-me
-  content_sha256: null
+  mechanism_quote: The plan agent enables you to create detailed implementation plans before starting
+    the implementation to ensure all requirements are met.
+  source: Visual Studio Code plan agent documentation
+  source_kind: shipped_product
+  organization: Microsoft
+  independence_group: microsoft
+  url: https://code.visualstudio.com/docs/agents/planning
+  resolved_url: https://code.visualstudio.com/docs/agents/planning
+  content_sha256: 0861ddcf005b7dd8f44be68329fc0fec94881626b2b14fe1c2263f08af4a0a4f
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-03-13'
-  retrieved: '2026-07-02'
-  claim: 'An installable agent skill (npx skills add, 433.8K installs shown, first seen Mar 13 2026) that
-    implements the interview phase: systematic pre-implementation questioning of the user before code
-    is generated'
-- tier: T3
-  match: aliased
-  mechanism_quote: We introduce a novel framework named ClarifyGPT, which aims to enhance code generation
-    by empowering LLMs with the ability to identify ambiguous requirements and ask targeted clarifying
-    questions.
-  source: 'Fangwen Mu et al. - ClarifyGPT: Empowering LLM-based Code Generation with Intention Clarification
-    (arXiv 2310.10996, also ACM DOI 10.1145/3660810)'
-  source_kind: peer_reviewed_research
-  organization: ClarifyGPT research team
-  independence_group: research:clarifygpt
-  url: https://arxiv.org/abs/2310.10996
-  resolved_url: https://arxiv.org/abs/2310.10996
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2023-10-17'
-  retrieved: '2026-07-02'
-  claim: Peer-reviewed framework showing that detecting ambiguous requirements and asking targeted clarifying
-    questions before generating code raised GPT-4 Pass@1 from 70.96% to 80.80% on MBPP-sanitized
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Visual Studio Code ships a Plan agent that creates detailed implementation plans before
+    starting implementation.
 - tier: T4
   match: aliased
-  mechanism_quote: This pattern changes the AI's behavior from “generate immediately” to “interview first,
-    then implement.”
-  source: Cowrie (Dev @ Bswen) - 'How to Get AI Coding Assistants to Ask Clarifying Questions Before Generating
-    Code' (docs.bswen.com)
+  mechanism_quote: We don't jump straight to "generate code". First, we generate a plan. That plan
+    is a concrete, reviewable proposal of how the model intends to implement the feature.
+  source: Equal Experts - AI-assisted development workflow
   source_kind: practitioner_report
-  organization: Cowrie / Bswen
-  independence_group: independent:cowrie-bswen
-  url: https://docs.bswen.com/blog/2026-04-01-ai-clarifying-questions-codex/
-  resolved_url: https://docs.bswen.com/blog/2026-04-01-ai-clarifying-questions-codex/
-  content_sha256: null
+  organization: Equal Experts
+  independence_group: equal-experts
+  url: https://www.equalexperts.com/blog/our-thinking/ai-assisted-development-workflow/
+  resolved_url: https://www.equalexperts.com/blog/our-thinking/ai-assisted-development-workflow/
+  content_sha256: 814ea022ef89e2c3335a3ba0def1a7dbf698e0cb89d4179bcca2f9cd7b811e39
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-04-01'
-  retrieved: '2026-07-02'
-  claim: Practitioner post with the full 5-sentence 'grill-me' prompt and a derived 'clarify-first' SKILL.md,
-    reporting fewer wrong assumptions and fewer revision cycles when Codex interviews before implementing
-verdict: weak
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Practitioner workflow describes generating a concrete, reviewable implementation plan
+    before letting the model generate code.
+verdict: verified

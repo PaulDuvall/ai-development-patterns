@@ -1,0 +1,121 @@
+schema_version: 2
+provenance_status: complete
+pattern: Centralized Rules
+slug: centralized-rules
+last_checked: '2026-07-10'
+search:
+  run_id: 'github-actions:29123202495'
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - centralized AI coding assistant rules repository sync CLAUDE.md AGENTS.md .cursorrules
+      - '"centralize" "AI instructions" "sync" "GitHub repositories"'
+      candidate_count: 7
+    mechanism:
+      queries:
+      - '"CLAUDE.md" "AGENTS.md" ".cursorrules" sync rules repository GitHub'
+      - '"One Source of Truth" "AI Instructions" AGENTS.md sync'
+      - '"AI rules" "CLAUDE.md" "AGENTS.md" GitHub repository'
+      candidate_count: 6
+    artifact:
+      queries:
+      - '".ai-rules.yaml" "CLAUDE.md" ".cursorrules" "AGENTS.md"'
+      - '"ai-rules generate" "CLAUDE.md" "AGENTS.md"'
+      - '"rules-version" "ds-agent-rules" "CLAUDE.md"'
+      candidate_count: 4
+adoption_score: 16
+tier_counts:
+  T1: 2
+  T2: 1
+  T4: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 4
+naming_alignment: aliased
+terminology_variants:
+- term: AI rules
+  used_by: Block and Sync AI Agent Rules
+  url: https://github.com/block/ai-rules
+- term: AI instructions
+  used_by: Port
+  url: https://docs.port.io/guides/all/manage-ai-instructions/
+- term: AGENTS.md single source of truth
+  used_by: Kaushik Gopal
+  url: https://kau.sh/blog/agents-md/
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: Creates CLAUDE.md, AGENTS.md, and other agent-specific files. Cursor uses AGENTS.md.
+  source: Block ai-rules
+  source_kind: open_source_implementation
+  organization: Block
+  independence_group: block
+  url: https://github.com/block/ai-rules
+  resolved_url: https://github.com/block/ai-rules
+  content_sha256: 731f6c0fc73f3ffff0c0ffd269e0dcdabb2bb3a132f0523ddaa9630ced49fd73
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Runnable open source CLI generates agent-specific instruction files from a shared AI rules source.
+- tier: T1
+  match: aliased
+  mechanism_quote: When anyone edits `.ai-rules.yaml` and pushes, GitHub Actions automatically re-generates and commits `CLAUDE.md`, `.cursorrules`, `AGENTS.md`, and all other AI tool config files.
+  source: Sync AI Agent Rules GitHub Action
+  source_kind: open_source_implementation
+  organization: Edwarddev0723
+  independence_group: edwarddev0723
+  url: https://github.com/marketplace/actions/sync-ai-agent-rules
+  resolved_url: https://github.com/marketplace/actions/sync-ai-agent-rules
+  content_sha256: 604d234f3a9f8e6e33e61d7d6629bc08b17a67e6135c4d3f60282728e8853658
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Runnable GitHub Action keeps multiple assistant configuration files synchronized from a shared .ai-rules.yaml source.
+- tier: T2
+  match: aliased
+  mechanism_quote: This guide demonstrates how to centralize these instructions in Port, and automatically sync them back into GitHub repositories whenever they are updated.
+  source: Port Manage AI Instructions guide
+  source_kind: reference_architecture
+  organization: Port
+  independence_group: port
+  url: https://docs.port.io/guides/all/manage-ai-instructions/
+  resolved_url: https://docs.port.io/guides/all/manage-ai-instructions/
+  content_sha256: 9b1041a0b6a198467c2ecc705416a7ac40cb65d8297b207725b61d040c9b2ae6
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Reference architecture centralizes AI instructions and syncs them into GitHub repositories as AGENTS.md updates.
+- tier: T4
+  match: aliased
+  mechanism_quote: If you use more than one tool, things drift fast. So I keep one repo as the source of truth for my AI setup, then wire my tools and projects back to it.
+  source: Kaushik Gopal, Keep your AGENTS.md in sync
+  source_kind: practitioner_report
+  organization: Kaushik Gopal
+  independence_group: kaushik-gopal
+  url: https://kau.sh/blog/agents-md/
+  resolved_url: https://kau.sh/blog/agents-md/
+  content_sha256: b6a8008e3f6054fcf5ce7d27b25fbefa473636d50fba94efc1eb62cd80386105
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2026-03-08'
+  retrieved: '2026-07-10'
+  claim: Practitioner report describes a shared repository as the source of truth for AI instructions, skills, commands, and compatibility files wired back into tools and projects.
+verdict: verified

@@ -1,0 +1,107 @@
+schema_version: 2
+provenance_status: complete
+pattern: Evidence Automation
+slug: evidence-automation
+last_checked: '2026-07-10'
+search:
+  run_id: 'github-actions:29123202495'
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - '"Evidence Automation" "audit evidence"'
+      - '"Evidence Automation" compliance evidence'
+      candidate_count: 3
+    mechanism:
+      queries:
+      - automated compliance evidence collection from access logs security configurations audit trails
+      - automatically collect audit evidence from CloudTrail AWS Config compliance assessment
+      - continuous compliance automated evidence collection SOC 2 audit readiness
+      candidate_count: 8
+    artifact:
+      queries:
+      - GitHub code search automated compliance evidence collection SOC 2 action audit
+      candidate_count: 1
+adoption_score: 12
+tier_counts:
+  T1: 2
+  T4: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: strong
+terminology_variants:
+- term: automated compliance
+  used_by: Vanta and Thoropass
+  url: https://www.thoropass.com/platform/compliance-automation
+- term: automated evidence collection
+  used_by: Vanta and Unosecur
+  url: https://help.vanta.com/en/articles/11690312-audit-101-how-audits-work
+- term: audit evidence automation
+  used_by: DSG.AI
+  url: https://www.dsg.ai/audit-evidence-automation
+evidence:
+- tier: T1
+  match: named
+  mechanism_quote: Having everything on one platform means you can automatically connect the right monitors
+    and features that generate auditor approved evidence,  directly communicate in the platform with your
+    auditor, and transparently know where you are in your audit process.
+  source: 'Thoropass: Compliance Automation product page'
+  source_kind: shipped_product
+  organization: Thoropass
+  independence_group: thoropass
+  url: https://www.thoropass.com/platform/compliance-automation
+  resolved_url: https://www.thoropass.com/platform/compliance-automation
+  content_sha256: 3db4e985e1df142cb05265ba0eb3a482c055de5b51e9fcf3d359fea7636b31c9
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Thoropass ships a compliance automation platform with evidence automation capabilities that
+    generate auditor-approved evidence from connected monitors and platform features.
+- tier: T1
+  match: named
+  mechanism_quote: Evidence intake, weak-support flags, control mapping, and source-linked workpaper drafts.
+  source: 'DSG.AI: Audit Evidence Automation product page'
+  source_kind: shipped_product
+  organization: DSG.AI
+  independence_group: dsg.ai
+  url: https://www.dsg.ai/audit-evidence-automation
+  resolved_url: https://www.dsg.ai/audit-evidence-automation
+  content_sha256: 75bc4928e4ec5a8d987fbbd9752274758b0457d0f871dbc5edc014ee757cf7dd
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: DSG.AI ships an audit evidence automation product that handles evidence intake, support
+    quality flags, control mapping, and source-linked workpaper drafts.
+- tier: T4
+  match: aliased
+  mechanism_quote: Applying its automation, Vanta gathered 90% of the evidence-a critical part of security,
+    including access logs, security configurations, and audit trails-preparation for both our internal and
+    external audits.
+  source: 'Unosecur: Why Does SOC2 Matter and How Does Unosecur Achieve the Certification?'
+  source_kind: case_study
+  organization: Unosecur
+  independence_group: unosecur
+  url: https://www.unosecur.com/resources/blog/why-does-soc2-matter-and-how-does-unosecur-achieve-the-certification
+  resolved_url: https://www.unosecur.com/resources/blog/why-does-soc2-matter-and-how-does-unosecur-achieve-the-certification
+  content_sha256: 5d8ef6021a7e83c4848623523a90c1af8c8e58e4ced47d302d4e6479394c9c8c
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Unosecur reports using Vanta automation to gather most SOC 2 audit evidence, including access
+    logs, security configurations, and audit trails.
+verdict: verified

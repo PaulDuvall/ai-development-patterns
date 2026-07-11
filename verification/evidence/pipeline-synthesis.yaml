@@ -1,0 +1,100 @@
+schema_version: 2
+provenance_status: complete
+pattern: Pipeline Synthesis
+slug: pipeline-synthesis
+last_checked: 2026-07-10
+search:
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - '"Pipeline Synthesis" AI development pattern CI/CD'
+        - '"Pipeline Synthesis" "CI/CD" "AI"'
+        - '"plain-English" build specifications CI/CD pipeline configurations'
+      candidate_count: 6
+    mechanism:
+      queries:
+        - GitHub Copilot generate GitHub Actions workflow natural language documentation
+        - generate CI/CD pipeline YAML from natural language AI product
+        - ChatGPT write CI/CD pipeline practitioner report GitHub Actions workflow
+      candidate_count: 9
+    artifact:
+      queries:
+        - AutoPipelineAI GitHub CI/CD pipeline generation natural language
+        - '"AutoPipelineAI" GitHub'
+        - '"natural language" "generates GitHub Actions YAML" "gh aw compile"'
+      candidate_count: 4
+adoption_score: 9
+tier_counts: {T1: 1, T4: 2}
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: aliased
+terminology_variants:
+  - term: Agentic Workflows
+    used_by: GitHub
+    url: https://raw.githubusercontent.com/github/gh-aw/main/README.md
+  - term: AutoPipelineAI
+    used_by: AutoPipelineAI authors
+    url: https://arxiv.org/html/2606.06662v1
+evidence:
+  - tier: T1
+    match: aliased
+    mechanism_quote: "Write agentic workflows in natural language markdown, and run them in GitHub Actions."
+    source: GitHub Agentic Workflows
+    source_kind: open_source_implementation
+    organization: GitHub
+    independence_group: github
+    url: https://raw.githubusercontent.com/github/gh-aw/main/README.md
+    resolved_url: https://raw.githubusercontent.com/github/gh-aw/main/README.md
+    content_sha256: 4a2c14d250af15c78faa03f15602809e554d4cc3c138f1f1b889480eb10b9b5d
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable GitHub CLI extension lets users define agentic workflows in natural-language Markdown and run them through GitHub Actions.
+  - tier: T4
+    match: aliased
+    mechanism_quote: "Run `gh aw compile issue-triage` and it generates a fully functional GitHub Actions workflow with AI orchestration built in."
+    source: GitHub Agentic Workflows Hands-On Guide
+    source_kind: practitioner_report
+    organization: htek.dev
+    independence_group: htek.dev
+    url: https://htek.dev/articles/github-agentic-workflows-hands-on-guide
+    resolved_url: https://htek.dev/articles/github-agentic-workflows-hands-on-guide
+    content_sha256: ee9abb509b2bf79c3642a3ac4f05f8ec604bafed60d4258b280cfc2f45a7d83d
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2026-02-16
+    retrieved: 2026-07-10
+    claim: Practitioner report describes compiling a plain-English issue-triage workflow into generated GitHub Actions YAML and running multiple workflows.
+  - tier: T4
+    match: aliased
+    mechanism_quote: "This paper introduces the AutoPipelineAI system, which generates CI/CD pipeline configurations using natural language descriptions."
+    source: AutoPipelineAI
+    source_kind: case_study
+    organization: Cairo University
+    independence_group: cairo-university
+    url: https://arxiv.org/html/2606.06662v1
+    resolved_url: https://arxiv.org/html/2606.06662v1
+    content_sha256: 2cf133ffa51238f85167838da7afae67524553571f79490db0e004e387af306c
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2026-06-04
+    retrieved: 2026-07-10
+    claim: Case study presents a context-aware system that translates natural-language CI/CD intent into validated GitHub Actions and GitLab CI/CD pipeline scripts.
+verdict: verified

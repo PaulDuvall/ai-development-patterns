@@ -1,0 +1,104 @@
+schema_version: 2
+provenance_status: complete
+pattern: Guided Refactoring
+slug: guided-refactoring
+last_checked: 2026-07-10
+search:
+  run_id: github-actions:29123202495
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - guided refactoring AI code smells tests metrics
+        - AI refactoring code smells test coverage quality metrics
+      candidate_count: 3
+    mechanism:
+      queries:
+        - AI assisted refactoring detect code smells validate tests
+        - GitHub Copilot refactoring code smell tests documentation
+        - case study AI refactoring code smells GitHub Copilot refactored codebase tests
+      candidate_count: 4
+    artifact:
+      queries:
+        - code_health_review refactoring MCP
+        - AI CodeFix eligible issues apply the fix
+        - Refactor selected code Copilot tests
+      candidate_count: 6
+adoption_score: 11
+tier_counts:
+  T1: 1
+  T2: 1
+  T4: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: aliased
+terminology_variants:
+  - term: AI CodeFix
+    used_by: SonarSource
+    url: https://docs.sonarsource.com/sonarqube-server/project-administration/ai-features/enable-ai-codefix
+  - term: agentic refactoring
+    used_by: CodeScene
+    url: https://codescene.com/blog/making-legacy-code-ai-ready-benchmarks-on-agentic-refactoring
+  - term: MCP-guided refactoring
+    used_by: CodeScene
+    url: https://codescene.com/blog/making-legacy-code-ai-ready-benchmarks-on-agentic-refactoring
+evidence:
+  - tier: T1
+    match: aliased
+    mechanism_quote: Copilot can help you to split up complex blocks of code into smaller units that are more suitable for reuse.
+    source: GitHub Copilot, refactoring tutorial
+    source_kind: shipped_product
+    organization: GitHub
+    independence_group: github
+    url: https://docs.github.com/en/copilot/tutorials/refactor-code
+    resolved_url: https://docs.github.com/en/copilot/tutorials/refactor-code
+    content_sha256: cb63e93f3a0c3827a4c408274403a99af49e455b16ea388276a17e5950c74bef
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: GitHub Copilot is a shipped coding-assistant product whose official refactoring tutorial shows developers using Copilot to restructure complex code into smaller reusable units.
+  - tier: T2
+    match: aliased
+    mechanism_quote: When an Instance Admin enables AI CodeFix for your project, you can get an AI-generated fix suggestion for eligible issues.
+    source: SonarQube Server AI CodeFix documentation
+    source_kind: official_documentation
+    organization: SonarSource
+    independence_group: sonarsource
+    url: https://docs.sonarsource.com/sonarqube-server/project-administration/ai-features/enable-ai-codefix
+    resolved_url: https://docs.sonarsource.com/sonarqube-server/project-administration/ai-features/enable-ai-codefix
+    content_sha256: 47c058077f33baf8b25994436433e9f856c2953bf6786b83d9778260e52a4022
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: SonarSource's canonical SonarQube Server documentation describes AI CodeFix generating fixes for eligible static-analysis issues and applying them from SonarQube or connected IDEs.
+  - tier: T4
+    match: aliased
+    mechanism_quote: After each iteration, the agent re-measures progress against Code Health, creating a tight feedback loop.
+    source: CodeScene blog, Making Legacy Code AI-Ready
+    source_kind: practitioner_report
+    organization: CodeScene
+    independence_group: codescene
+    url: https://codescene.com/blog/making-legacy-code-ai-ready-benchmarks-on-agentic-refactoring
+    resolved_url: https://codescene.com/blog/making-legacy-code-ai-ready-benchmarks-on-agentic-refactoring
+    content_sha256: 4aa9ccdc372c3470c02844ac17f1411c8a10c8e5a7c2b98f7176336bb3ec8c0c
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2026-03-18
+    retrieved: 2026-07-10
+    claim: CodeScene reports a benchmarked MCP-guided refactoring workflow where Claude Code receives Code Health feedback, forms a structured refactoring plan, runs correctness tests, and remeasures Code Health after each iteration.
+verdict: verified

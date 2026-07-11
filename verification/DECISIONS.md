@@ -27,15 +27,42 @@ Alignment values come from each pattern's `evidence/<slug>.yaml`; rules are defi
 
 | Pattern | Alignment | Industry terms | Recommendation | Decision |
 |---------|-----------|----------------|----------------|----------|
-| Agent Readiness | strong | *agent readiness* (Factory.ai, Kodus); *AI readiness assessment* (Microsoft — org-level, a name collision) | **Keep — accepted rename from Readiness Assessment** (most sources use the agent-readiness term; the former name collided with org-level AI readiness) | Accepted 2026-07-10 — canonical rename applied |
+| Agent Readiness | strong | *agent readiness* (Factory.ai, Kodus); *agent-ready codebase* (Upsun); *AI readiness checklist* (independent practitioner); *AI maturity self-assessment* (Coder) | **Keep — accepted rename from Readiness Assessment** (most sources use the agent-readiness term; the former name collided with org-level AI readiness) | Accepted 2026-07-10 — canonical rename applied |
 | Incremental Generation | aliased | no stable industry name; *progressive enhancement* collides with the established web-design term | **Keep — accepted rename from Progressive Enhancement** (the new catalog name describes the mechanism without retaining the collision) | Accepted 2026-07-10 — canonical rename applied |
 | Agent Memory | strong | *memory* / *agent memory* (Anthropic, Cline, MemGPT) | **Keep — accepted rename from Context Persistence** (memory terminology is consistent across sources) | Accepted 2026-07-10 — canonical rename applied |
-| Codified Rules | weak | `AGENTS.md` (open format), *Rules* (Cursor), `CLAUDE.md` (Anthropic), *repository custom instructions* (GitHub Copilot) | Keep + alias | Accepted 2026-07-04 — alias mentions merged (PR #29) |
+| Codified Rules | aliased | `AGENTS.md` (open format), *Rules* (Cursor), `CLAUDE.md` (Anthropic), *repository custom instructions* (GitHub Copilot) | Keep + alias | Accepted 2026-07-04 — alias mentions merged (PR #29) |
 | Tool Integration | aliased | *tool use* (Anthropic), *function calling* (OpenAI), *MCP* | Keep + alias | Accepted 2026-07-04 — alias mentions merged (PR #29) |
 | Planned Implementation | aliased | *plan mode* (Cursor, Claude Code) | Keep + alias (a Plan Mode rename would strain the principle-not-vendor-feature rule) | Accepted 2026-07-04 — alias mention merged (PR #29) |
 | Security Sandbox | strong | *sandboxing*, *devcontainer isolation*, *execution isolation*, *microVM sandbox* | Keep (most independently scoreable sources use our word; no spec-compliant candidate beats it) | Accepted 2026-07-04 |
-| Issue Generation | weak | no dominant competing term | Keep | Accepted 2026-07-04 |
+| Issue Generation | aliased | no dominant competing term | Keep | Accepted 2026-07-04 |
 | Developer Lifecycle | aliased | *AI-DLC* (AWS), spec-driven workflow framings | Keep (note the scope overlap with Spec-Driven Development) | Accepted 2026-07-04 |
+| Asynchronous Research | aliased | code research; async coding agents; cloud-based software engineering agent; coding agent / cloud agent | Review naming signal | — |
+| Atomic Decomposition | aliased | Task splitting and ownership; Sectioning; Contract-first fan-out | Review naming signal | — |
+| Autonomous Defense | aliased | Security Copilot agents; agentic SOC; AI SOC analyst; autonomous SOC | Review naming signal | — |
+| Autonomous Remediation | aliased | Copilot Autofix; Autofix; automated program repair | Review naming signal | — |
+| Bounded Autonomy | none | No stable industry term recorded | Review naming signal | — |
+| Centralized Rules | aliased | AI rules; AI instructions; AGENTS.md single source of truth | Review naming signal | — |
+| ChatOps Security | aliased | ChatOps solution; ChatOps for Security Operations | Review naming signal | — |
+| Context Optimization | aliased | LLM routing; dynamic model routing; choosing the right model | Review naming signal | — |
+| Error Resolution | aliased | Repairing Programs; Fix with Copilot; AI Root Cause Analysis | Review naming signal | — |
+| Event Automation | aliased | hooks; plugins; AI agent hooks | Review naming signal | — |
+| Feedback Flywheel | weak | harness engineering; living context | Review naming signal | — |
+| Guided Architecture | aliased | Domain modeling backbone pipeline; AWS Well-Architected reviews with Generative AI; Architectural design decisions | Review naming signal | — |
+| Guided Refactoring | aliased | AI CodeFix; agentic refactoring; MCP-guided refactoring | Review naming signal | — |
+| Handoff Automation | aliased | handoff summary; shift notifications; outage summary | Review naming signal | — |
+| Handoff Protocols | aliased | coding agent; human-in-the-loop; agent-generated PR | Review naming signal | — |
+| Image Spec | aliased | Screenshots and Files; Design to code; screenshot-to-code | Review naming signal | — |
+| Incident Automation | aliased | AI-generated runbook; AI SRE; Vibe OnCall | Review naming signal | — |
+| Long-Running Orchestration | aliased | cloud tasks; autonomous AI software engineer; Copilot cloud agent; background agents | Review naming signal | — |
+| Observable Development | aliased | LLM engineering platform; AI observability; tracing; agent observability; Harness Engineering | Review naming signal | — |
+| Pipeline Synthesis | aliased | Agentic Workflows; AutoPipelineAI | Review naming signal | — |
+| Policy Generation | weak | NL2Cedar; OPA AI assistant; Dynamic Kubernetes Policy Generator | Review naming signal | — |
+| Release Synthesis | aliased | release-please; release-notes-generator; automatically generated release notes; Semantic Release | Review naming signal | — |
+| Review Automation | aliased | automated PR reviews; automatic code review; AI code review | Review naming signal | — |
+| Suite Health | aliased | flaky test management; flaky test detection; automated detection and suppression | Review naming signal | — |
+| Testing Orchestration | aliased | automated unit test generation; writing tests with GitHub Copilot; automated unit test improvement | Review naming signal | — |
+| Upgrade Advisor | aliased | automated dependency update tool; Dependabot version updates / Dependabot security updates; Automatic Fix PRs; automatic pull requests with Renovate | Review naming signal | — |
+| Workflow Orchestration | weak | orchestration framework; workflow orchestration agents; human-in-the-loop AI agents | Review naming signal | — |
 
 This ledger retains earlier human naming decisions while evidence is refreshed independently.
 Current coverage, provenance, verdicts, and freshness are generated in `STATUS.md`. A pattern may

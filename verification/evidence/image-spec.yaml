@@ -1,0 +1,127 @@
+schema_version: 2
+provenance_status: complete
+pattern: Image Spec
+slug: image-spec
+last_checked: '2026-07-10'
+search:
+  run_id: github-actions:29123202495
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - '"image spec" "AI coding"'
+      candidate_count: 3
+    mechanism:
+      queries:
+      - '"upload images" "AI coding" "mockups"'
+      - '"v0" "screenshots" "generates code" "replicate the design interface"'
+      - '"Paste a design mockup" "agent sees the image" Cursor'
+      candidate_count: 5
+    artifact:
+      queries:
+      - '"screenshot to code" "GitHub" "React"'
+      candidate_count: 5
+adoption_score: 16
+tier_counts:
+  T1: 2
+  T2: 1
+  T4: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 4
+naming_alignment: aliased
+terminology_variants:
+- term: Screenshots and Files
+  used_by: v0 documentation
+  url: https://v0.app/docs/screenshots
+- term: Design to code
+  used_by: Cursor agent best-practices guidance
+  url: https://cursor.com/blog/agent-best-practices
+- term: screenshot-to-code
+  used_by: abi/screenshot-to-code and Orkes practitioner report
+  url: https://github.com/abi/screenshot-to-code
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: The v0 attachment feature allows users to upload or drag and drop files into the chat.
+    v0 analyzes these files and generates code to replicate the design interface shown
+  source: v0 Docs - Screenshots and Files
+  source_kind: shipped_product
+  organization: Vercel
+  independence_group: vercel
+  url: https://v0.app/docs/screenshots
+  resolved_url: https://v0.app/docs/screenshots
+  content_sha256: 46918cc8d100277b53724b55e41bd806750e1080287ccf30a4ed90a73fccddc6
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: v0 ships a product workflow where users attach screenshots, mockups, or wireframes in chat
+    and the tool generates code that replicates the visible interface.
+- tier: T1
+  match: aliased
+  mechanism_quote: Convert screenshots, mockups, Figma designs, and screen recordings into clean, functional
+    code using AI.
+  source: Abi Raja - screenshot-to-code
+  source_kind: open_source_implementation
+  organization: Abi Raja
+  independence_group: independent:abi-raja
+  url: https://github.com/abi/screenshot-to-code
+  resolved_url: https://github.com/abi/screenshot-to-code
+  content_sha256: b3953f5b1a9dd0ce4322ac4d2a30dadfdcff6686dfaf84c0f5c8dd17112f806b
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: The open-source screenshot-to-code app provides a runnable image-to-code implementation for
+    turning screenshots, mockups, Figma designs, and screen recordings into UI code.
+- tier: T2
+  match: aliased
+  mechanism_quote: Paste a design mockup and ask the agent to implement it. The agent sees the image
+    and can match layouts, colors, and spacing.
+  source: Cursor - Best practices for coding with agents
+  source_kind: official_documentation
+  organization: Cursor
+  independence_group: cursor
+  url: https://cursor.com/blog/agent-best-practices
+  resolved_url: https://cursor.com/blog/agent-best-practices
+  content_sha256: 60ab23c8e18aacc5fcaecaf72fd9531622fe4de460632b995c43203762634372
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2026-01-09'
+  retrieved: '2026-07-10'
+  claim: Cursor's official agent guidance recommends including images in prompts, specifically pasting
+    design mockups so the coding agent can implement layouts, colors, and spacing from visual context.
+- tier: T4
+  match: aliased
+  mechanism_quote: accept the image upload through the web UI, pass the screenshot to a visual LLM model,
+    generate a complete React and Typescript component, and then return the code back to me.
+  source: Orkes - How to Build a UI Screenshot-to-Code AI Agent
+  source_kind: practitioner_report
+  organization: Orkes
+  independence_group: orkes
+  url: https://www.orkes.io/blog/how-to-build-a-screenshot-to-react-ai-agent
+  resolved_url: https://www.orkes.io/blog/how-to-build-a-screenshot-to-react-ai-agent
+  content_sha256: 5f55ce09a4f13092285d27a9c24ce0cd993ca7971118672ab14bb774576cbce5
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2026-07-09'
+  retrieved: '2026-07-10'
+  claim: Orkes publishes a practitioner implementation report for a screenshot-to-React agent that accepts
+    an image upload, passes it to a visual LLM, and returns a generated React and TypeScript component.
+verdict: verified

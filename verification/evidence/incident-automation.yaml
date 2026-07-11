@@ -1,0 +1,120 @@
+schema_version: 2
+provenance_status: complete
+pattern: Incident Automation
+slug: incident-automation
+last_checked: '2026-07-10'
+search:
+  run_id: 'github-actions:29123202495'
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - '"Incident Automation" AI generate runbooks historical incidents'
+      - AI incident management generate runbooks from past incidents
+      candidate_count: 5
+    mechanism:
+      queries:
+      - AI learns from past incident resolutions suggest runbooks
+      - automated incident resolution AI runbooks previous incidents
+      - AI SRE correlate logs metrics deployments past incidents
+      - AI incident response similar incidents remediation actions
+      candidate_count: 9
+    artifact:
+      queries:
+      - GitHub code search incident runbook generator LLM
+      - GitHub code search PagerDuty incident AI runbook automation
+      candidate_count: 2
+adoption_score: 16
+tier_counts:
+  T1: 2
+  T2: 1
+  T4: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 4
+naming_alignment: aliased
+terminology_variants:
+- term: AI-generated runbook
+  used_by: PagerDuty Runbook Automation
+  url: https://www.pagerduty.com/platform/automation/runbook/
+- term: AI SRE
+  used_by: Harness and Microsoft
+  url: https://developer.harness.io/docs/ai-sre/runbooks/
+- term: Vibe OnCall
+  used_by: Vibranium Labs and Shutterstock
+  url: https://vibraniumlabs.ai/customers/shutterstock
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: Runbook Automation users have access to AI-generated Runbook feature to quickly start new jobs.
+  source: PagerDuty Runbook Automation
+  source_kind: shipped_product
+  organization: PagerDuty
+  independence_group: pagerduty
+  url: https://www.pagerduty.com/platform/automation/runbook/
+  resolved_url: https://www.pagerduty.com/platform/automation/runbook/
+  content_sha256: 07764b1d105021c3b13356ec3a106e227ceae9b94be9fd616eaac2a05fbe1e43
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: PagerDuty ships a runbook automation product with an AI-generated runbook feature for creating incident response jobs.
+- tier: T1
+  match: aliased
+  mechanism_quote: Harness AI SRE allows teams to automate incident resolution by leveraging Runbook automation.
+  source: Harness AI SRE Runbooks documentation
+  source_kind: shipped_product
+  organization: Harness
+  independence_group: harness
+  url: https://developer.harness.io/docs/ai-sre/runbooks/
+  resolved_url: https://developer.harness.io/docs/ai-sre/runbooks/
+  content_sha256: f943c82821fd307b7ac34bc5c67725d0d9469a53a7994485b571ba5aabc91746
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Harness ships AI SRE runbook automation that executes predefined incident-resolution workflows from incident triggers.
+- tier: T2
+  match: aliased
+  mechanism_quote: It automatically correlates logs, metrics, deployments, and past incidents.
+  source: Microsoft Azure SRE Agent incident response documentation
+  source_kind: official_documentation
+  organization: Microsoft
+  independence_group: microsoft
+  url: https://learn.microsoft.com/en-us/azure/sre-agent/incident-response
+  resolved_url: https://learn.microsoft.com/en-us/azure/sre-agent/incident-response
+  content_sha256: 112979e9139d9f5cf17dfb8a9e4c58deb99242d3e9e32b2f9957f21c45128e69
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Microsoft official documentation describes an AI SRE agent that uses past incidents alongside operational telemetry during incident response.
+- tier: T4
+  match: aliased
+  mechanism_quote: By accurately capturing detail, reviewing historical incidents, identifying patterns, and proposing targeted remediation actions, Vibe OnCall has played a significant role in reducing our Mean Time to Resolution (MTTR).
+  source: Vibranium Labs customer story with Shutterstock
+  source_kind: case_study
+  organization: Vibranium Labs
+  independence_group: vibranium-labs
+  url: https://vibraniumlabs.ai/customers/shutterstock
+  resolved_url: https://vibraniumlabs.ai/customers/shutterstock
+  content_sha256: 1996875b598e7d7771b2831ffe86bdca7446a0f2e330203e5f35c611c0eef7bf
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: The customer story reports production use of Vibe OnCall to review historical incidents, identify patterns, and propose remediation actions that reduce MTTR.
+verdict: verified

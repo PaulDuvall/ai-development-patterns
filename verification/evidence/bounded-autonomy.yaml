@@ -1,0 +1,141 @@
+schema_version: 2
+provenance_status: complete
+pattern: Bounded Autonomy
+slug: bounded-autonomy
+last_checked: '2026-07-10'
+search:
+  run_id: github-actions:29123202495
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - bounded autonomy coding agents max turns budget evidence trail
+      - bounded autonomy autonomous coding agent budget cap
+      - bounded autonomy agentic loop verification reach
+      candidate_count: 3
+    mechanism:
+      queries:
+      - autonomous coding agent max steps cost limit trajectory logs
+      - autonomous agent loop max turns budget cap structured output
+      - coding agent CI max turns budget cap json output
+      - agent workflow stop condition max messages token usage timeout
+      - graph agent recursion limit stop condition
+      candidate_count: 6
+    artifact:
+      queries:
+      - Claude Code --max-turns --output-format json CLI reference
+      - SWE-agent per_instance_cost_limit trajectory JSON
+      - AutoGen MaxMessageTermination TokenUsageTermination TimeoutTermination
+      - LangGraph recursion_limit GRAPH_RECURSION_LIMIT
+      candidate_count: 5
+adoption_score: 20
+tier_counts:
+  T1: 2
+  T2: 2
+  T4: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 5
+naming_alignment: none
+terminology_variants: []
+evidence:
+- tier: T1
+  match: unnamed
+  mechanism_quote: Limit the number of agentic turns (print mode only). Exits with an error when the limit
+    is reached. No limit by default.
+  source: Claude Code CLI reference
+  source_kind: shipped_product
+  organization: Anthropic
+  independence_group: anthropic
+  url: https://docs.anthropic.com/en/docs/claude-code/cli-reference
+  resolved_url: https://code.claude.com/docs/en/cli-reference
+  content_sha256: ce4d6cd5acc3f97d876df25262b45956f80a6ae94e87bfc53a655bc78022f1de
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2026-07-09'
+  retrieved: '2026-07-10'
+  claim: Claude Code ships a runnable CLI control that bounds non-interactive agent loops by maximum
+    agentic turns.
+- tier: T1
+  match: unnamed
+  mechanism_quote: Cost limit for every instance (task).
+  source: SWE-agent model configuration reference
+  source_kind: open_source_implementation
+  organization: SWE-agent
+  independence_group: swe-agent
+  url: https://swe-agent.com/latest/reference/model_config/
+  resolved_url: https://swe-agent.com/latest/reference/model_config/
+  content_sha256: 0a5f5390c44232136ef86a8a37c067821788e3608fadc31098ea9b2df9ea12cc
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: SWE-agent exposes a per-task cost ceiling in its runnable agent model configuration.
+- tier: T2
+  match: unnamed
+  mechanism_quote: 'MaxMessageTermination: Stops after a specified number of messages have been produced,
+    including both agent and task messages.'
+  source: Microsoft AutoGen termination tutorial
+  source_kind: official_documentation
+  organization: Microsoft
+  independence_group: microsoft
+  url: https://microsoft.github.io/autogen/stable/user-guide/agentchat-user-guide/tutorial/termination.html
+  resolved_url: https://microsoft.github.io/autogen/stable/user-guide/agentchat-user-guide/tutorial/termination.html
+  content_sha256: e4dbcd34aca1178a1b04484e0256ade13af7e962436ab68d5778013f0736de27
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: AutoGen's canonical agent-chat guidance documents explicit termination conditions for bounded
+    multi-agent runs.
+- tier: T2
+  match: unnamed
+  mechanism_quote: The recursion limit sets the maximum number of super-steps the graph can execute during
+    a single execution.
+  source: LangGraph graph API documentation
+  source_kind: official_documentation
+  organization: LangChain
+  independence_group: langchain
+  url: https://docs.langchain.com/oss/python/langgraph/graph-api
+  resolved_url: https://docs.langchain.com/oss/python/langgraph/graph-api
+  content_sha256: b2cf97a977b3eb5eae1566bf292abb66a4fdb9bda960a59ade7de42a571605db
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: LangGraph's official graph API guidance documents an execution-step ceiling for agent graphs.
+- tier: T4
+  match: unnamed
+  mechanism_quote: acts as a circuit breaker on everything else, killing the process before it burns through
+    your Anthropic credits
+  source: Trigger.dev, 10 Claude Code Tips You Did Not Know
+  source_kind: practitioner_report
+  organization: Trigger.dev
+  independence_group: trigger-dev
+  url: https://trigger.dev/blog/10-claude-code-tips-you-did-not-know
+  resolved_url: https://trigger.dev/blog/10-claude-code-tips-you-did-not-know
+  content_sha256: 40841fc4cffc0e60c3437f71f559ede414b3e32f586118729a01efa51429dc73
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2026-03-12'
+  retrieved: '2026-07-10'
+  claim: Trigger.dev reports a headless CI/CD usage pattern for Claude Code with max-turn and budget caps
+    as hard boundaries around autonomous agent execution.
+verdict: verified

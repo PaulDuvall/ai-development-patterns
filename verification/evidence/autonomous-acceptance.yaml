@@ -1,0 +1,111 @@
+schema_version: 2
+provenance_status: complete
+pattern: Autonomous Acceptance
+slug: autonomous-acceptance
+last_checked: 2026-07-10
+search:
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - '"Autonomous Acceptance" "AI" "Software Factory"'
+        - '"Software Factory" StrongDM "without human review"'
+      candidate_count: 10
+    mechanism:
+      queries:
+        - '"acceptance policy" "coding agents" "attestation"'
+        - '"signed attestation" "required status checks" "policy gate"'
+      candidate_count: 6
+    artifact:
+      queries:
+        - 'site:github.com/strongdm/attractor "Validate" "agent" "harness"'
+        - 'site:github.com/strongdm "software factory" "scenarios"'
+        - 'site:github.com "attest-build-provenance" "required status checks"'
+      candidate_count: 8
+adoption_score: 10
+tier_counts: {T2: 1, T4: 3}
+adoption_dimensions:
+  implementation_available: false
+  independent_adoption: false
+  independence_groups: 4
+naming_alignment: aliased
+terminology_variants:
+  - term: Software Factory
+    used_by: StrongDM
+    url: https://factory.strongdm.ai/
+evidence:
+  - tier: T4
+    match: aliased
+    mechanism_quote: "We built a Software Factory: non-interactive development where specs + scenarios drive agents that write code, run harnesses, and converge without human review."
+    source: StrongDM Software Factory
+    source_kind: practitioner_report
+    organization: StrongDM
+    independence_group: strongdm
+    url: https://factory.strongdm.ai/
+    resolved_url: https://factory.strongdm.ai/
+    content_sha256: 4eb1da3e8add5d0192aeac0e02e17fd95ae458f63ad5c6e95b4b5f12b5f768e2
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: StrongDM reports a Software Factory workflow where specifications and scenarios drive coding agents through harnesses until they converge without human review.
+  - tier: T4
+    match: aliased
+    mechanism_quote: "That idea of treating scenarios as holdout sets—used to evaluate the software but not stored where the coding agents can see them—is fascinating."
+    source: How StrongDM's AI team build serious software without even looking at the code
+    source_kind: practitioner_report
+    organization: Simon Willison
+    independence_group: simon-willison
+    url: https://simonwillison.net/2026/Feb/7/software-factory/
+    resolved_url: https://simonwillison.net/2026/Feb/7/software-factory/
+    content_sha256: 4222b87212bff422e2685f832fef2c3c9613c8845238f3745f3b5ae722f61135
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2026-02-07
+    retrieved: 2026-07-10
+    claim: The independent report describes StrongDM's Software Factory as using hidden scenario holdout sets to evaluate agent-produced software instead of normal human code review.
+  - tier: T4
+    match: unnamed
+    mechanism_quote: "Another interesting concept we can implement is a policy gate for releases using attestations."
+    source: How Palantir Mastered In-Toto
+    source_kind: case_study
+    organization: Palantir
+    independence_group: palantir
+    url: https://blog.palantir.com/how-palantir-mastered-in-toto-b8a7107371bb
+    resolved_url: https://blog.palantir.com/how-palantir-mastered-in-toto-b8a7107371bb?gi=7124838e2b03
+    content_sha256: f5fe80aec8b1586edf3fcbcb6a1752930bb1438b8e0540d66e8ce2ea9e401dc8
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Palantir describes a release policy gate backed by attestations, supporting the attested-control portion of the pattern without tying it to coding agents.
+  - tier: T2
+    match: unnamed
+    mechanism_quote: "After enabling required status checks, all required status checks must pass before collaborators can merge changes into the branch or tag."
+    source: GitHub rulesets documentation
+    source_kind: official_documentation
+    organization: GitHub
+    independence_group: github
+    url: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets
+    resolved_url: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets
+    content_sha256: f8b3cb2ac2ecc742c1a9f28f6e0c2431490e360c3ecf735570ef25192b5241df
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: GitHub documents a canonical machine-enforced merge gate where required checks must pass before changes can merge.
+verdict: weak

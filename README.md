@@ -453,7 +453,7 @@ Foundation patterns establish the essential infrastructure and team readiness re
 
 **Related Patterns**: [Codified Rules](#codified-rules), [Issue Generation](#issue-generation)
 
-**Source**: Factory.ai, "[Agent Readiness](https://factory.ai/product/agent-readiness)"; Eno Reyes, "[Making Codebases Agent Ready](https://www.youtube.com/watch?v=ShuJ_CN6zr4)" (AI Engineer), December 22, 2025
+**Source**: Factory.ai, "[Agent Readiness](https://factory.ai/product/agent-readiness)"; Kodus, "[agent-readiness](https://github.com/kodustech/agent-readiness)"; Guillaume Moigneu, "[Making coding agents reliable](https://developer.upsun.com/posts/ai/making-coding-agents-reliable)", February 17, 2026
 
 Industry tooling commonly calls this practice *agent readiness* (Factory.ai, Kodus) or an *AI readiness assessment* (Microsoft).
 

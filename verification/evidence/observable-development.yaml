@@ -1,0 +1,159 @@
+schema_version: 2
+provenance_status: complete
+pattern: Observable Development
+slug: observable-development
+last_checked: 2026-07-10
+search:
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - Observable Development AI coding agents structured logging tracing observability self-correct
+        - '"observable development" "AI" "logs" "traces"'
+        - '"AI agent observability" traces logs evaluations debugging agents'
+        - '"LLM observability" traces evaluations debug AI applications'
+      candidate_count: 8
+    mechanism:
+      queries:
+        - '"structured logs" "correlation_id" "AI" "debug" "agent"'
+        - '"traces" "tool calls" "handoffs" "guardrails" "agent" "debug"'
+        - '"logs and traces" "feedback signal" agent self-correct'
+        - '"computational" "inferential" "guides" "sensors" "agent" "self-correct"'
+      candidate_count: 7
+    artifact:
+      queries:
+        - site:github.com/langfuse/langfuse "open source LLM engineering platform" "debug AI applications"
+        - site:github.com/Arize-ai/phoenix "AI observability platform" "experimentation, evaluation, and troubleshooting"
+        - site:github.com "openai-agents-python" "tracing" "tool calls" "handoffs"
+        - site:github.com "langfuse.observe" "trace" "generation"
+      candidate_count: 4
+adoption_score: 18
+tier_counts:
+  T1: 2
+  T2: 1
+  T4: 2
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 5
+naming_alignment: aliased
+terminology_variants:
+  - term: LLM engineering platform
+    used_by: Langfuse
+    url: https://raw.githubusercontent.com/langfuse/langfuse/main/README.md
+  - term: AI observability
+    used_by: Arize Phoenix
+    url: https://raw.githubusercontent.com/Arize-ai/phoenix/main/README.md
+  - term: tracing
+    used_by: OpenAI Agents SDK
+    url: https://openai.github.io/openai-agents-python/tracing/
+  - term: agent observability
+    used_by: LangChain
+    url: https://www.langchain.com/blog/agent-observability-powers-agent-evaluation
+  - term: Harness Engineering
+    used_by: Martin Fowler
+    url: https://martinfowler.com/articles/harness-engineering.html
+evidence:
+  - tier: T1
+    match: aliased
+    mechanism_quote: Langfuse is an open source LLM engineering platform. It helps teams collaboratively
+      develop, monitor, evaluate, and debug AI applications.
+    source: Langfuse README
+    source_kind: open_source_implementation
+    organization: Langfuse
+    independence_group: langfuse
+    url: https://raw.githubusercontent.com/langfuse/langfuse/main/README.md
+    resolved_url: https://raw.githubusercontent.com/langfuse/langfuse/main/README.md
+    content_sha256: 55e64d9fc6c9794de93bee0bf1ca4b3972e9814e0857d74646b232de11eddc66
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable open-source platform captures LLM application observability data and uses it to
+      develop, monitor, evaluate, and debug AI applications.
+  - tier: T1
+    match: aliased
+    mechanism_quote: Phoenix is an open-source AI observability platform designed for experimentation,
+      evaluation, and troubleshooting.
+    source: Arize Phoenix README
+    source_kind: open_source_implementation
+    organization: Arize
+    independence_group: arize
+    url: https://raw.githubusercontent.com/Arize-ai/phoenix/main/README.md
+    resolved_url: https://raw.githubusercontent.com/Arize-ai/phoenix/main/README.md
+    content_sha256: 9952872c92cf0435bc8955e5be39a1f6ec452867a9c8e0add24ca7301932f942
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable open-source AI observability platform exposes traces and evaluation workflows for
+      troubleshooting AI application behavior.
+  - tier: T2
+    match: aliased
+    mechanism_quote: "The Agents SDK includes built-in tracing, collecting a comprehensive record of events
+      during an agent run: LLM generations, tool calls, handoffs, guardrails, and even custom events that
+      occur."
+    source: OpenAI Agents SDK tracing documentation
+    source_kind: official_documentation
+    organization: OpenAI
+    independence_group: openai
+    url: https://openai.github.io/openai-agents-python/tracing/
+    resolved_url: https://openai.github.io/openai-agents-python/tracing/
+    content_sha256: a146e888b9413dfb9f046782bbce47c22c6cc99b32c33e7a607b7fced6679226
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Official agent SDK guidance makes tracing a standard development and production diagnostic
+      mechanism for agent runs, tool calls, handoffs, guardrails, and custom events.
+  - tier: T4
+    match: aliased
+    mechanism_quote: Agent engineering is an iterative process, and tracing + evaluation are how you close
+      the loop.
+    source: LangChain, "Agent observability powers agent evaluation"
+    source_kind: practitioner_report
+    organization: LangChain
+    independence_group: langchain
+    url: https://www.langchain.com/blog/agent-observability-powers-agent-evaluation
+    resolved_url: https://www.langchain.com/blog/agent-observability-powers-agent-evaluation
+    content_sha256: 7de28f4868671fb8ed1d9623bb465caa7be2f405764f44c6ecab4711a92f14e4
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2026-01-27
+    retrieved: 2026-07-10
+    claim: Practitioner report describes agent observability as runtime traces, runs, and threads that feed
+      debugging, evaluation, production learning, and continuous improvement.
+  - tier: T4
+    match: aliased
+    mechanism_quote: Sensors (feedback controls) - observe after the agent acts and help it self-correct.
+    source: Martin Fowler, "Harness Engineering"
+    source_kind: practitioner_report
+    organization: Thoughtworks
+    independence_group: thoughtworks
+    url: https://martinfowler.com/articles/harness-engineering.html
+    resolved_url: https://martinfowler.com/articles/harness-engineering.html
+    content_sha256: 84190652ebf3fe340129f56c842c5835e1628c924667f399860b9e222a1a482e
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2026-04-02
+    retrieved: 2026-07-10
+    claim: Practitioner report frames agent harnesses as feedforward guides and feedback sensors, including
+      controls that observe agent behavior and support self-correction.
+verdict: verified

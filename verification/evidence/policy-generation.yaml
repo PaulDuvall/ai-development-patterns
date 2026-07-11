@@ -1,0 +1,101 @@
+schema_version: 2
+provenance_status: complete
+pattern: Policy Generation
+slug: policy-generation
+last_checked: 2026-07-10
+search:
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - "Policy Generation AI Rego Cedar"
+        - "AI-Powered Policy Generation OPA Rego"
+      candidate_count: 7
+    mechanism:
+      queries:
+        - "convert natural language authorization requirements into Cedar policy"
+        - "AI assistant generate Rego policy code from request"
+        - "LLM generate OPA Gatekeeper policies from Kubernetes cluster"
+      candidate_count: 9
+    artifact:
+      queries:
+        - "site:github.com \"StartPolicyGeneration\" \"NL2Cedar\""
+        - "site:github.com \"LLM\" \"generate\" \"Gatekeeper policies\" \"Rego\""
+        - "site:github.com \"generate the appropriate REGO policy code\""
+      candidate_count: 5
+adoption_score: 12
+tier_counts: {T1: 2, T4: 1}
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: weak
+terminology_variants:
+  - term: NL2Cedar
+    used_by: AWS
+    url: https://github.com/aws-samples/sample-amazon-bedrock-agentcore-onboarding/blob/main/08_policy/README.md
+  - term: OPA AI assistant
+    used_by: Harness
+    url: https://developer.harness.io/docs/platform/governance/policy-as-code/ai-for-policies/
+  - term: Dynamic Kubernetes Policy Generator
+    used_by: Red Hat
+    url: https://next.redhat.com/2026/03/20/eliminating-the-rego-tax-how-ai-orchestrators-automate-kubernetes-compliance/
+evidence:
+  - tier: T1
+    match: aliased
+    mechanism_quote: "Demonstrates NL2Cedar — converts a natural language description into a Cedar policy using `StartPolicyGeneration`"
+    source: AWS Samples AgentCore Onboarding Policy Example
+    source_kind: open_source_implementation
+    organization: AWS
+    independence_group: aws
+    url: https://github.com/aws-samples/sample-amazon-bedrock-agentcore-onboarding/blob/main/08_policy/README.md
+    resolved_url: https://github.com/aws-samples/sample-amazon-bedrock-agentcore-onboarding/blob/main/08_policy/README.md
+    content_sha256: c3a9644e9bf89f99c28d9a1702c277dbfeb3c0777653a4fb2fcfdc9e76c8f8db
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable AWS sample converts natural-language policy intent into Cedar by invoking policy generation.
+  - tier: T1
+    match: named
+    mechanism_quote: "The AI assistant will analyze your request and generate the appropriate REGO policy code."
+    source: Harness AI for Policies
+    source_kind: shipped_product
+    organization: Harness
+    independence_group: harness
+    url: https://developer.harness.io/docs/platform/governance/policy-as-code/ai-for-policies/
+    resolved_url: https://developer.harness.io/docs/platform/governance/policy-as-code/ai-for-policies/
+    content_sha256: 39a950f0662843a3316dab00d56b555a4d30b8eae12c1ef9104d5bc656099279
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Harness ships an AI assistant that generates OPA/Rego policy code from user policy requests.
+  - tier: T4
+    match: aliased
+    mechanism_quote: "a Dynamic Kubernetes Policy Generator that uses a large language model (LLM) to analyze live clusters and automatically generate context-aware OPA Gatekeeper policies"
+    source: Red Hat Next Dynamic Kubernetes Policy Generator Report
+    source_kind: practitioner_report
+    organization: Red Hat
+    independence_group: redhat
+    url: https://next.redhat.com/2026/03/20/eliminating-the-rego-tax-how-ai-orchestrators-automate-kubernetes-compliance/
+    resolved_url: https://next.redhat.com/2026/03/20/eliminating-the-rego-tax-how-ai-orchestrators-automate-kubernetes-compliance/
+    content_sha256: 46775f33cc1dd2783037e7ce9ddc2962c59dcf43126334064dc5bce6a3bf3c0f
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2026-03-20
+    retrieved: 2026-07-10
+    claim: Red Hat reports an LLM-based workflow that inspects Kubernetes clusters and generates context-aware OPA Gatekeeper policies.
+verdict: verified

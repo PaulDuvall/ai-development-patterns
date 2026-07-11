@@ -1,154 +1,120 @@
 schema_version: 2
-provenance_status: legacy-import
-legacy_run_url: https://github.com/PaulDuvall/ai-development-patterns/pull/25
-legacy_limitations: The PR records 7 aggregate queries, all three search modes, and an independent URL
-  re-fetch. Exact query strings, per-mode candidate counts, normalized content hashes, and verifier metadata
-  were not retained.
+provenance_status: complete
 pattern: Spec-Driven Development
 slug: spec-driven-development
-last_checked: '2026-07-02'
+last_checked: '2026-07-10'
 search:
-  run_id: legacy-import
-  checked_at: '2026-07-02'
+  run_id: 'github-actions:29123202495'
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
   modes:
     name:
-      queries: []
-      candidate_count: null
+      queries:
+      - Spec-Driven Development GitHub Spec Kit specifications executable implementation tasks AI coding agents
+      - Understanding Spec-Driven-Development Kiro spec-kit Tessl Martin Fowler
+      - living specs AI agent development acceptance criteria Augment Code
+      candidate_count: 22
     mechanism:
-      queries: []
-      candidate_count: null
+      queries:
+      - Kiro specs requirements.md design.md tasks.md acceptance criteria AI implementation
+      - requirements.md design.md tasks.md AI coding agent implementation plan acceptance criteria specs
+      candidate_count: 21
     artifact:
-      queries: []
-      candidate_count: null
-adoption_score: 18
+      queries:
+      - '".specify/memory/constitution.md" "spec-kit"'
+      - '"requirements.md" "design.md" "tasks.md" "EARS" "Kiro"'
+      candidate_count: 8
+adoption_score: 13
 tier_counts:
-  T1: 2
+  T1: 1
   T2: 1
   T4: 2
 adoption_dimensions:
   implementation_available: true
   independent_adoption: true
-  independence_groups: 5
+  independence_groups: 4
 naming_alignment: strong
 terminology_variants:
 - term: intent-driven development
-  used_by: GitHub (spec-kit README)
-  url: https://github.com/github/spec-kit
-- term: spec-first / spec-anchored / spec-as-source
-  used_by: Birgitta Böckeler (Thoughtworks) on martinfowler.com
-  url: https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html
-- term: Structured-Prompt-Driven Development (SPDD)
-  used_by: Wei Zhang and Jessie Jie Xia on martinfowler.com
-  url: https://martinfowler.com/articles/structured-prompt-driven/
+  used_by: GitHub Spec Kit
+  url: https://raw.githubusercontent.com/github/spec-kit/main/README.md
+- term: specs
+  used_by: AWS Kiro
+  url: https://kiro.dev/docs/specs/
 - term: living specs
   used_by: Augment Code
   url: https://www.augmentcode.com/guides/living-specs-for-ai-agent-development
-- term: 'specs (Kiro product feature: requirements.md/design.md/tasks.md with EARS-notation acceptance
-    criteria)'
-  used_by: AWS Kiro
-  url: https://kiro.dev/docs/specs/
-- term: executable specifications
-  used_by: Naman Jain, UC Berkeley EECS dissertation
-  url: https://www2.eecs.berkeley.edu/Pubs/TechRpts/2026/EECS-2026-158.html
 evidence:
 - tier: T1
   match: named
-  source: GitHub, Spec Kit (github/spec-kit)
+  mechanism_quote: 'Spec-Driven Development changes this: specifications become executable, directly generating working implementations rather than just guiding them.'
+  source: GitHub Spec Kit README
   source_kind: open_source_implementation
   organization: GitHub
   independence_group: github
-  url: https://github.com/github/spec-kit
-  resolved_url: https://github.com/github/spec-kit
-  content_sha256: null
+  url: https://raw.githubusercontent.com/github/spec-kit/main/README.md
+  resolved_url: https://raw.githubusercontent.com/github/spec-kit/main/README.md
+  content_sha256: 7979278eb9353b0210e7311b88bdc76d067bd6e1717283817d7f805a1864fb25
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-07-02'
-  retrieved: '2026-07-02'
-  claim: GitHub ships an open-source Spec-Driven Development toolkit (117k stars, 10.4k forks, 180 releases;
-    latest v0.12.4 dated 2026-07-02) with a constitution -> specify -> plan -> tasks -> implement workflow
-    that works with 30+ AI coding agents, making specifications executable artifacts that drive implementation.
-- tier: T1
-  match: unnamed
-  mechanism_quote: This constitution supersedes other practices for architecture, quality, and workflow
-    standards; non-negotiable rules MUST be enforced during development and review.
-  source: OpenZeppelin, ui-builder repository (.specify/memory/constitution.md)
-  source_kind: open_source_implementation
-  organization: OpenZeppelin
-  independence_group: openzeppelin
-  url: https://raw.githubusercontent.com/OpenZeppelin/ui-builder/main/.specify/memory/constitution.md
-  resolved_url: https://raw.githubusercontent.com/OpenZeppelin/ui-builder/main/.specify/memory/constitution.md
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-04-02'
-  retrieved: '2026-07-02'
-  claim: A shipped OpenZeppelin product maintains a versioned spec-kit constitution (v1.5.2, ratified
-    2025-09-17, last amended 2026-04-02) whose machine-readable rules govern AI-assisted implementation
-    and are enforced in CI; GitHub code search shows the same .specify/memory/constitution.md fingerprint
-    in repos from Microsoft, Cloud Posse, Optimizely, and others, and the .kiro/specs/*/requirements.md
-    fingerprint across dozens more unaffiliated repos.
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: GitHub Spec Kit provides a runnable open-source workflow where executable specifications drive implementation.
 - tier: T2
   match: named
-  source: AWS Kiro, official Specs documentation
+  mechanism_quote: 'Every spec generates three key files that form the foundation of your specification:'
+  source: AWS Kiro Specs documentation
   source_kind: official_documentation
   organization: Amazon Web Services
   independence_group: amazon
   url: https://kiro.dev/docs/specs/
   resolved_url: https://kiro.dev/docs/specs/
-  content_sha256: null
+  content_sha256: 2f87d7f81ced2978ada54f7cf819758a7642312f86f5ff7f36cfd4c1471e570c
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-06-25'
-  retrieved: '2026-07-02'
-  claim: Kiro's canonical product docs define specs as structured artifacts (requirements.md with user
-    stories and acceptance criteria, design.md, tasks.md) that formalize development before AI implementation,
-    with acceptance criteria captured up front and progress tracked across discrete tasks.
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Kiro's official docs define specs as requirements, design, and task artifacts that guide implementation planning.
 - tier: T4
   match: named
-  source: 'Birgitta Böckeler (Thoughtworks), martinfowler.com ''Understanding Spec-Driven-Development:
-    Kiro, spec-kit, and Tessl'''
+  mechanism_quote: The spec becomes the source of truth for the human and the AI.
+  source: 'Birgitta Bockeler, martinfowler.com: Understanding Spec-Driven-Development: Kiro, spec-kit, and Tessl'
   source_kind: practitioner_report
   organization: Thoughtworks
   independence_group: thoughtworks
   url: https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html
   resolved_url: https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html
-  content_sha256: null
+  content_sha256: 91bdeaa47ccff935dd53d0a43fcea54471702954889d904364d49b4ccd12a112
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   date: '2025-10-15'
-  retrieved: '2026-07-02'
-  claim: 'A hands-on comparison of three SDD tools (Kiro''s GIVEN/WHEN/THEN acceptance criteria in EARS-style
-    requirements, spec-kit''s constitution-driven workflow, Tessl''s regenerate-from-spec files marked
-    ''GENERATED FROM SPEC - DO NOT EDIT'') and a three-level taxonomy: spec-first, spec-anchored, spec-as-source.'
+  retrieved: '2026-07-10'
+  claim: A Thoughtworks practitioner report compares SDD tools and describes specs as the shared source of truth for humans and AI.
 - tier: T4
-  match: named
-  source: Augment Code, guide 'How to Write Living Specs for AI Agent Development'
+  match: aliased
+  mechanism_quote: Use structured acceptance criteria with testable requirements
+  source: 'Augment Code: How to Write Living Specs for AI Agent Development'
   source_kind: practitioner_report
   organization: Augment Code
   independence_group: augment-code
   url: https://www.augmentcode.com/guides/living-specs-for-ai-agent-development
   resolved_url: https://www.augmentcode.com/guides/living-specs-for-ai-agent-development
-  content_sha256: null
+  content_sha256: 05ac99f8eaa80bd49b946d0669770085019525ffaa00dbb4646af25435e326f9
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-06-18'
-  retrieved: '2026-07-02'
-  claim: A vendor implementation guide (published 2026-03-19, updated 2026-06-18) prescribing structured
-    specs with testable acceptance criteria (including EARS notation with human review gates) as coordination
-    infrastructure for AI agents, extending SDD with a 'living specs' feedback loop.
-verdict: weak
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Augment Code's living specs guide applies structured, testable acceptance criteria to AI-agent development workflows.
+verdict: verified

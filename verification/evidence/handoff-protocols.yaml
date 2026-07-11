@@ -1,0 +1,114 @@
+schema_version: 2
+provenance_status: complete
+pattern: Handoff Protocols
+slug: handoff-protocols
+last_checked: 2026-07-10
+search:
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - '"Handoff Protocols" "AI" "developers"'
+        - '"AI handoff" "human review" "coding agent"'
+      candidate_count: 5
+    mechanism:
+      queries:
+        - '"AI coding agent" "human review" "pull request"'
+        - '"human-in-the-loop" "coding agent" "approval"'
+        - '"assign" "coding agent" "issue" "pull request"'
+      candidate_count: 10
+    artifact:
+      queries:
+        - '"needsApproval" "RunState" "@openai/agents"'
+        - '"handoff_assessor.py" "handoff_config.yaml"'
+        - '"agent-generated PR" "Human reviewer evaluates the PR"'
+      candidate_count: 3
+adoption_score: 11
+tier_counts:
+  T1: 1
+  T2: 1
+  T4: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: aliased
+terminology_variants:
+  - term: coding agent
+    used_by: GitHub
+    url: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/start-copilot-sessions
+  - term: human-in-the-loop
+    used_by: OpenAI
+    url: https://openai.github.io/openai-agents-js/guides/human-in-the-loop/
+  - term: agent-generated PR
+    used_by: mabl
+    url: https://www.mabl.com/blog/how-we-built-a-system-for-ai-agents-to-ship-real-code-across-75-repos
+evidence:
+  - tier: T1
+    match: aliased
+    mechanism_quote: >-
+      Copilot will start working on the task in the background. Some entry
+      points open a pull request automatically.
+    source: GitHub Docs, Starting GitHub Copilot sessions
+    source_kind: shipped_product
+    organization: GitHub
+    independence_group: github
+    url: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/start-copilot-sessions
+    resolved_url: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/start-copilot-sessions
+    content_sha256: 39d319d85904b0727c8d870716d2e24eee70d642dacd7f49013f8720b2fc7f5d
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: GitHub Copilot cloud agent lets users start background agent sessions that take tasks and open pull requests.
+  - tier: T2
+    match: aliased
+    mechanism_quote: >-
+      When a tool call requires approval, the SDK pauses the run, returns
+      `interruptions`, and lets you resume later from the same `RunState`.
+    source: OpenAI Agents SDK, Human-in-the-loop
+    source_kind: official_documentation
+    organization: OpenAI
+    independence_group: openai
+    url: https://openai.github.io/openai-agents-js/guides/human-in-the-loop/
+    resolved_url: https://openai.github.io/openai-agents-js/guides/human-in-the-loop/
+    content_sha256: 32a6a2bba16e36522714973c4d5534c2a3713a6199d9a11add2d30229d24ab4a
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Official SDK guidance documents approval gates that pause agent execution and resume after human intervention.
+  - tier: T4
+    match: aliased
+    mechanism_quote: >-
+      If AI increases coding throughput by 3-5x across our team, human review
+      becomes the constraint. We couldn't have engineers reviewing 300 PRs/week
+      when many were low-risk changes (dependency bumps, lint fixes, test
+      updates). We needed a way to let AI catch obvious issues before human
+      reviewers spent time on them, freeing our developers to focus on the PRs
+      that genuinely need human judgment.
+    source: mabl, How We Built a System for AI Agents to Ship Real Code Across 75 Repos
+    source_kind: case_study
+    organization: mabl
+    independence_group: mabl
+    url: https://www.mabl.com/blog/how-we-built-a-system-for-ai-agents-to-ship-real-code-across-75-repos
+    resolved_url: https://www.mabl.com/blog/how-we-built-a-system-for-ai-agents-to-ship-real-code-across-75-repos
+    content_sha256: 499d2af446087a2df8906f3d7363c5e93f3396525a55c46da6f2e22740e13875
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2026-04-08
+    retrieved: 2026-07-10
+    claim: mabl reports an implemented agent-generated PR workflow that routes low-risk AI work through automated review while preserving human judgment for selected PRs.
+verdict: verified

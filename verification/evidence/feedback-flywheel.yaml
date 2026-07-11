@@ -1,0 +1,106 @@
+schema_version: 2
+provenance_status: complete
+pattern: Feedback Flywheel
+slug: feedback-flywheel
+last_checked: '2026-07-10'
+search:
+  run_id: github-actions:29123202495
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - feedback flywheel AI coding agents retrospectives rules commands
+      - Thoughtworks Radar feedback flywheel coding agents
+      candidate_count: 6
+    mechanism:
+      queries:
+      - AI-assisted development retrospective rules session logs
+      - AI coding feedback loop rules retrospective
+      - coding agent traces improve harness system prompt feedback loop
+      candidate_count: 7
+    artifact:
+      queries:
+      - site:github.com "persists insights into `.lattice/`" "next cycle"
+      - site:github.com "living context" "grows smarter with every feature cycle" "AI coding"
+      - site:github.com "trace analysis" "make improvements to the harness" "coding agent"
+      candidate_count: 3
+adoption_score: 9
+tier_counts:
+  T1: 1
+  T4: 2
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: weak
+terminology_variants:
+- term: harness engineering
+  used_by: LangChain
+  url: https://www.langchain.com/blog/improving-deep-agents-with-harness-engineering
+- term: living context
+  used_by: Lattice
+  url: https://github.com/techygarg/lattice
+evidence:
+- tier: T1
+  match: unnamed
+  mechanism_quote: Each stage consumes and produces artifacts in `.lattice/`, growing the living context
+    layer.
+  source: Lattice open-source AI-native workflow
+  source_kind: open_source_implementation
+  organization: Lattice
+  independence_group: techygarg/lattice
+  url: https://github.com/techygarg/lattice
+  resolved_url: https://github.com/techygarg/lattice
+  content_sha256: cd8ff942923e8f9bd197d59c6d38a0f40aed1cf1ef18d0452a7d50c3149a2654
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Lattice provides a runnable open-source workflow whose skills produce persistent artifacts under
+    .lattice so review insights and context carry into subsequent AI-assisted cycles.
+- tier: T4
+  match: named
+  mechanism_quote: teams capture successes and failures during a coding agent session and use them
+    to improve the predictability of future sessions
+  source: Thoughtworks Technology Radar, Feedback flywheel technique
+  source_kind: practitioner_report
+  organization: Thoughtworks
+  independence_group: thoughtworks
+  url: https://www.thoughtworks.com/radar/techniques/feedback-flywheel
+  resolved_url: https://www.thoughtworks.com/radar/techniques/feedback-flywheel
+  content_sha256: 5eddb98902c36391bf122954b16003c3a96e8cb76ff9c2ab3316301e37764d58
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2026-04-15'
+  retrieved: '2026-07-10'
+  claim: Thoughtworks reports practitioner adoption of the named feedback-flywheel technique, where
+    teams turn coding-agent session successes and failures into improvements for later sessions.
+- tier: T4
+  match: aliased
+  mechanism_quote: This serves as our recipe to analyze errors across runs and make improvements to
+    the harness.
+  source: LangChain, Improving Deep Agents with Harness Engineering
+  source_kind: practitioner_report
+  organization: LangChain
+  independence_group: langchain
+  url: https://www.langchain.com/blog/improving-deep-agents-with-harness-engineering
+  resolved_url: https://www.langchain.com/blog/improving-deep-agents-with-harness-engineering
+  content_sha256: ace48371c20e098ed8b8c08b30826e6982f64d647aab17c4e5b2026d0a5fe6b7
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: LangChain describes a harness-engineering feedback loop that groups agent run feedback,
+    analyzes repeated errors across traces, and updates system prompts or tools to improve later runs.
+verdict: verified

@@ -1,0 +1,105 @@
+schema_version: 2
+provenance_status: complete
+pattern: Deployment Synthesis
+slug: deployment-synthesis
+last_checked: '2026-07-10'
+search:
+  run_id: 'github-actions:29123202495'
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - '"Deployment Synthesis" "blue-green" AI deployment'
+      - '"AI" "blue-green deployment" "generate"'
+      candidate_count: 2
+    mechanism:
+      queries:
+      - natural language generate deployment pipeline blue green health checks
+      - AI generate CI/CD config deployment strategy verification steps
+      - prompt generate GitHub Actions workflows blue green deployment
+      candidate_count: 5
+    artifact:
+      queries:
+      - '"active_slot" "Help me generate GitHub Action workflows"'
+      - '"docker-compose-blue.yml" "docker-compose-green.yml" "GitHub Actions" "blue green"'
+      - '"Create a production pipeline" "Blue/Green" "Harness AI"'
+      candidate_count: 2
+adoption_score: 10
+tier_counts:
+  T1: 1
+  T2: 1
+  T5: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: false
+  independence_groups: 3
+naming_alignment: aliased
+terminology_variants:
+- term: blue-green deployment
+  used_by: Railway, Harness, and practitioner deployment guides
+  url: https://developer.harness.io/3k-docs/ai/effective-prompting-ai/
+- term: GitHub Copilot + Railway deployments
+  used_by: Railway
+  url: https://railway.com/agents/copilot
+- term: prompt-generated GitHub Actions blue-green workflow
+  used_by: Udit Kumar
+  url: https://medium.com/@uditk2/deploy-with-zero-downtime-on-existing-production-vm-with-github-actions-49454a9a5c4b
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: Ask Copilot to create Railway deployment workflow Copilot generates .github/workflows/deploy.yml
+  source: 'Railway: GitHub Copilot + Railway'
+  source_kind: shipped_product
+  organization: Railway
+  independence_group: railway
+  url: https://railway.com/agents/copilot
+  resolved_url: https://railway.com/agents/copilot
+  content_sha256: cb6dd49bda876c525115fabc7c0d2579047e5fbd88e7d51871ba0dd86f163839
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Railway ships a GitHub Copilot integration that can synthesize deployment workflow files, including a blue-green Railway environment strategy prompt.
+- tier: T2
+  match: aliased
+  mechanism_quote: Explicitly mention strategies such as Rolling, Blue/Green, or Canary.
+  source: 'Harness: Effective prompting with AI'
+  source_kind: official_documentation
+  organization: Harness
+  independence_group: harness
+  url: https://developer.harness.io/3k-docs/ai/effective-prompting-ai/
+  resolved_url: https://developer.harness.io/3k-docs/ai/effective-prompting-ai/
+  content_sha256: cb00198c3bdeb0843f8393c5e21e6d32738712f25edd99a046d7082bc7ea6962
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2026-07-02'
+  retrieved: '2026-07-10'
+  claim: Harness official AI prompting guidance instructs users to specify deployment strategies such as Blue/Green when generating DevOps pipeline configurations.
+- tier: T5
+  match: aliased
+  mechanism_quote: Help me generate GitHub Action workflows and simple scripts that implement this exact flow.
+  source: 'Udit Kumar: Deploy with Zero downtime on existing production VM with Github Actions'
+  source_kind: opinion
+  organization: Udit Kumar
+  independence_group: udit-kumar
+  url: https://medium.com/@uditk2/deploy-with-zero-downtime-on-existing-production-vm-with-github-actions-49454a9a5c4b
+  resolved_url: https://medium.com/@uditk2/deploy-with-zero-downtime-on-existing-production-vm-with-github-actions-49454a9a5c4b
+  content_sha256: f7a2da7f3180bc0d5abbe87c5a9e2c868de78c071fed670e42c91096bd630141
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2025-11-24'
+  retrieved: '2026-07-10'
+  claim: The practitioner report records using a prompt to generate GitHub Actions workflows and scripts for an exact blue-green zero-downtime deployment flow.
+verdict: weak

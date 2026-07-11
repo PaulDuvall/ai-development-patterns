@@ -1,0 +1,100 @@
+schema_version: 2
+provenance_status: complete
+pattern: Adversarial Evaluator
+slug: adversarial-evaluator
+last_checked: 2026-07-10
+search:
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - "LLM-as-a-judge framework open source evaluate LLM outputs adversarial reviewer independent judge coding agents"
+        - "\"adversarial evaluator\" LLM"
+        - "G-Eval NLG Evaluation using GPT-4 better human alignment EMNLP 2023 Findings"
+      candidate_count: 7
+    mechanism:
+      queries:
+        - "LangGraph reflection agents critique initial response example"
+        - "Microsoft AutoGen critic reviewer multi-agent code generation judge"
+        - "multi-agent debate LLM evaluation judge peer reviewed conference"
+      candidate_count: 6
+    artifact:
+      queries:
+        - "\"coder agent\" \"reviewer agent\" \"generate a critique\""
+        - "\"critic_agent\" \"reviewer\" \"autogen\" code snippet"
+        - "\"adversarial evaluator\" \"generator\" \"evaluator\" GitHub"
+      candidate_count: 3
+adoption_score: 13
+tier_counts:
+  T1: 2
+  T3: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: strong
+terminology_variants:
+  - term: Adversarial Workflow
+    used_by: movito/adversarial-workflow
+    url: https://github.com/movito/adversarial-workflow
+  - term: LLM-as-a-Judge
+    used_by: LMSYS Org
+    url: https://proceedings.neurips.cc/paper_files/paper/2023/hash/91f18a1287b398d378ef22505bf41832-Abstract-Datasets_and_Benchmarks.html
+evidence:
+  - tier: T1
+    match: named
+    mechanism_quote: "GAN-inspired three-agent harness that pits a generator against an adversarial evaluator to build applications with quality gates at every step."
+    source: coleam00/adversarial-dev
+    source_kind: open_source_implementation
+    organization: coleam00
+    independence_group: coleam00
+    url: https://github.com/coleam00/adversarial-dev
+    resolved_url: https://github.com/coleam00/adversarial-dev
+    content_sha256: ec0c11cb654d4058ab635649624a63bee9ecd27a5c5596384c2d43d2ce0c2ffc
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable open-source harness implements separate generator and adversarial evaluator agents with quality gates.
+  - tier: T1
+    match: named
+    mechanism_quote: "Adversarial review: Independent AI reviews your implementation"
+    source: movito/adversarial-workflow
+    source_kind: open_source_implementation
+    organization: movito
+    independence_group: movito
+    url: https://github.com/movito/adversarial-workflow
+    resolved_url: https://github.com/movito/adversarial-workflow
+    content_sha256: 50095985fcce4b60d0eded23e95b34e4ff657ee4a822c54747339dbf7e2051d1
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Runnable open-source package implements adversarial review through independent AI review stages and installable evaluators.
+  - tier: T3
+    match: aliased
+    mechanism_quote: "To address this, we explore using strong LLMs as judges to evaluate these models on more open-ended questions."
+    source: Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena
+    source_kind: peer_reviewed_research
+    organization: LMSYS Org
+    independence_group: lmsys
+    url: https://proceedings.neurips.cc/paper_files/paper/2023/hash/91f18a1287b398d378ef22505bf41832-Abstract-Datasets_and_Benchmarks.html
+    resolved_url: https://proceedings.neurips.cc/paper_files/paper/2023/hash/91f18a1287b398d378ef22505bf41832-Abstract-Datasets_and_Benchmarks.html
+    content_sha256: c8c91d57018c77b508adc73a00e05ac7760dd6b6873c666c000a7385d2b0f7f6
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: NeurIPS peer-reviewed research evaluates the use of strong LLMs as judges for open-ended model outputs.
+verdict: verified

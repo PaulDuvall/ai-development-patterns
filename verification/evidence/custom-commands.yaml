@@ -1,0 +1,118 @@
+schema_version: 2
+provenance_status: complete
+pattern: Custom Commands
+slug: custom-commands
+last_checked: 2026-07-10
+search:
+  run_id: "github-actions:29123202495"
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - Claude Code custom slash commands .claude/commands markdown official documentation
+        - Gemini CLI custom commands TOML official documentation
+        - '".claude/commands" "custom slash commands" engineering blog'
+        - '"custom slash commands" "Claude Code" "workflow"'
+      candidate_count: 4
+    mechanism:
+      queries:
+        - reusable prompts coding assistant slash commands project workflows markdown files
+        - define reusable prompts Gemini CLI .toml args shell execution workflow
+        - Claude Code reusable prompts project commands markdown files workflow
+        - AI coding CLI slash commands reusable workflow prompts
+      candidate_count: 4
+    artifact:
+      queries:
+        - 'site:github.com/google-gemini/gemini-cli "Custom commands" "~/.gemini/commands"'
+        - 'site:github.com/google-gemini/gemini-cli "custom slash commands" "TOML"'
+        - 'site:github.com/anthropics/claude-code "slash commands" ".claude/commands"'
+        - 'site:github.com ".claude/commands" "custom slash commands" "README"'
+      candidate_count: 2
+adoption_score: 16
+tier_counts: {T1: 2, T2: 1, T4: 1}
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 4
+naming_alignment: strong
+terminology_variants:
+  - term: custom slash commands
+    used_by: Anthropic; Vincent Bruijn
+    url: https://code.claude.com/docs/en/agent-sdk/slash-commands
+  - term: slash commands
+    used_by: Daniel Rosehill
+    url: https://raw.githubusercontent.com/danielrosehill/Claude-Slash-Commands/main/README.md
+evidence:
+  - tier: T1
+    match: named
+    mechanism_quote: "Custom commands let you save and reuse your favorite or most frequently used prompts as personal shortcuts within Gemini CLI."
+    source: Google Gemini CLI custom commands documentation
+    source_kind: open_source_implementation
+    organization: Google
+    independence_group: google
+    url: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/cli/custom-commands.md
+    resolved_url: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/cli/custom-commands.md
+    content_sha256: 3e1f405754cd3015a0c9612cae59ceceec234d360ef60a5c5ad7965c41de15f1
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Gemini CLI implements reusable personal and project custom commands loaded from command files.
+  - tier: T2
+    match: named
+    mechanism_quote: "In addition to using built-in slash commands, you can create your own custom commands that are available through the SDK."
+    source: Claude Agent SDK slash commands documentation
+    source_kind: official_documentation
+    organization: Anthropic
+    independence_group: anthropic
+    url: https://code.claude.com/docs/en/agent-sdk/slash-commands
+    resolved_url: https://code.claude.com/docs/en/agent-sdk/slash-commands
+    content_sha256: 4f867dce733dfcdb8da8f11f6a05baa271070de18051ebc23281d4b0baa56b33
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Anthropic documents custom slash commands as canonical guidance alongside built-in command discovery.
+  - tier: T4
+    match: named
+    mechanism_quote: "You create a Markdown file with your command specification, and Claude Code handles the rest."
+    source: Vincent Bruijn custom slash commands report
+    source_kind: practitioner_report
+    organization: Vincent Bruijn
+    independence_group: independent:vincent-bruijn
+    url: https://www.vincentbruijn.nl/articles/custom-slash-commands/
+    resolved_url: https://www.vincentbruijn.nl/articles/custom-slash-commands/
+    content_sha256: bb01aaa085e451f6adb9c9a2ad9d5d0d77e7aec83d03472752997f963a28eb62
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Practitioner report describes building a semantic-versioning workflow by creating a Markdown command specification.
+  - tier: T1
+    match: aliased
+    mechanism_quote: "This repository provides reusable slash commands that can be invoked within Claude Code sessions to automate repetitive tasks, enforce coding standards, and improve productivity."
+    source: Claude Slash Commands library
+    source_kind: open_source_implementation
+    organization: Daniel Rosehill
+    independence_group: independent:daniel-rosehill
+    url: https://raw.githubusercontent.com/danielrosehill/Claude-Slash-Commands/main/README.md
+    resolved_url: https://raw.githubusercontent.com/danielrosehill/Claude-Slash-Commands/main/README.md
+    content_sha256: 7c5f21c9d2108a0600826b60af666f6faf722bd7dd0f8d9e583a15f00b8dc586
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Open-source command library provides reusable Claude Code slash commands for repeatable development workflows.
+verdict: verified

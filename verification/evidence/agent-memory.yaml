@@ -1,163 +1,155 @@
 schema_version: 2
-provenance_status: legacy-import
-legacy_run_url: https://github.com/PaulDuvall/ai-development-patterns/pull/28
-legacy_limitations: The PR records 9 aggregate queries, all three search modes, and an independent URL
-  re-fetch. Exact query strings, per-mode candidate counts, normalized content hashes, and verifier metadata
-  were not retained.
+provenance_status: complete
 pattern: Agent Memory
 slug: agent-memory
-last_checked: '2026-07-02'
+last_checked: '2026-07-10'
 search:
-  run_id: legacy-import
-  checked_at: '2026-07-02'
+  run_id: github-actions:29123202495
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
   modes:
     name:
-      queries: []
-      candidate_count: null
+      queries:
+      - Agent Memory AI agent persistent memory across sessions
+      - Claude memory tool agent memory persistent context
+      - Cloudflare Agent Memory coding agent memory
+      candidate_count: 12
     mechanism:
-      queries: []
-      candidate_count: null
+      queries:
+      - AI coding agent store retrieve information across conversations directory memory files
+      - coding assistant structured markdown files remember project context across sessions
+      - AI agents maintain context across sessions decisions progress memory bank
+      - LLM agent long term memory outside context window session continuity
+      candidate_count: 16
     artifact:
-      queries: []
-      candidate_count: null
-adoption_score: 17
+      queries:
+      - GitHub "Memory Bank" "memory resets completely between sessions"
+      - GitHub "claude-mem" "preserves context across sessions"
+      - GitHub "agentmemory" "same memory server" "MCP"
+      candidate_count: 9
+adoption_score: 18
 tier_counts:
   T1: 2
   T2: 1
-  T4: 1
-  T5: 1
+  T4: 2
 adoption_dimensions:
   implementation_available: true
   independent_adoption: true
   independence_groups: 5
 naming_alignment: strong
 terminology_variants:
-- term: structured note-taking / agentic memory
-  used_by: Anthropic (Effective context engineering for AI agents)
-  url: https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
-- term: compaction
-  used_by: Anthropic (engineering guidance and platform docs)
-  url: https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
-- term: memory tool / memory files
-  used_by: Anthropic (Claude Messages API docs)
+- term: memory tool
+  used_by: Anthropic Claude API documentation
   url: https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool
 - term: Memory Bank
-  used_by: Cline (official docs) and community repos including gitpod-io/gitpod
+  used_by: Cline and Gitpod repository configuration
   url: https://docs.cline.bot/best-practices/memory-bank
-- term: virtual context management
-  used_by: MemGPT paper (Packer et al., UC Berkeley)
-  url: https://arxiv.org/abs/2310.08560
-- term: persistent context management
-  used_by: mcp-memory-keeper (MCP server for Claude Code)
-  url: https://github.com/mkreyman/mcp-memory-keeper
-- term: core memory / archival memory (out-of-context memory store)
-  used_by: Letta (agent platform docs)
-  url: https://docs.letta.com/memory
+- term: auto memory
+  used_by: Claude Code documentation
+  url: https://code.claude.com/docs/en/memory
+- term: persistent context
+  used_by: MCP Memory Keeper
+  url: https://mcpservers.org/servers/mkreyman/mcp-memory-keeper
 evidence:
 - tier: T1
   match: named
   mechanism_quote: The memory tool lets Claude store and retrieve information across conversations in
     a directory of memory files. Claude can create, read, update, and delete files that persist between
     sessions, building up knowledge over time without keeping everything in the context window.
-  source: Anthropic - Memory tool (Claude Messages API documentation)
+  source: Anthropic, Memory tool documentation
   source_kind: shipped_product
   organization: Anthropic
   independence_group: anthropic
   url: https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool
   resolved_url: https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool
-  content_sha256: null
+  content_sha256: b8da84a6ae741330c878b61b41e0567eee552ef7a6ae9e2fa55e46d58e14428b
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  retrieved: '2026-07-02'
-  claim: Anthropic ships a generally-available memory tool on the Messages API (tool type memory_20250818,
-    no beta header required) that lets Claude persist files outside the context window across sessions,
-    and the same doc prescribes a 'Multi-session software development pattern' with an initializer session,
-    progress log, session-start file reads, and end-of-session updates (undated page; date = retrieval
-    date)
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Anthropic ships a Claude API memory tool that stores files outside the context window and persists
+    them across conversations for later retrieval and updates.
 - tier: T1
   match: named
-  source: mkreyman - MCP Memory Keeper (GitHub repository)
+  mechanism_quote: agentmemory works with any agent that supports hooks, MCP, or REST API. All agents
+    share the same memory server.
+  source: rohitg00/agentmemory GitHub repository
   source_kind: open_source_implementation
-  organization: mkreyman
-  independence_group: independent:mkreyman
-  url: https://github.com/mkreyman/mcp-memory-keeper
-  resolved_url: https://github.com/mkreyman/mcp-memory-keeper
-  content_sha256: null
+  organization: rohitg00
+  independence_group: rohitg00
+  url: https://github.com/rohitg00/agentmemory
+  resolved_url: https://github.com/rohitg00/agentmemory
+  content_sha256: 9299c2b549f825e09441770715b02ff1f6c3f5da4d888e481cde8c018dadd337
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2026-03-25'
-  retrieved: '2026-07-02'
-  claim: A runnable MCP server (128 stars, latest release v0.12.1 on 2026-03-25) that provides persistent
-    context management for Claude Code and carries the exact repository topic tag 'context-persistence'
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: The repository provides a runnable shared memory server for agents through hooks, MCP, or REST,
+    supporting cross-agent persistent memory.
 - tier: T2
-  match: named
+  match: aliased
   mechanism_quote: Memory Bank is a documentation methodology that transforms Cline from a stateless assistant
-    into a persistent development partner. Through structured markdown files, Cline can "remember" your
-    project details across sessions.
-  source: Cline - Memory Bank documentation (docs.cline.bot best practices)
+    into a persistent development partner. Through structured markdown files, Cline can remember your project
+    details across sessions.
+  source: Cline, Memory Bank documentation
   source_kind: official_documentation
   organization: Cline
   independence_group: cline
   url: https://docs.cline.bot/best-practices/memory-bank
   resolved_url: https://docs.cline.bot/best-practices/memory-bank
-  content_sha256: null
+  content_sha256: c1cc254ea76b7be32c02f2fac490b4b94821f2ef50159a14e64597a9a06fd0fd
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  retrieved: '2026-07-02'
-  claim: Cline's official docs prescribe a six-file structured markdown memory schema (projectbrief.md,
-    productContext.md, activeContext.md, systemPatterns.md, techContext.md, progress.md) that the agent
-    must read at the start of every session to restore project context after memory resets (undated page;
-    date = retrieval date)
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Cline's official Memory Bank guidance prescribes structured markdown files that restore project
+    context across otherwise stateless assistant sessions.
 - tier: T4
   match: named
+  mechanism_quote: Coding agent memory. We use an internal OpenCode plugin that wires Agent Memory into
+    the development loop. Agent Memory provides memory of past compaction within sessions and across them.
+  source: Cloudflare Blog, Introducing Agent Memory
+  source_kind: practitioner_report
+  organization: Cloudflare
+  independence_group: cloudflare
+  url: https://blog.cloudflare.com/introducing-agent-memory/
+  resolved_url: https://blog.cloudflare.com/introducing-agent-memory/
+  content_sha256: cd1f37307475dfec34205a1d5a094e6ccf4b6a4a6c5c8861535ef07c603ed487
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2026-04-17'
+  retrieved: '2026-07-10'
+  claim: Cloudflare reports using an internal OpenCode plugin that wires Agent Memory into development
+    workflows and preserves compaction memory within and across sessions.
+- tier: T4
+  match: aliased
   mechanism_quote: After each reset, I rely ENTIRELY on my Memory Bank to understand the project and continue
     work effectively. I MUST read ALL memory bank files at the start of EVERY task - this is not optional.
-  source: Gitpod - .clinerules/memory-bank.md in gitpod-io/gitpod (production repo config)
+  source: Gitpod, .clinerules/memory-bank.md in gitpod-io/gitpod
   source_kind: case_study
   organization: Gitpod
   independence_group: gitpod
   url: https://github.com/gitpod-io/gitpod/blob/main/.clinerules/memory-bank.md
   resolved_url: https://github.com/gitpod-io/gitpod/blob/main/.clinerules/memory-bank.md
-  content_sha256: null
+  content_sha256: efaf307ce9fccb6b3aa734673aa4969427daae2f55abbb67c8fc37efe6ebf4c4
   verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2025-06-19'
-  retrieved: '2026-07-02'
-  claim: A 13,736-star production repository checks in Memory Bank instruction files (last committed 2025-06-19)
-    defining a hierarchical markdown memory schema for AI session continuity; GitHub code search for the
-    same instruction fingerprint ('memory resets completely between sessions') returns 1,326 files across
-    repositories, and a search for HANDOFF.md files mentioning 'context window' returns 3,576 files
-- tier: T5
-  match: named
-  mechanism_quote: Works across sessions, projects, even machines (if you use cloud Redis)
-  source: 'elfenleid - Show HN: Recall: Give Claude memory with Redis-backed persistent context (Hacker
-    News)'
-  source_kind: social_discussion
-  organization: elfenleid
-  independence_group: independent:elfenleid
-  url: https://news.ycombinator.com/item?id=45516584
-  resolved_url: https://news.ycombinator.com/item?id=45516584
-  content_sha256: null
-  verifier:
-    method: legacy-import
-    model: null
-    prompt_version: null
-    run_url: null
-  date: '2025-10-08'
-  retrieved: '2026-07-02'
-  claim: Show HN discussion (submitter elfenleid, 2025-10-08 per HN API timestamp 1759933686) of a tool
-    giving Claude persistent context across sessions via external storage, with commenters comparing it
-    to plain memory files Claude Code can natively edit
-verdict: weak
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Gitpod checks in Memory Bank operating instructions requiring the agent to reload structured memory
+    files at every task start to continue work after context resets.
+verdict: verified
