@@ -184,6 +184,29 @@ The system MUST output policies with proper indentation for human review.
 # Result: Policies output with proper indentation
 ```
 
+## Domain Fragments and Outcome Cases
+
+Keep global invariants separate from bounded domain specifications so an implementation task loads
+only the requirements it needs:
+
+```text
+specs/
+├── global-invariants.md
+├── authentication.md
+└── payments.md
+```
+
+Each domain fragment should cover three observable outcomes before implementation begins:
+
+| Outcome | What the specification must make explicit |
+|---|---|
+| Successful | Preconditions, resulting state, and externally visible behavior |
+| Rejected | Invalid or prohibited input, stable error behavior, and unchanged state |
+| Degraded | Dependency failure, the safe fallback, and the recovery signal |
+
+Anchor these outcomes and link normative requirements to tests that actually exist. Do not create
+placeholder test citations to make traceability appear complete.
+
 ## Git Workflow Integration
 
 Commit messages reference specification anchors for traceability:

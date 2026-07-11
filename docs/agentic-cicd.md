@@ -1,10 +1,33 @@
-# Agentic Continuous Delivery: Enhanced EARS Requirements Specification
+# Agentic Continuous Delivery: Illustrative EARS Requirements
+
+> **Status: illustrative and non-normative.** This document is an extended requirements input for
+> the [Pipeline Synthesis](../experiments/README.md#pipeline-synthesis) pattern and its
+> [worked example](../experiments/examples/pipeline-synthesis/). It is not a deployable baseline.
+> Every vendor choice, threshold, permission, and automated action requires project-specific threat
+> modeling, deterministic validation, and human-owned approval policy.
+
+Capitalized component names such as “Trunk Guardian” and “Dependency Steward” are local roles in
+this example, not additional catalog patterns. Model-generated findings remain advisory until a
+deterministic control or an authorized human validates and disposes them.
 
 ## Document Control
-- **Version:** 2.0
-- **Classification:** System Requirements
+- **Version:** 2.1
+- **Classification:** Illustrative System Requirements
 - **Scope:** AI-Augmented Continuous Delivery Pipeline
-- **Compliance:** EARS (Easy Approach to Requirements Syntax)
+- **Format:** EARS-style (Easy Approach to Requirements Syntax)
+
+## Catalog Context
+
+| Illustrative concern or role | Canonical catalog context |
+|---|---|
+| Trunk Guardian and Workflow Coordinator | [Workflow Orchestration](../experiments/README.md#workflow-orchestration) and [Pipeline Synthesis](../experiments/README.md#pipeline-synthesis) |
+| Dependency Steward | [Dependency Migration](../experiments/README.md#dependency-migration) |
+| Test Writer | [Testing Orchestration](../experiments/README.md#testing-orchestration) and [Test Promotion](../experiments/README.md#test-promotion) |
+| Code Review Assistant | [Review Automation](../experiments/README.md#review-automation) |
+| Continuous Release Orchestrator | [Autonomous Acceptance](../experiments/README.md#autonomous-acceptance) |
+| Security Auditor and Environment Guardian | [Security Orchestration](../experiments/README.md#security-orchestration) and [Policy Generation](../README.md#policy-generation) |
+| Observability Engineer | [Agent Observability](../README.md#agent-observability) |
+| Runtime limits and escalation | [Bounded Autonomy](../README.md#bounded-autonomy) |
 
 ---
 
@@ -13,7 +36,7 @@
 ### 1.1 Commit Verification
 **[SCI-001]** **THE SYSTEM SHALL** enforce cryptographic signing of all commits using Sigstore Gitsign **BEFORE** merge to protected branches.
 
-**[SCI-002]** **THE SYSTEM SHALL** verify commit signatures through GitHub Actions **WHERE** the verification workflow cannot be bypassed by repository administrators.
+**[SCI-002]** **THE SYSTEM SHALL** verify commit signatures through a required status check **WHERE** repository rules separately identify and audit any authorized bypass actors.
 
 **[SCI-003]** **WHEN** a commit signature verification fails, **THE SYSTEM SHALL** block the merge and notify the committer with remediation steps **WITHIN** 30 seconds.
 
@@ -34,7 +57,7 @@
 
 **[SCI-010]** **THE SYSTEM SHALL** classify changes into categories (documentation, configuration, source code, dependencies) **WHERE** each category triggers specific tool subsets based on impact analysis.
 
-**[SCI-011]** **WHEN** commits contain only documentation changes (*.md, *.txt, docs/), **THE SYSTEM SHALL** skip security scanning, dependency checks, and build processes **WHILE** executing only documentation validation and link checking.
+**[SCI-011]** **WHEN** a trusted path classifier confirms that a change contains only non-executable documentation, **THE SYSTEM SHALL** skip source build and dependency scans **WHILE** still executing documentation, link, secret, and workflow-policy validation.
 
 **[SCI-012]** **THE SYSTEM SHALL** maintain change pattern rules **WHERE** file extension patterns, directory paths, and commit message keywords determine tool execution scope.
 
@@ -57,7 +80,7 @@
 ### 2.1 Intelligent Test Execution
 **[BQT-001]** **THE SYSTEM SHALL** analyze code changes through Code Impact Analyzer **TO** determine affected test suites and execution scope **WITHIN** 2 minutes of commit.
 
-**[BQT-002]** **THE SYSTEM SHALL** execute only tests related to changed files and their dependencies **WHERE** test selection is based on static analysis and historical test-to-code mapping.
+**[BQT-002]** **THE SYSTEM SHALL** execute tests related to changed files and their dependencies **WHERE** test selection is based on static analysis and historical test-to-code mapping **AND** protected-branch validation retains a complete deterministic suite.
 
 **[BQT-003]** **WHEN** changes affect only configuration files (*.yml, *.json, *.env), **THE SYSTEM SHALL** run configuration validation tests **WHILE** skipping unit and integration test suites.
 
@@ -80,11 +103,11 @@
 **[BQT-011]** **THE SYSTEM SHALL** reject code with cyclomatic complexity > 15 or cognitive complexity > 20 **UNLESS** explicitly approved by senior engineer with justification.
 
 ### 2.4 Review Process
-**[BQT-012]** **THE SYSTEM SHALL** require approval from at least one human reviewer **AND** the Code Review Assistant **BEFORE** merge to main.
+**[BQT-012]** **THE SYSTEM SHALL** require approval from at least one authorized human reviewer **BEFORE** merge to main **WHERE** Code Review Assistant output is advisory and cannot approve its own change.
 
 **[BQT-013]** **THE SYSTEM SHALL** ensure Code Review Assistant evaluates security patterns, performance implications, and best practices **WHERE** findings are presented as actionable suggestions **ONLY FOR** files containing source code changes.
 
-**[BQT-014]** **IF** critical issues are identified by Code Review Assistant, **THEN THE SYSTEM SHALL** block merge **UNTIL** issues are resolved or explicitly waived with documented rationale.
+**[BQT-014]** **IF** Code Review Assistant reports a critical issue, **THEN THE SYSTEM SHALL** route the finding to deterministic verification and human disposition **WHERE** confirmed policy failures block merge until resolved or explicitly waived with documented rationale.
 
 ### 2.5 Requirements Traceability
 **[BQT-015]** **THE SYSTEM SHALL** maintain bidirectional traceability between requirements (FR-*, NFR-*) and test cases **WHERE** Requirements Reviewer validates coverage.
@@ -121,7 +144,7 @@
 ### 3.3 Rollback Capabilities
 **[DRC-009]** **THE SYSTEM SHALL** maintain rollback-ready artifacts for previous 5 versions **WHERE** each artifact includes configuration and database migration scripts.
 
-**[DRC-010]** **WHEN** production incidents occur, **THE SYSTEM SHALL** enable Rollback First Responder to initiate automated rollback **WITHIN** 2 minutes of detection.
+**[DRC-010]** **WHEN** a deterministic incident condition matches a pre-approved rollback policy, **THE SYSTEM SHALL** enable Rollback First Responder to initiate automated rollback **WITHIN** 2 minutes of detection **AND** preserve the trigger evidence for review.
 
 **[DRC-011]** **THE SYSTEM SHALL** execute rollback validation tests **AFTER** rollback completion **TO** ensure system stability and data integrity.
 
@@ -152,7 +175,7 @@
 
 **[SEC-005]** **THE SYSTEM SHALL** validate environment configurations against CIS benchmarks **BEFORE** each deployment.
 
-**[SEC-006]** **IF** configuration drift is detected, **THEN THE SYSTEM SHALL** auto-remediate using Infrastructure as Code **OR** escalate to security team **WITHIN** 30 minutes.
+**[SEC-006]** **IF** configuration drift is detected, **THEN THE SYSTEM SHALL** generate a reviewable Infrastructure as Code correction **OR** escalate to the security team **WITHIN** 30 minutes **WHERE** only an approved pipeline may apply the correction.
 
 ### 4.3 Performance Security
 **[SEC-007]** **THE SYSTEM SHALL** monitor performance metrics through Performance Guardian **WHERE** resource consumption anomalies may indicate security issues.
@@ -247,7 +270,7 @@
 ### 7.2 Evidence Chain
 **[HAI-006]** **THE SYSTEM SHALL** link every AI decision to supporting evidence **WHERE** evidence includes tool outputs, logs, and confidence scores.
 
-**[HAI-007]** **THE SYSTEM SHALL** sign all AI agent outputs using Sigstore **WHERE** signatures enable tamper detection and non-repudiation.
+**[HAI-007]** **THE SYSTEM SHALL** sign retained AI agent outputs using Sigstore **WHERE** signatures bind the output digest, input provenance, and signer identity for tamper detection but do not assert that the output is correct.
 
 **[HAI-008]** **THE SYSTEM SHALL** maintain provenance graph **WHERE** each node represents tool/agent invocation **AND** edges represent data flow.
 
@@ -256,7 +279,7 @@
 
 **[HAI-010]** **THE SYSTEM SHALL** learn from tool selection patterns **WHERE** successful change-type to tool mappings are reinforced and ineffective combinations are deprioritized.
 
-**[HAI-011]** **THE SYSTEM SHALL** retrain AI models quarterly **OR** when accuracy drops below 85% **USING** accumulated feedback data from tool effectiveness and change pattern analysis.
+**[HAI-011]** **THE SYSTEM SHALL** evaluate provider model versions, prompts, and routing policy quarterly **OR** when measured task accuracy drops below 85% **USING** accumulated feedback from tool effectiveness and change pattern analysis.
 
 **[HAI-012]** **WHEN** AI confidence is below 70%, **THE SYSTEM SHALL** escalate to human review **WITH** AI reasoning and alternative recommendations.
 
@@ -362,4 +385,5 @@
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0 | Initial | Original | Base requirements |
-| 2.0 | Current | Enhanced | Added temporal clauses, conditionals, performance requirements, integration specs |
+| 2.0 | Historical | Enhanced | Added temporal clauses, conditionals, performance requirements, integration specs |
+| 2.1 | 2026-07-11 | Maintainers | Marked the document illustrative, mapped local roles to catalog patterns, and restored human and deterministic authority |

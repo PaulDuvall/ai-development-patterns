@@ -10,6 +10,7 @@ This directory ships documentation only: this README plus two specification docu
 
 - [`ci_spec.md`](ci_spec.md) — plain-English CI/CD pipeline specification covering dependency installation, quality checks, testing, security validation, build artifacts, environment-specific configuration, quality gates, failure handling, monitoring, and compliance. This is the source document an agent converts into platform-specific configuration.
 - [`blue_green_deployment.md`](blue_green_deployment.md) — blue-green deployment extension: the atomic traffic-switch invariants, illustrative AWS and Kubernetes reference implementations, canary-versus-blue-green anti-pattern detection, and deployment checklists.
+- [`../../../docs/agentic-cicd.md`](../../../docs/agentic-cicd.md) - Extended, non-normative EARS requirements input for review and tailoring
 
 ## Quick Start
 

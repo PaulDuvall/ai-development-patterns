@@ -573,6 +573,9 @@ generated notes are pipeline output, not a standalone AI pattern.
 
 Complete Example: See [examples/pipeline-synthesis/](examples/pipeline-synthesis/), including the
 [blue-green deployment subtype](examples/pipeline-synthesis/blue_green_deployment.md).
+For a larger requirements input, see the
+[illustrative Agentic Continuous Delivery EARS specification](../docs/agentic-cicd.md); it is
+non-normative and requires project-specific review before use.
 
 #### Anti-pattern: Manual Pipelines
 

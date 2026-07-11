@@ -865,6 +865,12 @@ SpecDriven AI combines three key elements:
 - **Rigorous Test-Driven Development** with coverage tracking and automated validation
 - **AI-powered implementation** with persistent context through structured specifications
 
+For large systems, keep the specification reviewable by splitting it into bounded domain
+fragments with shared global invariants. Within each fragment, describe successful behavior,
+explicit rejection behavior, and safe degraded behavior, then connect every normative outcome to
+executable validation. This preserves traceability without turning one document into an
+unreviewable, application-wide prompt.
+
 **Key Innovation: Authority Level System**
 
 Specifications use authority levels to resolve conflicts and establish precedence:
@@ -3022,6 +3028,13 @@ Injecting faults without a falsifiable hypothesis, bounded target, abort conditi
 - Reduced deployment failures
 - Faster incident response with AI-generated runbooks
 - Proactive technical debt management
+
+# Resources
+
+- [AI Development Best Practices](docs/ai-development-best-practices.md) — an actionable,
+  cross-pattern implementation checklist.
+- [Claude Code Guide](docs/claude-code-guide.md) — a tool-specific guide to configuring and using
+  Claude Code with the catalog's development practices.
 
 ## Contributing
 
