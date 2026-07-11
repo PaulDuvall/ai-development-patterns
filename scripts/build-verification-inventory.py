@@ -139,7 +139,7 @@ def select_work(inventory, mode, pattern=None, limit=10):
 
 def build_execution_matrix(
         selected, mode, unit_dir="verification/run-plan/units"):
-    """Return one immutable research unit per pattern plus optional discovery."""
+    """Return one immutable local-agent unit per pattern plus optional discovery."""
     unit_dir = Path(unit_dir)
     units = []
     for index, item in enumerate(selected, 1):
@@ -164,9 +164,9 @@ def build_execution_matrix(
         })
     if len(units) > MAX_EXECUTION_UNITS:
         raise ValueError(
-            f"execution plan exceeds GitHub's {MAX_EXECUTION_UNITS}-job matrix limit")
-    # GitHub rejects an empty matrix before a job-level condition can reliably
-    # short-circuit it. The sentinel is never executed because has_units=false.
+            f"execution plan exceeds the {MAX_EXECUTION_UNITS}-unit safety limit")
+    # Keep the persisted matrix shape nonempty for deterministic local tooling.
+    # The sentinel is metadata only and is never assigned to a research agent.
     include = units or [{
         "unit_id": "noop",
         "kind": "noop",
@@ -178,7 +178,7 @@ def build_execution_matrix(
 
 
 def write_execution_plan(matrix, units, unit_dir, matrix_output):
-    """Persist auditable unit worklists and a compact Actions matrix."""
+    """Persist auditable unit worklists and a compact local execution plan."""
     directory = Path(unit_dir)
     directory.mkdir(parents=True, exist_ok=True)
     for unit in units:

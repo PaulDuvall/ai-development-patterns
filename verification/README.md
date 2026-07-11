@@ -2,12 +2,13 @@
 
 This directory contains the structured evidence behind adoption verdicts. The system measures
 whether a practice exists in industry independently from whether industry uses this catalog's name
-for it. `patterns.yaml` remains the canonical pattern registry.
+for it. `patterns.yaml` remains the canonical stable-pattern registry; the reference table in
+`experiments/README.md` is the exploratory-pattern registry.
 
 An evidence file is an **assessment**, not automatically a verification. Only schema-v2 evidence
-with complete search, source, retrieval, and verifier provenance can earn `verdict: verified`.
-Migrated evidence is explicitly marked `provenance_status: legacy-import`, appears as **needs
-refresh** in [STATUS.md](STATUS.md), and cannot earn a verified verdict.
+with complete search, source, retrieval, local-run, and verifier provenance can earn
+`verdict: verified`. Migrated evidence is explicitly marked `provenance_status: legacy-import`,
+appears as **needs refresh** in [STATUS.md](STATUS.md), and cannot earn a verified verdict.
 
 ## Trust model
 
@@ -16,36 +17,49 @@ The capability deliberately separates three operations:
 1. **Validate** — deterministic, offline, read-only checks recompute every score, dimension,
    verdict, naming signal, catalog mapping, pending entry, and generated status row.
 2. **Check links and content** — networked, read-only checks confirm cited pages remain reachable
-   and that recorded mechanism quotes remain present in fetched content. This runs weekly and can
-   also be requested manually.
-3. **Refresh evidence** — bounded web research creates one isolated artifact per selected pattern.
-   Research has no repository mutation credential; trusted post-model code hydrates source
-   retrieval metadata, then clean matrix jobs validate every fixed-path unit before trusted code
-   assembles shared state and a scoped publisher opens one run-level PR.
+   and recorded mechanism quotes remain present. This runs weekly and can be requested manually.
+3. **Evaluate locally** — bounded, model-backed web research runs only in an interactive local
+   Codex client. A deterministic plan and exact human approval precede every agent call. Read-only
+   research agents return proposals to one root writer; a separate agent reviews each batch before
+   trusted local code hydrates, validates, and scans the result.
 
 The flow is:
 
 ```text
-schedule/manual request
-  -> deterministic catalog inventory
-  -> protected-environment human approval for this plan and run attempt
-  -> selected-provider credential/model/quota preflight
-  -> one read-only research unit per pattern
-  -> trusted URL/quote hydration -> content-bound unit artifact
-  -> exact per-unit validation
-  -> trusted all-or-nothing assembly and global validation
-  -> scoped publisher -> one reviewable PR
+signed-in local Codex request
+  -> deterministic catalog inventory and immutable plan
+  -> exact human approval: APPROVE LOCAL EVALUATION <plan-id>
+  -> up to three read-only research agents at a time
+  -> root task writes one evidence file per selected pattern
+  -> trusted URL/quote hydration -> content-bound evidence
+  -> independent read-only semantic verifier per batch
+  -> exact scope, provenance, derivation, secret, and test checks
+  -> second human publication approval
+  -> one draft PR -> manual human review and merge
 ```
 
 `scripts/build-verification-inventory.py` owns catalog parsing, freshness ordering, in-flight PR
-deduplication, and bounded selection. The research model receives its generated inventory and
-worklist; it does not choose or expand its own scope.
+deduplication, and bounded selection. The research agents receive its generated inventory and
+worklist; they do not choose or expand their own scope. The local finalizer removes selected slugs
+from `pending-evidence.yaml`, synchronizes evidence-derived naming signals, and
+regenerates `STATUS.md` once. Overlaps, unknown or duplicate pending slugs, orphan evidence,
+duplicate canonical URLs, and multiple scored entries from one independence group fail validation.
 
-The trusted assembler writes each validated evidence file, removes the same slugs from
-`pending-evidence.yaml` atomically, synchronizes evidence-derived naming signals, and regenerates
-`STATUS.md` once. Overlaps, unknown pending slugs, duplicate pending slugs,
-orphan evidence, duplicate canonical URLs, and multiple scored entries from one independence group
-all fail validation.
+The repository never reads an evaluator API key. Execution follows the active local Codex
+authentication: a client signed in through a ChatGPT plan uses that plan's Codex allowance or
+credits, while a local CLI authenticated with an API key is billed as OpenAI Platform API usage.
+The planner requires an operator attestation and rejects known evaluator key environment variables;
+that attestation is explicit but not cryptographic proof. Use the signed-in Codex app when the
+intended billing path is the ChatGPT plan. See OpenAI's [Codex pricing](https://learn.chatgpt.com/docs/pricing),
+[ChatGPT-plan usage guide](https://help.openai.com/en/articles/11369540-using-codex-with-your-chatgpt-plan),
+and [Codex rate card](https://help.openai.com/en/articles/20001106-codex-rate-card-2).
+
+Both approval phrases are interactive operator controls. The planner enforces the first phrase in
+the supported local workflow, and the skill enforces the second before publication, but neither is
+a digital signature. A repository writer can edit YAML, so CI acceptance proves manifest
+consistency—not that it cryptographically observed a person typing the phrase. Human review of the
+conversation, final diff, draft PR, and manual merge remains part of the trust model. Actions uses a
+read-only default token and is not allowed to create or approve pull requests.
 
 ## Run it
 
@@ -65,20 +79,19 @@ python3 -m pytest tests/test_evidence_files.py -m "not slow"
 ```
 
 The `Adoption Evidence` workflow (`.github/workflows/evidence-validation.yml`) exposes the same
-checks through `workflow_dispatch` and `workflow_call`, runs for every pull request, and runs
-weekly. A separate `pull_request_target` workflow executes the default branch's trusted validator
-against pull-request data without executing pull-request code. It posts the required commit-status
-context `Trusted evidence checks` on the immutable candidate revision.
+checks through `workflow_dispatch` and `workflow_call`, runs for every pull request, and
+runs weekly. A separate `pull_request_target` workflow executes the default branch's trusted
+validator against pull-request data without executing pull-request code. It posts the required
+commit-status context `Trusted evidence checks` on the immutable candidate revision.
 
 ```bash
 gh workflow run evidence-validation.yml
 ```
 
-After this workflow exists on the default branch, an administrator can idempotently install its
-required-check ruleset, scoped Actions publisher setting, and protected paid-research environment.
-The authenticated GitHub user becomes the required reviewer; the command is a dry run unless
-`--apply` is supplied. Apply mode also removes the retired generic provider secrets and unprefixed
-Anthropic federation variables so old workflow definitions remain credentialless:
+An administrator can idempotently install the required-check ruleset and least-privilege Actions
+setting. The command is a dry run unless `--apply` is supplied. Apply mode also removes retired
+evaluator secrets, variables, and the former paid-research environment so historical workflow
+definitions remain credentialless:
 
 ```bash
 python3 scripts/configure-repository-rules.py
@@ -87,7 +100,7 @@ python3 scripts/configure-repository-rules.py --apply
 
 ### Network link and content check
 
-Run the slow, read-only checks locally with:
+Run the slow, read-only checks locally or request the deterministic Actions workflow:
 
 ```bash
 python3 -m pytest tests/test_evidence_files.py tests/test_evidence_content.py -m slow
@@ -95,209 +108,137 @@ gh workflow run evidence-validation.yml -f check_links=true
 ```
 
 Bot-protected responses are handled separately from dead links. Trusted retrieval makes at most
-three attempts with a 30-second per-attempt timeout and bounded exponential backoff for connection
-failures, timeouts, truncated streams, 408/425/429 responses, and 500/502/503/504 server errors;
-certificate and other permanent failures still fail closed.
-Complete evidence also records a
-normalized-content SHA-256 and an exact mechanism quote so content drift is observable even when a
-URL remains live. Legacy imports have null hashes and are skipped by semantic provenance checks
-until refreshed. During refresh, trusted post-model hydration fails unless the quote is present and
-overwrites the resolved URL, digest, and retrieval date before the unit manifest is created. Weekly
-checks later fail when the quote disappears and warn when the normalized digest changes. A strict
-second fetch is available as a diagnostic for sources expected to be byte-stable, but dynamic pages
-can legitimately produce a different normalized digest between requests:
+three attempts with a 30-second per-attempt timeout and bounded exponential backoff for transient
+connection failures, timeouts, truncated streams, 408/425/429 responses, and selected 5xx errors;
+certificate and other permanent failures fail closed.
+
+Complete evidence records a normalized-content SHA-256 and an exact mechanism quote, so content
+drift is observable even when a URL remains live. Trusted hydration fails unless the quote is
+present and overwrites the resolved URL, digest, and retrieval date. Weekly checks fail when the
+quote disappears and warn when normalized content changes. A strict second fetch is available as a
+diagnostic for sources expected to be byte-stable:
 
 ```bash
 EVIDENCE_HASH_STRICT=1 python3 -m pytest tests/test_evidence_content.py -m slow
 ```
 
-### Evidence refresh
+### Local evidence evaluation
 
-The `Pattern Verification & Discovery` workflow (`.github/workflows/verify-patterns.yml`) uses
-OpenAI by default, refreshes the stalest evidence on Monday at 05:00 UTC, and runs discovery on the
-first day of each month at 06:00 UTC. Trigger it from the Actions tab or with:
-
-```bash
-gh workflow run verify-patterns.yml                        # up to 10 stalest/missing patterns
-gh workflow run verify-patterns.yml -f mode=full -f confirm_full_catalog=true  # all available patterns + discovery
-gh workflow run verify-patterns.yml -f mode=discover-only  # discovery only
-gh workflow run verify-patterns.yml -f mode=single-pattern -f pattern="Security Sandbox"
-gh workflow run verify-patterns.yml -f provider=anthropic  # explicit alternate provider
-```
-
-Every run with selected work stops after the free deterministic planning job and waits at the
-protected `evidence-paid-research` environment. The planning summary shows the provider, model,
-selected units, and approximate OpenAI token-cost envelope before anything billable happens. In the
-Actions run, select **Review deployments**, select `evidence-paid-research`, and choose **Approve and
-deploy** only after reviewing that summary. Choosing **Reject**, leaving the request waiting, or
-cancelling the run before approval makes zero provider calls. This approval applies to both manual dispatches and
-the weekly schedule; neither provider preflight nor research can start first.
-
-Approval is bound to the exact plan hash and `GITHUB_RUN_ATTEMPT`. **Re-run failed jobs** cannot
-reuse an approval from an earlier attempt; use **Re-run all jobs**, review the newly generated plan,
-and approve again. This intentionally makes every paid retry another explicit spending decision.
-
-The environment is an external safety control and must retain at least one required reviewer plus
-its protected-branches-only policy. The authorization job verifies both settings and fails closed if
-they drift. For this single-owner repository, self-review remains allowed so the maintainer can
-approve a run they initiated, while administrator bypass is disabled. Adding a second reviewer
-would allow stronger two-person approval.
-The manual `confirm_full_catalog` acknowledgement is an additional full-run warning, not a
-substitute for environment approval.
-
-This gate protects the paid provider path in `.github/workflows/verify-patterns.yml`. Local
-`/verify-patterns` commands and separate opt-in assistant/review workflows are outside this gate and
-must be authorized independently. One environment approval authorizes the entire displayed plan,
-not each individual worker, so review the unit count and bounds before approving.
-
-By default, preparation fails while another same-repository `verify/refresh-*` PR is open, and the
-publisher repeats that check after research. This keeps the generated status, pending list, and
-decision ledger on one review branch at a time. A maintainer may intentionally overlap a manual
-run with `-f allow_open_verification_pr=true`; evidence slugs already changed by the older PR are
-excluded, but the resulting aggregate PR may still need a rebase because both branches regenerate
-shared files.
-
-As a local alternative, Claude Code can run the same evidence methodology from the repository root:
+Open this repository in the signed-in Codex app and invoke:
 
 ```text
-/verify-patterns
-/verify-patterns --pattern "Security Sandbox"
-/verify-patterns --discover-only
-/verify-patterns --full
+$evaluate-pattern-adoption
 ```
 
-Research produces candidate data only. Every selected pattern gets its own immutable worklist,
-research process, artifact, and fresh validation job. A run publishes nothing unless every unit
-succeeds. Trusted code then combines only the disjoint evidence files, applies pending-list
-removals, synchronizes deterministic decision-ledger signals, regenerates `STATUS.md`, and opens
-one draft PR for the run. Renames and demotions remain human decisions.
+Start from a dedicated clean branch or worktree at the current `origin/main`. Fetch `origin`, verify
+that `HEAD` equals `origin/main`, and require `git status --short` to produce no output before
+planning. Do not stash, discard, absorb, or work around existing changes. In particular, no
+unrelated tracked or untracked changes may exist under `verification/` or in
+`experiments/NOTES.md`. The final scope validator intentionally inspects the whole checkout and
+fails when any changed path falls outside the exact approved run.
 
-Before any research matrix starts, one provider-specific preflight makes a minimal real model
-request with the selected credential and exact configured model. A missing or invalid credential,
-an inaccessible model, or already exhausted quota therefore fails one job instead of starting up to
-49 doomed workers. This request is billable and proves provider availability at the start of the
-run; it cannot reserve enough capacity for every later research unit. Provider selection remains
-explicit, and a failed preflight never falls back to the other provider.
+Ask for one explicit scope:
 
-Paid research is bounded independently of provider availability. Research matrices run one worker
-at a time and stop the remaining queue on the first failure. OpenAI workers use low reasoning and a
-Codex rollout budget of 300,000 weighted tokens: non-cached input counts once and sampled output
-counts 6.25 times, matching the highest output/input price ratio in the reviewed cost-sensitive
-model allowlist (`gpt-5.6-luna`, `gpt-5.4-mini`, and `gpt-5.4-nano`). Each unit is also instructed
-to make at most 12 live searches. This is a model-turn stop, not a hard dollar cap: one response can
-cross it, and cached input, web-search calls, and long-context premiums are billed separately. The
-run summary shows the unit count and approximate short-context non-cached token envelope before the
-matrix starts. Manual `full` mode therefore also requires `confirm_full_catalog=true`; a model
-outside the reviewed allowlist requires a separate manual `allow_high_cost_model=true` override.
+| Scope | Selection |
+|---|---|
+| `stale` | Up to 10 missing, legacy, or stale patterns by default |
+| `stable` | All 24 stable patterns from `patterns.yaml` |
+| `exploratory` | All 25 exploratory patterns from `experiments/README.md` |
+| `all` | All 49 catalog patterns plus one discovery unit |
+| `single` | One exact catalog pattern name |
+| `discovery` | Discovery only; no pattern evidence |
 
-After trusted hydration, fixed-path export, and secret scanning, each completed unit is cached under
-the source run ID, plan hash, and unit ID. Re-running the same GitHub Actions run can reuse that
-exact artifact without another provider call. A new run never rebinds an old artifact to new
-provenance. OpenAI project budgets are alert thresholds rather than enforced spending caps, so use a
-dedicated project/key, conservative per-model rate limits, and the
-[Usage Dashboard export](https://help.openai.com/en/articles/20001072-how-do-i-export-monthly-usage-details-from-the-api-usage-dashboard)
-to reconcile costs by API key and model.
-
-The draft PR is the single review surface. Evidence-gap issues are tracking outputs, not separate
-approval requests. If the aggregate adds `Review naming signal` rows, make any naming choice in
-`verification/DECISIONS.md` on that PR (or in a follow-up PR); no response is required when no such
-row appears.
-
-Each provider has separate preflight and `contents: read` research jobs, disables persisted checkout
-credentials, and disallows direct GitHub mutation tools. Keeping both stages provider-specific
-prevents OpenAI code from receiving the OIDC permission used only by optional Anthropic federation.
-The publisher prefers a short-lived GitHub App token configured with the
-`VERIFY_PATTERNS_APP_ID` repository variable and `VERIFY_PATTERNS_APP_PRIVATE_KEY` secret.
-After opening a draft PR, it dispatches trusted default-branch validation by PR number, so the
-required result is attached to the candidate revision even when an automation-created PR event is
-approval-gated. No long-lived personal access token is passed to the research agent.
-
-The default OpenAI path uses the official pinned
-[`openai/codex-action`](https://learn.chatgpt.com/docs/github-action) with native web search,
-one directory-scoped bubblewrap root, and a dedicated unprivileged OS account per research unit
-operating on a
-private copy with no `.git` or `.beads` data (only empty, locked sandbox sentinels). Root-owned
-read-only directories restrict that account to exactly one assigned evidence YAML, or to
-`experiments/NOTES.md` for the single discovery unit; an OS-boundary check and a keyless pinned-CLI
-sandbox smoke test verify
-the effective profile and immutable Python 3.11 research environment before the model starts.
-`CODEX_HOME` remains root-owned except for Codex's required `installation_id` file and
-`tmp/arg0` runtime directory; a credential-free missing-thread smoke initializes the same
-in-process app server used by the model action. Its reviewed network profile permits public
-evidence fetches while the sandbox continues to reject local/private targets; model-run commands
-inherit only core process variables and cannot launch a login shell that rehydrates the runner
-environment. After Codex exits, the workflow kills every research-user process and the API proxy;
-trusted code from the untouched checkout then hydrates retrieval metadata and exports that one fixed
-unit path. Configure a
-dedicated OpenAI Platform project or
-[service-account key](https://platform.openai.com/docs/api-reference/project-service-accounts) as
-the `EVIDENCE_OPENAI_API_KEY` Actions secret. The evidence-specific name intentionally differs from
-the retired `OPENAI_API_KEY`: historical workflow attempts retain their old YAML for 30 days, so
-leaving the old secret deleted prevents those ungated attempts from regaining a credential. A
-ChatGPT subscription/session token is not an API key, and API
-usage is billed to the Platform project. The default model is
-[`gpt-5.6-luna`](https://developers.openai.com/api/docs/models/gpt-5.6-luna) at low reasoning
-effort. Set the optional `OPENAI_EVIDENCE_MODEL` repository variable to another reviewed
-cost-sensitive model identifier; higher-cost models require the explicit manual override described
-above. The OpenAI preflight calls the configured model once before the first isolated worker starts.
+The skill first runs a deterministic, non-model planner. Equivalent direct planning commands are:
 
 ```bash
-gh secret set EVIDENCE_OPENAI_API_KEY  # prompts without echoing the key
-gh variable set OPENAI_EVIDENCE_MODEL --body gpt-5.6-luna  # optional explicit default
+python3 scripts/plan-local-verification.py plan \
+  --scope stale --surface codex-app --attest-chatgpt
+python3 scripts/plan-local-verification.py plan \
+  --scope single --pattern "Security Sandbox" \
+  --surface codex-app --attest-chatgpt
+python3 scripts/plan-local-verification.py plan \
+  --scope all --surface codex-app --attest-chatgpt
 ```
 
-Anthropic remains an explicit `provider=anthropic` option. That path prefers workload-identity
-federation when `EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID`,
-`EVIDENCE_ANTHROPIC_ORGANIZATION_ID`, and optional evidence-specific
-service-account/workspace repository variables are configured, then uses
-`EVIDENCE_ANTHROPIC_API_KEY` only when federation is absent. The evidence-specific names keep old,
-ungated workflow definitions credentialless if someone re-runs them. Do not recreate the retired
-`ANTHROPIC_API_KEY` or unprefixed federation variables. Provider selection never silently falls
-back to the other provider.
+The planner first reads open main-targeting PR file lists through `gh` so it cannot unknowingly
+repeat already-paid evidence work. Stale scope excludes in-flight evidence. Exact `stable`,
+`exploratory`, `all`, and `single` scopes fail visibly when a selected pattern is in flight rather
+than silently shrinking the advertised 24/25/49/1 pattern count.
+
+The planner writes an ephemeral inventory and worklist plus a pending manifest under
+`verification/local-runs/`. It reports the exact plan ID, stable/exploratory unit counts, discovery
+flag, maximum searches, and number of open-PR exclusions checked. It refuses GitHub Actions and
+known evaluator API-key variables. No model, subagent, web search, provider preflight, or repository
+publication occurs during planning; the read-only GitHub PR query is not model research.
+
+Research begins only after the user responds with the exact phrase printed by the planner:
+
+```text
+APPROVE LOCAL EVALUATION <plan-id>
+```
+
+Bind that response to the immutable plan:
 
 ```bash
-gh secret set EVIDENCE_ANTHROPIC_API_KEY  # prompts without echoing the key
-# Or configure workload identity instead of a static evidence key:
-gh variable set EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID --body '<rule-id>'
-gh variable set EVIDENCE_ANTHROPIC_ORGANIZATION_ID --body '<organization-id>'
-gh variable set EVIDENCE_ANTHROPIC_SERVICE_ACCOUNT_ID --body '<service-account-id>'
-gh variable set EVIDENCE_ANTHROPIC_WORKSPACE_ID --body '<workspace-id>'
-# Optional, independent capabilities:
-gh secret set CLAUDE_ASSISTANT_API_KEY
-gh secret set CLAUDE_REVIEW_API_KEY
-gh variable set ENABLE_ANTHROPIC_ASSISTANT --body true
-gh variable set ENABLE_ANTHROPIC_REVIEW --body true
+python3 scripts/plan-local-verification.py approve \
+  --manifest verification/local-runs/codex-local-<uuid>.yaml \
+  --confirmation "APPROVE LOCAL EVALUATION <plan-id>"
 ```
 
-Use distinct underlying provider keys or service accounts for these capabilities when possible.
-Copying one raw key into several secret names separates workflow lookup, but not billing, scope, or
-revocation.
+Approval records the plan ID and UTC time, then makes the manifest read-only. Its SHA-256 becomes
+part of every search and verifier record. A changed plan, changed manifest, new run, or retry with a
+new plan needs new approval. An earlier blanket instruction is not approval for a plan that did not
+yet exist.
 
-API-key runs use the same provider preflight helper as OpenAI. Federation runs use a one-turn,
-no-tools invocation of the same pinned Claude action as research, followed by the same fail-closed
-execution-result check, before the matrix is allowed to start.
-The Anthropic job root-locks the checkout except for the assigned unit path, uses `dontAsk` mode
-with an exact project-read/one-file-edit permission rule, restricts the built-in tool set, disables
-all MCP and Bash tools, and derives retrieval metadata afterward with an immutable trusted helper.
-This verifier provider is independent from the optional `Claude Code Review` and `@claude`
-assistant workflows. The PR reviewer runs only when the `ENABLE_ANTHROPIC_REVIEW` repository
-variable is `true` and `CLAUDE_REVIEW_API_KEY` is set. The assistant uses the separate
-`CLAUDE_ASSISTANT_API_KEY`, runs only when `ENABLE_ANTHROPIC_ASSISTANT` is `true`, and accepts
-`@claude` requests only from the repository owner. Leave both enable variables absent or false for
-the no-provider default. When either dedicated key is absent, that optional workflow skips its
-provider action; deterministic PR checks continue without Claude review.
-No provider final-message or raw execution-file artifact is retained; normal action progress remains
-in GitHub's retained Actions log. For both providers, trusted hydration happens after the model and
-before export, so each immutable unit manifest binds the fetched resolved URLs, content hashes, and
-retrieval dates.
-The provider stage scans each fixed unit before upload; a fresh clean runner rejects unsafe entries
-and scans again after download without duplicating the just-completed fetch. The trusted assembler rejects
-missing, extra, duplicate, or mismatched units and reruns global cross-pattern validation before
-PR creation.
+If the user cancels or declines while the manifest is still pending, run no agents and commit
+nothing. Remove only that pending manifest and the ephemeral `verification/pattern-inventory.yaml`,
+`.verify-worklist`, and `verification/run-plan/` artifacts created by that plan. Never delete an
+approved manifest, evidence, or unrelated work as cancellation cleanup.
+
+The approved evaluation runs at most three `adoption_researcher` subagents concurrently, one
+pattern per agent. The root task is the only writer. Each worker searches the name, mechanism, and
+artifact modes with at most 12 live queries total and returns a structured proposal. Trusted local
+code hydrates every source URL and quote. A fresh `adoption_verifier` then independently reviews
+each batch's mechanism matches, tier admissions, dates, quotes, and independence claims.
+The unit and search caps bound the work but are not a fixed-price guarantee. OpenAI notes that
+[subagent workflows consume more tokens](https://learn.chatgpt.com/docs/agent-configuration/subagents)
+than comparable single-agent work, so review the complete unit count before approving a plan.
+
+After all approved units have been written, hydrated, and independently reviewed, finalize the run:
+
+```bash
+python3 scripts/finalize-local-verification.py \
+  --manifest verification/local-runs/codex-local-<uuid>.yaml \
+  --manifest-sha256 <approved-manifest-sha256>
+```
+
+Finalization enforces exact changed-path and manifest-bound provenance, removes selected pending
+slugs, synchronizes evidence-derived decision signals, regenerates `STATUS.md`, recomputes every
+verdict, scans candidate files for credentials, and runs the evidence tests. It does not commit,
+push, open a pull request, or merge.
+
+The user must inspect the final diff and give a second, post-validation approval for the exact plan:
+
+```text
+APPROVE DRAFT EVIDENCE PR <plan-id>
+```
+
+Only then may the root task create one commit and one **draft** evidence PR for the run. Evidence-gap
+issues are tracking outputs, not separate decision surfaces. Naming and rubric decisions remain
+human-owned in [DECISIONS.md](DECISIONS.md). The workflow never marks the PR ready and never merges
+it; a human reviews and merges it manually.
+
+GitHub Actions deliberately cannot run this evaluation. The `Adoption Evidence` workflow contains
+no evaluator key, model action, provider preflight, research matrix, or scheduled model refresh;
+its weekly role is limited to deterministic validation, freshness reporting, and read-only source
+checks. The former general `@claude` Actions assistant is removed. A separate fixed-purpose Claude
+PR-review workflow remains opt-in behind its own enable variable and dedicated key; it reviews pull
+requests and is not an evidence-research or refresh path.
 
 ## Schema v2
 
-Every evidence file uses `schema_version: 2`. A complete file has this shape (values abbreviated):
+Every evidence file uses `schema_version: 2`. New complete evidence uses local manifest provenance
+(values abbreviated):
 
 ```yaml
 schema_version: 2
@@ -306,11 +247,12 @@ pattern: Spec-Driven Development
 slug: spec-driven-development
 last_checked: 2026-07-10
 search:
-  run_id: "github-actions:123456789"
-  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/123456789
+  run_id: "codex-local:123e4567-e89b-42d3-a456-426614174000"
+  run_ref: verification/local-runs/codex-local-123e4567-e89b-42d3-a456-426614174000.yaml
+  run_manifest_sha256: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
   provider: openai
-  model: gpt-5.6-luna
-  prompt_version: evidence-v2-openai-codex-v1+sha256.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+  model: codex-managed
+  prompt_version: evidence-v2-codex-local-v1+sha256.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
   checked_at: 2026-07-10
   modes:
     name:
@@ -343,38 +285,56 @@ evidence:
     content_sha256: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
     verifier:
       method: automated
-      model: gpt-5.6-luna
-      prompt_version: evidence-v2-openai-codex-v1+sha256.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/123456789
+      model: codex-managed
+      prompt_version: evidence-v2-codex-local-v1+sha256.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      run_ref: verification/local-runs/codex-local-123e4567-e89b-42d3-a456-426614174000.yaml
+      run_manifest_sha256: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
     date: 2026-07-10       # omit when the source supplies no publication/update date
     retrieved: 2026-07-10
     claim: Runnable toolkit implements a specification-to-plan-to-tasks workflow.
 verdict: weak
 ```
 
-`scripts/validate-evidence.py` rejects asserted derived values; it recomputes them from the
-entries on every run.
+`scripts/validate-evidence.py` rejects asserted derived values; it recomputes them from the entries
+on every run.
+
+### Local run manifest
+
+Every future complete assessment points to one committed, content-addressed file under
+`verification/local-runs/`. The manifest records:
+
+- a `codex-local:<UUIDv4>` run ID and matching safe repository-relative path;
+- the base Git SHA, checked date, scope, exact selected slugs, and discovery flag;
+- the local Codex surface, model label, versioned prompt contract, and
+  `auth_mode: chatgpt-operator-attested`; and
+- the exact plan ID plus human approval status and UTC approval time.
+
+The plan ID hashes immutable plan fields; `run_manifest_sha256` hashes the approved manifest bytes.
+The validator rejects missing, pending, changed, symlinked, traversing, mismatched, or unselected
+manifests. The auth mode records the operator's assertion and does not claim cryptographic
+verification of the account's billing configuration. Likewise, `approval.status: approved` is an
+auditable operator attestation, not a signature or independent proof that the exact phrase was
+typed.
+
+Historical complete evidence with canonical `github-actions:<run-number>` IDs and matching
+repository Actions URLs remains valid historical provenance. New model-backed GitHub Actions runs
+are disabled and unsupported; local evidence uses `run_ref` and `run_manifest_sha256`, never
+`run_url`.
 
 ### Search provenance
 
 Complete provenance records all three search modes:
 
 - **name** — the catalog name and observed terminology variants;
-- **mechanism** — the behavior and problem, excluding the catalog name;
-- **artifact** — code/config fingerprints from working implementations.
+- **mechanism** — the behavior and problem, excluding the catalog name; and
+- **artifact** — code/configuration fingerprints from working implementations.
 
-Each mode requires the exact queries and candidate count, and the combined candidate count cannot
-be smaller than the admitted evidence set. Complete runs also record the selected research
-provider, actual model, and versioned contract identifier—even when `evidence: none found`—use at
-most 12 queries, and carry a
-`github-actions:<run-number>` ID bound to this repository's canonical Actions run URL, bind every
-verifier to that same run, require its model and prompt version to match the workflow-selected
-provider, and set `search.checked_at` equal to `last_checked`. The prompt version includes a SHA-256
-fingerprint of the pinned workflow, permission profile, and shared research methodology, so a
-contract change produces a new machine-checked identifier. The clean candidate job additionally
-binds selected files to the current run and requires exact completion of the deterministic
-worklist. `evidence: none found` is valid only with this auditable complete search record; its run
-URL identifies the immutable provider execution even though there are no entry-level verifiers.
+Each mode requires exact queries and a candidate count. The combined candidate count cannot be
+smaller than the admitted evidence set. Complete runs use at most 12 queries, set
+`search.checked_at` equal to `last_checked`, and bind every verifier to the same model, prompt
+version, run manifest, and manifest digest. The prompt version includes a SHA-256 fingerprint of the
+skill and shared methodology, so a contract change produces a new machine-checked identifier.
+`evidence: none found` is valid only with this complete bounded-search record.
 
 A legacy import uses `run_id: legacy-import`, empty query lists, and null candidate counts. It also
 records the immutable original PR in `legacy_run_url` and states precisely what was not retained in
@@ -384,28 +344,25 @@ records the immutable original PR in `legacy_run_url` and states precisely what 
 
 Every entry records:
 
-- `source_kind` — constrained by its tier;
-- `organization` — human-readable source owner or author affiliation;
-- `independence_group` — a stable lowercase machine key used to prevent double-counting;
-- `url` and `resolved_url` — the submitted and final canonical URLs;
-- `content_sha256` — SHA-256 of normalized fetched response text;
-- `verifier` — method, model, prompt version, and immutable run URL;
-- `retrieved` — the actual fetch date; and
-- `mechanism_quote` — a verbatim passage demonstrating the same mechanism.
+- `source_kind` constrained by its tier;
+- `organization` and stable lowercase `independence_group`;
+- submitted `url`, fetched `resolved_url`, and normalized `content_sha256`;
+- verifier method, model, prompt version, local manifest reference, and manifest digest;
+- actual `retrieved` date; and
+- a short verbatim `mechanism_quote` demonstrating the same mechanism.
 
-Complete entries require all provenance values and a mechanism quote. Legacy imports retain
-truthful null hash/verifier values and any historical quote gaps; this incompleteness is why they
-cannot verify. A source's `date` is included only when the source itself supplies a publication or
-update date—retrieval dates are never substituted.
+Complete entries require every provenance value and a mechanism quote. Legacy imports retain
+truthful null hash/verifier values and historical quote gaps; this incompleteness is why they cannot
+verify. A source's `date` is included only when the source itself supplies a publication or update
+date—retrieval dates are never substituted.
 
-Organization labels map consistently to one independence group across the evidence corpus, so one
-company cannot become “independent” by inventing two group keys. Complete content digests are also
-globally unique. The network checker rejects local/private DNS and IP targets, revalidates every
-redirect, caps redirects and response size, compares the observed final URL with `resolved_url`,
-and requires a mechanism quote that normalizes to at least 20 characters.
+Organization labels map consistently to one independence group across the corpus. Complete content
+digests and canonical URLs are globally unique. The network checker rejects local/private DNS and
+IP targets, revalidates every redirect, caps redirects and response size, compares the observed
+final URL with `resolved_url`, and requires a mechanism quote that normalizes to at least 20
+characters.
 
-Use the deterministic producer to fetch a source, follow redirects, normalize visible text, compute
-the digest, and verify the proposed quote before adding an entry:
+Use the deterministic producer to inspect one proposed source before adding it:
 
 ```bash
 python3 scripts/evidence_content.py https://example.com/source \
@@ -418,7 +375,7 @@ At most three entries per tier may be scored. One `independence_group` may score
 pattern file.
 
 | Tier | Weight | Allowed `source_kind` | Admission test |
-|------|--------|-----------------------|----------------|
+|---|---:|---|---|
 | T1 | 5 | `shipped_product`, `open_source_implementation` | Can a user run the implementation today? |
 | T2 | 4 | `official_documentation`, `reference_architecture` | Is it canonical guidance rather than promotion? |
 | T3 | 3 | `conference_talk`, `peer_reviewed_research` | Is there a dated talk record or reviewed publication? |
@@ -430,8 +387,7 @@ T5 is a discovery/naming signal. It never unlocks a verified adoption verdict.
 ## Derived fields
 
 **`adoption_score`** is the tier-weight sum, capped at three entries per tier (range 0–45). The
-displayed score includes T5, but the verified threshold counts T1–T4 points only, so a social or
-opinion point cannot supply the deciding eighth point.
+displayed score includes T5, but the verified threshold counts T1–T4 points only.
 
 **`adoption_dimensions`** separates availability from adoption:
 
@@ -442,13 +398,12 @@ opinion point cannot supply the deciding eighth point.
 
 **`verdict`** is recomputed:
 
-- `verified` — complete v2 provenance, at least 8 T1–T4 points,
-  `implementation_available: true`, and
-  `independent_adoption: true`;
+- `verified` — complete v2 provenance, at least 8 T1–T4 points, an implementation, and independent
+  adoption;
 - `weak` — assessed evidence that does not meet every verified condition, including every
   positive-score legacy import; and
-- `unverified` — score <= 2. Complete provenance proves that this follows a three-mode search;
-  a legacy import with this verdict still remains **needs refresh**.
+- `unverified` — score <= 2. Complete provenance proves that this follows a three-mode search; a
+  legacy import with this verdict still remains **needs refresh**.
 
 **`naming_alignment`** is a separate terminology signal computed from each entry's `match`:
 
@@ -457,7 +412,7 @@ opinion point cannot supply the deciding eighth point.
 - `aliased` — none use the catalog name, but sources use other stable names; and
 - `none` — the mechanism is practiced without a stable name.
 
-`terminology_variants` records those other names. A strong adoption verdict with weak or aliased
+`terminology_variants` records alternative names. A strong adoption verdict with weak or aliased
 naming is a rename/alias discussion, not an adoption failure.
 
 ## Legacy migration
@@ -473,7 +428,7 @@ per-mode candidate counts, content hashes, or verifier metadata. Migration there
 - removes publication dates that were actually retrieval dates; and
 - leaves hashes and unavailable verifier data null.
 
-No missing search, quote, or hash was invented. A normal complete refresh is the only route from
+No missing search, quote, or hash was invented. A complete local refresh is the only route from
 **needs refresh** to a verified verdict.
 
 ## Generated status and human decisions
@@ -483,7 +438,7 @@ assessed, verified, weak, unverified, and pending counts separately. `stale` (mo
 since a complete check) and `needs refresh` are overlapping freshness/provenance signals, not
 verdicts.
 
-[DECISIONS.md](DECISIONS.md) is the human-owned naming and rubric ledger. Trusted aggregation
+[DECISIONS.md](DECISIONS.md) is the human-owned naming and rubric ledger. Local finalization
 synchronizes evidence-derived Alignment and may add a neutral review placeholder, but never edits
 an existing human Decision. Humans own detailed terms, recommendations, and decisions. After a
 human edit, regenerate the status file:
@@ -495,7 +450,8 @@ python3 scripts/generate-verification-status.py
 ## Files
 
 - `evidence/<slug>.yaml` — one schema-v2 assessment per catalog slug.
-- `pending-evidence.yaml` — catalog slugs with no assessment; shrinks atomically with evidence.
-- `STATUS.md` — generated at-a-glance coverage, verdict, naming, and freshness view.
+- `local-runs/codex-local-<uuid>.yaml` — immutable approved plan and local execution attestation.
+- `pending-evidence.yaml` — catalog slugs with no assessment; updated during local finalization.
+- `STATUS.md` — generated coverage, verdict, naming, and freshness view.
 - `DECISIONS.md` — human-owned naming and rubric decisions.
-- `pattern-inventory.yaml` and candidate artifacts — ephemeral and never committed.
+- `pattern-inventory.yaml`, `.verify-worklist`, and `run-plan/` — ephemeral planning artifacts.

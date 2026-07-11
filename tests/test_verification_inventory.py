@@ -179,11 +179,11 @@ def test_discovery_mode_has_one_shared_file_unit():
     }]
 
 
-def test_execution_matrix_enforces_github_job_limit():
+def test_execution_matrix_enforces_local_safety_limit():
     selected = [record(f"Pattern {index}", f"pattern-{index}")
                 for index in range(MODULE.MAX_EXECUTION_UNITS + 1)]
 
-    with pytest.raises(ValueError, match="matrix limit"):
+    with pytest.raises(ValueError, match="unit safety limit"):
         MODULE.build_execution_matrix(selected, "stale-default")
 
 

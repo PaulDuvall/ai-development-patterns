@@ -1,0 +1,264 @@
+#!/usr/bin/env python3
+"""Shared fail-closed helpers for local Codex evaluation run manifests."""
+
+import datetime
+import hashlib
+import json
+import re
+import stat
+from pathlib import Path
+
+import yaml
+from yaml.constructor import ConstructorError
+from yaml.events import AliasEvent
+
+
+LOCAL_MANIFEST_VERSION = 1
+LOCAL_RUN_ID_RE = re.compile(
+    r"^codex-local:([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-"
+    r"[89ab][0-9a-f]{3}-[0-9a-f]{12})$")
+LOCAL_RUN_REF_RE = re.compile(
+    r"^verification/local-runs/codex-local-([0-9a-f]{8}-[0-9a-f]{4}-"
+    r"4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\.yaml$")
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+GIT_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+PROMPT_VERSION_RE = re.compile(
+    r"^evidence-v2-codex-local-v1\+sha256\.[0-9a-f]{64}$")
+SCOPES = {"stale", "stable", "exploratory", "all", "single", "discovery"}
+SURFACES = {"codex-app", "codex-cli", "codex-ide"}
+MAX_MANIFEST_BYTES = 1024 * 1024
+
+MANIFEST_FIELDS = {
+    "schema_version", "run_id", "plan_id", "base_sha", "checked_date",
+    "scope", "selected_slugs", "include_discovery", "execution", "approval",
+}
+EXECUTION_FIELDS = {
+    "provider", "surface", "auth_mode", "model", "prompt_version",
+}
+APPROVAL_FIELDS = {"status", "approved_at", "plan_id"}
+
+
+class UniqueKeyLoader(yaml.SafeLoader):
+    """Safe YAML loader that also rejects aliases and duplicate keys."""
+
+    def compose_node(self, parent, index):
+        if self.check_event(AliasEvent):
+            event = self.peek_event()
+            raise ConstructorError(
+                "while composing YAML", event.start_mark,
+                "aliases are not allowed in local run manifests", event.start_mark)
+        return super().compose_node(parent, index)
+
+
+def _construct_unique_mapping(loader, node, deep=False):
+    mapping = {}
+    for key_node, value_node in node.value:
+        key = loader.construct_object(key_node, deep=deep)
+        try:
+            duplicate = key in mapping
+        except TypeError as exc:
+            raise ConstructorError(
+                "while constructing YAML", node.start_mark,
+                "found an unhashable key", key_node.start_mark) from exc
+        if duplicate:
+            raise ConstructorError(
+                "while constructing YAML", node.start_mark,
+                f"found duplicate key {key!r}", key_node.start_mark)
+        mapping[key] = loader.construct_object(value_node, deep=deep)
+    return mapping
+
+
+UniqueKeyLoader.add_constructor(
+    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _construct_unique_mapping)
+
+
+def iso_date(value):
+    """Return whether value is an exact YYYY-MM-DD calendar date."""
+    if isinstance(value, datetime.date):
+        value = value.isoformat()
+    if not isinstance(value, str) or re.fullmatch(r"\d{4}-\d{2}-\d{2}", value) is None:
+        return False
+    try:
+        datetime.date.fromisoformat(value)
+    except ValueError:
+        return False
+    return True
+
+
+def approved_timestamp(value):
+    """Return whether value is a UTC ISO timestamp emitted by the planner."""
+    if not isinstance(value, str) or not value.endswith("Z"):
+        return False
+    try:
+        datetime.datetime.fromisoformat(value[:-1] + "+00:00")
+    except ValueError:
+        return False
+    return True
+
+
+def canonical_plan(manifest):
+    """Return the immutable fields covered by plan_id."""
+    checked_date = manifest.get("checked_date")
+    if isinstance(checked_date, datetime.date):
+        checked_date = checked_date.isoformat()
+    return {
+        "schema_version": manifest.get("schema_version"),
+        "run_id": manifest.get("run_id"),
+        "base_sha": manifest.get("base_sha"),
+        "checked_date": checked_date,
+        "scope": manifest.get("scope"),
+        "selected_slugs": manifest.get("selected_slugs"),
+        "include_discovery": manifest.get("include_discovery"),
+        "execution": manifest.get("execution"),
+    }
+
+
+def compute_plan_id(manifest):
+    """Hash a canonical JSON encoding of the immutable research plan."""
+    payload = json.dumps(
+        canonical_plan(manifest), sort_keys=True, separators=(",", ":"),
+        ensure_ascii=False).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def manifest_sha256(path):
+    """Return the digest that evidence records after human approval."""
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def run_ref_for_id(run_id):
+    """Return the only allowed repository-relative path for a local run ID."""
+    match = LOCAL_RUN_ID_RE.fullmatch(run_id) if isinstance(run_id, str) else None
+    if match is None:
+        raise ValueError("local run_id must be codex-local:<UUIDv4>")
+    return f"verification/local-runs/codex-local-{match.group(1)}.yaml"
+
+
+def validate_manifest(data, run_ref=None, require_approved=True):
+    """Validate a local plan manifest and return it unchanged."""
+    if not isinstance(data, dict) or set(data) != MANIFEST_FIELDS:
+        raise ValueError("local run manifest has missing or unknown top-level fields")
+    if data.get("schema_version") != LOCAL_MANIFEST_VERSION \
+            or type(data.get("schema_version")) is not int:
+        raise ValueError(f"local run manifest schema_version must be {LOCAL_MANIFEST_VERSION}")
+    run_id = data.get("run_id")
+    run_match = LOCAL_RUN_ID_RE.fullmatch(run_id) if isinstance(run_id, str) else None
+    if run_match is None:
+        raise ValueError("local run manifest run_id must be codex-local:<UUIDv4>")
+    if run_ref is not None:
+        ref_match = (
+            LOCAL_RUN_REF_RE.fullmatch(run_ref)
+            if isinstance(run_ref, str) else None)
+        if ref_match is None or ref_match.group(1) != run_match.group(1):
+            raise ValueError("local run manifest path must match its run_id")
+    base_sha = data.get("base_sha")
+    if not isinstance(base_sha, str) or GIT_SHA_RE.fullmatch(base_sha) is None:
+        raise ValueError("local run manifest base_sha must be a full Git SHA")
+    if not iso_date(data.get("checked_date")):
+        raise ValueError("local run manifest checked_date must be YYYY-MM-DD")
+    if data.get("scope") not in SCOPES:
+        raise ValueError(f"local run manifest scope must be one of {sorted(SCOPES)}")
+    selected = data.get("selected_slugs")
+    if not isinstance(selected, list) or not all(
+            isinstance(slug, str) and SLUG_RE.fullmatch(slug) for slug in selected):
+        raise ValueError("local run manifest selected_slugs must be canonical slugs")
+    if len(selected) != len(set(selected)):
+        raise ValueError("local run manifest selected_slugs contains duplicates")
+    if data["scope"] == "single" and len(selected) != 1:
+        raise ValueError("single scope must select exactly one pattern")
+    if data["scope"] == "discovery" and selected:
+        raise ValueError("discovery scope must not select evidence patterns")
+    if type(data.get("include_discovery")) is not bool:
+        raise ValueError("local run manifest include_discovery must be boolean")
+    if data["scope"] == "discovery" and not data["include_discovery"]:
+        raise ValueError("discovery scope must include discovery")
+
+    execution = data.get("execution")
+    if not isinstance(execution, dict) or set(execution) != EXECUTION_FIELDS:
+        raise ValueError("local run manifest execution fields are invalid")
+    if execution.get("provider") != "openai":
+        raise ValueError("local Codex evaluation provider must be openai")
+    if execution.get("surface") not in SURFACES:
+        raise ValueError(f"local Codex surface must be one of {sorted(SURFACES)}")
+    if execution.get("auth_mode") != "chatgpt-operator-attested":
+        raise ValueError("local Codex auth_mode must be chatgpt-operator-attested")
+    if not isinstance(execution.get("model"), str) or not execution["model"].strip():
+        raise ValueError("local Codex model label must be non-empty")
+    prompt_version = execution.get("prompt_version")
+    if not isinstance(prompt_version, str) \
+            or PROMPT_VERSION_RE.fullmatch(prompt_version) is None:
+        raise ValueError("local Codex prompt_version must contain the contract SHA-256")
+
+    plan_id = data.get("plan_id")
+    if not isinstance(plan_id, str) or SHA256_RE.fullmatch(plan_id) is None \
+            or plan_id != compute_plan_id(data):
+        raise ValueError("local run manifest plan_id does not match its immutable plan")
+    approval = data.get("approval")
+    if not isinstance(approval, dict) or set(approval) != APPROVAL_FIELDS:
+        raise ValueError("local run manifest approval fields are invalid")
+    if approval.get("plan_id") != plan_id:
+        raise ValueError("local run approval must bind the exact plan_id")
+    if approval.get("status") == "pending":
+        if approval.get("approved_at") is not None:
+            raise ValueError("pending local run approval must have approved_at: null")
+        if require_approved:
+            raise ValueError("local run manifest has not been human-approved")
+    elif approval.get("status") == "approved":
+        if not approved_timestamp(approval.get("approved_at")):
+            raise ValueError("approved local run must record a UTC approved_at timestamp")
+    else:
+        raise ValueError("local run approval status must be pending or approved")
+    return data
+
+
+def load_manifest(repo_root, run_ref, expected_sha256=None, require_approved=True):
+    """Load a safe repository-relative manifest and bind its exact bytes."""
+    if not isinstance(run_ref, str) or LOCAL_RUN_REF_RE.fullmatch(run_ref) is None:
+        raise ValueError("search.run_ref must be a safe verification/local-runs path")
+    if expected_sha256 is not None and (
+            not isinstance(expected_sha256, str)
+            or SHA256_RE.fullmatch(expected_sha256) is None):
+        raise ValueError("search.run_manifest_sha256 must be 64 lowercase hex characters")
+    root = Path(repo_root).resolve()
+    relative = Path(run_ref)
+    parent = root
+    for part in relative.parts[:-1]:
+        parent /= part
+        info = parent.lstat()
+        if parent.is_symlink() or not stat.S_ISDIR(info.st_mode):
+            raise ValueError("local run manifest parent must be a real directory")
+    path = root / relative
+    info = path.lstat()
+    if path.is_symlink() or not stat.S_ISREG(info.st_mode):
+        raise ValueError("local run manifest must be a regular non-symlink file")
+    if info.st_size > MAX_MANIFEST_BYTES:
+        raise ValueError("local run manifest exceeds the size limit")
+    digest = manifest_sha256(path)
+    if expected_sha256 is not None and digest != expected_sha256:
+        raise ValueError("search.run_manifest_sha256 does not match the local run manifest")
+    data = yaml.load(path.read_text(encoding="utf-8"), Loader=UniqueKeyLoader)
+    return validate_manifest(data, run_ref, require_approved), path, digest
+
+
+def write_manifest(path, data):
+    """Write a stable local manifest after validating its current state."""
+    validate_manifest(data, require_approved=False)
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.is_symlink() or (target.exists() and not target.is_file()):
+        raise ValueError("local run manifest target must be a regular non-symlink file")
+    target.write_text(
+        yaml.safe_dump(data, sort_keys=False, allow_unicode=True), encoding="utf-8")
+
+
+def contract_digest(paths):
+    """Hash ordered contract filenames and bytes without checkout-path variance."""
+    digest = hashlib.sha256()
+    for path in paths:
+        source = Path(path)
+        digest.update(source.name.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(source.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()

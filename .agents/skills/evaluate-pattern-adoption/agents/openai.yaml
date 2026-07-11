@@ -1,0 +1,4 @@
+interface:
+  display_name: "Evaluate Pattern Adoption"
+  short_description: "Run local multi-agent adoption research"
+  default_prompt: "Use $evaluate-pattern-adoption to evaluate all stable and exploratory patterns locally."
