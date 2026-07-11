@@ -5,6 +5,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
   schedule:
     # Run weekly to catch external link issues
     - cron: '0 6 * * 1'
@@ -31,6 +32,9 @@ jobs:
       run: |
         python3 -m pip install --upgrade pip
         python3 -m pip install -r tests/requirements.txt
+
+    - name: Validate canonical two-word pattern names
+      run: python3 scripts/validate-pattern-names.py
     
     - name: Run pattern compliance tests
       run: |

@@ -32,7 +32,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 12. **Maintain Test-to-Specification Traceability**: Link every specification element to automated tests with anchored references and coverage tracking using [Spec-Driven Development](../README.md#spec-driven-development).
 
-13. **Structured Observability**: Implement comprehensive logging with operation context, correlation IDs, and specific error details in standardized formats (JSON/structured) for AI analysis and debugging using [Observable Development](../README.md#observable-development).
+13. **Structured Observability**: Implement comprehensive logging with operation context, correlation IDs, and specific error details in standardized formats (JSON/structured) for AI analysis and debugging using [Agent Observability](../README.md#agent-observability).
 
 14. **Transparent Error Handling**: Design error messages and system responses with sufficient context for AI diagnosis, including error codes, affected components, and suggested remediation steps using [Error Resolution](../README.md#error-resolution).
 
@@ -54,7 +54,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 21. **Capture High-Impact Knowledge**: Document successful patterns (>80% success rate) and failure modes (>30 minutes wasted) in structured, searchable formats with specific success metrics and context.
 
-22. **Context Optimization**: Match AI tool selection to task complexity using [Context Optimization](../experiments/README.md#context-optimization) and defined criteria: simple models for queries <500 tokens, complex models for architecture decisions >2000 tokens.
+22. **[Model Routing](../README.md#model-routing)**: Match AI tool selection to task complexity using defined criteria: simple models for queries <500 tokens, complex models for architecture decisions >2000 tokens.
 
 23. **Image Spec**: Use diagrams, mockups, and flows as primary specifications for complex needs using [Image Spec](../README.md#image-spec), supplemented with structured text for precise details.
 
@@ -68,7 +68,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 27. **Self-Documenting Commands**: Include comprehensive built-in help with usage patterns, examples, and parameter explanations in every AI development tool using [Custom Commands](../README.md#custom-commands).
 
-28. **Hooks-Based Governance**: Implement flexible hook systems for automated monitoring, logging, and policy enforcement at critical development workflow points using [Event Automation](../README.md#event-automation).
+28. **Hooks-Based Governance**: Implement flexible hook systems for automated monitoring, logging, and policy enforcement at critical development workflow points using [Agent Hooks](../README.md#agent-hooks).
 
 29. **Modular Command Architecture**: Organize AI tools into clear categories with well-defined scopes (project-specific vs. machine-wide) for flexible workflows.
 
@@ -80,9 +80,9 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 32. **Policy Generation**: Transform compliance specifications into executable Cedar/OPA policy files using AI assistance for consistency and automation with [Policy Generation](../README.md#policy-generation).
 
-33. **Security Orchestration**: Aggregate multiple security tools and use AI to summarize findings, reducing alert fatigue while maintaining rigor with [Security Orchestration](../README.md#security-orchestration).
+33. **[Security Orchestration](../experiments/README.md#security-orchestration)**: Aggregate multiple security tools and use AI to summarize findings, reducing alert fatigue while maintaining rigor.
 
-34. **Baseline Management**: Use AI to analyze historical data and establish intelligent monitoring thresholds that minimize false positives using [Observable Development](../README.md#observable-development).
+34. **Baseline Management**: Use AI to analyze historical data and establish intelligent monitoring thresholds that minimize false positives using [Agent Observability](../README.md#agent-observability).
 
 35. **Incident Automation**: Generate actionable playbooks from historical incident data and continuously improve operational procedures using [Incident Automation](../experiments/README.md#incident-automation).
 
@@ -118,7 +118,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 49. **Continuous Integration for AI**: Implement CI pipelines that include AI model validation, performance regression testing, and automated deployment of AI components alongside traditional code.
 
-50. **Chaos Engineering for AI Systems**: Apply chaos engineering principles to AI systems by introducing controlled failures in AI model responses, degraded model performance, and service dependencies.
+50. **[Guided Chaos](../README.md#guided-chaos) for AI Systems**: Apply controlled failures to AI model responses, degraded model performance, and service dependencies.
 
 ## Version Control Security
 
@@ -204,7 +204,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 ### Phase 3: Advanced Capabilities (Weeks 5-8)
 - Practices 16-25: Parallel development, knowledge management, AI model lifecycle
-- Practice 50: Chaos engineering for AI systems
+- Practice 50: [Guided Chaos](../README.md#guided-chaos) for AI systems
 - Scale to sophisticated multi-agent and context-aware development with resilience testing
 
 ### Phase 4: Operations & Tooling (Continuous)
@@ -228,7 +228,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 ### Development Success  
 - >90% test coverage maintained for AI-generated code
 - Faster feature delivery with maintained quality standards
-- Reduced debugging time through observable development
+- Reduced debugging time through [Agent Observability](../README.md#agent-observability)
 
 ### Operations Success
 - Automated policy compliance verification and reporting
@@ -251,7 +251,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 | **Cloud & Platform Frameworks** | AWS Well-Architected Framework • Azure Well-Architected Framework • Google Cloud Architecture Framework • Cloud Native Computing Foundation (CNCF) • Platform Engineering |
 | **Methodologies & Practices** | Extreme Programming (XP) • Kanban • Lean • Trunk-Based Development • Steel Thread • Pair Programming • Mob Programming |
 | **Operations & Delivery**  | 12-Factor App • Continuous Integration • Continuous Delivery • Continuous Deployment • Feature Toggles • Infrastructure as Code (IaC) • DevOps • DevSecOps • Site Reliability Engineering (SRE) |
-| **Techniques**             | Code Reviews • Prototyping / Spikes • Progressive Delivery (Canary, Blue/Green) • Chaos Engineering • Metrics & Observability |
+| **Techniques**             | Code Reviews • Prototyping / Spikes • Progressive Delivery (Canary, Blue/Green) • [Guided Chaos](../README.md#guided-chaos) • Metrics & Observability |
 
 ---
 

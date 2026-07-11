@@ -1,6 +1,7 @@
 # Experimental Pattern Notes
 
-This file tracks patterns under exploration that may eventually be formalized into full patterns.
+This file tracks ideas that are not yet full catalog patterns. Formal experimental patterns live in
+[README.md](README.md).
 
 ## Pattern Exploration Queue
 
@@ -9,144 +10,41 @@ This file tracks patterns under exploration that may eventually be formalized in
 **Status**: Early exploration
 **Date Added**: 2025-12-04
 
-**Description**: Using voice input tools (e.g., WisprFlow, Talon Voice, Voice Control for VSCode) to dictate code, commands, and AI prompts for hands-free development.
+**Description**: Use voice input tools to dictate prompts, commands, and limited code while
+preserving keyboard or pointer fallback for precision work.
 
 **Potential Use Cases**:
+
 - Accessibility for developers with mobility limitations
-- Reducing repetitive strain injuries (RSI)
-- Faster prompt composition for AI interactions
-- Multi-modal input (voice + keyboard/mouse hybrid)
-- Hands-free code review and exploration
+- Reduced repetitive strain during prompt-heavy work
+- Faster high-level prompt composition
+- Hands-free code review and navigation
 
 **Tools to Evaluate**:
-- [WisprFlow](https://wisprflow.ai/) - Voice-to-text for coding
-- [Talon Voice](https://talonvoice.com/) - Voice control for development
-- [Voice Control for VSCode](https://marketplace.visualstudio.com/items?itemName=pokey.cursorless) - VSCode voice extensions
-- Native OS voice control (macOS Voice Control, Windows Speech Recognition)
+
+- [Wispr Flow](https://wisprflow.ai/)
+- [Talon Voice](https://talonvoice.com/)
+- [Cursorless](https://www.cursorless.org/)
+- Native operating-system voice control
 
 **Research Questions**:
-1. How accurate is voice-to-code for technical terminology (function names, variable names)?
-2. Can voice dictation handle AI prompt composition effectively?
-3. What's the learning curve for voice commands vs. keyboard shortcuts?
-4. Does voice input improve or hinder AI-assisted development workflows?
-5. How does voice integrate with existing AI coding tools (Claude Code, Cursor, Copilot)?
 
-**Next Steps**:
-- [ ] Test WisprFlow with Claude Code for prompt dictation
-- [ ] Evaluate voice accuracy for Python/JavaScript/TypeScript
-- [ ] Measure WPM (words per minute) voice vs. keyboard for prompts
-- [ ] Document voice command vocabulary for common AI interactions
-- [ ] Assess impact on [Agent Memory](../README.md#agent-memory) pattern
+1. How accurately does voice input handle identifiers and technical vocabulary?
+2. Which tasks benefit from voice rather than keyboard input?
+3. How should sensitive dictated content be detected and redacted?
+4. Does voice input improve throughput without increasing correction time?
 
 **Related Patterns**:
-- [Tool Integration](../README.md#tool-integration) - Voice as input tool for AI
-- [Developer Lifecycle](../README.md#developer-lifecycle) - Voice-triggered workflow commands
-- [Agent Memory](../README.md#agent-memory) - Voice input as context source
+
+- [Tool Integration](../README.md#tool-integration) — voice is an input tool.
+- [Developer Lifecycle](../README.md#developer-lifecycle) — voice may trigger workflow steps.
+- [Agent Memory](../README.md#agent-memory) — transcripts can become retained context.
 
 **Anti-patterns to Avoid**:
-- Over-reliance on voice for precise code editing (better for high-level commands)
-- Using voice in noisy environments (poor transcription accuracy)
-- Voice-only workflow without keyboard fallback (voice fatigue)
 
----
-
-### Agentic Loops
-
-**Status**: Early exploration
-**Date Added**: 2025-01-11
-
-**Description**: Enable long autonomous coding sessions where AI iteratively improves work until explicit completion criteria are met. Uses a stop hook to intercept exit attempts and feed the same prompt back, allowing Claude to self-correct through test failures, error messages, and its own code. See the [Claude Code Ralph Wiggum plugin](https://github.com/anthropics/claude-code/blob/main/plugins/ralph-wiggum/README.md).
-
-**Core Mechanics**:
-- **Stop hook** intercepts exit attempts and re-injects the original prompt
-- **File persistence** allows each iteration to see previous work
-- **Completion promise** (e.g., `<promise>COMPLETE</promise>`) signals success
-- **Iteration limits** provide safety bounds (e.g., `--max-iterations 50`)
-
-**Potential Use Cases**:
-- Greenfield projects you can start and walk away from
-- TDD workflows: write failing tests → implement → run tests → fix → repeat
-- Multi-phase feature builds with clear success criteria
-- Tasks with automatic verification (tests, linters, type checkers)
-
-**Tools to Evaluate**:
-- [Ralph Wiggum Plugin](https://github.com/anthropics/claude-code/blob/main/plugins/ralph-wiggum/README.md) - Official Claude Code agentic loop implementation
-- Custom stop hooks with iteration tracking
-- Prompt templates with completion promises
-
-**Research Questions**:
-1. How do you craft effective completion promises that prevent false positives?
-2. What iteration limits balance thoroughness vs. cost for different task types?
-3. How should prompts structure incremental goals for multi-phase work?
-4. When should loops include explicit fallback/escape instructions?
-5. What metrics distinguish productive iteration from thrashing?
-
-**Next Steps**:
-- [ ] Test /ralph-loop with various task types (API builds, test suites, refactoring)
-- [ ] Document effective prompt templates with completion promises
-- [ ] Measure iteration counts and API costs for common workflows
-- [ ] Define prompt patterns for self-correction (TDD cycles, debug loops)
-- [ ] Identify tasks unsuitable for agentic loops (design decisions, unclear criteria)
-
-**Related Patterns**:
-- [Parallel Agents](../README.md#parallel-agents) - Multiple loops running concurrently
-- [Developer Lifecycle](../README.md#developer-lifecycle) - Triggering loops on events
-- [CheckPoint](#checkpoint) - Validation criteria within loop iterations
-
-**Anti-patterns to Avoid**:
-- Missing iteration limits (runaway costs, infinite loops)
-- Vague completion criteria ("make it good" vs. explicit success metrics)
-- Tasks requiring human judgment or design decisions
-- Prompts without self-correction guidance (test → fix → retry cycles)
-- Generating large codebases you don't understand or know how to maintain
-
----
-
-### CheckPoint
-
-**Status**: Early exploration
-**Date Added**: 2025-01-11
-
-**Description**: A systematic validation gate that runs a series of quality checks (refactoring, security, code quality, performance, architecture, documentation) after each development task to ensure continuous quality.
-
-**Potential Use Cases**:
-- Post-commit quality validation before pushing
-- Pre-merge checks in pull request workflows
-- Continuous compliance verification during development
-- Architecture drift detection after feature additions
-- Documentation freshness validation
-
-**Tools to Evaluate**:
-- Claude Code slash commands (/xsecurity, /xquality, /xrefactor, etc.)
-- Pre-commit hooks with multi-check orchestration
-- Custom checkpoint scripts with configurable check suites
-- CI/CD pipeline quality gates
-
-**Research Questions**:
-1. What's the optimal set of checks to run after each task?
-2. How do you balance thoroughness vs. developer velocity?
-3. Should checkpoints be blocking or advisory?
-4. How do you handle check failures mid-workflow?
-5. Can AI assistants auto-remediate checkpoint failures?
-
-**Next Steps**:
-- [ ] Define standard checkpoint check categories
-- [ ] Create configurable checkpoint profiles (quick, standard, thorough)
-- [ ] Implement checkpoint as Claude Code custom command
-- [ ] Measure impact on code quality metrics over time
-- [ ] Document checkpoint integration with CI/CD pipelines
-
-**Related Patterns**:
-- [Agent Readiness](../README.md#agent-readiness) - Code quality prerequisites before automation
-- [Security Sandbox](../README.md#security-sandbox) - Running agents in isolated environments
-- [Agentic Loops](#agentic-loops) - Long autonomous coding sessions with self-correction
-- [Guided Refactoring](../README.md#guided-refactoring) - Code improvement checks
-
-**Anti-patterns to Avoid**:
-- Running all checks on every minor change (developer fatigue)
-- Checkpoint failures without actionable remediation guidance
-- Skipping checkpoints under time pressure (quality debt)
-- One-size-fits-all checks regardless of change scope
+- Voice-only workflows without a precision fallback
+- Dictating secrets or regulated data into unapproved transcription services
+- Treating transcription confidence as code correctness
 
 ---
 
@@ -155,84 +53,89 @@ This file tracks patterns under exploration that may eventually be formalized in
 **Status**: Early exploration
 **Date Added**: 2026-07-10
 
-**Description**: Delegating asynchronous agent work by mentioning or tagging an agent in existing collaboration surfaces so the agent inherits thread context, performs code or workflow actions, and reports results back where the work was requested.
+**Description**: Trigger asynchronous agent work by mentioning an agent in an existing collaboration
+thread so the request inherits bounded context and reports status back to the same surface.
+
+This exploration owns only the **trigger**. [Code Research](../README.md#code-research) owns
+investigative intent; [Long-Running Orchestration](README.md#long-running-orchestration) owns
+duration, durable state, and checkpoints; [Bounded Autonomy](../README.md#bounded-autonomy) owns
+turn, spend, time, stall, and divergence limits; and
+[Handoff Protocols](README.md#handoff-protocols) owns return, approval, correction, and takeover.
 
 **Potential Use Cases**:
-- Assigning repository tasks from Slack threads without leaving team discussion context
-- Turning incident, support, or product conversations into agent-executed follow-up work
-- Letting non-IDE collaborators request pull requests, tickets, analysis, or documentation updates
-- Preserving visible delegation trails in channels, issue threads, and team workspaces
+
+- Assigning a repository task from a Slack or Teams discussion
+- Turning incident or support conversations into agent-executed follow-up work
+- Letting non-IDE collaborators request analysis, documentation, issues, or pull requests
+- Preserving a visible delegation and status trail in the originating thread
 
 **Tools to Evaluate**:
-- [Claude Tag](https://www.anthropic.com/news/introducing-claude-tag) - Slack-based shared Claude agent that responds to `@Claude`, uses connected tools, and works asynchronously
-- [GitHub Copilot cloud agent for Slack](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/integrate-cloud-agent-with-slack) - Slack integration for initiating Copilot cloud agent sessions and opening pull requests from conversation context
-- [ChatGPT workspace agents](https://help.openai.com/en/articles/20001143-chatgpt-workspace-agents-for-enterprise-and-business) - Shared agents that can be created, used, shared, and managed in ChatGPT and Slack under organization controls
 
-**Discovery Sources**:
-- Anthropic introduced Claude Tag on June 23, 2026, describing Slack tagging as a way to assign tasks, use connected tools, respond in-thread, and run asynchronously over hours or days.
-- GitHub documents a Copilot cloud agent Slack integration where users mention the GitHub app or send direct messages to initiate cloud agent sessions, capture thread context, and open pull requests.
-- OpenAI documents ChatGPT workspace agents for Business and Enterprise workspaces, including creating, using, sharing, and managing agents in ChatGPT and Slack.
+- [Claude in Slack](https://www.anthropic.com/news/introducing-claude-tag)
+- [GitHub Copilot coding agent for Slack](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/integrate-cloud-agent-with-slack)
+- [ChatGPT workspace agents](https://help.openai.com/en/articles/20001143-chatgpt-workspace-agents-for-enterprise-and-business)
+
+**Trigger Contract**:
+
+```yaml
+mention_delegation:
+  requester: user-123
+  source_thread: slack:C0123:1720000000.0001
+  requested_scope: repository-analysis
+  authorization: read-only
+  context_policy: summarize-and-redact
+  accepted_statuses: [queued, running, blocked, completed]
+  mutation_requires_separate_approval: true
+```
 
 **Research Questions**:
-1. What permission model prevents a channel mention from accidentally granting broader repository or business-tool access?
-2. How should thread context be summarized or redacted before it becomes pull request or ticket context?
-3. What visible status markers help humans know whether an agent accepted, queued, blocked, or completed delegated work?
-4. When should mention-based delegation create a durable issue or PR versus replying only in the original thread?
-5. How do teams measure whether channel-based delegation improves throughput without burying accountability?
 
-**Next Steps**:
-- [ ] Test Slack-to-agent delegation with a repository task that opens a pull request
-- [ ] Compare channel mention, direct message, issue assignment, and scheduled-agent triggers
-- [ ] Document required safeguards for identity, approval, and thread-context retention
-- [ ] Evaluate how mention delegation overlaps with asynchronous research and event automation
-- [ ] Capture failure modes where casual mentions trigger unintended agent work
+1. What permission model prevents a casual mention from granting repository write access?
+2. How should private thread context be redacted before becoming durable task context?
+3. Which status markers make queued, blocked, and completed work visible?
+4. When should a mention create a durable issue or pull request?
 
 **Related Patterns**:
-- [Event Automation](../README.md#event-automation) - Mentions can act as human-triggered events
-- [Developer Lifecycle](../README.md#developer-lifecycle) - Delegation becomes part of daily team workflow
-- [Asynchronous Research](README.md#asynchronous-research) - Mentioned agents can run background investigations or implementation tasks
+
+- [Handoff Protocols](README.md#handoff-protocols) — receives completed or blocked work.
+- [Long-Running Orchestration](README.md#long-running-orchestration) — persists state after the trigger.
+- [Code Research](../README.md#code-research) — supplies one bounded asynchronous intent.
 
 **Anti-patterns to Avoid**:
-- Treating every mention as authorization to write code or open pull requests
-- Letting private or sensitive thread context leak into persistent PR descriptions or ticket bodies
-- Hiding agent work in side threads without clear status, ownership, or review handoff
-- Routing critical incident actions through mention-only workflows without explicit approvals
 
----
+- Treating every mention as authorization to mutate a repository
+- Persisting sensitive conversation context in a public issue or pull request
+- Hiding agent status in side threads without clear ownership
+- Executing incident-response mutations from a mention without explicit approval
+
+## Consolidated Concepts
+
+Iteration and retry-loop mechanics now belong to
+[Long-Running Orchestration](README.md#long-running-orchestration), while all turn, spend, time,
+stall, and divergence controls belong to [Bounded Autonomy](../README.md#bounded-autonomy).
+
+Post-task quality checkpoints now belong to [Testing Orchestration](README.md#testing-orchestration)
+for test and quality-gate execution and [Autonomous Acceptance](README.md#autonomous-acceptance) for
+separately owned release policy. They are no longer tracked as an independent exploration.
 
 ## Notes Template
 
-When adding new pattern explorations, copy this template:
-
 ```markdown
-### [Pattern Name]
+### Exploration Name
 
-**Status**: [Early exploration | Active testing | Ready for formalization]
+**Status**: Early exploration
 **Date Added**: YYYY-MM-DD
 
-**Description**: Brief 1-2 sentence description
-
-**Potential Use Cases**:
-- Use case 1
-- Use case 2
-
-**Tools to Evaluate**:
-- Tool 1 with link
-- Tool 2 with link
+**Description**: One-sentence mechanism and outcome.
 
 **Research Questions**:
-1. Question 1
-2. Question 2
-
-**Next Steps**:
-- [ ] Step 1
-- [ ] Step 2
+1. What makes this distinct from existing linked patterns?
+2. Which runnable implementation demonstrates it?
+3. What evidence would justify formalization?
 
 **Related Patterns**:
-- Link to pattern 1
-- Link to pattern 2
+- [Existing Pattern](link)
 
 **Anti-patterns to Avoid**:
-- Anti-pattern 1
-- Anti-pattern 2
+- Concrete failure mode
 ```

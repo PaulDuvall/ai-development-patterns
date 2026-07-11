@@ -11,6 +11,12 @@ Use this template to collect comprehensive error context for AI diagnosis.
 
 **Exit Code**: [e.g., 1, 3, 127]
 
+**Correlation ID**: [application request/job identifier]
+
+**Agent Trace ID**: [optional; link to the separate agent-run trace]
+
+**Evidence References**: [redacted logs, traces, screenshots, or CI artifacts]
+
 **Failed Command**:
 ```bash
 [The exact command that failed]

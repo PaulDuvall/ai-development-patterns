@@ -135,7 +135,16 @@ def extract_section_markdown(lines, headings, target):
         if heading["line"] > target["line"] and heading["level"] <= target["level"]:
             end = heading["line"]
             break
-    body = lines[start:end]
+    # Compatibility anchors belong to the following README heading and are
+    # unnecessary in the in-page dataset, whose cards already have canonical
+    # IDs. Without filtering, an anchor immediately before the next heading is
+    # incorrectly appended to the preceding pattern's body.
+    body = [
+        line for line in lines[start:end]
+        if not re.fullmatch(
+            r"\s*<a\s+id=[\"'][^\"']+[\"']\s*></a>\s*", line, re.IGNORECASE
+        )
+    ]
     # Trim leading/trailing blanks and a trailing horizontal rule.
     while body and not body[0].strip():
         body.pop(0)
@@ -147,7 +156,8 @@ def extract_section_markdown(lines, headings, target):
 def parse_reference_table(text):
     """Parse the 'Complete Pattern Reference' table.
 
-    Returns ordered list of dicts: name, id, maturity, type, description, deps.
+    Returns ordered list of dicts: name, id, maturity, category, type,
+    description, deps.
     Category-only rows (empty maturity / no link) are skipped.
     """
     section = re.search(
@@ -159,6 +169,7 @@ def parse_reference_table(text):
         raise ValueError("Could not locate '## Complete Pattern Reference' table")
 
     rows = []
+    columns = None
     link_re = re.compile(r"\[([^\]]+)\]\(#([^)]+)\)")
     for raw in section.group(1).splitlines():
         line = raw.strip()
@@ -169,11 +180,31 @@ def parse_reference_table(text):
         # Split on unescaped pipes so a GFM-escaped pipe (\|) inside a cell
         # (e.g. inline code or a regex alternation) does not shift columns.
         cells = [c.strip().replace("\\|", "|") for c in re.split(r"(?<!\\)\|", inner)]
-        if len(cells) < 5:
+        if not cells:
             continue
-        name_cell, maturity, ptype, description, deps = cells[:5]
-        if name_cell.lower().startswith("pattern") or set(name_cell) <= {"-", ":"}:
-            continue  # header / divider row
+        if cells[0].lower() == "pattern":
+            columns = {name.lower(): index for index, name in enumerate(cells)}
+            required = {
+                "pattern", "maturity", "category", "type", "description",
+                "dependencies",
+            }
+            missing = required - set(columns)
+            if missing:
+                raise ValueError(
+                    "Complete Pattern Reference table is missing columns: "
+                    + ", ".join(sorted(missing))
+                )
+            continue
+        if set(cells[0]) <= {"-", ":"}:
+            continue  # divider row
+        if columns is None or max(columns.values()) >= len(cells):
+            continue
+        name_cell = cells[columns["pattern"]]
+        maturity = cells[columns["maturity"]]
+        category = cells[columns["category"]]
+        ptype = cells[columns["type"]]
+        description = cells[columns["description"]]
+        deps = cells[columns["dependencies"]]
         link = link_re.search(name_cell)
         if not link or not maturity:
             continue  # category-only row
@@ -182,6 +213,7 @@ def parse_reference_table(text):
                 "name": link.group(1).strip(),
                 "id": link.group(2).strip(),
                 "maturity": maturity,
+                "category": category,
                 "type": ptype,
                 "description": description,
                 "deps_raw": deps,
@@ -286,9 +318,11 @@ def resolve_deps(deps_raw, name_to_id):
         return []
     out = []
     for part in cleaned.split(","):
-        name = part.strip()
-        if not name:
+        raw_name = part.strip()
+        if not raw_name:
             continue
+        link = re.fullmatch(r"\[([^\]]+)\]\(#([^)]+)\)", raw_name)
+        name = link.group(1).strip() if link else raw_name
         pid = name_to_id.get(name)
         if pid is None:
             # Fail loud: a dependency that matches no pattern signals table drift
@@ -296,6 +330,11 @@ def resolve_deps(deps_raw, name_to_id):
             raise ValueError(
                 f"Dependency '{name}' does not match any pattern in the "
                 f"Complete Pattern Reference table"
+            )
+        if link and link.group(2) != pid:
+            raise ValueError(
+                f"Dependency link for '{name}' points to '#{link.group(2)}', "
+                f"expected '#{pid}'"
             )
         out.append({"name": name, "id": pid})
     return out
@@ -389,6 +428,13 @@ def build_dataset():
         if category is None:
             raise ValueError(
                 f"Pattern '{row['name']}' is not under a known category H1"
+            )
+        expected_category = CATEGORY_META[category]["name"]
+        if row["category"] != expected_category:
+            raise ValueError(
+                f"Pattern '{row['name']}' declares category "
+                f"'{row['category']}' in the reference table but is under "
+                f"'{expected_category} Patterns'"
             )
         counts[category] += 1
         patterns.append(

@@ -226,7 +226,7 @@ echo "# test" >> tests/golden/api/test_payment.py
 
 - **Testing Orchestration**: Golden tests anchor the test suite
 - **Spec-Driven Development**: Golden tests derive from specifications
-- **Suite Health**: Monitor golden test stability over time
+- **[Flake Management](../../README.md#flake-management)**: Monitor golden test stability over time
 
 ## Troubleshooting
 

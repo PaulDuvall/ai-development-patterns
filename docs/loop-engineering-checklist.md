@@ -2,7 +2,7 @@
 
 *Safe autonomous loops — three principles, each check named with the primitive that enforces it.*
 
-This is the field companion to the [Loop Engineering Lens](../README.md#loop-engineering-lens). Each check pairs a generic principle (vendor-neutral) with the Claude Code primitive (in backticks) that enforces it. The runnable wrapper is [the wrapper-script example](../experiments/examples/bounded-autonomy/), and the bounding discipline is the [Bounded Autonomy](../experiments/README.md#bounded-autonomy) pattern.
+This is the field companion to the [Loop Engineering Lens](../README.md#loop-engineering-lens). Each check pairs a generic principle (vendor-neutral) with the Claude Code primitive (in backticks) that enforces it. The runnable wrapper is [the wrapper-script example](../examples/bounded-autonomy/), and the bounding discipline is the [Bounded Autonomy](../README.md#bounded-autonomy) pattern.
 
 ## Principle 1 — No executable done-check, no loop
 
@@ -71,5 +71,5 @@ Bound the loop. Humans own the edges.
 ## Related
 
 - [Loop Engineering Lens](../README.md#loop-engineering-lens)
-- [Bounded Autonomy](../experiments/README.md#bounded-autonomy)
-- [the wrapper-script example](../experiments/examples/bounded-autonomy/)
+- [Bounded Autonomy](../README.md#bounded-autonomy)
+- [the wrapper-script example](../examples/bounded-autonomy/)

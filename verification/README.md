@@ -142,9 +142,9 @@ Ask for one explicit scope:
 | Scope | Selection |
 |---|---|
 | `stale` | Up to 10 missing, legacy, or stale patterns by default |
-| `stable` | All 24 stable patterns from `patterns.yaml` |
-| `exploratory` | All 25 exploratory patterns from `experiments/README.md` |
-| `all` | All 49 catalog patterns plus one discovery unit |
+| `stable` | All 29 stable patterns from `patterns.yaml` |
+| `exploratory` | All 18 exploratory patterns from `experiments/README.md` |
+| `all` | All 47 catalog patterns plus one discovery unit |
 | `single` | One exact catalog pattern name |
 | `discovery` | Discovery only; no pattern evidence |
 
@@ -163,7 +163,7 @@ python3 scripts/plan-local-verification.py plan \
 The planner first reads open main-targeting PR file lists through `gh` so it cannot unknowingly
 repeat already-paid evidence work. Stale scope excludes in-flight evidence. Exact `stable`,
 `exploratory`, `all`, and `single` scopes fail visibly when a selected pattern is in flight rather
-than silently shrinking the advertised 24/25/49/1 pattern count.
+than silently shrinking the advertised 29/18/47/1 pattern count.
 
 The planner writes an ephemeral inventory and worklist plus a pending manifest under
 `verification/local-runs/`. It reports the exact plan ID, stable/exploratory unit counts, discovery

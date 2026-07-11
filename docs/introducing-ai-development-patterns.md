@@ -46,14 +46,17 @@ Daily practice patterns for AI-assisted coding workflows:
 - **[Spec-Driven Development](../README.md#spec-driven-development)**: Using executable specs to guide AI code generation
 - **[Incremental Generation](../README.md#incremental-generation)**: Building features incrementally rather than all at once
 - **[Agent Memory](../README.md#agent-memory)**: Managing context and continuity across AI-assisted sessions
+- **[Model Routing](../README.md#model-routing)**: Matching model capability, latency, and cost to each task
+- **[Code Research](../README.md#code-research)**: Delegating executable technical investigations to coding agents
 
 ### Operations Patterns
 CI/CD, security, and production management with AI:
 - **[Policy Generation](../README.md#policy-generation)**: Transforming compliance requirements into executable policy files
-- **[Security Orchestration](../README.md#security-orchestration)**: Aggregating security tools and summarizing findings for actionable insights
-- **[Observable Development](../README.md#observable-development)**: Establishing intelligent performance baselines and monitoring thresholds
+- **[Agent Observability](../README.md#agent-observability)**: Tracing agent activity and system behavior for diagnosis and evaluation
+- **[Evidence Automation](../README.md#evidence-automation)**: Producing auditable compliance evidence from operational data
+- **[Guided Chaos](../README.md#guided-chaos)**: Designing targeted resilience experiments from system architecture
 
-For advanced and in-progress ideas, see the experimental catalog in [experiments/](../experiments/), including patterns like **[Pipeline Synthesis](../experiments/README.md#pipeline-synthesis)**, **[Debt Forecasting](../experiments/README.md#debt-forecasting)**, and **[Context Optimization](../experiments/README.md#context-optimization)**.
+For advanced and in-progress ideas, see the experimental catalog in [experiments/](../experiments/), including patterns like **[Pipeline Synthesis](../experiments/README.md#pipeline-synthesis)**, **[Flake Management](../experiments/README.md#flake-management)**, and **[Autonomous SOC](../experiments/README.md#autonomous-soc)**.
 
 ## What Makes This Different?
 

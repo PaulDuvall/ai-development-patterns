@@ -27,7 +27,7 @@ class DependencyGraphAnalyzer:
                 if '[' in dependencies_text:
                     # Extract from markdown links
                     import re
-                    dep_matches = re.findall(r'\\[([^\\]]+)\\]', dependencies_text)
+                    dep_matches = re.findall(r'\[([^\]]+)\]', dependencies_text)
                     dependencies.extend(dep_matches)
                 else:
                     # Split by comma for plain text
@@ -200,8 +200,8 @@ class TestPatternDependencies:
         foundation_violations = []
         
         for pattern_name, data in table_data.items():
-            pattern_type = data.get('type', '')
-            if pattern_type == 'Foundation':
+            pattern_category = data.get('category', '')
+            if pattern_category == 'Foundation':
                 dependencies = analyzer.dependency_graph.get(pattern_name, [])
                 # Foundation patterns should have minimal dependencies
                 if len(dependencies) > 2:  # Allow up to 2 dependencies
@@ -222,7 +222,7 @@ class TestPatternDependencies:
         depths = analyzer.analyze_dependency_depth()
         
         deep_dependencies = []
-        max_reasonable_depth = 5  # Reasonable maximum dependency depth
+        max_reasonable_depth = 6  # Matches the catalog-level graph metric gate below
         
         for pattern, depth in depths.items():
             if depth > max_reasonable_depth:
@@ -270,13 +270,13 @@ class TestPatternDependencies:
         category_levels = {'Foundation': 0, 'Development': 1, 'Operations': 2}
         
         for pattern_name, dependencies in analyzer.dependency_graph.items():
-            pattern_type = table_data[pattern_name].get('type', '')
-            pattern_level = category_levels.get(pattern_type, -1)
+            pattern_category = table_data[pattern_name].get('category', '')
+            pattern_level = category_levels.get(pattern_category, -1)
             
             for dep in dependencies:
                 if dep in table_data:
-                    dep_type = table_data[dep].get('type', '')
-                    dep_level = category_levels.get(dep_type, -1)
+                    dep_category = table_data[dep].get('category', '')
+                    dep_level = category_levels.get(dep_category, -1)
                     
                     # Operations can depend on Development and Foundation
                     # Development can depend on Foundation
@@ -285,10 +285,10 @@ class TestPatternDependencies:
                         if pattern_level < dep_level:
                             category_violations.append({
                                 'pattern': pattern_name,
-                                'pattern_type': pattern_type, 
+                                'pattern_category': pattern_category,
                                 'dependency': dep,
-                                'dependency_type': dep_type,
-                                'issue': f'{pattern_type} pattern depends on {dep_type} pattern'
+                                'dependency_category': dep_category,
+                                'issue': f'{pattern_category} pattern depends on {dep_category} pattern'
                             })
         
         assert not category_violations, f"Category dependency violations: {category_violations}"
@@ -310,7 +310,7 @@ class TestPatternDependencies:
                 if '[' in dependencies_text and ']' in dependencies_text:
                     # Has markdown links - this is good
                     import re
-                    links = re.findall(r'\\[([^\\]]+)\\]\\([^)]+\\)', dependencies_text)
+                    links = re.findall(r'\[([^\]]+)\]\([^)]+\)', dependencies_text)
                     if not links:
                         format_issues.append({
                             'pattern': pattern_name,

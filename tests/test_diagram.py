@@ -63,8 +63,8 @@ class TestMermaidDiagram:
         "Agent Readiness", "Codified Rules", "Security Sandbox",
         "Developer Lifecycle", "Tool Integration", "Issue Generation",
         "Agent Memory", "Incremental Generation", "Spec-Driven Development",
-        "Atomic Decomposition", "Parallel Agents", "Observable Development",
-        "Guided Refactoring", "Policy Generation", "Security Orchestration",
+        "Atomic Decomposition", "Parallel Agents", "Agent Observability",
+        "Guided Refactoring", "Policy Generation", "Evidence Automation",
     ]
 
     def test_diagram_includes_all_patterns(self, diagram_patterns):

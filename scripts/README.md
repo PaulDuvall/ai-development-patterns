@@ -74,6 +74,24 @@ approval after the final diff is available, then permits one draft evidence PR a
 auto-merges it. GitHub Actions runs only deterministic validation plus read-only link/content
 checks for this capability.
 
+### Canonical Pattern-Name Validation
+
+#### `validate-pattern-names.py`
+
+Validates every active canonical name: stable patterns from `patterns.yaml` and experimental
+patterns from the bounded reference table in `experiments/README.md`. It enforces the exact
+two-word, Title Case, no-`AI`-prefix rules from `pattern-spec.md`, as well as unique names/slugs,
+canonical IDs and anchors, table parity and order, and matching content sections. Historical prose
+and compatibility anchors are intentionally outside the active-name surface.
+
+```bash
+python3 scripts/validate-pattern-names.py
+```
+
+The deterministic pattern-validation workflow runs this check on pull requests, pushes to `main`,
+its weekly schedule, and manual `workflow_dispatch` runs. It never invokes a model or uses a
+provider API key.
+
 ### Patterns Website Data
 
 #### `generate-patterns-data.py`
@@ -130,7 +148,7 @@ README.md is the **single source of record**. Three layers guarantee the publish
 ### Pattern Count Management
 
 #### `update-pattern-count.py`
-**Purpose**: Automatically updates the pattern count badges in README.md and index.html based on the current number of patterns in `tests/conftest.py`.
+**Purpose**: Automatically updates the pattern count badges in README.md and index.html based on the current number of stable patterns in `patterns.yaml`.
 
 **Usage**:
 ```bash
@@ -138,7 +156,7 @@ python3 scripts/update-pattern-count.py
 ```
 
 **Features**:
-- Counts patterns from the `EXPECTED_PATTERNS` list in conftest.py
+- Counts stable patterns from `patterns.yaml`, the catalog source of truth
 - Updates the shields.io badge in README.md and index.html with the exact count
 - Outputs pattern count for GitHub Actions integration
 - Validates that the badge pattern exists before updating
@@ -202,9 +220,9 @@ The GitHub Actions integration ensures:
 ### Example Output
 ```bash
 🔍 Counting patterns from conftest.py...
-✓ Found 22 patterns
+✓ Found 29 patterns
 📝 Updating pattern count badges...
-✅ Successfully updated pattern count badges to 22
+✅ Successfully updated pattern count badges to 29
 ```
 
 ## Troubleshooting
@@ -216,8 +234,8 @@ If the script reports "No badge pattern found to update":
 
 ### Pattern Count Mismatch
 If the count seems wrong:
-- Check `tests/conftest.py` for the `EXPECTED_PATTERNS` list
-- Verify that pattern names in the list match the actual patterns in README.md
+- Check the `patterns` list in `patterns.yaml`
+- Verify that registry names match the stable reference table and sections in README.md
 - Run the test suite to check for pattern compliance issues
 
 ### Pre-commit Hook Issues

@@ -20,7 +20,7 @@ patterns:
     automatable: true
     description: >
       Version and maintain AI coding standards as explicit configuration files.
-    related: [agent-readiness, security-sandbox, agent-memory, progressive-disclosure, event-automation, guided-refactoring]
+    related: [agent-readiness, security-sandbox, agent-memory, progressive-disclosure, agent-hooks, guided-refactoring]
 
   - id: security-sandbox
     name: Security Sandbox
@@ -30,7 +30,7 @@ patterns:
     automatable: true
     description: >
       Run AI tools in isolated environments without access to secrets or sensitive data.
-    related: [codified-rules, security-orchestration, policy-generation, event-automation]
+    related: [codified-rules, policy-generation, agent-hooks, bounded-autonomy]
 
   - id: developer-lifecycle
     name: Developer Lifecycle
@@ -40,7 +40,7 @@ patterns:
     automatable: false
     description: >
       A staged, plan-first discipline for taking a single feature from problem to production with AI assistance.
-    related: [planned-implementation, spec-driven-development, atomic-decomposition, observable-development]
+    related: [planned-implementation, spec-driven-development, atomic-decomposition, agent-observability]
 
   - id: tool-integration
     name: Tool Integration
@@ -50,7 +50,7 @@ patterns:
     automatable: true
     description: >
       Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions.
-    related: [security-sandbox, developer-lifecycle]
+    related: [security-sandbox, developer-lifecycle, model-routing]
 
   - id: issue-generation
     name: Issue Generation
@@ -60,7 +60,7 @@ patterns:
     automatable: true
     description: >
       Generate Kanban-optimized work items from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies.
-    related: [agent-readiness]
+    related: [agent-readiness, atomic-decomposition]
 
   # Development (17 patterns)
   - id: spec-driven-development
@@ -101,16 +101,16 @@ patterns:
     automatable: true
     description: >
       Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols.
-    related: [codified-rules, progressive-disclosure]
+    related: [codified-rules, progressive-disclosure, code-research]
 
-  - id: event-automation
-    name: Event Automation
+  - id: agent-hooks
+    name: Agent Hooks
     category: development
     maturity: intermediate
-    anchor: "#event-automation"
+    anchor: "#agent-hooks"
     automatable: true
     description: >
-      Execute custom commands automatically at assistant lifecycle events to enforce policies and automate workflows.
+      Attach commands and policy checks to assistant lifecycle hooks so validation and workflow controls run automatically.
     related: [codified-rules, security-sandbox, custom-commands]
 
   - id: custom-commands
@@ -120,8 +120,8 @@ patterns:
     anchor: "#custom-commands"
     automatable: true
     description: >
-      Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and sophisticated workflows.
-    related: [event-automation, spec-driven-development, codified-rules]
+      Discover and extend assistant command vocabularies with reusable workflows that encode domain expertise.
+    related: [agent-hooks, spec-driven-development, codified-rules]
 
   - id: progressive-disclosure
     name: Progressive Disclosure
@@ -150,18 +150,18 @@ patterns:
     anchor: "#guided-refactoring"
     automatable: true
     description: >
-      Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics.
-    related: [codified-rules]
+      Improve code systematically with AI, measurable quality metrics, and test-preserving refactoring rules.
+    related: [codified-rules, debt-forecasting]
 
-  - id: observable-development
-    name: Observable Development
+  - id: agent-observability
+    name: Agent Observability
     category: development
     maturity: intermediate
-    anchor: "#observable-development"
+    anchor: "#agent-observability"
     automatable: false
     description: >
-      Strategic logging and debugging that makes system behavior visible to AI.
-    related: [developer-lifecycle]
+      Capture structured traces, tool events, evaluations, and runtime context so teams and agents can diagnose and improve behavior.
+    related: [developer-lifecycle, error-resolution, bounded-autonomy]
 
   - id: image-spec
     name: Image Spec
@@ -170,7 +170,7 @@ patterns:
     anchor: "#image-spec"
     automatable: true
     description: >
-      Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context.
+      Use screenshots and design mockups as visual specifications that coding agents translate into UI code and refine through visual feedback.
     related: [spec-driven-development, incremental-generation]
 
   - id: adversarial-evaluator
@@ -180,7 +180,7 @@ patterns:
     anchor: "#adversarial-evaluator"
     automatable: true
     description: >
-      Separate the generating agent from an independent judging agent (ideally a different model) and use adversarial pressure or cross-model divergence as eval signal for high-stakes decisions.
+      Separate the generating agent from an independent judge and use adversarial pressure or cross-model divergence as an evaluation signal.
     related: [planned-implementation, incremental-generation, spec-driven-development]
 
   - id: parallel-agents
@@ -191,7 +191,7 @@ patterns:
     automatable: false
     description: >
       Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration.
-    related: [atomic-decomposition]
+    related: [atomic-decomposition, bounded-autonomy]
 
   - id: error-resolution
     name: Error Resolution
@@ -200,29 +200,59 @@ patterns:
     anchor: "#error-resolution"
     automatable: false
     description: >
-      Automatically collect error context from logs, system state, and git history, then use AI to diagnose root causes and generate validated fixes.
-    related: [developer-lifecycle, observable-development, tool-integration]
+      Collect failure context, reproduce and diagnose the cause with AI, then apply a proposed fix only after human review and deterministic validation.
+    related: [developer-lifecycle, agent-observability, tool-integration]
 
-  - id: autonomous-remediation
-    name: Autonomous Remediation
+  - id: model-routing
+    name: Model Routing
+    category: development
+    maturity: advanced
+    anchor: "#model-routing"
+    automatable: true
+    description: >
+      Route each task to a model whose capability, context, latency, and cost profile matches the work.
+    related: [incremental-generation, adversarial-evaluator, tool-integration]
+
+  - id: code-research
+    name: Code Research
     category: development
     maturity: intermediate
-    anchor: "#autonomous-remediation"
+    anchor: "#code-research"
     automatable: true
     description: >
-      Pair deterministic rule-based detectors with LLM remediators inside an event-driven loop so codified rule violations are caught and fixed automatically before the AI session continues.
-    related: [codified-rules, event-automation, guided-refactoring, error-resolution]
+      Answer technical questions with isolated agent-run experiments that produce executable, reviewable evidence.
+    related: [parallel-agents, agent-memory, adversarial-evaluator, bounded-autonomy]
 
-  # Operations (4 patterns)
-  - id: security-orchestration
-    name: Security Orchestration
-    category: operations
-    maturity: intermediate
-    anchor: "#security-orchestration"
+  - id: bounded-autonomy
+    name: Bounded Autonomy
+    category: development
+    maturity: advanced
+    anchor: "#bounded-autonomy"
     automatable: true
     description: >
-      Aggregate multiple security tools and use AI to summarize findings for actionable insights.
-    related: [security-sandbox, centralized-rules]
+      Cap autonomous loops by turns, spend, and time while detecting stalls and preserving a machine-readable evidence trail.
+    related: [parallel-agents, agent-memory, agent-observability]
+
+  # Operations (6 patterns)
+  - id: policy-generation
+    name: Policy Generation
+    category: operations
+    maturity: advanced
+    anchor: "#policy-generation"
+    automatable: false
+    description: >
+      Convert natural-language policy intent or runtime context into validated policy-as-code such as Cedar, Rego, OPA, and Gatekeeper.
+    related: [security-sandbox, evidence-automation]
+
+  - id: evidence-automation
+    name: Evidence Automation
+    category: operations
+    maturity: advanced
+    anchor: "#evidence-automation"
+    automatable: true
+    description: >
+      Continuously collect control evidence from logs and configuration changes into dated, audit-ready records.
+    related: [policy-generation, agent-observability, centralized-rules]
 
   - id: centralized-rules
     name: Centralized Rules
@@ -231,16 +261,35 @@ patterns:
     anchor: "#centralized-rules"
     automatable: true
     description: >
-      Enforce organization-wide AI rules through a central Git repository that syncs to standard AI assistant configuration files with automatic language and framework detection.
-    related: [codified-rules, progressive-disclosure, security-orchestration]
+      Enforce organization-wide AI instructions from a central source that synchronizes standard assistant configuration files.
+    related: [codified-rules, progressive-disclosure, evidence-automation]
 
-  - id: policy-generation
-    name: Policy Generation
+  - id: drift-remediation
+    name: Drift Remediation
     category: operations
     maturity: advanced
-    anchor: "#policy-generation"
-    automatable: false
+    anchor: "#drift-remediation"
+    automatable: true
     description: >
-      Transform compliance requirements into executable Cedar/OPA policy files with AI assistance.
-    related: [security-sandbox]
+      Detect infrastructure drift against declared state and generate reviewable corrective patches with approval gates.
+    related: [agent-observability, error-resolution, bounded-autonomy]
 
+  - id: debt-forecasting
+    name: Debt Forecasting
+    category: operations
+    maturity: intermediate
+    anchor: "#debt-forecasting"
+    automatable: true
+    description: >
+      Forecast maintenance burden from code, dependency, coverage, and documentation trends so teams can prioritize technical debt.
+    related: [guided-refactoring, model-routing, tool-integration]
+
+  - id: guided-chaos
+    name: Guided Chaos
+    category: operations
+    maturity: advanced
+    anchor: "#guided-chaos"
+    automatable: true
+    description: >
+      Generate hypothesis-driven chaos experiments from architecture and dependency evidence with explicit blast-radius and recovery controls.
+    related: [agent-observability, bounded-autonomy, error-resolution]

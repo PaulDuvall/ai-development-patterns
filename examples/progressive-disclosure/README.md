@@ -23,5 +23,4 @@ Keep a small, universal rules file that applies to every task, and load speciali
 
 1. Keep `.ai/CLAUDE.md` minimal and explicit about **when** to load specialized rules.
 2. Add small, focused rule files under `.ai/rules/` (aim for <100 lines each).
-3. Optionally combine with [Event Automation](../../README.md#event-automation) to auto-load the relevant rules before edits, writes, or test runs.
-
+3. Optionally combine with [Agent Hooks](../../README.md#agent-hooks) to auto-load the relevant rules before edits, writes, or test runs.

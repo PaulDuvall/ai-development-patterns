@@ -238,22 +238,57 @@ class TestParserRobustness:
         assert "Real" in heads and "After" in heads
         assert "Not A Heading" not in heads
 
+    def test_section_body_drops_next_heading_compatibility_anchor(self, generator):
+        lines = ["## First", "First body.", '<a id="former-second"></a>', "## Second"]
+        headings = generator.parse_headings(lines)
+        body = generator.extract_section_markdown(lines, headings, headings[0])
+        assert body == "First body."
+
     def test_reference_table_handles_escaped_pipe(self, generator):
         table = (
             "## Complete Pattern Reference\n\n"
-            "| Pattern | Maturity | Type | Description | Dependencies |\n"
-            "|--|--|--|--|--|\n"
-            "| **[Foo](#foo)** | Beginner | Development | uses `a \\| b` | None |\n\n"
+            "| Pattern | Maturity | Category | Type | Description | Dependencies |\n"
+            "|--|--|--|--|--|--|\n"
+            "| **[Foo](#foo)** | Beginner | Development | Development | uses `a \\| b` | None |\n\n"
             "## Next\n"
         )
         rows = generator.parse_reference_table(table)
         assert len(rows) == 1
+        assert rows[0]["category"] == "Development"
         assert rows[0]["description"] == "uses `a | b`"
         assert rows[0]["deps_raw"] == "None"
+
+    def test_dataset_rejects_reference_category_section_drift(
+            self, generator, monkeypatch, tmp_path):
+        readme = generator.README_PATH.read_text(encoding="utf-8")
+        changed = readme.replace(
+            "| **[Agent Readiness](#agent-readiness)** | Beginner | Foundation |",
+            "| **[Agent Readiness](#agent-readiness)** | Beginner | Development |",
+            1,
+        )
+        path = tmp_path / "README.md"
+        path.write_text(changed, encoding="utf-8")
+        monkeypatch.setattr(generator, "README_PATH", path)
+
+        with pytest.raises(ValueError, match="declares category 'Development'"):
+            generator.build_dataset()
 
     def test_dependency_resolution_fails_loud_on_unknown(self, generator):
         with pytest.raises(ValueError):
             generator.resolve_deps("Nonexistent Pattern", {"Foo": "foo"})
+
+    def test_dependency_resolution_accepts_valid_anchor_links(self, generator):
+        assert generator.resolve_deps(
+            "[Foo](#foo), [Bar Baz](#bar-baz)",
+            {"Foo": "foo", "Bar Baz": "bar-baz"},
+        ) == [
+            {"name": "Foo", "id": "foo"},
+            {"name": "Bar Baz", "id": "bar-baz"},
+        ]
+
+    def test_dependency_resolution_rejects_wrong_anchor(self, generator):
+        with pytest.raises(ValueError, match="expected '#foo'"):
+            generator.resolve_deps("[Foo](#wrong)", {"Foo": "foo"})
 
     def test_inject_diagram_raises_clear_error_without_markers(self, generator):
         with pytest.raises(ValueError, match="PATTERNS:DIAGRAM"):

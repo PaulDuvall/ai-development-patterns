@@ -5,4 +5,5 @@
 # --registry). When a pattern gains evidence, remove its slug atomically in the
 # same PR: overlaps, duplicate slugs, and unknown catalog slugs are validation errors.
 #
-pending: []
+pending:
+  - dependency-migration

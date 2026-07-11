@@ -138,9 +138,9 @@ The tool-augmented approach provides accurate, current information instead of ed
 
 This pattern enables and enhances:
 - [Spec-Driven Development](../../README.md#spec-driven-development) - AI can validate against actual system state
-- [Observable Development](../../README.md#observable-development) - AI can read logs and monitoring data
+- [Agent Observability](../../README.md#agent-observability) - Agents and reviewers can inspect traces and monitoring data
 - [Workflow Orchestration](../../experiments/README.md#workflow-orchestration) - Enables data-driven workflow decisions
-- [Observable Development](../../README.md#observable-development) - AI can analyze actual performance metrics
+- [Agent Observability](../../README.md#agent-observability) - Agents and reviewers can analyze actual performance metrics
 
 ## Further Reading
 

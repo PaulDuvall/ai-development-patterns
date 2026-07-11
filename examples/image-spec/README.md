@@ -1,28 +1,30 @@
 # Image Spec Example
 
-This example provides a repeatable, image-first workflow for the [Image Spec](../../README.md#image-spec) pattern: use diagrams and mockups as primary specifications, then iterate with annotated visuals.
+This example provides a repeatable [Image Spec](../../README.md#image-spec) workflow: translate one screenshot or design mockup into UI code, then refine it with annotated visual feedback. Industry aliases include *design-to-code* and *screenshot-to-code*.
 
 ## Workflow
 
-1. Create a **single** high-level diagram (architecture, UI mock, or flow) with labels and constraints (ports, component names, state transitions).
-2. Attach the image and provide a short prompt that clarifies only what the image cannot (tech stack, scope, constraints).
-3. Run the generated result, capture a screenshot, and annotate what’s missing or incorrect.
-4. Re-attach the annotated image and iterate on one slice at a time.
+1. Choose a **single** UI screenshot or mockup and name the state it represents.
+2. Attach it with a short prompt that supplies only the missing behavior, stack, accessibility, and component-library constraints.
+3. Run the generated UI, capture a screenshot, and annotate visual differences.
+4. Re-attach the annotated screenshot and iterate on one screen or state at a time.
 
-## Recommended Image Set
+## Recommended Inputs
 
-- `architecture.png`: components + boundaries + ports
-- `data-model.png`: fields + relationships + example payloads
-- `ui-mock.png`: layout + key interactions
-- `flow.png`: sequence of steps + decision points
+- `checkout-empty.png`: empty-cart layout and calls to action
+- `checkout-filled.png`: populated state, totals, and validation placement
+- `checkout-mobile.png`: responsive target at the named viewport
+- `design-tokens.json`: non-visual constraint referenced by the prompt
 
 ## Prompt Template
 
 ```text
-Build the system from the attached images.
-Tech stack: <stack>
-Scope: <what to implement first>
-Constraints: <performance/security/testing constraints>
-Output: code + tests + a short runbook
+Implement the attached <screen/state> as a <framework> component.
+Match: <layout, spacing, colors, typography, responsive viewport>.
+Reuse: <existing tokens and component library>.
+Behavior not visible in the image: <interactions and validation>.
+Do not invent: <backend behavior or unshown screens>.
+Output: component + focused interaction/accessibility tests.
 ```
 
+Architecture and flow diagrams may accompany the prompt as context, but this pattern does not treat them as independently verified executable specifications.

@@ -135,7 +135,7 @@ git diff --name-only HEAD~1 HEAD
 Track test suite health over time:
 
 ```markdown
-### Test Suite Health
+### Flake Management
 - Test suite duration trend: ⬆️ +12% (last 7 days)
   - Suggestion: Investigate slow tests, consider parallelization
 - Flaky tests detected: 3

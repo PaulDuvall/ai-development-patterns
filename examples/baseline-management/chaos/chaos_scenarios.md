@@ -1,4 +1,4 @@
-# Chaos Engineering Scenarios
+# Guided Chaos Scenarios
 
 ## Overview
 This directory contains chaos engineering scenarios based on the AI Development Patterns. Each scenario is designed to test system resilience and recovery capabilities.

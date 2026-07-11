@@ -69,7 +69,7 @@ class PatternParser:
             stripped = line.strip()
             
             # Detect table start
-            if "| Pattern | Maturity | Type | Description |" in stripped:
+            if "| Pattern | Maturity | Category | Type | Description | Dependencies |" in stripped:
                 in_table = True
                 continue
                 
@@ -80,14 +80,14 @@ class PatternParser:
             # Parse table rows
             if in_table and stripped.startswith('|') and 'Pattern' not in stripped:
                 parts = [p.strip() for p in stripped.split('|')[1:-1]]  # Remove empty first/last
-                if len(parts) >= 4 and not parts[0].startswith('**'):  # Skip category headers
+                if len(parts) >= 6:
                     # Extract pattern name from markdown link
                     pattern_match = re.search(r'\*\*\[(.*?)\]', parts[0])
                     if pattern_match:
                         pattern_name = pattern_match.group(1)
                         maturity = parts[1]
-                        pattern_type = parts[2]
-                        description = parts[3]
+                        pattern_type = parts[3]
+                        description = parts[4]
                         patterns.append((pattern_name, maturity, pattern_type, description))
         
         return patterns
@@ -254,7 +254,7 @@ class ReferenceTableParser:
             stripped = line.strip()
             
             # Detect table start
-            if "| Pattern | Maturity | Type | Description | Dependencies |" in stripped:
+            if "| Pattern | Maturity | Category | Type | Description | Dependencies |" in stripped:
                 in_table = True
                 continue
             
@@ -269,7 +269,7 @@ class ReferenceTableParser:
             # Parse table rows
             if in_table and stripped.startswith('|'):
                 parts = [p.strip() for p in stripped.split('|')[1:-1]]
-                if len(parts) >= 5:
+                if len(parts) >= 6:
                     # Extract pattern name from markdown link
                     pattern_match = re.search(r'\*\*\[(.+?)\]\((.+?)\)\*\*', parts[0])
                     if pattern_match:
@@ -278,9 +278,10 @@ class ReferenceTableParser:
                         
                         table_data[pattern_name] = {
                             'maturity': parts[1],
-                            'type': parts[2], 
-                            'description': parts[3],
-                            'dependencies': parts[4],
+                            'category': parts[2],
+                            'type': parts[3],
+                            'description': parts[4],
+                            'dependencies': parts[5],
                             'anchor_link': anchor_link
                         }
         

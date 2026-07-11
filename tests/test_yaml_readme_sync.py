@@ -10,7 +10,7 @@ import re
 import pytest
 from pathlib import Path
 from conftest import REPO_ROOT
-from utils.pattern_parser import PatternParser
+from utils.pattern_parser import PatternParser, ReferenceTableParser
 
 
 PATTERNS_YAML_PATH = REPO_ROOT / "patterns.yaml"
@@ -116,3 +116,18 @@ class TestYamlReadmeSync:
             f"patterns.yaml has {yaml_count} patterns, "
             f"README has {readme_count}"
         )
+
+    def test_yaml_categories_match_reference_table(
+        self, yaml_patterns, readme_content
+    ):
+        """Registry and advertised table categories must agree exactly."""
+        table = ReferenceTableParser(readme_content).extract_reference_table()
+        mismatches = []
+        for pattern in yaml_patterns:
+            displayed = table.get(pattern["name"], {}).get("category")
+            expected = pattern["category"].title()
+            if displayed != expected:
+                mismatches.append(
+                    f"{pattern['name']}: table={displayed!r}, expected={expected!r}"
+                )
+        assert not mismatches, f"Category mismatches: {mismatches}"

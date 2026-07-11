@@ -217,7 +217,7 @@ Coverage: 89% (31/35 spec requirements covered)"
 This implementation demonstrates integration with:
 - [Security Sandbox](../security-sandbox/) - Secure testing environment
 - [Testing Orchestration](../../experiments/README.md#testing-orchestration) - Multi-layered testing approach
-- [Observable Development](../../README.md#observable-development) - Logging and debugging capabilities
+- [Agent Observability](../../README.md#agent-observability) - Tracing and debugging capabilities
 
 ## Running the Complete Example
 
