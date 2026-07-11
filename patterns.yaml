@@ -50,7 +50,7 @@ patterns:
     automatable: true
     description: >
       Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions.
-    related: [security-sandbox, developer-lifecycle, model-routing]
+    related: [security-sandbox, developer-lifecycle, agent-observability]
 
   - id: issue-generation
     name: Issue Generation
@@ -60,7 +60,7 @@ patterns:
     automatable: true
     description: >
       Generate small, deployable work items (<1 hour with AI assistance) from requirements using AI to ensure continuous delivery with clear acceptance criteria and dependency tracking.
-    related: [agent-readiness, atomic-decomposition]
+    related: [agent-readiness, spec-driven-development]
 
   # Development (17 patterns)
   - id: spec-driven-development
@@ -71,7 +71,7 @@ patterns:
     automatable: true
     description: >
       Use executable specifications to guide AI code generation with clear acceptance criteria before implementation.
-    related: [developer-lifecycle, custom-commands, image-spec, atomic-decomposition]
+    related: [developer-lifecycle, tool-integration, custom-commands, image-spec, agent-observability]
 
   - id: planned-implementation
     name: Planned Implementation
@@ -81,7 +81,7 @@ patterns:
     automatable: true
     description: >
       Interview, constrain, and plan before writing code so AI implementation matches actual requirements instead of confident-sounding assumptions.
-    related: [incremental-generation, spec-driven-development, adversarial-evaluator]
+    related: [developer-lifecycle, spec-driven-development, incremental-generation, adversarial-evaluator]
 
   - id: incremental-generation
     name: Incremental Generation
@@ -91,7 +91,7 @@ patterns:
     automatable: true
     description: >
       Build complex features through small, deployable iterations rather than big-bang generation.
-    related: [planned-implementation, atomic-decomposition, image-spec, adversarial-evaluator]
+    related: [planned-implementation, developer-lifecycle, image-spec, adversarial-evaluator]
 
   - id: agent-memory
     name: Agent Memory
@@ -101,7 +101,7 @@ patterns:
     automatable: true
     description: >
       Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols.
-    related: [codified-rules, progressive-disclosure, code-research]
+    related: [codified-rules, progressive-disclosure, spec-driven-development, parallel-agents]
 
   - id: agent-hooks
     name: Agent Hooks
@@ -111,7 +111,7 @@ patterns:
     automatable: true
     description: >
       Attach commands and policy checks to assistant lifecycle hooks so validation and workflow controls run automatically.
-    related: [codified-rules, security-sandbox, custom-commands]
+    related: [codified-rules, security-sandbox, custom-commands, bounded-autonomy]
 
   - id: custom-commands
     name: Custom Commands
@@ -121,7 +121,7 @@ patterns:
     automatable: true
     description: >
       Discover and extend assistant command vocabularies with reusable workflows that encode domain expertise.
-    related: [agent-hooks, spec-driven-development, codified-rules]
+    related: [agent-hooks, spec-driven-development, codified-rules, progressive-disclosure]
 
   - id: progressive-disclosure
     name: Progressive Disclosure
@@ -131,7 +131,7 @@ patterns:
     automatable: true
     description: >
       Load AI assistant rules incrementally based on task context to prevent instruction saturation and context bloat.
-    related: [codified-rules, agent-memory, centralized-rules]
+    related: [codified-rules, agent-memory, custom-commands, agent-hooks, centralized-rules, model-routing]
 
   - id: atomic-decomposition
     name: Atomic Decomposition
@@ -141,7 +141,7 @@ patterns:
     automatable: true
     description: >
       Break complex features into atomic, independently implementable tasks for parallel AI agent execution.
-    related: [incremental-generation, parallel-agents]
+    related: [developer-lifecycle, incremental-generation, issue-generation, parallel-agents]
 
   - id: guided-refactoring
     name: Guided Refactoring
@@ -151,7 +151,7 @@ patterns:
     automatable: true
     description: >
       Improve code systematically with AI, measurable quality metrics, and test-preserving refactoring rules.
-    related: [codified-rules, debt-forecasting]
+    related: [codified-rules, agent-hooks, debt-forecasting]
 
   - id: agent-observability
     name: Agent Observability
@@ -171,7 +171,7 @@ patterns:
     automatable: true
     description: >
       Use screenshots and design mockups as visual specifications that coding agents translate into UI code and refine through visual feedback.
-    related: [spec-driven-development, incremental-generation]
+    related: [spec-driven-development, incremental-generation, model-routing]
 
   - id: adversarial-evaluator
     name: Adversarial Evaluator
@@ -191,7 +191,7 @@ patterns:
     automatable: false
     description: >
       Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration.
-    related: [atomic-decomposition, bounded-autonomy]
+    related: [atomic-decomposition, security-sandbox]
 
   - id: error-resolution
     name: Error Resolution
@@ -211,7 +211,7 @@ patterns:
     automatable: true
     description: >
       Route each task to a model whose capability, context, latency, and cost profile matches the work.
-    related: [incremental-generation, adversarial-evaluator, tool-integration]
+    related: [tool-integration, incremental-generation, adversarial-evaluator]
 
   - id: code-research
     name: Code Research
@@ -231,7 +231,7 @@ patterns:
     automatable: true
     description: >
       Cap autonomous loops by turns, spend, and time while detecting stalls and preserving a machine-readable evidence trail.
-    related: [parallel-agents, agent-memory, agent-observability]
+    related: [parallel-agents, agent-observability, agent-memory]
 
   # Operations (6 patterns)
   - id: policy-generation
@@ -242,7 +242,7 @@ patterns:
     automatable: false
     description: >
       Convert natural-language policy intent or runtime context into validated policy-as-code such as Cedar, Rego, OPA, and Gatekeeper.
-    related: [security-sandbox, evidence-automation]
+    related: [security-sandbox, evidence-automation, centralized-rules]
 
   - id: evidence-automation
     name: Evidence Automation
@@ -282,7 +282,7 @@ patterns:
     automatable: true
     description: >
       Forecast maintenance burden from code, dependency, coverage, and documentation trends so teams can prioritize technical debt.
-    related: [guided-refactoring, model-routing, tool-integration]
+    related: [guided-refactoring, tool-integration, model-routing]
 
   - id: guided-chaos
     name: Guided Chaos

@@ -131,3 +131,27 @@ class TestYamlReadmeSync:
                     f"{pattern['name']}: table={displayed!r}, expected={expected!r}"
                 )
         assert not mismatches, f"Category mismatches: {mismatches}"
+
+    def test_yaml_related_matches_readme_stable_pattern_links(
+        self, yaml_patterns, readme_content
+    ):
+        """Ordered YAML relationships mirror each README Related Patterns field."""
+        parsed = PatternParser(readme_content).extract_patterns()
+        id_by_name = {pattern["name"]: pattern["id"]
+                      for pattern in yaml_patterns}
+        mismatches = []
+        for pattern in yaml_patterns:
+            related_names = parsed[pattern["name"]].related_patterns
+            expected = [
+                id_by_name[name]
+                for name in related_names
+                if name in id_by_name
+            ]
+            if pattern["related"] != expected:
+                mismatches.append(
+                    f"{pattern['name']}: yaml={pattern['related']!r}, "
+                    f"README={expected!r}"
+                )
+
+        assert not mismatches, "Related-pattern drift:\n" + "\n".join(
+            mismatches)
