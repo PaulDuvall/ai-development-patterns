@@ -20,13 +20,3 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "deps"
-  - package-ecosystem: pip
-    directory: /tests
-    schedule:
-      interval: weekly
-      day: monday
-      time: "09:30"
-      timezone: Etc/UTC
-    open-pull-requests-limit: 5
-    commit-message:
-      prefix: "deps"

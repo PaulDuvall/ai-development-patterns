@@ -169,11 +169,16 @@ def test_trusted_pr_workflow_executes_only_base_branch_validation_code():
     workflow = load_workflow(TRUSTED)
     assert "pull_request_target" in workflow["on"]
     job = workflow["jobs"]["trusted-evidence"]
+    base_checkout = named_step(job, "Checkout trusted base")
     candidate_checkout = named_step(job, "Checkout candidate as inert data")
     assert candidate_checkout["with"]["repository"] == (
         "${{ steps.resolve.outputs.head_repo }}")
     assert candidate_checkout["with"]["ref"] == (
         "${{ steps.resolve.outputs.head_sha }}")
+    assert candidate_checkout["with"]["allow-unsafe-pr-checkout"] == "true"
+    assert "allow-unsafe-pr-checkout" not in base_checkout["with"]
+    assert TRUSTED.read_text(encoding="utf-8").count(
+        "allow-unsafe-pr-checkout: true") == 1
     commands = "\n".join(str(step.get("run", "")) for step in job["steps"])
     assert "trusted/scripts/validate-evidence.py" in commands
     assert "trusted/scripts/generate-verification-status.py" in commands

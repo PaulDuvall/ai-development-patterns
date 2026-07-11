@@ -304,6 +304,19 @@ class TestExampleDirectories:
         
         assert not invalid_requirements, f"Invalid requirements files: {invalid_requirements}"
 
+    def test_security_sandbox_generator_matches_committed_requirements(
+            self, repo_root):
+        """The fallback generator must not recreate stale dependency floors."""
+        script = (repo_root / "examples/security-sandbox/ai-sandbox.sh").read_text(
+            encoding="utf-8")
+        marker = "cat > \"$req_file\" << 'EOF'\n"
+        generated = script.split(marker, 1)[1].split("\nEOF", 1)[0]
+        committed = (repo_root / (
+            "examples/security-sandbox/requirements-sandbox.txt"
+        )).read_text(encoding="utf-8").strip()
+
+        assert generated.strip() == committed
+
 
 class TestExampleCompleteness:
     """Test suite for checking example completeness against patterns"""
