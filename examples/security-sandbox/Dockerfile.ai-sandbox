@@ -3,7 +3,7 @@
 # Based on the Security Sandbox pattern from README.md
 
 # Use official Python slim image for smaller attack surface
-FROM python:3.11-slim-bullseye
+FROM python:3.13-slim-bullseye
 
 # Metadata
 LABEL maintainer="AI Development Team"
