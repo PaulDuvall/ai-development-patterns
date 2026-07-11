@@ -674,7 +674,7 @@ jobs:
           sudo chmod -R a=rX /opt/evidence-python
 
       - name: Download deterministic research plan
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: verification-research-plan-${{ needs.prepare.outputs.plan_id }}
           path: verification/run-plan
@@ -1076,7 +1076,7 @@ jobs:
           sudo chmod 0555 /opt/evidence-tools
 
       - name: Download deterministic research plan
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: verification-research-plan-${{ needs.prepare.outputs.plan_id }}
           path: verification/run-plan
@@ -1322,7 +1322,7 @@ jobs:
           persist-credentials: false
 
       - name: Download candidate unit
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: verification-unit-${{ needs.prepare.outputs.plan_id }}-${{ matrix.unit_id }}
           path: candidate-unit
@@ -1647,13 +1647,13 @@ jobs:
           persist-credentials: false
 
       - name: Download deterministic research plan
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: verification-research-plan-${{ needs.prepare.outputs.plan_id }}
           path: verification/run-plan
 
       - name: Download every validated unit separately
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: validated-verification-unit-${{ needs.prepare.outputs.plan_id }}-*
           path: validated-units
@@ -1900,7 +1900,7 @@ jobs:
           fi
 
       - name: Download validated candidate
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: validated-verification-candidate-${{ needs.prepare.outputs.plan_id }}
           path: candidate
