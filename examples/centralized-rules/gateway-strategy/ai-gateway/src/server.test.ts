@@ -69,15 +69,16 @@ test("gateway enforces auth, per-IP throttling, and the global provider cap", as
   assert(address && typeof address !== "string");
   const port = address.port;
 
-  for (let index = 0; index < 11; index += 1) {
+  for (let index = 0; index < 10; index += 1) {
     assert.equal(await post(port, "192.0.2.1", undefined, {}), 401);
   }
+  assert.equal(await post(port, "192.0.2.1", undefined, {}), 429);
   assert.equal(providerCalls, 0);
 
   for (let index = 0; index < 10; index += 1) {
-    assert.equal(await post(port, "192.0.2.1", `Bearer ${TOKEN}`, {}), 400);
+    assert.equal(await post(port, "192.0.2.2", `Bearer ${TOKEN}`, {}), 400);
   }
-  assert.equal(await post(port, "192.0.2.1", `Bearer ${TOKEN}`, {}), 429);
+  assert.equal(await post(port, "192.0.2.2", `Bearer ${TOKEN}`, {}), 429);
   assert.equal(providerCalls, 0, "invalid input must not spend provider budget");
 
   const validTask = {
@@ -85,14 +86,14 @@ test("gateway enforces auth, per-IP throttling, and the global provider cap", as
     taskType: "plan",
     userPrompt: "Do not call a provider",
   };
-  for (let host = 2; host <= 11; host += 1) {
+  for (let host = 3; host <= 12; host += 1) {
     assert.equal(
       await post(port, `192.0.2.${host}`, `Bearer ${TOKEN}`, validTask),
       200,
     );
   }
   assert.equal(
-    await post(port, "192.0.2.12", `Bearer ${TOKEN}`, validTask),
+    await post(port, "192.0.2.13", `Bearer ${TOKEN}`, validTask),
     429,
   );
   assert.equal(providerCalls, 10, "global cap must span distinct source IPs");

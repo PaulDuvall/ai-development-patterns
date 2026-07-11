@@ -86,9 +86,10 @@ npm link
 ai-dev plan "Implement idempotent refund API"
 ```
 
-The example binds to `127.0.0.1`, rate limits authenticated source IPs, and permits at most ten
-provider-backed requests per minute across the process. Treat those as development safeguards, not
-production controls. Remote binding additionally requires `ALLOW_REMOTE_AI_GATEWAY=true`; before
+The example binds to `127.0.0.1`, rate limits each source IP before authentication, and permits at
+most ten provider-backed requests per minute across the process. Treat those as development
+safeguards, not production controls. Remote binding additionally requires
+`ALLOW_REMOTE_AI_GATEWAY=true`; before
 enabling it, put the service behind organizational identity, distributed rate limiting, per-user
 request and token budgets, audit controls, and network policy.
 Never expose the example directly to an untrusted network.

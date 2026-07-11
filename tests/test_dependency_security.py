@@ -178,6 +178,8 @@ def test_gateway_example_is_locked_local_and_cost_guarded():
     assert 'requireGatewayAuth(expectedGatewayToken())' in server
     assert "taskRateLimit" in server
     assert "createRequestBudget" in server
+    route = server[server.index("  app.post("):server.index("    async (req, res)")]
+    assert route.index("taskRateLimit") < route.index("requireGatewayAuth")
     assert 'process.env.AI_GATEWAY_HOST || "127.0.0.1"' in server
     assert "ALLOW_REMOTE_AI_GATEWAY" in server
     assert "app.listen(port, host" in server

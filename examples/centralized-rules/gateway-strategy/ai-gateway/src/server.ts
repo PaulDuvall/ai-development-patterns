@@ -99,8 +99,8 @@ export function createGatewayApp(taskRunner: TaskRunner = runOrgTask): Express {
 
   app.post(
     "/ai/run-task",
-    requireGatewayAuth(expectedGatewayToken()),
     taskRateLimit,
+    requireGatewayAuth(expectedGatewayToken()),
     async (req, res) => {
       try {
         const { repoSummary, taskType, userPrompt } = req.body;
