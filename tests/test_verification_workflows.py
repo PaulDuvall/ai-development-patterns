@@ -344,7 +344,7 @@ def test_workflow_policy_changes_run_in_deterministic_evidence_validation():
     workflow = load_workflow(EVIDENCE)
     watched = set(workflow["on"]["push"]["paths"])
     assert {
-        ".github/trusted-policy-requirements.txt",
+        ".github/requirements.txt",
         "scripts/validate-workflow-policy.py",
         "tests/test_workflow_policy.py",
     } <= watched

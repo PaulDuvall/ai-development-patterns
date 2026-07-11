@@ -123,7 +123,7 @@ jobs:
           python-version: "3.11"
           cache: pip
           cache-dependency-path: |
-            trusted/.github/trusted-policy-requirements.txt
+            trusted/.github/requirements.txt
             trusted/tests/requirements.txt
 
       - name: Install minimal trusted workflow-policy dependency
@@ -131,7 +131,7 @@ jobs:
         if: steps.resolve.outputs.eligible == 'true'
         run: >-
           python3 -m pip install --requirement
-          trusted/.github/trusted-policy-requirements.txt
+          trusted/.github/requirements.txt
 
       - name: Enforce candidate workflow policy with trusted code
         id: workflow-policy

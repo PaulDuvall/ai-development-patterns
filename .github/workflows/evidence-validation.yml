@@ -51,7 +51,7 @@ on:
       - .agents/skills/evaluate-pattern-adoption/**
       - .codex/agents/**
       - .codex/config.toml
-      - .github/trusted-policy-requirements.txt
+      - .github/requirements.txt
       - .github/workflows/evidence-validation.yml
       - .github/workflows/trusted-evidence-validation.yml
   pull_request:

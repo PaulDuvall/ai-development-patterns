@@ -18,6 +18,7 @@ GATEWAY_ROOT = (
 
 PYTHON_DIRECTORIES = {
     "/",
+    "/.github",
     "/examples/parallel-agents/docker",
     "/examples/security-sandbox",
     "/examples/spec-driven-development",

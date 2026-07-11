@@ -12,6 +12,7 @@ import os
 import re
 import runpy
 import stat
+import subprocess
 import sys
 from pathlib import Path
 
@@ -31,7 +32,7 @@ REQUIRED_TRUST_ROOT_FILES = (
     ".codex/agents/adoption-researcher.toml",
     ".codex/agents/adoption-verifier.toml",
     ".codex/config.toml",
-    ".github/trusted-policy-requirements.txt",
+    ".github/requirements.txt",
     ".github/workflows/trusted-evidence-validation.yml",
     "AGENTS.md",
     "pyproject.toml",
@@ -68,6 +69,10 @@ OPTIONAL_TRUST_ROOT_FILES = (
     "sitecustomize.py",
     "usercustomize.py",
 )
+RUNTIME_CACHE_DIRECTORIES = frozenset({
+    "__pycache__", ".mypy_cache", ".pytest_cache", ".ruff_cache",
+})
+RUNTIME_CACHE_SUFFIXES = frozenset({".pyc", ".pyo"})
 
 CONFIGURATION = runpy.run_path(
     str(Path(__file__).with_name("configure-repository-rules.py")))
@@ -435,6 +440,11 @@ def inspect_value(path, value, location="$", command=False):
                     and child.casefold() in {"read", "write"}):
                 findings.append(
                     f"{path}:{child_location}: GitHub Models permission is forbidden")
+            if (folded_key == "permissions" and isinstance(child, str)
+                    and child.casefold() in {"read-all", "write-all"}):
+                findings.append(
+                    f"{path}:{child_location}: blanket workflow permissions "
+                    "are forbidden")
             if folded_key == "copilot-requests":
                 findings.append(
                     f"{path}:{child_location}: GitHub Copilot requests "
@@ -485,6 +495,42 @@ def iter_action_references(value):
             yield from iter_action_references(child)
 
 
+def tracked_tree_paths(root):
+    """Return UTF-8 paths committed at HEAD without executing repository code."""
+    root = Path(root)
+    git_metadata = root / ".git"
+    if not git_metadata.exists():
+        return None
+    result = subprocess.run(
+        [
+            "git", "-c", "core.hooksPath=/dev/null", "-C", str(root),
+            "ls-tree", "-rz", "--name-only", "HEAD",
+        ],
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode:
+        raise WorkflowPolicyError(
+            f"cannot enumerate committed trust-root paths: {root}")
+    try:
+        return {
+            item.decode("utf-8")
+            for item in result.stdout.split(b"\0")
+            if item
+        }
+    except UnicodeDecodeError as exc:
+        raise WorkflowPolicyError(
+            f"committed trust-root path is not UTF-8: {root}") from exc
+
+
+def has_tracked_descendant(relative_directory, tracked_paths):
+    """Return whether a committed file exists below a relative directory."""
+    if tracked_paths is None:
+        return True
+    prefix = relative_directory.rstrip("/") + "/"
+    return any(path.startswith(prefix) for path in tracked_paths)
+
+
 def trust_root_inventory(root_path):
     """Return a bounded recursive trust inventory plus unsafe-entry findings."""
     root = Path(root_path)
@@ -499,6 +545,7 @@ def trust_root_inventory(root_path):
 
     inventory = {}
     findings = []
+    tracked_paths = tracked_tree_paths(root)
     file_count = 0
     entry_count = 0
     total_bytes = 0
@@ -537,6 +584,7 @@ def trust_root_inventory(root_path):
                 "trust-root inventory exceeds its total byte bound")
         inventory[relative] = (
             "file",
+            stat.S_IMODE(file_stat.st_mode),
             file_stat.st_size,
             hashlib.sha256(path.read_bytes()).hexdigest(),
         )
@@ -575,8 +623,15 @@ def trust_root_inventory(root_path):
             retained_directories = []
             for name in directories:
                 path = current_path / name
-                entry_stat = path.lstat()
                 child_relative = path.relative_to(root).as_posix()
+                entry_stat = path.lstat()
+                if stat.S_ISDIR(entry_stat.st_mode) \
+                        and name in RUNTIME_CACHE_DIRECTORIES \
+                        and (tracked_paths is None
+                             or child_relative not in tracked_paths) \
+                        and not has_tracked_descendant(
+                            child_relative, tracked_paths):
+                    continue
                 if stat.S_ISLNK(entry_stat.st_mode) or not stat.S_ISDIR(
                         entry_stat.st_mode):
                     findings.append(
@@ -592,8 +647,13 @@ def trust_root_inventory(root_path):
             directories[:] = retained_directories
             for name in filenames:
                 path = current_path / name
+                child_relative = path.relative_to(root).as_posix()
+                if tracked_paths is not None \
+                        and child_relative not in tracked_paths \
+                        and path.suffix.casefold() in RUNTIME_CACHE_SUFFIXES:
+                    continue
                 add_file(
-                    path, path.relative_to(root).as_posix(), required=True)
+                    path, child_relative, required=True)
     return inventory, findings
 
 

@@ -2,6 +2,7 @@
 
 import importlib.util
 import os
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -137,6 +138,23 @@ def test_github_models_permission_is_rejected(tmp_path):
     assert any(
         "GitHub Models permission is forbidden" in item
         for item in MODULE.validate_directory(tmp_path))
+
+
+@pytest.mark.parametrize("permission", ["read-all", "write-all", "READ-ALL"])
+def test_blanket_permission_shorthand_is_rejected(tmp_path, permission):
+    write_workflow(
+        tmp_path,
+        "blanket-permissions.yml",
+        f"name: unsafe permissions\non: workflow_dispatch\n"
+        f"permissions: {permission}\n"
+        "jobs:\n  check:\n    runs-on: ubuntu-latest\n"
+        "    steps:\n      - run: python3 -m pytest\n",
+    )
+
+    findings = MODULE.validate_directory(tmp_path)
+
+    assert any("blanket workflow permissions are forbidden" in item
+               for item in findings)
 
 
 def test_github_copilot_requests_permission_is_rejected(tmp_path):
@@ -419,6 +437,19 @@ def test_protected_runtime_replacement_requires_exact_owner_upgrade(
         candidate, trusted, allow_trust_root_upgrade=True) == []
 
 
+def test_protected_runtime_mode_change_requires_owner_upgrade(tmp_path):
+    trusted = tmp_path / "trusted"
+    candidate = tmp_path / "candidate"
+    populate_minimal_trust_root(trusted)
+    populate_minimal_trust_root(candidate)
+    protected = candidate / "scripts" / "validate-workflow-policy.py"
+    protected.chmod(0o755)
+
+    findings = MODULE.validate_trust_root_integrity(candidate, trusted)
+
+    assert any("without exact OWNER approval" in item for item in findings)
+
+
 @pytest.mark.parametrize("relative", [
     "scripts/yaml.py",
     "scripts/yaml/__init__.py",
@@ -438,6 +469,56 @@ def test_added_import_shadow_or_startup_hook_requires_owner_upgrade(
     findings = MODULE.validate_trust_root_integrity(candidate, trusted)
 
     assert any("without exact OWNER approval" in item for item in findings)
+
+
+def test_untracked_runtime_caches_do_not_change_committed_inventory(tmp_path):
+    root = tmp_path / "repository"
+    populate_minimal_trust_root(root)
+    subprocess.run(["git", "init", "-q", root], check=True)
+    subprocess.run(["git", "-C", root, "add", "."], check=True)
+    subprocess.run(
+        [
+            "git", "-C", root, "-c", "user.name=Fixture",
+            "-c", "user.email=fixture@example.com", "commit", "-qm",
+            "fixture",
+        ],
+        check=True,
+    )
+    baseline, baseline_findings = MODULE.trust_root_inventory(root)
+    cache_file = root / "scripts" / "__pycache__" / "yaml.cpython-311.pyc"
+    cache_file.parent.mkdir()
+    cache_file.write_bytes(b"runtime cache")
+    pytest_cache = root / "tests" / ".pytest_cache" / "state"
+    pytest_cache.parent.mkdir()
+    pytest_cache.write_text("runtime cache", encoding="utf-8")
+
+    observed, observed_findings = MODULE.trust_root_inventory(root)
+
+    assert baseline_findings == observed_findings == []
+    assert observed == baseline
+
+
+def test_tracked_runtime_cache_artifact_remains_protected(tmp_path):
+    root = tmp_path / "repository"
+    populate_minimal_trust_root(root)
+    tracked_cache = root / "scripts" / "__pycache__" / "yaml.cpython-311.pyc"
+    tracked_cache.parent.mkdir()
+    tracked_cache.write_bytes(b"tracked executable bytecode")
+    subprocess.run(["git", "init", "-q", root], check=True)
+    subprocess.run(["git", "-C", root, "add", "-f", "."], check=True)
+    subprocess.run(
+        [
+            "git", "-C", root, "-c", "user.name=Fixture",
+            "-c", "user.email=fixture@example.com", "commit", "-qm",
+            "fixture",
+        ],
+        check=True,
+    )
+
+    inventory, findings = MODULE.trust_root_inventory(root)
+
+    assert findings == []
+    assert "scripts/__pycache__/yaml.cpython-311.pyc" in inventory
 
 
 def test_owner_upgrade_never_permits_required_runtime_deletion(tmp_path):
@@ -494,7 +575,7 @@ def test_protected_tree_definition_covers_hosted_and_local_trust_roots():
         ".agents/skills/evaluate-pattern-adoption/references/evidence-methodology.md",
         ".codex/agents/adoption-researcher.toml",
         ".codex/agents/adoption-verifier.toml",
-        ".github/trusted-policy-requirements.txt",
+        ".github/requirements.txt",
         ".github/workflows/trusted-evidence-validation.yml",
         "AGENTS.md",
         "pyproject.toml",

@@ -20,6 +20,7 @@ updates:
   - package-ecosystem: pip
     directories:
       - /
+      - /.github
       - /examples/parallel-agents/docker
       - /examples/security-sandbox
       - /examples/spec-driven-development
