@@ -2961,26 +2961,26 @@ Injecting faults without a falsifiable hypothesis, bounded target, abort conditi
 ## Common AI Development Anti-Patterns
 
 ### Foundation Anti-Patterns
-- **Rushing Into AI**: Starting AI adoption without proper assessment
-- **Context Drift**: Inconsistent AI rules across team members
-- **Unrestricted Access**: Allowing AI tools access to sensitive data
-- **Ad-Hoc Development**: Skipping structured development lifecycle
+- **[Premature Adoption](#anti-pattern-premature-adoption)**: Starting AI adoption without proper assessment
+- **[Broken Context](#anti-pattern-broken-context)**: Maintaining inconsistent AI rules across team members
+- **[Unrestricted Access](#anti-pattern-unrestricted-access)**: Allowing AI tools to access sensitive data
+- **[Unplanned Development](#anti-pattern-unplanned-development)**: Skipping the structured development lifecycle
 
 ### Development Anti-Patterns
-- **Implementation-First AI**: Writing code before defining acceptance criteria
-- **Test Generation Without Strategy**: Creating tests without coherent quality goals
-- **Big Bang Generation**: Attempting complex features in single AI interaction
-- **Uncoordinated Multi-Tool Usage**: Using multiple AI tools without orchestration
-- **Black Box Systems**: Insufficient logging for AI debugging
-- **Unclear Boundaries**: Ambiguous human-AI handoff points
+- **[Blind Generation](#anti-pattern-blind-generation)**: Writing code before defining requirements and acceptance criteria
+- **[Scattered Testing](experiments/README.md#anti-pattern-scattered-testing)**: Creating tests without coherent quality goals
+- **[Monolithic Generation](#anti-pattern-monolithic-generation)**: Attempting a complex feature in one AI interaction
+- **[Chaotic Orchestration](experiments/README.md#anti-pattern-chaotic-orchestration)**: Coordinating tools or agents without explicit state and ownership
+- **[Opaque Runs](#anti-pattern-opaque-runs)**: Omitting the trace data needed to diagnose agent behavior
+- **[Broken Boundaries](experiments/README.md#anti-pattern-broken-boundaries)**: Leaving human-agent handoff points ambiguous
 
 ### Operations Anti-Patterns
-- **Fragmented Security**: Isolated security tools without unified framework
-- **Alert Fatigue**: Overwhelming developers with low-priority findings
-- **Static Deployment**: Fixed scripts without AI adaptation
-- **Trusting AI Blue-Green Generation**: Accepting AI output without validation for deployment patterns
-- **Reactive Maintenance**: Firefighting instead of proactive AI-assisted management
-- **Blind Chaos Testing**: Random fault injection without understanding dependencies
+- **[Passive Scanning](experiments/README.md#anti-pattern-passive-scanning)**: Running isolated security tools without prioritized remediation
+- **[Over-Alerting](experiments/README.md#anti-pattern-over-alerting)**: Overwhelming developers with low-priority findings
+- **[Manual Pipelines](experiments/README.md#anti-pattern-manual-pipelines)**: Hand-authoring deployment pipelines without a validated generation contract
+- **[Blind Acceptance](experiments/README.md#anti-pattern-blind-acceptance)**: Accepting generated deployment output without independent validation
+- **[Reactive Debt](#anti-pattern-reactive-debt)**: Firefighting instead of forecasting maintenance burden
+- **[Random Chaos](#anti-pattern-random-chaos)**: Injecting faults without a bounded hypothesis and recovery path
 
 ---
 

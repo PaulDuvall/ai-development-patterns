@@ -141,10 +141,10 @@ All pattern names MUST follow these strict naming conventions:
 
 All anti-pattern names MUST follow these strict conventions:
 
-1. **Prefix with negative or cautionary modifier**
-   - Use: "Broken", "Blind", "Over", "Under", "False"
-   - Use: "Un-" prefix (Unplanned, Unchecked, Undocumented)
-   - Use: Negative adjectives (Premature, Reckless, Static, Manual, Scattered)
+1. **Begin with an approved negative or cautionary modifier**
+   - Common modifiers include: "Broken", "Blind", "False", "Premature", "Reckless", "Static", "Manual", and "Scattered"
+   - Supported prefixed forms include: "Unplanned", "Unchecked", "Undocumented", "Over-Alerting", and "Under-Specified"
+   - `scripts/validate-pattern-names.py` maintains the explicit accepted vocabulary; introducing another modifier requires updating that allowlist and its tests in the same change
    - Example: "Broken Context", "Blind Generation", "Over-Alerting"
 
 2. **Exactly two words OR one hyphenated compound, Title Case**
@@ -160,7 +160,7 @@ All anti-pattern names MUST follow these strict conventions:
    - Example: "Lazy Testing" is judgmental (avoid)
 
 4. **Symmetrical with positive patterns where logical**
-   - Pattern: "Spec-Driven Development" → Anti-pattern: "Spec Neglect"
+   - Pattern: "Spec-Driven Development" → Anti-pattern: "Spec-Ignored"
    - Pattern: "Pipeline Synthesis" → Anti-pattern: "Manual Pipelines"
    - Pattern: "Workflow Orchestration" → Anti-pattern: "Chaotic Orchestration"
    - Symmetry helps learners understand the contrast
@@ -199,7 +199,7 @@ All anti-pattern names MUST follow these strict conventions:
 | Blind Generation | Negative + Noun | "Blind" prefix, technical focus |
 | Over-Alerting | Hyphenated compound | "Over-" prefix, clear excess problem |
 | Uncoordinated Agents | Negative + Noun | "Un-" prefix, symmetrical with "Parallel Agents" |
-| Spec Neglect | Noun + failure mode | Symmetrical with "Spec-Driven Development" pattern |
+| Spec-Ignored | Hyphenated compound | Failure modifier and symmetry with "Spec-Driven Development" |
 
 #### Examples of Anti-pattern Names Violating Rules
 
@@ -207,7 +207,7 @@ All anti-pattern names MUST follow these strict conventions:
 |----------------------|-----------|---------------|
 | Rushing Into AI | 3 words, no clear prefix | Premature Adoption |
 | Test Generation Without Strategy | 4 words, no negative prefix | Scattered Testing |
-| Kitchen Sink Upload | 3 words, informal/humorous | Excessive Context |
+| Kitchen Sink Upload | 3 words, informal/humorous | Bloated Context |
 | Analysis Paralysis | No negative prefix (common phrase) | Over-Analysis |
 | Blue-Green-Canary Confusion | 3+ words, too specific | Confused Deployment |
 
@@ -265,7 +265,9 @@ Before finalizing an anti-pattern name, verify:
 - Name the anti-pattern with a descriptive title
 - Explain why it's problematic
 - Provide specific consequences
-- Examples: "Policy Drift", "Alert Fatigue", "Blind Testing"
+- Reuse the exact canonical H4 name in any summary or reference list; aliases are not permitted
+- Link summary/reference entries to the canonical definition
+- Examples: "Untested Policies", "Over-Alerting", "Blind Testing"
 
 ### Pattern Length Guidelines
 

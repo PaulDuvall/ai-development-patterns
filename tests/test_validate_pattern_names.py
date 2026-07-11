@@ -79,6 +79,31 @@ def test_repository_catalog_validates_all_47_active_names():
     assert not validator.errors
 
 
+def test_public_antipattern_reference_reuses_valid_canonical_names():
+    """The downstream summary may only display canonical validated labels."""
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    experiments = (REPO_ROOT / "experiments" / "README.md").read_text(
+        encoding="utf-8")
+    section = re.search(
+        r"(?ms)^# Anti-Patterns Reference\s*$\n(.*?)(?=^---\s*$)", readme)
+    assert section, "README anti-pattern reference section is missing"
+    displayed = re.findall(
+        r"(?m)^- \*\*\[([^\]]+)\]\(([^)]+)\)\*\*:", section.group(1))
+    assert len(displayed) == 16
+    assert len({name for name, _ in displayed}) == len(displayed)
+
+    canonical = {
+        item["name"]
+        for content in (readme, experiments)
+        for item in PatternValidator.antipattern_labels(content.splitlines())
+    }
+    validator = PatternValidator()
+    for name, target in displayed:
+        assert validator.validate_antipattern_name(name), (name, target)
+        assert name in canonical, f"{name!r} is not a canonical H4 anti-pattern"
+    assert not validator.errors
+
+
 def test_name_validator_runs_weekly_and_on_demand_in_actions():
     workflow = (REPO_ROOT / ".github" / "workflows" /
                 "pattern-validation.yml").read_text(encoding="utf-8")
