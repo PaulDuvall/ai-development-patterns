@@ -18,6 +18,8 @@ import sys
 import time
 import logging
 
+# Implements: REQ-001, REQ-002, REQ-003, REQ-004, REQ-005, REQ-006, REQ-007
+
 
 class IAMPolicyGenerator:
     """Generates AWS IAM policies based on policy types and resource specifications"""
@@ -87,17 +89,19 @@ class IAMPolicyGenerator:
         """Validate ARN format according to AWS ARN syntax"""
         if not arn:
             return False, "Resource ARN cannot be empty"
+
+        # Split at most five times because the resource component may itself
+        # contain colons. Report structural truncation before the generic
+        # character/partition error so callers receive the actionable reason.
+        arn_parts = arn.split(':', 5)
+        if len(arn_parts) < 6:
+            return False, "ARN must have at least 6 components separated by colons"
         
         # AWS ARN format: arn:partition:service:region:account-id:resource-type/resource-id
         arn_pattern = r'^arn:aws:[a-zA-Z0-9\-]+:[a-zA-Z0-9\-]*:[0-9]*:[a-zA-Z0-9\-\./*:_]*$'
         
         if not re.match(arn_pattern, arn):
-            return False, f"Invalid ARN format. Expected: arn:aws:service:region:account:resource"
-        
-        # Extract service from ARN
-        arn_parts = arn.split(':')
-        if len(arn_parts) < 6:
-            return False, "ARN must have at least 6 components separated by colons"
+            return False, "Invalid ARN format. Expected: arn:aws:service:region:account:resource"
         
         service = arn_parts[2]
         if service not in self.VALID_SERVICES:

@@ -161,7 +161,7 @@ EOF
     if [ -z "$(git diff --name-only --diff-filter=U)" ]; then
         log_success "All conflicts resolved automatically!"
         return 0
-    else:
+    else
         return 1
     fi
 }
@@ -191,7 +191,7 @@ merge_agent_branch() {
             git merge --ff-only "$temp_branch"
             
             create_merge_report "$branch_name" "success" "Clean merge completed"
-        else:
+        else
             log_info "No changes in $branch_name"
             create_merge_report "$branch_name" "no_changes" "Branch contains no new changes"
         fi
@@ -208,7 +208,7 @@ merge_agent_branch() {
             git merge --ff-only "$temp_branch"
             
             create_merge_report "$branch_name" "success" "Merged with automated conflict resolution"
-        else:
+        else
             log_error "Manual intervention required for $branch_name"
             
             # Save conflict information

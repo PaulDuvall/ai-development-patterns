@@ -20,7 +20,7 @@ class TestCLIRequirements:
     """Test CLI requirements from specification section {#cli_requirements}"""
     
     def test_policy_type_flag(self):
-        """Test --policy-type flag acceptance [^test_cli_policy_type]"""
+        """REQ-001: Accept the required --policy-type flag."""
         # Test valid policy type
         result = subprocess.run([
             sys.executable, str(SCRIPT_PATH),
@@ -35,7 +35,7 @@ class TestCLIRequirements:
         assert "policy" in output or "Version" in output
     
     def test_resource_flag(self):
-        """Test --resource flag acceptance [^test_cli_resource]"""
+        """REQ-001: Accept the required --resource flag."""
         result = subprocess.run([
             sys.executable, str(SCRIPT_PATH),
             "--policy-type", "s3-read", 
@@ -50,7 +50,7 @@ class TestCLIRequirements:
         assert "arn:aws:s3:::my-bucket/my-object" in policy_json
     
     def test_exit_codes(self):
-        """Test exit codes for success and validation errors [^test_exit_codes]"""
+        """REQ-001: Return distinct success and validation exit codes."""
         # Test success case (exit code 0)
         result = subprocess.run([
             sys.executable, str(SCRIPT_PATH),
@@ -79,7 +79,7 @@ class TestCLIRequirements:
         assert result.returncode != 0
     
     def test_help_display(self):
-        """Test help information display [^test_cli_help]"""
+        """REQ-001: Display CLI help without executing generation."""
         result = subprocess.run([
             sys.executable, str(SCRIPT_PATH),
             "--help"
@@ -92,7 +92,7 @@ class TestCLIRequirements:
         assert "Examples:" in result.stdout
     
     def test_compact_flag(self):
-        """Test --compact flag for JSON output formatting"""
+        """REQ-007: Support compact JSON output formatting."""
         # Test normal output (with indentation)
         result_normal = subprocess.run([
             sys.executable, str(SCRIPT_PATH),
@@ -119,7 +119,7 @@ class TestCLIRequirements:
         json.loads(result_compact.stdout)
     
     def test_missing_required_arguments(self):
-        """Test behavior when required arguments are missing"""
+        """REQ-001: Reject invocations missing required arguments."""
         # Missing both arguments
         result = subprocess.run([
             sys.executable, str(SCRIPT_PATH)
@@ -137,7 +137,7 @@ class TestCLIRequirements:
         assert result.returncode != 0
     
     def test_policy_validation_in_output(self):
-        """Test that output includes policy validation when requested"""
+        """REQ-007: Include validation metadata by default."""
         result = subprocess.run([
             sys.executable, str(SCRIPT_PATH),
             "--policy-type", "s3-read",
@@ -151,7 +151,7 @@ class TestCLIRequirements:
         assert "metadata" in output or "validation_status" in json.dumps(output)
     
     def test_no_validation_info_flag(self):
-        """Test --no-validation-info flag excludes metadata"""
+        """REQ-007: Omit validation metadata only when requested."""
         result = subprocess.run([
             sys.executable, str(SCRIPT_PATH),
             "--policy-type", "s3-read",

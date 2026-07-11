@@ -52,7 +52,7 @@ fi
 
 # Show available knowledge patterns
 if [[ -d ".ai/knowledge/patterns" ]]; then
-    local pattern_count=$(find .ai/knowledge/patterns -name "*.md" -not -name "README.md" | wc -l)
+    pattern_count=$(find .ai/knowledge/patterns -name "*.md" -not -name "README.md" | wc -l)
     if [[ $pattern_count -gt 0 ]]; then
         echo "💡 Available Knowledge Patterns:"
         find .ai/knowledge/patterns -name "*.md" -not -name "README.md" -exec basename {} .md \; | head -5

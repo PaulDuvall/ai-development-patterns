@@ -1,4 +1,4 @@
-# Spec-Driven Development - Complete Implementation
+# Spec-Driven Development - Executable Example
 
 This directory contains the complete implementation of the **Spec-Driven Development** pattern, demonstrating machine-readable specifications with authority levels, automated coverage tracking, and rigorous Test-Driven Development (TDD) integration.
 
@@ -16,7 +16,8 @@ For complete pattern documentation, see: [Spec-Driven Development](../../README.
 ### Core Implementation
 - **`iam_policy_generator.py`** - Complete IAM Policy Generator implementation
 - **`spec_validator.py`** - Automated specification coverage tracking tool
-- **`iam_policy_spec.md`** - Machine-readable specification with authority levels
+- **`iam_policy_spec.md`** - Machine-readable specification with seven normative requirements
+- **`traceability.yaml`** - Explicit specification, implementation, and quality-gate scope
 - **`.pre-commit-config.yaml`** - Pre-commit hooks for specification validation
 
 ### Specification Examples
@@ -48,18 +49,18 @@ Specifications use authority levels to resolve conflicts:
 python spec_validator.py --check-coverage --authority-conflicts
 
 # Output shows specification coverage
-Specification Coverage Report:
-✅ cli_requirements: 100% (3/3 tests linked)
-✅ input_validation: 85% (6/7 tests linked) 
-⚠️  Missing test: [^test_malformed_arn] in line 23
+Total specifications: 4
+Total test references: 17
+Missing tests: 0
+Coverage: 100.0%
 ```
 
 ### Traceability System
 Each specification requirement links to automated tests:
 ```markdown
-- Validate resource ARN format before policy generation [^test_arn_validation]
+- **REQ-003**: The generator MUST reject malformed ARNs with an actionable error. [^test_arn_validation]
 
-[^test_arn_validation]: tests/test_iam_validation.py::test_arn_format_validation
+[^test_arn_validation]: tests/test_validation.py::TestInputValidation::test_arn_format_validation
 ```
 
 ## Usage Examples
@@ -71,7 +72,7 @@ Each specification requirement links to automated tests:
 pip install -r requirements.txt
 
 # Run the IAM Policy Generator
-python iam_policy_generator.py --policy-type s3-read --resource arn:aws:s3:::my-bucket/*
+python iam_policy_generator.py --policy-type s3-read --resource 'arn:aws:s3:::my-bucket/*' --no-validation-info
 
 # Expected output: Valid IAM policy JSON
 {
@@ -79,7 +80,7 @@ python iam_policy_generator.py --policy-type s3-read --resource arn:aws:s3:::my-
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": ["s3:GetObject"],
+      "Action": ["s3:GetObject", "s3:ListBucket"],
       "Resource": "arn:aws:s3:::my-bucket/*"
     }
   ]
@@ -98,8 +99,8 @@ swagger-codegen validate -i api_openapi.yaml
 # Generate API client from OpenAPI spec
 swagger-codegen generate -i api_openapi.yaml -l python -o ./generated-client/
 
-# Parse structured specification anchors
-python spec_validator.py --validate-anchors user_authentication_structured.md
+# Validate a different structured specification
+python spec_validator.py --validate-syntax user_authentication_structured.md
 ```
 
 ### 3. Specification Validation
@@ -115,18 +116,11 @@ python spec_validator.py --authority-conflicts
 python spec_validator.py --validate-syntax iam_policy_spec.md
 ```
 
-### 4. Running Tests with Coverage
+### 4. Running the Complete Embedded Suite
 
 ```bash
-# Run all tests with specification coverage
-pytest --cov=src --cov-report=html
-
-# Run specific specification tests
-pytest tests/test_iam_validation.py -v
-
-# Generate coverage report
-coverage html
-open htmlcov/index.html
+# Run behavior tests and the traceability fitness tests
+python -m pytest -q tests test_requirement_coverage.py
 ```
 
 ### 5. Pre-commit Hook Setup
@@ -147,26 +141,14 @@ The IAM Policy Generator specification demonstrates machine-readable format:
 ```markdown
 # IAM Policy Generator Specification {#iam_policy_gen}
 
-## CLI Requirements {#cli_requirements authority=system}
-The system MUST provide a command-line interface that:
-- Accepts policy type via `--policy-type` flag [^test_cli_policy_type]
-- Validates input parameters against AWS IAM constraints [^test_input_validation]
-- Generates syntactically correct IAM policy JSON [^test_iam_syntax]
-- Returns exit code 0 for success, 1 for validation errors [^test_exit_codes]
+## CLI Contract {#cli_contract authority=system}
+- **REQ-001**: The CLI MUST require `--policy-type` and `--resource`. [^test_cli_policy_type]
 
 ## Input Validation {#input_validation authority=platform}  
-The system MUST:
-- Reject invalid AWS service names with clear error messages [^test_invalid_service]
-- Validate resource ARN format before policy generation [^test_arn_validation]
-- Implement rate limiting for API calls [^test_rate_limit]
+- **REQ-003**: The generator MUST reject malformed ARNs with an actionable error. [^test_arn_validation]
 
-[^test_cli_policy_type]: tests/test_cli.py::test_policy_type_flag
-[^test_input_validation]: tests/test_validation.py::test_input_validation
-[^test_iam_syntax]: tests/test_iam_policy.py::test_policy_syntax
-[^test_exit_codes]: tests/test_cli.py::test_exit_codes
-[^test_invalid_service]: tests/test_validation.py::test_invalid_service_names
-[^test_arn_validation]: tests/test_validation.py::test_arn_format_validation
-[^test_rate_limit]: tests/test_rate_limiting.py::test_api_rate_limiting
+[^test_cli_policy_type]: tests/test_cli.py::TestCLIRequirements::test_policy_type_flag
+[^test_arn_validation]: tests/test_validation.py::TestInputValidation::test_arn_format_validation
 ```
 
 ## Authority Conflict Resolution
@@ -264,19 +246,14 @@ This implementation demonstrates integration with:
    python spec_validator.py --check-coverage
    ```
 
-4. **Run tests with coverage:**
+4. **Run the complete embedded suite:**
    ```bash
-   pytest --cov=src --cov-report=html
+   python -m pytest -q tests test_requirement_coverage.py
    ```
 
 5. **Generate IAM policies:**
    ```bash
-   python iam_policy_generator.py --policy-type s3-read --resource arn:aws:s3:::my-bucket/*
-   ```
-
-6. **View coverage report:**
-   ```bash
-   open htmlcov/index.html
+   python iam_policy_generator.py --policy-type s3-read --resource 'arn:aws:s3:::my-bucket/*'
    ```
 
 This example demonstrates how SpecDriven AI transforms AI development from ad-hoc prompting to a rigorous, specification-first approach with automated validation and comprehensive traceability.

@@ -14,7 +14,6 @@ Usage:
 
 import argparse
 import re
-import os
 import sys
 from pathlib import Path
 import ast
@@ -34,53 +33,64 @@ class SpecificationValidator:
             print(f"❌ Specification file not found: {self.spec_file}")
             return {}
             
-        content = self.spec_file.read_text()
+        content = self.spec_file.read_text(encoding="utf-8")
         specifications = {}
-        
-        # Extract anchored sections with authority levels
-        section_pattern = r'## ([^{]+)\{#([^}]+)(?:\s+authority=([^}]+))?\}'
-        test_ref_pattern = r'\[\^([^\]]+)\]:\s*([^\n]+)'
-        
-        # Find all sections
-        for match in re.finditer(section_pattern, content):
+
+        section_pattern = re.compile(
+            r'^##\s+(.+?)\s+\{#([A-Za-z0-9_-]+)'
+            r'(?:\s+authority=(system|platform|feature))?\}\s*$',
+            re.MULTILINE,
+        )
+        test_definitions = dict(re.findall(
+            r'^\[\^([^\]]+)\]:\s*(\S.*?)\s*$', content, re.MULTILINE))
+        section_matches = list(section_pattern.finditer(content))
+
+        for index, match in enumerate(section_matches):
             title = match.group(1).strip()
             anchor = match.group(2)
             authority = match.group(3) or "feature"  # Default authority
-            
+
+            section_end = (
+                section_matches[index + 1].start()
+                if index + 1 < len(section_matches)
+                else len(content)
+            )
+            section_body = content[match.end():section_end]
+            requirements = []
+            unlinked_requirements = []
+            cited_reference_ids = []
+
+            for line in section_body.splitlines():
+                if not re.search(r'\b(?:MUST|SHOULD|MAY)\b', line):
+                    continue
+                requirement = re.sub(r'\s*\[\^[^\]]+\]', '', line)
+                requirement = requirement.strip().lstrip('-').strip()
+                requirements.append(requirement)
+                line_references = re.findall(r'\[\^([^\]]+)\]', line)
+                if not line_references:
+                    unlinked_requirements.append(requirement)
+                for reference_id in line_references:
+                    if reference_id not in cited_reference_ids:
+                        cited_reference_ids.append(reference_id)
+
+            # Anchored explanatory sections are useful documentation but are
+            # not coverage units. Only normative sections enter the report.
+            if not requirements:
+                continue
+
             specifications[anchor] = {
                 "title": title,
                 "authority": authority,
                 "authority_level": self.authority_levels.get(authority, 1),
-                "test_references": [],
-                "requirements": []
+                "test_references": [
+                    {"id": reference_id,
+                     "path": test_definitions.get(reference_id)}
+                    for reference_id in cited_reference_ids
+                ],
+                "requirements": requirements,
+                "unlinked_requirements": unlinked_requirements,
             }
-        
-        # Find test references
-        for match in re.finditer(test_ref_pattern, content):
-            ref_id = match.group(1)
-            test_path = match.group(2).strip()
-            
-            # Find which specification this reference belongs to
-            for spec_id, spec_data in specifications.items():
-                if f"[^{ref_id}]" in content:
-                    spec_data["test_references"].append({
-                        "id": ref_id,
-                        "path": test_path
-                    })
-        
-        # Extract requirements (lines starting with - or MUST/SHOULD)
-        requirement_pattern = r'- (.+?)(?:\[|\n|$)'
-        must_should_pattern = r'The system (MUST|SHOULD|MAY) (.+?)(?:\[|\n|$)'
-        
-        for match in re.finditer(requirement_pattern, content):
-            req = match.group(1).strip()
-            # Associate with nearest specification anchor
-            # This is simplified - in practice you'd track section context
-            for spec_data in specifications.values():
-                if len(spec_data["requirements"]) < 5:  # Limit per section
-                    spec_data["requirements"].append(req)
-                    break
-        
+
         return specifications
     
     def find_test_files(self) -> set[str]:
@@ -91,41 +101,69 @@ class SpecificationValidator:
                 if test_file.name.startswith("test_"):
                     test_files.add(str(test_file))
         return test_files
+
+    @staticmethod
+    def _node_exists(nodes: list[ast.AST], node_path: list[str]) -> bool:
+        """Return whether an AST contains a pytest ``Class::method`` path."""
+        current_nodes = nodes
+        for node_name in node_path:
+            matching_node = next(
+                (
+                    node for node in current_nodes
+                    if isinstance(node, (ast.ClassDef, ast.FunctionDef,
+                                         ast.AsyncFunctionDef))
+                    and node.name == node_name
+                ),
+                None,
+            )
+            if matching_node is None:
+                return False
+            current_nodes = matching_node.body
+        return True
     
     def validate_test_references(self, specifications: dict[str, dict]) -> dict[str, list[str]]:
         """Validate that referenced test files and functions exist"""
         validation_results = {}
-        test_files = self.find_test_files()
-        
+
         for spec_id, spec_data in specifications.items():
-            missing_tests = []
-            
+            missing_tests = [
+                f"Requirement has no test reference: {requirement}"
+                for requirement in spec_data["unlinked_requirements"]
+            ]
+
             for test_ref in spec_data["test_references"]:
                 test_path = test_ref["path"]
-                
-                # Parse test path (e.g., "tests/test_validation.py::test_arn_validation")
-                if "::" in test_path:
-                    file_path, function_name = test_path.split("::", 1)
-                else:
-                    file_path, function_name = test_path, None
-                
-                # Check if file exists
+
+                if not test_path:
+                    missing_tests.append(
+                        f"Undefined test reference: [^{test_ref['id']}]")
+                    continue
+
+                path_parts = test_path.split("::")
+                file_path = path_parts[0]
+                node_path = path_parts[1:]
                 full_path = Path(file_path)
-                if not full_path.exists() and str(full_path) not in test_files:
+                if not full_path.is_absolute():
+                    full_path = self.spec_file.resolve().parent / full_path
+
+                # Check if file exists
+                if not full_path.is_file():
                     missing_tests.append(f"Missing test file: {file_path}")
                     continue
-                
-                # Check if function exists (simplified - would need AST parsing for full validation)
-                if function_name and full_path.exists():
+
+                if node_path:
                     try:
-                        content = full_path.read_text()
-                        if f"def {function_name}" not in content:
-                            missing_tests.append(f"Missing test function: {function_name} in {file_path}")
-                    except Exception as e:
-                        missing_tests.append(f"Error reading {file_path}: {e}")
-            
+                        tree = ast.parse(full_path.read_text(encoding="utf-8"))
+                        if not self._node_exists(tree.body, node_path):
+                            missing_tests.append(
+                                f"Missing test node: {'::'.join(node_path)} "
+                                f"in {file_path}")
+                    except (OSError, SyntaxError) as error:
+                        missing_tests.append(
+                            f"Error reading {file_path}: {error}")
+
             validation_results[spec_id] = missing_tests
-        
+
         return validation_results
     
     def check_authority_conflicts(self, specifications: dict[str, dict]) -> list[str]:
@@ -225,9 +263,15 @@ class SpecificationValidator:
         if not re.search(r'(MUST|SHOULD|MAY)', content):
             errors.append("No requirement strength indicators found (MUST/SHOULD/MAY)")
         
-        # Validate authority levels
-        invalid_authorities = re.findall(r'authority=([^}\s]+)', content)
-        for auth in invalid_authorities:
+        # Validate authority attributes on anchored headings only. Examples in
+        # prose may legitimately show placeholders such as ``authority=level``.
+        heading_authorities = re.findall(
+            r'^#{2,6}\s+.+?\s+\{#[^}\s]+'
+            r'(?:\s+authority=([^}\s]+))?\}\s*$',
+            content,
+            re.MULTILINE,
+        )
+        for auth in filter(None, heading_authorities):
             if auth not in self.authority_levels:
                 errors.append(f"Invalid authority level: {auth}")
         
@@ -300,7 +344,8 @@ def main():
         parser.print_help()
         return 1
     
-    validator = SpecificationValidator(args.spec_file, args.test_dir)
+    selected_spec_file = args.validate_syntax or args.spec_file
+    validator = SpecificationValidator(selected_spec_file, args.test_dir)
     
     exit_code = validator.run_validation(
         check_coverage=args.check_coverage,

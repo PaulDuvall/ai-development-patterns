@@ -3,7 +3,6 @@
 
 import pytest
 import re
-import os
 import yaml
 from pathlib import Path
 
@@ -12,67 +11,58 @@ class TestRequirementTraceability:
     
     def setup_method(self):
         """Load traceability configuration"""
-        self.project_root = Path(__file__).parent.parent.parent
+        # This is a self-contained example. Repository-wide scanning silently
+        # mixes unrelated requirements and implementation files into its
+        # denominator, so every traceability surface is rooted here.
+        self.project_root = Path(__file__).resolve().parent
         self.traceability_config = self._load_traceability_config()
         self.requirements = self._extract_requirements()
         self.test_files = self._find_test_files()
         
     def _load_traceability_config(self):
         """Load traceability rules from configuration"""
-        config_path = self.project_root / ".ai" / "traceability" / "requirements_map.yml"
-        if config_path.exists():
-            with open(config_path) as f:
-                return yaml.safe_load(f)
-        return {}
+        config_path = self.project_root / "traceability.yaml"
+        assert config_path.is_file(), "traceability.yaml is required"
+        with open(config_path, encoding="utf-8") as handle:
+            config = yaml.safe_load(handle)
+        assert isinstance(config, dict), "traceability.yaml must be a mapping"
+        return config
     
     def _extract_requirements(self):
-        """Extract all requirements from documentation"""
+        """Extract requirement IDs only from declared specification files."""
         requirements = set()
-        
-        # Scan README and docs for requirements
-        for file_path in self.project_root.rglob("*.md"):
-            if file_path.is_file():
-                content = file_path.read_text()
-                req_matches = re.findall(r'REQ-\d+', content)
-                requirements.update(req_matches)
-                
+        specification_files = self.traceability_config.get(
+            "specification_files", [])
+        assert specification_files, "Declare at least one specification file"
+        for relative in specification_files:
+            file_path = self.project_root / relative
+            assert file_path.is_file(), f"Specification file not found: {relative}"
+            content = file_path.read_text(encoding="utf-8")
+            requirements.update(re.findall(r'\bREQ-\d{3}\b', content))
+        assert requirements, "Declared specifications contain no REQ-NNN IDs"
         return requirements
     
     def _find_test_files(self):
         """Find all test files in the project"""
-        test_files = []
-        test_dirs = ["tests/", "test/"]
-        
-        for test_dir in test_dirs:
-            test_path = self.project_root / test_dir
-            if test_path.exists():
-                test_files.extend(test_path.rglob("test_*.py"))
-                test_files.extend(test_path.rglob("*_test.py"))
-                
-        return test_files
-    
-    @pytest.mark.requirement("REQ-TRACE-001")
-    def test_all_requirements_have_tests(self):
-        """
-        REQ-TRACE-001: All business requirements must have corresponding test coverage
-        """
-        requirements_with_tests = set()
-        
-        # Scan all test files for requirement markers
+        test_path = self.project_root / "tests"
+        assert test_path.is_dir(), "tests/ directory is required"
+        return sorted(test_path.rglob("test_*.py"))
+
+    def _test_requirement_references(self):
+        """Return requirement IDs cited by executable tests."""
+        references = set()
         for test_file in self.test_files:
-            content = test_file.read_text()
-            
-            # Find pytest markers: @pytest.mark.requirement("REQ-123")
-            marker_matches = re.findall(r'@pytest\.mark\.requirement\(["\']([^"\']+)["\']\)', content)
-            requirements_with_tests.update(marker_matches)
-            
-            # Find docstring references: REQ-123
-            docstring_matches = re.findall(r'REQ-\d+', content)
-            requirements_with_tests.update(docstring_matches)
+            content = test_file.read_text(encoding="utf-8")
+            references.update(re.findall(r'\bREQ-\d{3}\b', content))
+        return references
         
+    def test_all_requirements_have_tests(self):
+        """All declared requirements must have real executable test coverage."""
+        requirements_with_tests = self._test_requirement_references()
         # Check coverage
         untested_requirements = self.requirements - requirements_with_tests
-        coverage_percentage = (len(requirements_with_tests) / len(self.requirements)) * 100 if self.requirements else 100
+        covered = self.requirements & requirements_with_tests
+        coverage_percentage = (len(covered) / len(self.requirements)) * 100
         
         target_coverage = self.traceability_config.get('quality_gates', {}).get('min_test_coverage_traceability', 90)
         
@@ -81,54 +71,48 @@ class TestRequirementTraceability:
             f"Untested requirements: {sorted(untested_requirements)}"
         )
     
-    @pytest.mark.requirement("REQ-TRACE-002") 
-    def test_no_orphaned_test_markers(self):
-        """
-        REQ-TRACE-002: Test requirement markers must reference valid requirements
-        """
-        orphaned_markers = set()
-        
-        for test_file in self.test_files:
-            content = test_file.read_text()
-            marker_matches = re.findall(r'@pytest\.mark\.requirement\(["\']([^"\']+)["\']\)', content)
-            
-            for marker in marker_matches:
-                if marker not in self.requirements:
-                    orphaned_markers.add(f"{marker} in {test_file.relative_to(self.project_root)}")
-        
-        assert not orphaned_markers, (
-            f"Found orphaned test requirement markers (referencing non-existent requirements):\n"
-            f"{sorted(orphaned_markers)}"
+    def test_no_orphaned_test_requirement_references(self):
+        """Tests may reference only requirement IDs declared by the spec."""
+        orphaned = self._test_requirement_references() - self.requirements
+        assert not orphaned, (
+            "Found test references to undeclared requirements:\n"
+            f"{sorted(orphaned)}"
         )
     
-    @pytest.mark.requirement("REQ-TRACE-003")
     def test_code_has_requirement_annotations(self):
-        """
-        REQ-TRACE-003: Implementation code should reference requirements in comments/docstrings
-        """
-        code_files = list(self.project_root.rglob("*.py"))
-        code_files = [f for f in code_files if not any(exclude in str(f) for exclude in ["tests/", "test/", "__pycache__"])]
-        
+        """Declared implementation files must link back to valid requirements."""
+        relative_files = self.traceability_config.get(
+            "implementation_files", [])
+        assert relative_files, "Declare at least one implementation file"
+        code_files = [self.project_root / relative for relative in relative_files]
+        assert all(path.is_file() for path in code_files), (
+            f"Missing implementation files: "
+            f"{[str(path) for path in code_files if not path.is_file()]}"
+        )
         files_with_requirements = 0
-        total_code_files = len(code_files)
-        
+        annotated_requirements = set()
         for code_file in code_files:
-            content = code_file.read_text()
-            
-            # Look for requirement annotations
-            if re.search(r'(# Implements:|# Satisfies:|REQ-\d+)', content):
+            content = code_file.read_text(encoding="utf-8")
+            annotations = set(re.findall(r'\bREQ-\d{3}\b', content))
+            orphaned = annotations - self.requirements
+            assert not orphaned, (
+                f"{code_file.name} references undeclared requirements: "
+                f"{sorted(orphaned)}")
+            if annotations:
                 files_with_requirements += 1
-        
-        if total_code_files > 0:
-            annotation_percentage = (files_with_requirements / total_code_files) * 100
-            target_percentage = self.traceability_config.get('quality_gates', {}).get('min_backward_traceability', 70)
-            
-            assert annotation_percentage >= target_percentage, (
-                f"Code requirement annotation coverage is {annotation_percentage:.1f}%, below target {target_percentage}%.\n"
-                f"Files with requirement annotations: {files_with_requirements}/{total_code_files}"
-            )
+                annotated_requirements.update(annotations)
+
+        annotation_percentage = (files_with_requirements / len(code_files)) * 100
+        target_percentage = self.traceability_config.get('quality_gates', {}).get('min_backward_traceability', 70)
+        assert annotation_percentage >= target_percentage, (
+            f"Code requirement annotation coverage is {annotation_percentage:.1f}%, below target {target_percentage}%.\n"
+            f"Files with requirement annotations: {files_with_requirements}/{len(code_files)}"
+        )
+        missing = self.requirements - annotated_requirements
+        assert not missing, (
+            "Implementation annotations do not cover requirements: "
+            f"{sorted(missing)}")
     
-    @pytest.mark.requirement("REQ-TRACE-004")
     def test_user_stories_have_acceptance_criteria(self):
         """
         REQ-TRACE-004: All user stories must have linked acceptance criteria
@@ -153,7 +137,6 @@ class TestRequirementTraceability:
                 f"User stories: {sorted(user_stories)}"
             )
     
-    @pytest.mark.requirement("REQ-TRACE-005")
     def test_compliance_requirements_mapped(self):
         """
         REQ-TRACE-005: Compliance requirements must be mapped to implementation requirements
@@ -182,25 +165,28 @@ class TestRequirementTraceability:
 
     def test_traceability_health_metrics(self):
         """Generate and validate overall traceability health metrics"""
-        
+        requirements_with_tests = self.requirements & self._test_requirement_references()
+        implementation_text = "\n".join(
+            (self.project_root / relative).read_text(encoding="utf-8")
+            for relative in self.traceability_config["implementation_files"])
+        annotated = self.requirements & set(
+            re.findall(r'\bREQ-\d{3}\b', implementation_text))
         metrics = {
             'total_requirements': len(self.requirements),
             'total_test_files': len(self.test_files),
-            'requirements_with_tests': 0,
-            'orphaned_tests': 0,
-            'code_files_with_annotations': 0
+            'requirements_with_tests': len(requirements_with_tests),
+            'orphaned_tests': len(
+                self._test_requirement_references() - self.requirements),
+            'requirements_with_code': len(annotated),
         }
-        
-        # Calculate detailed metrics
-        # This would be expanded with actual metric collection logic
-        
+
         print(f"\n=== Traceability Health Report ===")
         print(f"Total Requirements: {metrics['total_requirements']}")
         print(f"Total Test Files: {metrics['total_test_files']}")
-        
-        if metrics['total_requirements'] > 0:
-            coverage = (metrics['requirements_with_tests'] / metrics['total_requirements']) * 100
-            print(f"Test Coverage: {coverage:.1f}%")
-        
-        # This test always passes but provides visibility into traceability health
-        assert True
+        coverage = (metrics['requirements_with_tests'] / metrics['total_requirements']) * 100
+        print(f"Test Traceability: {coverage:.1f}%")
+        print(f"Requirements Linked to Code: {metrics['requirements_with_code']}")
+
+        assert metrics['orphaned_tests'] == 0
+        assert metrics['requirements_with_tests'] == metrics['total_requirements']
+        assert metrics['requirements_with_code'] == metrics['total_requirements']
