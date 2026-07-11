@@ -240,7 +240,7 @@ graph TD
 | **[Security Sandbox](#security-sandbox)** | Beginner | Foundation | Foundation | Run AI tools in isolated environments without access to secrets or sensitive data | [Codified Rules](#codified-rules) |
 | **[Developer Lifecycle](#developer-lifecycle)** | Intermediate | Foundation | Workflow | Take one feature from problem to production through a staged, plan-first discipline | [Codified Rules](#codified-rules), [Security Sandbox](#security-sandbox) |
 | **[Tool Integration](#tool-integration)** | Intermediate | Foundation | Foundation | Connect AI systems to external data, APIs, and tools | [Security Sandbox](#security-sandbox), [Developer Lifecycle](#developer-lifecycle) |
-| **[Issue Generation](#issue-generation)** | Intermediate | Foundation | Foundation | Generate flow-sized work items with acceptance criteria and dependencies | [Agent Readiness](#agent-readiness) |
+| **[Issue Generation](#issue-generation)** | Intermediate | Foundation | Foundation | Generate deployable work items sized under one AI-assisted hour, with acceptance criteria and dependencies | [Agent Readiness](#agent-readiness) |
 | **Development** | | Development | | *Daily coding workflows and tactical controls* | |
 | **[Spec-Driven Development](#spec-driven-development)** | Intermediate | Development | Development | Guide code generation with executable specifications and acceptance criteria | [Developer Lifecycle](#developer-lifecycle) |
 | **[Planned Implementation](#planned-implementation)** | Beginner | Development | Development | Interview, constrain, and plan before writing code | None |

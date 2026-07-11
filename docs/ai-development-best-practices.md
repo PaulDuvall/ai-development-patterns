@@ -22,7 +22,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 8. **Structured Development Lifecycle**: Follow a systematic 9-stage process from problem definition through deployment and monitoring for consistent AI-assisted development using [Developer Lifecycle](../README.md#developer-lifecycle).
 
-9. **Size Tasks Appropriately**: Use 4-8 hour work items for standard development with [Issue Generation](../README.md#issue-generation) and 1-2 hour atomic tasks for parallel AI agent execution with [Atomic Decomposition](../README.md#atomic-decomposition).
+9. **Size Tasks Appropriately**: Keep [Issue Generation](../README.md#issue-generation) work items deployable in under one hour with AI assistance, and use 1-2 hour atomic tasks for parallel AI agent execution with [Atomic Decomposition](../README.md#atomic-decomposition).
 
 10. **Generate Structured Work Items**: Break down features into specific, testable tasks with clear acceptance criteria using [Issue Generation](../README.md#issue-generation) to ensure continuous development flow.
 

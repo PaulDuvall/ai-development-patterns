@@ -252,7 +252,7 @@ window.PATTERNS_DATA = {
       "maturity": "Intermediate",
       "type": "Foundation",
       "category": "foundation",
-      "shortDescription": "Generate flow-sized work items with acceptance criteria and dependencies",
+      "shortDescription": "Generate deployable work items sized under one AI-assisted hour, with acceptance criteria and dependencies",
       "dependencies": [
         {
           "name": "Agent Readiness",

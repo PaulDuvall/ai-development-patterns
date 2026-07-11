@@ -258,7 +258,7 @@ ai "Write complete auth system with tests"
 ```bash
 # Task sizing rule
 Target: <1 hour
-Maximum: 2 hours (if longer, split it)
+Maximum: 1 hour (if longer, split it)
 Optimal: 15-45 minutes
 
 # Task checklist
