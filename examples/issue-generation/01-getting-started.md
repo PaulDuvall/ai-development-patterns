@@ -1,4 +1,4 @@
-# Getting Started with AI Issue Generation
+# Getting Started with Issue Generation
 
 Learn how to generate Kanban-optimized issues for AI-assisted development workflows.
 

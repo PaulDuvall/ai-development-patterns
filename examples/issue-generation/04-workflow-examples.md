@@ -1,6 +1,6 @@
 # Detailed Kanban Workflow Examples
 
-This document provides comprehensive examples for implementing the AI Issue Generation pattern with detailed Kanban workflows, epic management, and CI integration.
+This document provides comprehensive examples for implementing the Issue Generation pattern with detailed Kanban workflows, epic management, and CI integration.
 
 ## Kanban Epic Breakdown Example
 

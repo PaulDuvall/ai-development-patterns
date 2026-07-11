@@ -1,4 +1,4 @@
-# CI Integration Examples for AI Issue Generation
+# CI Integration Examples for Issue Generation
 
 This document provides detailed examples for integrating AI-generated issues with CI workflows, including file tracking, traceability, and automated reporting.
 

@@ -23,7 +23,7 @@ graph TB
 
     subgraph D[Development]
         DL --> SD[Spec-Driven Development]
-        DL --> PI[Planned Implementation] --> INCR[Incremental Generation]
+        PI[Planned Implementation] --> INCR[Incremental Generation]
         INCR --> AD[Atomic Decomposition] --> PA[Parallel Agents]
         INCR --> AE[Adversarial Evaluator]
         CR --> AM[Agent Memory] --> PD[Progressive Disclosure]
@@ -32,7 +32,7 @@ graph TB
         CR --> GR[Guided Refactoring]
         DL --> AO[Agent Observability] --> ER[Error Resolution]
         TI --> MR[Model Routing]
-        PA --> CRES[Code Research]
+        AM --> CRES[Code Research]
         PA --> BA[Bounded Autonomy]
     end
 
@@ -191,7 +191,7 @@ graph TD
 
     subgraph "Phase 2: Development (Weeks 3-4)"
         D --> G[Spec-Driven Development]
-        D --> H[Planned Implementation]
+        H[Planned Implementation]
         H --> I[Incremental Generation]
         I --> J[Adversarial Evaluator]
         Q[Agent Hooks]
@@ -201,8 +201,9 @@ graph TD
         I --> K[Atomic Decomposition]
         K --> L[Parallel Agents]
         D --> O[Agent Observability]
+        B --> GR[Guided Refactoring]
         F --> MR[Model Routing]
-        L --> RS[Code Research]
+        F --> RS[Code Research]
         L --> BA[Bounded Autonomy]
     end
 
@@ -212,7 +213,7 @@ graph TD
         B --> T[Centralized Rules]
         O --> DR[Drift Remediation]
         O --> GC[Guided Chaos]
-        B --> DF[Debt Forecasting]
+        GR --> DF[Debt Forecasting]
     end
 
     B --> Q
@@ -296,7 +297,7 @@ The patterns use different task sizing approaches based on their purpose and con
 ```mermaid
 graph TD
     A[Feature Request] --> B[Issue Generation]
-    B --> C[4-8 Hour Work Items]
+    B --> C[Sub-1-Hour Work Items]
     C --> D{Parallel Implementation?}
     D -->|Yes| E[Atomic Decomposition]
     D -->|No| F[Incremental Generation]
@@ -310,7 +311,7 @@ graph TD
 
 **Task Sizing Hierarchy**:
 
-- **[Issue Generation](#issue-generation)** (4-8 hours): Standard Kanban work items for continuous flow and rapid feedback
+- **[Issue Generation](#issue-generation)** (<1 hour with AI assistance): Small, deployable work items for continuous flow and rapid feedback
 - **[Atomic Decomposition](#atomic-decomposition)** (1-2 hours): Ultra-small tasks for parallel agent execution without conflicts
 - **[Incremental Generation](#incremental-generation)** (Daily cycles): Deployment-focused iterations that may contain multiple work items
 
@@ -320,7 +321,7 @@ graph TD
 - Use **[Incremental Generation](#incremental-generation)** when prioritizing rapid market feedback over task granularity
 
 **Pattern Differentiation**:
-- **[Issue Generation](#issue-generation)**: Creates Kanban work items (4-8 hours) for human team workflows
+- **[Issue Generation](#issue-generation)**: Creates small, deployable work items (<1 hour with AI assistance) for human team workflows
 - **[Atomic Decomposition](#atomic-decomposition)**: Creates ultra-small tasks (1-2 hours) for parallel AI agents
 - **[Incremental Generation](#incremental-generation)**: Creates deployment cycles (daily) focused on user feedback
 
@@ -504,7 +505,7 @@ Starting AI adoption without proper assessment leads to inconsistent practices, 
 **Maturity**: Beginner
 **Description**: Version and maintain AI coding standards as explicit configuration files that persist across sessions and team members.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Agent Memory](#agent-memory), [Progressive Disclosure](#progressive-disclosure), [Agent Hooks](#agent-hooks), [Custom Commands](#custom-commands), [Centralized Rules](#centralized-rules), [Harness Engineering Lens](#harness-engineering-lens)
+**Related Patterns**: [Agent Readiness](#agent-readiness), [Developer Lifecycle](#developer-lifecycle), [Agent Memory](#agent-memory), [Progressive Disclosure](#progressive-disclosure), [Agent Hooks](#agent-hooks), [Custom Commands](#custom-commands), [Centralized Rules](#centralized-rules), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Source**: "[AGENTS.md](https://agents.md/)" open format specification (OpenAI, Google Jules, Cursor, Factory); Cursor, "[Rules](https://cursor.com/docs/rules)" documentation
 
@@ -610,7 +611,7 @@ Allowing multiple parallel agents to write to the same directories creates race 
 **Maturity**: Intermediate
 **Description**: A staged, plan-first discipline for taking a single feature from problem to production with AI assistance.
 
-**Related Patterns**: [Lifecycle Lens](#lifecycle-lens), [Planned Implementation](#planned-implementation), [Spec-Driven Development](#spec-driven-development), [Atomic Decomposition](#atomic-decomposition), [Agent Observability](#agent-observability)
+**Related Patterns**: [Lifecycle Lens](#lifecycle-lens), [Codified Rules](#codified-rules), [Security Sandbox](#security-sandbox), [Planned Implementation](#planned-implementation), [Spec-Driven Development](#spec-driven-development), [Atomic Decomposition](#atomic-decomposition), [Agent Observability](#agent-observability)
 
 **Source**: GitHub, "[Spec Kit](https://github.com/github/spec-kit)"; AWS DevOps & Developer Productivity Blog, "[AI-Driven Development Life Cycle: Reimagining Software Engineering](https://aws.amazon.com/blogs/devops/ai-driven-development-life-cycle/)", July 31, 2025
 
@@ -791,7 +792,7 @@ graph TD
 
 **Core Principles**
 
-- **Small Batch Sizing**: Each work item sized for 4-8 hours max to enable continuous delivery and rapid feedback
+- **Small Batch Sizing**: Each work item sized to complete in under an hour with AI assistance, enabling continuous delivery and rapid feedback
 - **AI-Assisted Decomposition**: Use AI to break down requirements into implementable tasks
 - **Traceability Integration**: Connect issues to implementation files and CI workflows
 - **Dependency Mapping**: Establish clear relationships between work items and epics
@@ -2702,7 +2703,7 @@ Sending every task to the largest, most expensive model increases cost and laten
 **Maturity**: Intermediate
 **Description**: Answer technical questions with isolated agent-run experiments that produce executable, reviewable evidence.
 
-**Related Patterns**: [Parallel Agents](#parallel-agents), [Agent Memory](#agent-memory), [Adversarial Evaluator](#adversarial-evaluator)
+**Related Patterns**: [Parallel Agents](#parallel-agents), [Agent Memory](#agent-memory), [Tool Integration](#tool-integration), [Adversarial Evaluator](#adversarial-evaluator)
 
 **Source**: Simon Willison, "[Code research projects with async coding agents](https://simonwillison.net/2025/Nov/6/async-code-research/)," November 6, 2025
 
@@ -2941,7 +2942,7 @@ Waiting for debt to cause outages or block delivery loses the lead time a trend 
 
 **Related Patterns**: [Agent Observability](#agent-observability), [Bounded Autonomy](#bounded-autonomy), [Error Resolution](#error-resolution)
 
-The compatibility anchor above preserves inbound links to the former catalog entry. The new name emphasizes that AI proposes a bounded experiment; it does not receive open-ended authority to inject faults.
+The compatibility anchor above preserves inbound links to the former catalog entry. The name emphasizes that AI proposes a bounded experiment; it does not receive open-ended authority to inject faults.
 
 ```yaml
 # chaos-experiment.yml

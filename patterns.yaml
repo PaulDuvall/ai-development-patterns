@@ -59,7 +59,7 @@ patterns:
     anchor: "#issue-generation"
     automatable: true
     description: >
-      Generate Kanban-optimized work items from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies.
+      Generate small, deployable work items (<1 hour with AI assistance) from requirements using AI to ensure continuous delivery with clear acceptance criteria and dependency tracking.
     related: [agent-readiness, atomic-decomposition]
 
   # Development (17 patterns)

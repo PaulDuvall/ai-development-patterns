@@ -110,13 +110,13 @@ mention_delegation:
 
 ## Consolidated Concepts
 
-Iteration and retry-loop mechanics now belong to
+Iteration and retry-loop mechanics belong to
 [Long-Running Orchestration](README.md#long-running-orchestration), while all turn, spend, time,
 stall, and divergence controls belong to [Bounded Autonomy](../README.md#bounded-autonomy).
 
-Post-task quality checkpoints now belong to [Testing Orchestration](README.md#testing-orchestration)
+Post-task quality checkpoints belong to [Testing Orchestration](README.md#testing-orchestration)
 for test and quality-gate execution and [Autonomous Acceptance](README.md#autonomous-acceptance) for
-separately owned release policy. They are no longer tracked as an independent exploration.
+separately owned release policy. They are not tracked as an independent exploration.
 
 ## Notes Template
 

@@ -216,7 +216,7 @@ notifier.send_handoff_update(
 - Use quality gates to trigger human review of AI-generated tests
 - Track testing effectiveness across different handoff modes
 
-### Observable AI Development
+### [Agent Observability](../../../README.md#agent-observability)
 - Log handoff decisions and outcomes for analysis
 - Monitor handoff effectiveness and adjust thresholds
 - Debug handoff failures and improve assessment accuracy

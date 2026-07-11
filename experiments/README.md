@@ -566,7 +566,7 @@ pipeline_spec:
 ```
 
 Generate configuration into a reviewable branch, validate its syntax, pin third-party actions, and
-run it in a disposable environment before promotion. The retired standalone deployment entry is now
+run it in a disposable environment before promotion. The retired standalone deployment entry is
 a subtype: blue-green means two complete environments and an all-at-once traffic switch, not canary
 traffic splitting. The retired release-note material is retained as a deterministic release stage;
 generated notes are pipeline output, not a standalone AI pattern.

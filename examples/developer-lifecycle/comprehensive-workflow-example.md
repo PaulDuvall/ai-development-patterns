@@ -1,10 +1,10 @@
-# Comprehensive AI Developer Lifecycle Workflow
+# Comprehensive Developer Lifecycle Workflow
 
-This example demonstrates how to implement the complete AI Developer Lifecycle using the enhanced implementation techniques, including the Five-Try Rule, markdown iteration, and function-level decomposition.
+This example demonstrates how to implement the complete Developer Lifecycle using the enhanced implementation techniques, including the Five-Try Rule, markdown iteration, and function-level decomposition.
 
 ## Overview: 7-Step Implementation of 9-Stage Lifecycle
 
-The enhanced AI Developer Lifecycle can be implemented using this proven 7-step workflow that incorporates the lifecycle's nine stages:
+The enhanced Developer Lifecycle can be implemented using this proven 7-step workflow that incorporates the lifecycle's nine stages:
 
 ```mermaid
 graph TD
@@ -350,4 +350,4 @@ claude -p "Generate JWT service following OpenAPI specification"
 - **Integration time**: Minimal debugging due to clear function contracts
 - **Production readiness**: Comprehensive tests and monitoring before deployment
 
-This comprehensive workflow demonstrates how the enhanced AI Developer Lifecycle pattern creates systematic, high-quality implementations through structured planning, systematic failure recovery, and comprehensive integration practices.
+This comprehensive workflow demonstrates how the enhanced Developer Lifecycle pattern creates systematic, high-quality implementations through structured planning, systematic failure recovery, and comprehensive integration practices.

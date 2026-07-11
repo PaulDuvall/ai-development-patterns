@@ -41,7 +41,7 @@ def validate_code_change(file_path, content):
 
 ## AI DEVELOPMENT STANDARDS
 
-### Rules as Code
+### Codified Rules
 ```bash
 # AUTOMATED CHECK:
 [ ! -d ".ai" ] && echo "MISSING: .ai/ configuration directory"
