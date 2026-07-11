@@ -10,8 +10,21 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "ci"
+    groups:
+      actions-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
   - package-ecosystem: pip
-    directory: /
+    directories:
+      - /
+      - /examples/parallel-agents/docker
+      - /examples/security-sandbox
+      - /examples/spec-driven-development
+      - /experiments/examples/test-promotion
+      - /tests
     schedule:
       interval: weekly
       day: monday
@@ -20,3 +33,64 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "deps"
+    groups:
+      python-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+        group-by: dependency-name
+      python-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+  - package-ecosystem: npm
+    directories:
+      - /examples/centralized-rules/gateway-strategy/ai-dev-cli
+      - /examples/centralized-rules/gateway-strategy/ai-gateway
+      - /examples/centralized-rules/gateway-strategy/org-ai-client
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:30"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps"
+    groups:
+      npm-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+        group-by: dependency-name
+      npm-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+  - package-ecosystem: docker
+    directories:
+      - /examples/parallel-agents/docker
+      - /examples/security-sandbox
+    schedule:
+      interval: weekly
+      day: monday
+      time: "10:00"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps"
+    groups:
+      docker-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+        group-by: dependency-name
+      docker-security:
+        applies-to: security-updates
+        patterns:
+          - "*"

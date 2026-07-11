@@ -5,7 +5,6 @@ import argparse
 import datetime
 import importlib.util
 import json
-import os
 import re
 import subprocess
 import sys
@@ -15,20 +14,21 @@ from pathlib import Path
 import yaml
 
 from local_verification import (
+    REFUSED_API_ENV,
     contract_digest,
     compute_plan_id,
     load_manifest,
     manifest_sha256,
+    refuse_hosted_or_api_execution,
     run_ref_for_id,
+    search_ledger_ref_for_id,
     write_manifest,
 )
 
 
 ROOT = Path(__file__).parent.parent.resolve()
-REFUSED_API_ENV = {
-    "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "EVIDENCE_OPENAI_API_KEY",
-    "EVIDENCE_ANTHROPIC_API_KEY", "CLAUDE_CODE_OAUTH_TOKEN",
-}
+MAX_RESEARCH_BATCH_SIZE = 3
+VERIFIER_TURNS_PER_BATCH = 2
 EVIDENCE_PATH_RE = re.compile(
     r"^verification/evidence/([a-z0-9]+(?:-[a-z0-9]+)*)\.yaml$")
 
@@ -79,6 +79,8 @@ def contract_paths(root):
     return [
         skill_root / "SKILL.md",
         skill_root / "references" / "evidence-methodology.md",
+        Path(root) / ".codex" / "agents" / "adoption-researcher.toml",
+        Path(root) / ".codex" / "agents" / "adoption-verifier.toml",
     ]
 
 
@@ -96,17 +98,6 @@ def prepare_new_manifest_path(root, run_ref):
     if target.exists() or target.is_symlink():
         raise ValueError("local run manifest path already exists")
     return target
-
-
-def refuse_hosted_or_api_execution(environ=None):
-    environ = environ if environ is not None else os.environ
-    if environ.get("GITHUB_ACTIONS") == "true":
-        raise ValueError("local pattern evaluation is forbidden in GitHub Actions")
-    configured = sorted(name for name in REFUSED_API_ENV if environ.get(name))
-    if configured:
-        raise ValueError(
-            "refusing API-key-backed evaluation; unset these variables and use a "
-            f"signed-in Codex client: {', '.join(configured)}")
 
 
 def inflight_slugs_from_prs(pull_requests):
@@ -328,6 +319,11 @@ def main():
                 if item["slug"] in selected:
                     locations[item["location"]] += 1
             research_units = len(selected) + int(manifest["include_discovery"])
+            verifier_batches = (
+                len(selected) + MAX_RESEARCH_BATCH_SIZE - 1
+            ) // MAX_RESEARCH_BATCH_SIZE
+            verifier_units = verifier_batches * VERIFIER_TURNS_PER_BATCH
+            total_subagent_turns = research_units + verifier_units
             inflight_count = sum(item["in_flight"] for item in inventory)
             print(f"Plan ID: {manifest['plan_id']}")
             print(f"Run manifest: {run_ref}")
@@ -335,8 +331,17 @@ def main():
                 f"Pattern units: {len(selected)} "
                 f"({locations['main']} stable, {locations['experimental']} exploratory)")
             print(f"Discovery unit: {'yes' if manifest['include_discovery'] else 'no'}")
-            print(f"Total research-agent units: {research_units}")
+            print(f"Researcher subagent turns: {research_units}")
+            print(
+                f"Maximum verifier subagent turns: {verifier_units} "
+                f"({VERIFIER_TURNS_PER_BATCH} per batch of up to "
+                f"{MAX_RESEARCH_BATCH_SIZE} patterns)")
+            print(f"Maximum total subagent turns: {total_subagent_turns}")
             print(f"Maximum live searches: {research_units * 12}")
+            print(f"Execution provider: {manifest['execution']['provider']}")
+            print(f"Execution surface: {manifest['execution']['surface']}")
+            print(f"Execution auth mode: {manifest['execution']['auth_mode']}")
+            print(f"Execution model: {manifest['execution']['model']}")
             print(f"Open-PR evidence exclusions checked: {inflight_count}")
             print("No model, subagent, or provider API call has run.")
             print(
@@ -351,6 +356,7 @@ def main():
             print(f"RUN_ID={manifest['run_id']}")
             print(f"RUN_REF={run_ref}")
             print(f"RUN_MANIFEST_SHA256={digest}")
+            print(f"SEARCH_LEDGER_REF={search_ledger_ref_for_id(manifest['run_id'])}")
             print(f"CHECKED_DATE={manifest['checked_date']}")
             print(f"MODEL={manifest['execution']['model']}")
             print(f"PROMPT_VERSION={manifest['execution']['prompt_version']}")

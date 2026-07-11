@@ -4,6 +4,8 @@ on:
   pull_request_target: # zizmor: ignore[dangerous-triggers] candidate data is never executed
     branches: [main]
     types: [opened, synchronize, reopened, ready_for_review, edited]
+  issue_comment:
+    types: [created, edited, deleted]
   workflow_dispatch:
     inputs:
       pr_number:
@@ -15,16 +17,21 @@ on:
 # checked out as inert data and is never imported or executed.
 permissions:
   contents: read
+  issues: read
   pull-requests: read
   statuses: write
 
 concurrency:
-  group: trusted-evidence-${{ github.event.pull_request.number || inputs.pr_number }}
+  group: trusted-evidence-${{ github.event.pull_request.number || github.event.issue.number || inputs.pr_number }}
   cancel-in-progress: true
 
 jobs:
   trusted-evidence:
     name: Trusted validator execution
+    if: >-
+      github.event_name != 'issue_comment' ||
+      (github.event.issue.pull_request != null &&
+       github.event.comment.author_association == 'OWNER')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -32,21 +39,45 @@ jobs:
         id: resolve
         env:
           GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number || inputs.pr_number }}
         run: |
           set -euo pipefail
           [[ "$PR_NUMBER" =~ ^[1-9][0-9]*$ ]]
           pull=$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}")
-          [ "$(jq -r .state <<< "$pull")" = "open" ]
-          [ "$(jq -r .base.ref <<< "$pull")" = "main" ]
+          state=$(jq -r .state <<< "$pull")
+          base_ref=$(jq -r .base.ref <<< "$pull")
+          head_sha=$(jq -r .head.sha <<< "$pull")
+          [[ "$head_sha" =~ ^[0-9a-f]{40}$ ]]
+          eligible=false
+          if [ "$state" = "open" ] && [ "$base_ref" = "main" ]; then
+            eligible=true
+          else
+            echo "::notice::PR #${PR_NUMBER} is ${state} with base ${base_ref}; trusted validation is a successful no-op."
+          fi
+          trust_root_approved=false
+          if [ "$eligible" = true ]; then
+            expected="APPROVE TRUST ROOT ${head_sha}"
+            comments=$(gh api --paginate --slurp \
+              "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments?per_page=100")
+            if jq -e --arg expected "$expected" \
+              'any(.[][]; .body == $expected and .author_association == "OWNER")' \
+              <<< "$comments" > /dev/null; then
+              trust_root_approved=true
+            else
+              echo "::notice::Protected trust-root changes require an OWNER comment containing exactly: ${expected}"
+            fi
+          fi
           {
-            echo "head_sha=$(jq -r .head.sha <<< "$pull")"
+            echo "eligible=$eligible"
+            echo "head_sha=$head_sha"
             echo "head_repo=$(jq -r .head.repo.full_name <<< "$pull")"
             echo "base_sha=$(jq -r .base.sha <<< "$pull")"
+            echo "trust_root_approved=$trust_root_approved"
           } >> "$GITHUB_OUTPUT"
 
       - name: Checkout trusted base
         id: checkout-base
+        if: steps.resolve.outputs.eligible == 'true'
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ steps.resolve.outputs.base_sha }}
@@ -55,6 +86,7 @@ jobs:
 
       - name: Checkout candidate as inert data
         id: checkout-candidate
+        if: steps.resolve.outputs.eligible == 'true'
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           repository: ${{ steps.resolve.outputs.head_repo }}
@@ -67,6 +99,7 @@ jobs:
 
       - name: Reject unsafe candidate filesystem entries
         id: filesystem
+        if: steps.resolve.outputs.eligible == 'true'
         run: |
           set -euo pipefail
           if find candidate -type l -print -quit | grep -q .; then
@@ -84,18 +117,47 @@ jobs:
 
       - name: Set up Python 3.11
         id: setup-python
+        if: steps.resolve.outputs.eligible == 'true'
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.11"
           cache: pip
-          cache-dependency-path: trusted/tests/requirements.txt
+          cache-dependency-path: |
+            trusted/.github/trusted-policy-requirements.txt
+            trusted/tests/requirements.txt
+
+      - name: Install minimal trusted workflow-policy dependency
+        id: install-policy
+        if: steps.resolve.outputs.eligible == 'true'
+        run: >-
+          python3 -m pip install --requirement
+          trusted/.github/trusted-policy-requirements.txt
+
+      - name: Enforce candidate workflow policy with trusted code
+        id: workflow-policy
+        if: steps.resolve.outputs.eligible == 'true'
+        env:
+          TRUST_ROOT_APPROVED: ${{ steps.resolve.outputs.trust_root_approved }}
+        run: |
+          set -euo pipefail
+          upgrade_args=()
+          if [ "$TRUST_ROOT_APPROVED" = true ]; then
+            upgrade_args+=(--allow-trust-root-upgrade)
+          fi
+          python3 trusted/scripts/validate-workflow-policy.py \
+            --trusted-root trusted \
+            --candidate-root candidate \
+            "${upgrade_args[@]}" \
+            candidate/.github/workflows
 
       - name: Install trusted validation dependencies
         id: install
+        if: steps.resolve.outputs.eligible == 'true'
         run: python3 -m pip install --requirement trusted/tests/requirements.txt
 
       - name: Reject credentials in candidate data
         id: secret-scan
+        if: steps.resolve.outputs.eligible == 'true'
         run: >-
           python3 trusted/scripts/scan-candidate-secrets.py
           candidate/README.md
@@ -106,6 +168,7 @@ jobs:
 
       - name: Recompute candidate evidence with trusted validator
         id: evidence
+        if: steps.resolve.outputs.eligible == 'true'
         run: >-
           python3 trusted/scripts/validate-evidence.py
           --dir candidate/verification/evidence
@@ -115,6 +178,7 @@ jobs:
 
       - name: Recompute candidate status with trusted generator
         id: status
+        if: steps.resolve.outputs.eligible == 'true'
         env:
           SUBMITTED_STATUS: ${{ runner.temp }}/submitted-verification-status.md
         run: |
@@ -146,7 +210,10 @@ jobs:
           PY
 
       - name: Publish trusted result on the candidate revision
-        if: ${{ always() && steps.resolve.outputs.head_sha != '' }}
+        if: >-
+          always() &&
+          steps.resolve.outputs.eligible == 'true' &&
+          steps.resolve.outputs.head_sha != ''
         env:
           GH_TOKEN: ${{ github.token }}
           HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
@@ -156,6 +223,8 @@ jobs:
               steps.checkout-candidate.outcome != 'success' ||
               steps.filesystem.outcome != 'success' ||
               steps.setup-python.outcome != 'success' ||
+              steps.install-policy.outcome != 'success' ||
+              steps.workflow-policy.outcome != 'success' ||
               steps.install.outcome != 'success' ||
               steps.secret-scan.outcome != 'success' ||
               steps.evidence.outcome != 'success' ||

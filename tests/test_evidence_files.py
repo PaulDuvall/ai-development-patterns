@@ -29,6 +29,8 @@ LOCAL_SPEC.loader.exec_module(LOCAL)
 LOCAL_UUID = "123e4567-e89b-42d3-a456-426614174000"
 LOCAL_RUN_ID = f"codex-local:{LOCAL_UUID}"
 LOCAL_RUN_REF = f"verification/local-runs/codex-local-{LOCAL_UUID}.yaml"
+LOCAL_LEDGER_REF = (
+    f"verification/local-runs/codex-local-{LOCAL_UUID}-search-events.yaml")
 LOCAL_MODEL = "codex-managed"
 LOCAL_PROMPT_VERSION = f"evidence-v2-codex-local-v1+sha256.{'a' * 64}"
 
@@ -255,15 +257,32 @@ def bind_document_to_local_run(document, manifest_path):
     return document
 
 
-def write_local_fixture(tmp_path, *, slugs=("example",)):
+def write_local_ledger(repo, manifest_path, manifest, document):
+    digest = LOCAL.manifest_sha256(manifest_path)
+    ledger = LOCAL.new_search_ledger(manifest, LOCAL_RUN_REF, digest)
+    for mode, details in document["search"]["modes"].items():
+        for index, query in enumerate(details["queries"]):
+            LOCAL.append_search_event(
+                ledger, manifest, LOCAL_RUN_REF, digest, document["slug"], mode,
+                "web.search_query", query,
+                details["candidate_count"] if index == 0 else 0)
+    path = repo / LOCAL_LEDGER_REF
+    LOCAL.write_search_ledger(
+        path, ledger, manifest, LOCAL_RUN_REF, digest, require_complete=True)
+    return path
+
+
+def write_local_fixture(tmp_path, *, slugs=("example",), document=None):
     repo = tmp_path / "repo"
     evidence_dir = repo / "verification" / "evidence"
     evidence_dir.mkdir(parents=True)
     manifest_path = repo / LOCAL_RUN_REF
     manifest = local_manifest(slugs)
     LOCAL.write_manifest(manifest_path, manifest)
-    document = bind_document_to_local_run(evidence_document(), manifest_path)
+    document = bind_document_to_local_run(
+        document or evidence_document(), manifest_path)
     evidence_path = write_document(evidence_dir, document)
+    write_local_ledger(repo, manifest_path, manifest, document)
     return repo, evidence_dir, evidence_path, manifest_path, document, manifest
 
 
@@ -319,6 +338,77 @@ def test_complete_local_codex_fixture_binds_to_approved_manifest(tmp_path):
     assert result.returncode == 0, result.stdout
 
 
+def test_complete_local_codex_fixture_preserves_identical_retries(tmp_path):
+    document = evidence_document()
+    document["search"]["modes"]["name"] = {
+        "queries": ["example pattern", "example pattern"],
+        "candidate_count": 2,
+    }
+    _, evidence_dir, _, _, _, _ = write_local_fixture(
+        tmp_path, document=document)
+
+    result = run_validator(evidence_dir)
+
+    assert result.returncode == 0, result.stdout
+
+
+def test_local_codex_search_ledger_must_exist(tmp_path):
+    repo, evidence_dir, _, _, _, _ = write_local_fixture(tmp_path)
+    (repo / LOCAL_LEDGER_REF).unlink()
+
+    assert_fails(evidence_dir, "local search-event ledger is invalid")
+
+
+def test_local_codex_search_ledger_cannot_be_a_symlink(tmp_path):
+    repo, evidence_dir, _, _, _, _ = write_local_fixture(tmp_path)
+    ledger_path = repo / LOCAL_LEDGER_REF
+    target = tmp_path / "ledger-target.yaml"
+    target.write_bytes(ledger_path.read_bytes())
+    ledger_path.unlink()
+    ledger_path.symlink_to(target)
+
+    assert_fails(evidence_dir, "search-event ledger must be a regular non-symlink file")
+
+
+def test_local_codex_search_ledger_binds_research_contract_digest(tmp_path):
+    repo, evidence_dir, _, _, _, _ = write_local_fixture(tmp_path)
+    ledger_path = repo / LOCAL_LEDGER_REF
+    ledger = yaml.safe_load(ledger_path.read_text(encoding="utf-8"))
+    ledger["research_contract_sha256"] = "f" * 64
+    ledger_path.write_text(yaml.safe_dump(ledger, sort_keys=False), encoding="utf-8")
+
+    assert_fails(
+        evidence_dir,
+        "search-event ledger research_contract_sha256 does not match this run")
+
+
+@pytest.mark.parametrize(
+    ("mode", "field", "value"),
+    [
+        ("name", "queries", ["different exact query"]),
+        ("mechanism", "candidate_count", 99),
+    ],
+)
+def test_local_codex_search_claims_must_exactly_match_trusted_ledger(
+        tmp_path, mode, field, value):
+    _, evidence_dir, _, _, document, _ = write_local_fixture(tmp_path)
+    document["search"]["modes"][mode][field] = value
+    write_document(evidence_dir, document)
+
+    assert_fails(evidence_dir, "does not exactly match search.modes")
+
+
+def test_local_none_found_cannot_complete_without_search_ledger(tmp_path):
+    document = evidence_document(entries=[])
+    repo, evidence_dir, _, _, _, _ = write_local_fixture(
+        tmp_path, document=document)
+    (repo / LOCAL_LEDGER_REF).unlink()
+
+    assert_fails(
+        evidence_dir,
+        "'none found' requires a complete, reconciled local search-event ledger")
+
+
 def test_local_codex_manifest_must_exist(tmp_path):
     _, evidence_dir, _, manifest_path, _, _ = write_local_fixture(tmp_path)
     manifest_path.unlink()
@@ -354,6 +444,7 @@ def test_local_codex_manifest_parent_cannot_be_a_symlink(tmp_path):
     target_dir.mkdir()
     target = target_dir / manifest_path.name
     target.write_bytes(manifest_path.read_bytes())
+    (repo / LOCAL_LEDGER_REF).unlink()
     manifest_path.unlink()
     manifest_path.parent.rmdir()
     manifest_path.parent.symlink_to(target_dir, target_is_directory=True)
@@ -520,6 +611,19 @@ def test_complete_search_has_twelve_query_cap(tmp_path):
     assert_fails(tmp_path, "13 queries exceeds max 12")
 
 
+def test_complete_search_preserves_truthful_identical_retries(tmp_path):
+    document = evidence_document()
+    document["search"]["modes"]["name"] = {
+        "queries": ["example pattern", "example pattern"],
+        "candidate_count": 2,
+    }
+    write_document(tmp_path, document)
+
+    result = run_validator(tmp_path)
+
+    assert result.returncode == 0, result.stdout
+
+
 def test_complete_search_run_and_verifier_are_bound_to_same_actions_run(tmp_path):
     document = evidence_document()
     document["search"]["run_id"] = "arbitrary"
@@ -600,6 +704,16 @@ def test_complete_entries_require_source_and_verifier_provenance(tmp_path):
     assert "missing required field 'organization'" in result.stdout
     assert "64 lowercase hex" in result.stdout
     assert "'run_url' must be this repository's canonical Actions URL" in result.stdout
+
+
+@pytest.mark.parametrize("field", ["url", "resolved_url"])
+def test_submitted_and_resolved_evidence_urls_require_https(tmp_path, field):
+    document = evidence_document()
+    document["evidence"][0][field] = "http://vendor-a.example/evidence/t1"
+    write_document(tmp_path, document)
+
+    assert_fails(
+        tmp_path, f"'{field}' must be a concrete public HTTPS URL")
 
 
 def test_source_kind_must_match_tier(tmp_path):

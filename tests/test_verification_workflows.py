@@ -11,7 +11,13 @@ WORKFLOWS = ROOT / ".github" / "workflows"
 VERIFY = WORKFLOWS / "verify-patterns.yml"
 TRUSTED = WORKFLOWS / "trusted-evidence-validation.yml"
 EVIDENCE = WORKFLOWS / "evidence-validation.yml"
-CLAUDE_REVIEW = WORKFLOWS / "claude-code-review.yml"
+PATTERN_VALIDATION = WORKFLOWS / "pattern-validation.yml"
+PAGES = WORKFLOWS / "deploy-pages.yml"
+
+
+def workflow_paths():
+    """Return every filename extension GitHub recognizes as a workflow."""
+    return sorted({*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")})
 
 
 def load_workflow(path):
@@ -24,7 +30,7 @@ def named_step(job, name):
 
 def test_every_external_action_is_pinned_to_a_commit_sha():
     unpinned = []
-    for path in sorted(WORKFLOWS.glob("*.yml")):
+    for path in workflow_paths():
         for line_number, line in enumerate(
                 path.read_text(encoding="utf-8").splitlines(), 1):
             match = re.search(r"\buses:\s*([^\s#]+)", line)
@@ -42,7 +48,7 @@ def test_model_backed_pattern_evaluation_is_local_only():
 
     workflow_text = {
         path.name: path.read_text(encoding="utf-8")
-        for path in WORKFLOWS.glob("*.yml")
+        for path in workflow_paths()
     }
     combined = "\n".join(workflow_text.values())
     forbidden = (
@@ -52,8 +58,22 @@ def test_model_backed_pattern_evaluation_is_local_only():
         "codex sandbox",
         "EVIDENCE_OPENAI_API_KEY",
         "EVIDENCE_ANTHROPIC_API_KEY",
+        "OPENAI_API_KEY",
+        "ANTHROPIC_API_KEY",
+        "VERIFY_PATTERNS_PAT",
+        "VERIFY_PATTERNS_APP_PRIVATE_KEY",
+        "CLAUDE_ASSISTANT_API_KEY",
+        "CLAUDE_REVIEW_API_KEY",
+        "CLAUDE_CODE_OAUTH_TOKEN",
         "OPENAI_EVIDENCE_MODEL",
         "ANTHROPIC_EVIDENCE_MODEL",
+        "ANTHROPIC_FEDERATION_RULE_ID",
+        "ANTHROPIC_ORGANIZATION_ID",
+        "ANTHROPIC_SERVICE_ACCOUNT_ID",
+        "ANTHROPIC_WORKSPACE_ID",
+        "VERIFY_PATTERNS_APP_ID",
+        "ENABLE_ANTHROPIC_ASSISTANT",
+        "ENABLE_ANTHROPIC_REVIEW",
         "EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID",
         "evidence-paid-research",
         ".github/codex/evidence-research.toml",
@@ -69,7 +89,8 @@ def test_model_backed_pattern_evaluation_is_local_only():
         name for name, text in workflow_text.items()
         if "anthropics/claude-code-action@" in text
     }
-    assert anthropic_action_files == {"claude-code-review.yml"}
+    assert not anthropic_action_files
+    assert not (WORKFLOWS / "claude-code-review.yml").exists()
     assert not (WORKFLOWS / "claude.yml").exists()
 
 
@@ -131,6 +152,7 @@ def test_local_evaluator_inputs_are_watched_but_never_executed_by_actions():
         "verification/local-runs/**",
         "scripts/local_verification.py",
         "scripts/plan-local-verification.py",
+        "scripts/record-local-search-event.py",
         "scripts/finalize-local-verification.py",
         "tests/test_local_research_scope.py",
         "tests/test_local_verification.py",
@@ -138,33 +160,14 @@ def test_local_evaluator_inputs_are_watched_but_never_executed_by_actions():
 
     jobs_text = str(workflow["jobs"])
     assert "plan-local-verification.py" not in jobs_text
+    assert "record-local-search-event.py" not in jobs_text
     assert "finalize-local-verification.py" not in jobs_text
     assert "evaluate-pattern-adoption" not in jobs_text
 
 
-def test_optional_claude_review_is_opt_in_and_skips_without_a_key():
-    workflow = load_workflow(CLAUDE_REVIEW)
-    job = workflow["jobs"]["claude-review"]
-    assert job["if"] == "vars.ENABLE_ANTHROPIC_REVIEW == 'true'"
-    credential = named_step(job, "Detect optional Anthropic credential")
-    assert credential["env"]["ANTHROPIC_API_KEY"] == (
-        "${{ secrets.CLAUDE_REVIEW_API_KEY }}")
-    assert 'if [ -n "$ANTHROPIC_API_KEY" ]' in credential["run"]
-    assert "configured=$configured" in credential["run"]
-    action = named_step(job, "Run Claude Code Review")
-    assert "steps.anthropic-credential.outputs.configured == 'true'" in (
-        action["if"])
-    assert action["with"]["anthropic_api_key"] == (
-        "${{ secrets.CLAUDE_REVIEW_API_KEY }}")
-    assert "direct_prompt" not in action["with"]
-    assert "REPO: ${{ github.repository }}" in action["with"]["prompt"]
-    assert "PR NUMBER: ${{ github.event.pull_request.number }}" in (
-        action["with"]["prompt"])
-
-
 def test_no_workflow_can_restore_a_legacy_shared_provider_secret():
     workflow_text = "\n".join(
-        path.read_text(encoding="utf-8") for path in WORKFLOWS.glob("*.yml"))
+        path.read_text(encoding="utf-8") for path in workflow_paths())
     assert "secrets.OPENAI_API_KEY" not in workflow_text
     assert "secrets.ANTHROPIC_API_KEY" not in workflow_text
 
@@ -184,10 +187,39 @@ def test_trusted_pr_workflow_executes_only_base_branch_validation_code():
     assert TRUSTED.read_text(encoding="utf-8").count(
         "allow-unsafe-pr-checkout: true") == 1
     commands = "\n".join(str(step.get("run", "")) for step in job["steps"])
+    policy = named_step(
+        job, "Enforce candidate workflow policy with trusted code")
+    assert policy["id"] == "workflow-policy"
+    assert policy["if"] == "steps.resolve.outputs.eligible == 'true'"
+    assert policy["env"]["TRUST_ROOT_APPROVED"] == (
+        "${{ steps.resolve.outputs.trust_root_approved }}")
+    assert "python3 trusted/scripts/validate-workflow-policy.py" in policy["run"]
+    assert "--trusted-root trusted" in policy["run"]
+    assert "--candidate-root candidate" in policy["run"]
+    assert "upgrade_args+=(--allow-trust-root-upgrade)" in policy["run"]
+    assert 'if [ "$TRUST_ROOT_APPROVED" = true ]' in policy["run"]
+    assert '"${upgrade_args[@]}"' in policy["run"]
+    assert "candidate/.github/workflows" in policy["run"]
+    step_names = [step["name"] for step in job["steps"]]
+    assert step_names.index(
+        "Install minimal trusted workflow-policy dependency") < (
+            step_names.index(
+                "Enforce candidate workflow policy with trusted code"))
+    assert step_names.index(
+        "Enforce candidate workflow policy with trusted code") < (
+            step_names.index("Install trusted validation dependencies"))
     assert "trusted/scripts/validate-evidence.py" in commands
     assert "trusted/scripts/generate-verification-status.py" in commands
+    assert "trusted/scripts/validate-workflow-policy.py" in commands
     assert "candidate/scripts/" not in commands
+    assert "candidate/tests/" not in commands
     assert 'context="Trusted evidence checks"' in commands
+    publish = named_step(
+        job, "Publish trusted result on the candidate revision")
+    assert "steps.workflow-policy.outcome != 'success'" in publish["env"][
+        "FAILED"]
+    assert "steps.install-policy.outcome != 'success'" in publish["env"][
+        "FAILED"]
     status = named_step(job, "Recompute candidate status with trusted generator")
     assert "trusted/scripts/generate-verification-status.py --root candidate" in status["run"]
     assert 'marker = "\\n## How to refresh\\n"' in status["run"]
@@ -195,6 +227,128 @@ def test_trusted_pr_workflow_executes_only_base_branch_validation_code():
     assert "candidate/scripts/generate-verification-status.py" not in status["run"]
 
 
+def test_trusted_pr_workflow_no_ops_when_pr_is_no_longer_eligible():
+    workflow = load_workflow(TRUSTED)
+    trigger_types = workflow["on"]["pull_request_target"]["types"]
+    job = workflow["jobs"]["trusted-evidence"]
+    resolve = named_step(job, "Resolve immutable pull request revisions")
+
+    assert trigger_types == [
+        "opened", "synchronize", "reopened", "ready_for_review", "edited"]
+    assert 'eligible=false' in resolve["run"]
+    assert 'echo "eligible=$eligible"' in resolve["run"]
+    assert "successful no-op" in resolve["run"]
+
+    for step in job["steps"]:
+        if step["name"] == "Resolve immutable pull request revisions":
+            continue
+        assert "steps.resolve.outputs.eligible == 'true'" in step["if"]
+
+
+def test_trust_root_upgrade_requires_exact_commit_bound_owner_comment():
+    workflow = load_workflow(TRUSTED)
+    job = workflow["jobs"]["trusted-evidence"]
+    resolve = named_step(job, "Resolve immutable pull request revisions")
+
+    assert workflow["on"]["issue_comment"]["types"] == [
+        "created", "edited", "deleted"]
+    assert workflow["permissions"]["issues"] == "read"
+    assert "github.event.issue.pull_request != null" in job["if"]
+    assert "github.event.comment.author_association == 'OWNER'" in job["if"]
+    assert "startsWith" not in job["if"]
+    assert "github.event.issue.number" in workflow["concurrency"]["group"]
+    assert "github.event.issue.number" in resolve["env"]["PR_NUMBER"]
+    assert 'expected="APPROVE TRUST ROOT ${head_sha}"' in resolve["run"]
+    assert "gh api --paginate --slurp" in resolve["run"]
+    assert '.body == $expected' in resolve["run"]
+    assert '.author_association == "OWNER"' in resolve["run"]
+    assert "trust_root_approved=true" in resolve["run"]
+    assert 'echo "trust_root_approved=$trust_root_approved"' in resolve["run"]
+
+
+def test_general_validation_runs_once_and_has_a_stable_result_only_gate():
+    workflow = load_workflow(PATTERN_VALIDATION)
+    jobs = workflow["jobs"]
+    validation = jobs["deterministic-validation"]
+    gate = jobs["validation-gate"]
+
+    assert workflow["on"]["pull_request"] == {
+        "branches": ["main"],
+        "types": [
+            "opened", "synchronize", "reopened", "ready_for_review", "edited"],
+    }
+    assert gate["name"] == "Validation gate"
+    assert gate["needs"] == ["deterministic-validation"]
+    assert gate["if"] == "always()"
+    assert all("uses" not in step for step in gate["steps"])
+    assert "needs.deterministic-validation.result" in str(gate["steps"])
+
+    setup = named_step(validation, "Set up Python 3.11")
+    assert setup["with"]["cache"] == "pip"
+    assert setup["with"]["cache-dependency-path"] == (
+        "tests/requirements.txt")
+    setup_node = named_step(validation, "Set up Node.js 24")
+    assert setup_node["uses"] == (
+        "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e")
+    assert setup_node["with"]["node-version"] == "24"
+    assert setup_node["with"]["cache"] == "npm"
+    assert setup_node["with"]["cache-dependency-path"].splitlines() == [
+        "examples/centralized-rules/gateway-strategy/ai-dev-cli/package-lock.json",
+        "examples/centralized-rules/gateway-strategy/ai-gateway/package-lock.json",
+        "examples/centralized-rules/gateway-strategy/org-ai-client/package-lock.json",
+    ]
+    npm_build = named_step(validation, "Install and build locked npm examples")
+    assert "npm ci --ignore-scripts --no-audit --no-fund" in npm_build["run"]
+    assert "npm run build" in npm_build["run"]
+    for directory in setup_node["with"]["cache-dependency-path"].splitlines():
+        assert directory.removesuffix("/package-lock.json") in npm_build["run"]
+    test_steps = [
+        step for step in validation["steps"]
+        if "python3 -m pytest" in str(step.get("run", ""))
+    ]
+    assert [step["name"] for step in test_steps] == [
+        "Run deterministic repository tests once"]
+    report = named_step(validation, "Upload deterministic test reports")
+    assert report["with"]["path"] == "tests/test-results/"
+    assert report["with"]["if-no-files-found"] == "error"
+
+
+def test_external_links_run_only_weekly_or_when_manually_requested():
+    workflow = load_workflow(PATTERN_VALIDATION)
+    links = workflow["jobs"]["external-links"]
+
+    assert "github.event_name == 'schedule'" in links["if"]
+    assert "inputs.check_external_links" in links["if"]
+    assert named_step(links, "Check external README links")[
+        "continue-on-error"] == "true"
+
+
+def test_pages_pushes_are_scoped_to_site_inputs():
+    workflow = load_workflow(PAGES)
+    paths = set(workflow["on"]["push"]["paths"])
+
+    assert {
+        "README.md", "index.html", "*.md", "LICENSE", "patterns.yaml",
+        "assets/**", "docs/**", "examples/**", "experiments/**",
+        "verification/**",
+    } <= paths
+    assert ".beads/**" not in paths
+
+
 def test_required_evidence_check_has_no_pull_request_path_filter():
     workflow = load_workflow(EVIDENCE)
     assert workflow["on"]["pull_request"] == {"branches": ["main"]}
+
+
+def test_workflow_policy_changes_run_in_deterministic_evidence_validation():
+    workflow = load_workflow(EVIDENCE)
+    watched = set(workflow["on"]["push"]["paths"])
+    assert {
+        ".github/trusted-policy-requirements.txt",
+        "scripts/validate-workflow-policy.py",
+        "tests/test_workflow_policy.py",
+    } <= watched
+    command = named_step(
+        workflow["jobs"]["deterministic-evidence"],
+        "Run fast evidence tests")["run"]
+    assert "tests/test_workflow_policy.py" in command

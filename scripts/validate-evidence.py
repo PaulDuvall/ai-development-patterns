@@ -23,6 +23,9 @@ from local_verification import (
     LOCAL_RUN_ID_RE,
     LOCAL_RUN_REF_RE,
     load_manifest,
+    load_search_ledger,
+    reconcile_search_projection,
+    search_ledger_ref_for_id,
 )
 
 
@@ -143,7 +146,7 @@ def parsed_date(value):
 
 
 def is_valid_url(value):
-    """Return True for a concrete, credential-free HTTP(S) URL."""
+    """Return True for a concrete, credential-free public HTTPS URL."""
     if not isinstance(value, str) or "..." in value or any(c.isspace() for c in value):
         return False
     parsed = urlsplit(value)
@@ -152,7 +155,7 @@ def is_valid_url(value):
     except ValueError:
         return False
     if not (
-            parsed.scheme in {"http", "https"} and parsed.netloc and parsed.hostname
+            parsed.scheme == "https" and parsed.netloc and parsed.hostname
             and parsed.username is None and parsed.password is None):
         return False
     hostname = parsed.hostname.rstrip(".").casefold()
@@ -321,7 +324,6 @@ def validate_search(data, errors):
     for mode in stable_sorted(unknown):
         errors.append(f"search.modes: unknown mode '{mode}'")
     total_queries = 0
-    seen_queries = set()
     for mode in sorted(SEARCH_MODES & modes.keys()):
         value = modes[mode]
         if not _require_mapping_keys(
@@ -343,10 +345,6 @@ def validate_search(data, errors):
                     if not isinstance(query, str) or not query.strip():
                         errors.append(
                             f"search.modes.{mode}.queries[{index}] must be non-empty")
-                    elif query in seen_queries:
-                        errors.append(f"search: duplicate query {query!r}")
-                    else:
-                        seen_queries.add(query)
                 total_queries += len(queries)
             if isinstance(count, bool) or not isinstance(count, int) or count < 0:
                 errors.append(
@@ -481,7 +479,8 @@ def validate_entry(
         errors.append(f"{label}: independence_group must be a lowercase machine key")
     for field in ("url", "resolved_url"):
         if not is_valid_url(entry.get(field)):
-            errors.append(f"{label}: '{field}' must be a concrete HTTP(S) URL")
+            errors.append(
+                f"{label}: '{field}' must be a concrete public HTTPS URL")
     for field in ("date", "retrieved"):
         if field in entry and not is_iso_date(entry.get(field)):
             errors.append(f"{label}: '{field}' must be ISO 8601 (YYYY-MM-DD)")
@@ -541,7 +540,7 @@ def validate_terminology_variants(data, errors):
             if not isinstance(variant.get(field), str) or not variant.get(field, "").strip():
                 errors.append(f"{label}: '{field}' must be a non-empty string")
         if not is_valid_url(variant.get("url")):
-            errors.append(f"{label}: 'url' must be a concrete public HTTP(S) URL")
+            errors.append(f"{label}: 'url' must be a concrete public HTTPS URL")
         term = variant.get("term")
         if isinstance(term, str) and term.strip():
             key = unicodedata.normalize("NFKC", term).casefold().strip()
@@ -649,7 +648,7 @@ def validate_evidence_entries(data, errors, today):
 
 
 def validate_local_run_binding(data, path, errors):
-    """Bind complete local evidence to one approved, byte-identical run plan."""
+    """Bind local evidence to its approved plan and trusted search ledger."""
     if data.get("provenance_status") != "complete":
         return
     search = data.get("search")
@@ -693,6 +692,20 @@ def validate_local_run_binding(data, path, errors):
     if slug not in manifest["selected_slugs"]:
         errors.append(
             "search: evidence slug must be selected by the approved local run manifest")
+    ledger_ref = search_ledger_ref_for_id(manifest["run_id"])
+    try:
+        ledger, _ = load_search_ledger(
+            repo_root, ledger_ref, manifest, run_ref, manifest_digest,
+            require_complete=True)
+        reconcile_search_projection(ledger, slug, search.get("modes"))
+    except (OSError, ValueError, yaml.YAMLError) as exc:
+        if is_none_found(data.get("evidence")):
+            errors.append(
+                "'none found' requires a complete, reconciled local search-event "
+                f"ledger: {exc}")
+        else:
+            errors.append(
+                f"search: local search-event ledger is invalid: {exc}")
 
 
 def validate_tier_caps_and_groups(entries, errors):

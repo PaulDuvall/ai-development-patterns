@@ -4,14 +4,25 @@ import { program } from "commander";
 import * as fs from "fs";
 import * as path from "path";
 
-const GATEWAY_URL = process.env.AI_GATEWAY_URL || "http://localhost:3000";
+const GATEWAY_URL = process.env.AI_GATEWAY_URL || "http://127.0.0.1:3000";
+
+function gatewayToken(): string {
+  const token = process.env.AI_GATEWAY_TOKEN;
+  if (!token || Buffer.byteLength(token, "utf8") < 32) {
+    throw new Error("AI_GATEWAY_TOKEN must contain at least 32 bytes");
+  }
+  return token;
+}
 
 async function callGateway(taskType: string, userPrompt: string) {
   const repoSummary = detectRepoContext();
 
   const response = await fetch(`${GATEWAY_URL}/ai/run-task`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Authorization": `Bearer ${gatewayToken()}`,
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify({
       repoSummary,
       taskType,
@@ -30,11 +41,11 @@ function detectRepoContext(): string {
   const cwd = process.cwd();
   const parts: string[] = [];
 
-  // Detect package.json
+  // Detect package.json without reading project-controlled contents into the
+  // summary sent to the remote gateway.
   const pkgPath = path.join(cwd, "package.json");
   if (fs.existsSync(pkgPath)) {
-    const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
-    parts.push(`Node.js project: ${pkg.name || "unknown"}`);
+    parts.push("Node.js project");
   }
 
   // Detect language

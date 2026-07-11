@@ -81,21 +81,61 @@ python3 -m pytest tests/test_evidence_files.py -m "not slow"
 The `Adoption Evidence` workflow (`.github/workflows/evidence-validation.yml`) exposes the same
 checks through `workflow_dispatch` and `workflow_call`, runs for every pull request, and
 runs weekly. A separate `pull_request_target` workflow executes the default branch's trusted
-validator against pull-request data without executing pull-request code. It posts the required
-commit-status context `Trusted evidence checks` on the immutable candidate revision.
+validator against pull-request data without executing pull-request code. After installing pinned
+dependencies from the trusted base, policy code semantically parses every candidate `.yml` and
+`.yaml` workflow as bounded inert data; aliases, duplicate keys, and unsupported structures fail
+closed. It rejects local and Docker actions and permits only commit-pinned external action
+repositories already allowlisted by the trusted base. A new action family requires an earlier
+allowlist-only PR. The same scan rejects hosted model/provider entry points, requires candidate
+copies of essential trust-root files to remain present, and cannot be weakened by candidate tests.
+Before any full test dependency is installed, the gate recursively inventories and byte-compares
+the candidate's complete `scripts/`, `tests/`, workflow, local-skill, and Codex-agent execution
+closure against the trusted base. Added startup/import hooks and any unapproved difference fail
+closed. It posts the required commit-status context `Trusted evidence checks` on the immutable
+candidate revision.
+Closed or otherwise ineligible pull requests are successful no-ops rather than false failures.
+
+A legitimate trust-root upgrade requires a repository `OWNER` to comment on the pull request with
+the candidate's current 40-character head SHA in this exact form:
+
+```text
+APPROVE TRUST ROOT <head-sha>
+```
+
+The approval is commit-bound: a new push requires a new exact comment. Creating, editing, or
+deleting an owner comment reruns the default branch's trusted workflow, so removing approval cannot
+leave a stale successful result. Candidate workflow code cannot manufacture the approval output.
 
 ```bash
 gh workflow run evidence-validation.yml
 ```
 
 An administrator can idempotently install the required-check ruleset and least-privilege Actions
-setting. The command is a dry run unless `--apply` is supplied. Apply mode also removes retired
-evaluator secrets, variables, and the former paid-research environment so historical workflow
-definitions remain credentialless:
+setting. The required contexts are `Trusted evidence checks`, `Validation gate`, and
+`Dependency Review`. Actions is limited to the repositories admitted by the trusted workflow
+scanner plus `github/codeql-action` for default setup; blanket GitHub-owned and Marketplace
+verified-creator access are disabled, and every action reference must use a full commit SHA. Every
+workflow run from an external contributor's fork requires maintainer approval, the default token is
+read-only, and Actions cannot approve pull requests. The same configuration enables secret
+scanning, push protection, CodeQL
+default setup for Actions, JavaScript/TypeScript, and Python using the extended remote-threat
+suite. CodeQL scans main, same-repository pull requests, and the weekly schedule, but is not a
+native merge rule because GitHub default setup excludes public fork pull requests and would leave
+them unmergeable.
+
+[GitHub Models repository enablement is a public-preview Settings UI control](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/managing-github-models-in-your-repository);
+GitHub documents no public REST or GraphQL repository-setting endpoint that this script can verify.
+Before apply, an administrator must set **Settings → Models → Models in this repository** to
+**Disabled**. Apply mode fails before its first write unless the administrator supplies the explicit
+manual attestation flag below. The command remains a dry run unless `--apply` is supplied. Apply
+mode also removes retired evaluator and assistant credentials and the former paid-research
+environment so historical workflow definitions remain credentialless:
 
 ```bash
 python3 scripts/configure-repository-rules.py
-python3 scripts/configure-repository-rules.py --apply
+python3 scripts/configure-repository-rules.py \
+  --apply \
+  --attest-github-models-disabled
 ```
 
 ### Network link and content check
@@ -186,9 +226,9 @@ python3 scripts/plan-local-verification.py approve \
 ```
 
 Approval records the plan ID and UTC time, then makes the manifest read-only. Its SHA-256 becomes
-part of every search and verifier record. A changed plan, changed manifest, new run, or retry with a
-new plan needs new approval. An earlier blanket instruction is not approval for a plan that did not
-yet exist.
+part of every search, ledger, and verifier record, and approval prints the deterministic
+`SEARCH_LEDGER_REF`. A changed plan, changed manifest, new run, or retry with a new plan needs new
+approval. An earlier blanket instruction is not approval for a plan that did not yet exist.
 
 If the user cancels or declines while the manifest is still pending, run no agents and commit
 nothing. Remove only that pending manifest and the ephemeral `verification/pattern-inventory.yaml`,
@@ -197,10 +237,21 @@ approved manifest, evidence, or unrelated work as cancellation cleanup.
 
 The approved evaluation runs at most three `adoption_researcher` subagents concurrently, one
 pattern per agent. The root task is the only writer. Each worker searches the name, mechanism, and
-artifact modes with at most 12 live queries total and returns a structured proposal. Trusted local
-code hydrates every source URL and quote. A fresh `adoption_verifier` then independently reviews
-each batch's mechanism matches, tier admissions, dates, quotes, and independence claims.
-The unit and search caps bound the work but are not a fixed-price guarantee. OpenAI notes that
+artifact modes with at most 12 live queries total and returns a structured proposal plus one
+sanitized receipt per actual query. The root records each receipt with
+`scripts/record-local-search-event.py`; the recorder derives candidate counts from distinct public
+candidate URLs and then discards those URLs. The committed ledger retains only the tool, mode,
+exact query, derived count, immutable run bindings, and event hash chain—never raw tool output,
+reasoning, credentials, cookies, headers, or signed URLs. Trusted local code hydrates every source
+URL and quote. A real retry is a new ordered event even when its exact query repeats. The
+in-progress ledger is owner-only on the local filesystem. A fresh
+`adoption_verifier` then independently reviews each batch's mechanism
+matches, tier admissions, dates, quotes, independence claims, and ledger projection.
+The pre-approval plan lists researcher turns, two verifier turns per deterministic batch of up to
+three patterns (initial and post-fix), the maximum total subagent turns, model, surface, auth mode,
+and search cap. Researcher retries and any third verifier turn require a new approved plan.
+Verifiers may reopen only evidence URLs and cannot perform additional searches; discovery has no
+verifier turn. These caps bound the work but are not a fixed-price guarantee. OpenAI notes that
 [subagent workflows consume more tokens](https://learn.chatgpt.com/docs/agent-configuration/subagents)
 than comparable single-agent work, so review the complete unit count before approving a plan.
 
@@ -212,10 +263,12 @@ python3 scripts/finalize-local-verification.py \
   --manifest-sha256 <approved-manifest-sha256>
 ```
 
-Finalization enforces exact changed-path and manifest-bound provenance, removes selected pending
-slugs, synchronizes evidence-derived decision signals, regenerates `STATUS.md`, recomputes every
-verdict, scans candidate files for credentials, and runs the evidence tests. It does not commit,
-push, open a pull request, or merge.
+Finalization validates the ledger's run ID, approved-manifest and research-contract digests, event
+hash chain, approved scope, mode coverage, and query bound. It requires every evidence file's exact
+queries and per-mode candidate counts to match the ledger before enforcing changed-path provenance,
+removing selected pending slugs, synchronizing evidence-derived decision signals, regenerating
+`STATUS.md`, recomputing every verdict, scanning candidate files for credentials, and running the
+evidence tests. It does not commit, push, open a pull request, or merge.
 
 The user must inspect the final diff and give a second, post-validation approval for the exact plan:
 
@@ -223,17 +276,18 @@ The user must inspect the final diff and give a second, post-validation approval
 APPROVE DRAFT EVIDENCE PR <plan-id>
 ```
 
-Only then may the root task create one commit and one **draft** evidence PR for the run. Evidence-gap
-issues are tracking outputs, not separate decision surfaces. Naming and rubric decisions remain
-human-owned in [DECISIONS.md](DECISIONS.md). The workflow never marks the PR ready and never merges
-it; a human reviews and merges it manually.
+Only then may the root task create one commit and one **draft** evidence PR for the run, including
+the approved manifest and sanitized search-event ledger. Evidence-gap issues are tracking outputs,
+not separate decision surfaces. Naming and rubric decisions remain human-owned in
+[DECISIONS.md](DECISIONS.md). The workflow never marks the PR ready and never merges it; a human
+reviews and merges it manually.
 
 GitHub Actions deliberately cannot run this evaluation. The `Adoption Evidence` workflow contains
 no evaluator key, model action, provider preflight, research matrix, or scheduled model refresh;
 its weekly role is limited to deterministic validation, freshness reporting, and read-only source
 checks. The former general `@claude` Actions assistant is removed. A separate fixed-purpose Claude
-PR-review workflow remains opt-in behind its own enable variable and dedicated key; it reviews pull
-requests and is not an evidence-research or refresh path.
+PR-review workflow is also removed, so Actions has no provider-backed assistant, evidence-research,
+or model-refresh path.
 
 ## Schema v2
 
@@ -329,12 +383,16 @@ Complete provenance records all three search modes:
 - **mechanism** — the behavior and problem, excluding the catalog name; and
 - **artifact** — code/configuration fingerprints from working implementations.
 
-Each mode requires exact queries and a candidate count. The combined candidate count cannot be
-smaller than the admitted evidence set. Complete runs use at most 12 queries, set
-`search.checked_at` equal to `last_checked`, and bind every verifier to the same model, prompt
-version, run manifest, and manifest digest. The prompt version includes a SHA-256 fingerprint of the
-skill and shared methodology, so a contract change produces a new machine-checked identifier.
-`evidence: none found` is valid only with this complete bounded-search record.
+Each local mode requires exact queries and a candidate count projected from the run's sibling
+`codex-local-<uuid>-search-events.yaml` ledger. One ledger event corresponds to one actual query;
+trusted code derives its count from distinct credential-free public candidate URLs, then discards
+the URLs. The ledger binds the run ID, approved-manifest digest, and SHA-256 research-contract
+fingerprint covering the skill, methodology, and two agent definitions. Its events are hash-chained,
+scope-checked, and capped at 12 per unit. The combined candidate count cannot be smaller than the
+admitted evidence set. Complete runs set `search.checked_at` equal to `last_checked` and bind every
+verifier to the same model, prompt version, run manifest, and manifest digest. `evidence: none found`
+is valid only when all three modes exactly reconcile with the ledger. This is a deterministic audit
+record, not cryptographic proof that an operator or tool performed a search.
 
 A legacy import uses `run_id: legacy-import`, empty query lists, and null candidate counts. It also
 records the immutable original PR in `legacy_run_url` and states precisely what was not retained in
@@ -451,6 +509,7 @@ python3 scripts/generate-verification-status.py
 
 - `evidence/<slug>.yaml` — one schema-v2 assessment per catalog slug.
 - `local-runs/codex-local-<uuid>.yaml` — immutable approved plan and local execution attestation.
+- `local-runs/codex-local-<uuid>-search-events.yaml` — sanitized, run-bound search receipts.
 - `pending-evidence.yaml` — catalog slugs with no assessment; updated during local finalization.
 - `STATUS.md` — generated coverage, verdict, naming, and freshness view.
 - `DECISIONS.md` — human-owned naming and rubric decisions.

@@ -27,6 +27,7 @@ def load_script(name):
 PLAN = load_script("plan-local-verification.py")
 LOCAL = load_script("local_verification.py")
 FINALIZE = load_script("finalize-local-verification.py")
+RECORD = load_script("record-local-search-event.py")
 
 
 def plan_args(**overrides):
@@ -68,6 +69,11 @@ def test_project_agent_configuration_enforces_bounded_read_only_workers():
         assert agent["sandbox_mode"] == "read-only"
         assert "model" not in agent
         assert "spawn subagents" in agent["developer_instructions"]
+    verifier = tomllib.loads(
+        (ROOT / ".codex" / "agents" / "adoption-verifier.toml").read_text(
+            encoding="utf-8"))["developer_instructions"]
+    assert "Do not perform a web search" in verifier
+    assert "exact source URLs already present" in verifier
 
 
 def test_skill_contains_both_exact_human_gates_and_no_hosted_fallback():
@@ -80,6 +86,11 @@ def test_skill_contains_both_exact_human_gates_and_no_hosted_fallback():
     assert "never auto-merge" in skill.casefold()
     assert "GitHub Actions" in skill
     assert "must not start Codex" in skill
+    assert "record-local-search-event.py" in skill
+    assert "raw tool output" in skill
+    assert "two per deterministic batch" in skill
+    assert "Do not retry, replace, or follow up with a researcher" in skill
+    assert "third verifier turn requires a new exact plan approval" in skill
 
 
 def make_tiny_repo(root):
@@ -88,6 +99,7 @@ def make_tiny_repo(root):
     (root / "experiments").mkdir()
     (root / ".agents" / "skills" / "evaluate-pattern-adoption" /
      "references").mkdir(parents=True)
+    (root / ".codex" / "agents").mkdir(parents=True)
     (root / "scripts" / "build-verification-inventory.py").write_bytes(
         (ROOT / "scripts" / "build-verification-inventory.py").read_bytes())
     (root / "patterns.yaml").write_text(yaml.safe_dump({
@@ -106,6 +118,9 @@ def make_tiny_repo(root):
     (root / ".agents" / "skills" / "evaluate-pattern-adoption" /
      "references" / "evidence-methodology.md").write_text(
         "local evidence methodology\n", encoding="utf-8")
+    for name in ("adoption-researcher.toml", "adoption-verifier.toml"):
+        (root / ".codex" / "agents" / name).write_text(
+            f"name = {name!r}\n", encoding="utf-8")
     (root / ".gitignore").write_text(
         ".verify-worklist\n"
         "__pycache__/\n"
@@ -254,6 +269,169 @@ def test_plan_is_deterministic_before_exact_human_approval(tmp_path, monkeypatch
     assert oct(path.stat().st_mode & 0o777) == "0o444"
 
 
+def test_planner_discloses_agent_turns_and_execution_before_approval(
+        monkeypatch, capsys):
+    selected = [f"pattern-{index}" for index in range(4)]
+    manifest = {
+        "plan_id": "a" * 64,
+        "selected_slugs": selected,
+        "include_discovery": True,
+        "execution": {
+            "provider": "openai",
+            "surface": "codex-app",
+            "auth_mode": "chatgpt-operator-attested",
+            "model": "codex-managed",
+        },
+    }
+    inventory = [
+        {
+            "slug": slug,
+            "location": "main" if index < 2 else "experimental",
+            "in_flight": False,
+        }
+        for index, slug in enumerate(selected)
+    ]
+    monkeypatch.setattr(
+        PLAN, "create_plan",
+        lambda _args: (manifest, "verification/local-runs/plan.yaml", inventory))
+    monkeypatch.setattr(
+        sys, "argv",
+        [str(PLAN.__file__), "plan", "--scope", "all", "--attest-chatgpt"])
+
+    assert PLAN.main() == 0
+    output = capsys.readouterr().out
+    assert "Researcher subagent turns: 5" in output
+    assert "Maximum verifier subagent turns: 4 (2 per batch of up to 3 patterns)" in output
+    assert "Maximum total subagent turns: 9" in output
+    assert "Maximum live searches: 60" in output
+    assert "Execution provider: openai" in output
+    assert "Execution surface: codex-app" in output
+    assert "Execution auth mode: chatgpt-operator-attested" in output
+    assert "Execution model: codex-managed" in output
+    assert "APPROVE LOCAL EVALUATION " + "a" * 64 in output
+
+
+def approved_tiny_plan(tmp_path, monkeypatch, *, scope="stable"):
+    clear_paid_environment(monkeypatch)
+    make_tiny_repo(tmp_path)
+    manifest, run_ref, _ = PLAN.create_plan(plan_args(scope=scope), root=tmp_path)
+    approved, _, digest = PLAN.approve_plan(
+        tmp_path / run_ref,
+        f"APPROVE LOCAL EVALUATION {manifest['plan_id']}", root=tmp_path)
+    return approved, run_ref, digest
+
+
+def test_search_receipts_create_sanitized_bound_hash_chained_ledger(
+        tmp_path, monkeypatch):
+    manifest, run_ref, digest = approved_tiny_plan(tmp_path, monkeypatch)
+    receipts = (
+        ("name", "stable pattern adoption", ["https://one.example/result"]),
+        (
+            "mechanism", "bounded agent workflow industry",
+            ["https://two.example/a", "https://two.example/b"]),
+        ("artifact", "github agent workflow config", []),
+    )
+    for mode, query, candidates in receipts:
+        ledger_ref, _ = RECORD.record_event(
+            tmp_path, run_ref, digest, "stable-pattern", mode,
+            "web.search_query", query, candidates)
+
+    ledger, _ = LOCAL.load_search_ledger(
+        tmp_path, ledger_ref, manifest, run_ref, digest, require_complete=True)
+
+    assert ledger["run_id"] == manifest["run_id"]
+    assert ledger["run_manifest_sha256"] == digest
+    assert ledger["research_contract_sha256"] == (
+        manifest["execution"]["prompt_version"].rsplit(".", 1)[1])
+    assert LOCAL.search_projection(ledger, "stable-pattern") == {
+        "name": {"queries": ["stable pattern adoption"], "candidate_count": 1},
+        "mechanism": {
+            "queries": ["bounded agent workflow industry"], "candidate_count": 2},
+        "artifact": {"queries": ["github agent workflow config"], "candidate_count": 0},
+    }
+    serialized = (tmp_path / ledger_ref).read_text(encoding="utf-8")
+    assert oct((tmp_path / ledger_ref).stat().st_mode & 0o777) == "0o600"
+    assert "https://one.example/result" not in serialized
+    assert "https://two.example" not in serialized
+    assert ledger["events"][1]["previous_event_sha256"] == (
+        ledger["events"][0]["event_sha256"])
+
+
+@pytest.mark.parametrize(
+    ("query", "candidate_urls"),
+    [
+        ("authorization: bearer abcdefghijklmnopqrstuvwxyz", []),
+        ("safe query", ["https://example.com/?access_token=secret"]),
+        ("safe query", ["https://user:password@example.com/result"]),
+    ],
+)
+def test_search_receipt_rejects_credentials_without_retaining_them(
+        tmp_path, monkeypatch, query, candidate_urls):
+    _, run_ref, digest = approved_tiny_plan(tmp_path, monkeypatch)
+
+    with pytest.raises(ValueError, match="credential|credential-free"):
+        RECORD.record_event(
+            tmp_path, run_ref, digest, "stable-pattern", "name",
+            "web.search_query", query, candidate_urls)
+
+    run_id = LOCAL.load_manifest(tmp_path, run_ref, digest)[0]["run_id"]
+    ledger_path = tmp_path / LOCAL.search_ledger_ref_for_id(run_id)
+    assert not ledger_path.exists()
+
+
+def test_search_ledger_preserves_repeated_queries_and_rejects_hash_tampering(
+        tmp_path, monkeypatch):
+    manifest, run_ref, digest = approved_tiny_plan(tmp_path, monkeypatch)
+    ledger_ref, _ = RECORD.record_event(
+        tmp_path, run_ref, digest, "stable-pattern", "name",
+        "web.search_query", "stable pattern", ["https://one.example/result"])
+    with pytest.raises(ValueError, match="is missing modes"):
+        LOCAL.load_search_ledger(
+            tmp_path, ledger_ref, manifest, run_ref, digest,
+            require_complete=True)
+    for mode, candidate_urls in (
+            ("name", ["https://two.example/result"]),
+            ("mechanism", []),
+            ("artifact", [])):
+        RECORD.record_event(
+            tmp_path, run_ref, digest, "stable-pattern", mode,
+            "web.search_query", "stable pattern", candidate_urls)
+
+    ledger, _ = LOCAL.load_search_ledger(
+        tmp_path, ledger_ref, manifest, run_ref, digest, require_complete=True)
+
+    assert [event["sequence"] for event in ledger["events"]] == [1, 2, 3, 4]
+    assert len({event["event_sha256"] for event in ledger["events"]}) == 4
+    assert LOCAL.search_projection(ledger, "stable-pattern") == {
+        "name": {
+            "queries": ["stable pattern", "stable pattern"],
+            "candidate_count": 2,
+        },
+        "mechanism": {"queries": ["stable pattern"], "candidate_count": 0},
+        "artifact": {"queries": ["stable pattern"], "candidate_count": 0},
+    }
+
+    path = tmp_path / ledger_ref
+    ledger["events"][0]["candidate_count"] = 9
+    path.write_text(yaml.safe_dump(ledger, sort_keys=False), encoding="utf-8")
+    with pytest.raises(ValueError, match="event_sha256 does not match"):
+        LOCAL.load_search_ledger(
+            tmp_path, ledger_ref, manifest, run_ref, digest)
+
+
+def test_search_receipt_refuses_hosted_execution(tmp_path, monkeypatch):
+    manifest, run_ref, digest = approved_tiny_plan(tmp_path, monkeypatch)
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+
+    with pytest.raises(ValueError, match="forbidden in GitHub Actions"):
+        RECORD.record_event(
+            tmp_path, run_ref, digest, "stable-pattern", "name",
+            "web.search_query", "stable pattern", [])
+
+    assert not (
+        tmp_path / LOCAL.search_ledger_ref_for_id(manifest["run_id"])).exists()
+
+
 def test_planner_requires_explicit_chatgpt_auth_attestation(
         tmp_path, monkeypatch):
     clear_paid_environment(monkeypatch)
@@ -393,6 +571,9 @@ def test_finalizer_restores_shared_files_when_a_check_fails(
     monkeypatch.setattr(
         FINALIZE, "load_manifest",
         lambda *args: (manifest, None, "a" * 64))
+    monkeypatch.setattr(
+        FINALIZE, "load_search_ledger", lambda *args, **kwargs: ({"events": []}, None))
+    monkeypatch.setattr(FINALIZE, "reconcile_selected_searches", lambda *args: None)
     monkeypatch.setattr(FINALIZE.SCOPE, "validate", lambda *args, **kwargs: set())
 
     def fail_run(*args):
@@ -449,6 +630,9 @@ def test_finalizer_success_path_covers_every_scope(
     monkeypatch.setattr(
         FINALIZE, "load_manifest",
         lambda *args: (manifest, None, "a" * 64))
+    monkeypatch.setattr(
+        FINALIZE, "load_search_ledger", lambda *args, **kwargs: ({"events": []}, None))
+    monkeypatch.setattr(FINALIZE, "reconcile_selected_searches", lambda *args: None)
     monkeypatch.setattr(
         FINALIZE.SCOPE, "validate",
         lambda *args, **kwargs: calls.append((args, kwargs)) or set())

@@ -51,17 +51,43 @@ approved manifest.
 
 #### `local_verification.py`
 
-Provides fail-closed local run-manifest parsing, canonical plan hashing, UUID-bound manifest paths,
-content hashing, duplicate-key and YAML-alias rejection, and approval validation. Complete local
-evidence binds the exact committed manifest bytes with `run_ref` and
-`run_manifest_sha256`.
+Provides fail-closed local run-manifest and search-ledger parsing, canonical plan/event hashing,
+UUID-bound paths, content hashing, duplicate-key and YAML-alias rejection, approval validation, and
+exact evidence-to-ledger reconciliation. Complete local evidence binds the exact committed manifest
+bytes with `run_ref` and `run_manifest_sha256`.
+
+#### `record-local-search-event.py`
+
+Records one sanitized receipt immediately after an approved local research search. The root task
+passes the visible tool identifier, exact mode/query, and each distinct public candidate URL that
+was actually examined. Trusted code validates the URLs, derives the candidate count, discards the
+URLs, and appends only the tool/mode/query/count to a run-bound hash chain:
+
+```bash
+python3 scripts/record-local-search-event.py \
+  --manifest verification/local-runs/codex-local-<uuid>.yaml \
+  --manifest-sha256 <approved-manifest-sha256> \
+  --unit dependency-migration \
+  --mode artifact \
+  --tool web.search_query \
+  --query "dependency update agent migration pull request" \
+  --candidate-url https://example.com/public-source
+```
+
+The recorder refuses GitHub Actions and evaluator API-key environments. It rejects credentials,
+credential-bearing URLs, out-of-scope units, and more than 12 events per unit. A truthful retry may
+repeat the exact query; its distinct sequence number and event hash preserve the ordered attempt.
+It never accepts or stores raw tool output or reasoning. The resulting
+`codex-local-<uuid>-search-events.yaml` file binds the run ID, approved-manifest digest, and
+research-contract digest and is written with owner-only local permissions.
 
 #### `finalize-local-verification.py`
 
-Finalizes one approved run without publishing it. It enforces exact changed-path and provenance
-scope, updates the pending list and generated status, synchronizes evidence-derived decision
-signals, recomputes verdicts, scans candidate files for credentials, and runs the deterministic
-evidence tests.
+Finalizes one approved run without publishing it. It first validates complete ledger coverage and
+exactly reconciles every evidence mode's ordered queries and candidate count. It then enforces exact
+changed-path and provenance scope, updates the pending list and generated status, synchronizes
+evidence-derived decision signals, recomputes verdicts, scans candidate files for credentials, and
+runs the deterministic evidence tests.
 
 ```bash
 python3 scripts/finalize-local-verification.py \
@@ -132,8 +158,8 @@ cp scripts/pre-commit-patterns.sh .git/hooks/pre-commit && chmod +x .git/hooks/p
 
 README.md is the **single source of record**. Three layers guarantee the published site always reflects it:
 
-1. **Deploy rebuild (server)** — `.github/workflows/deploy-pages.yml` runs `scripts/build.sh` before every GitHub Pages publish (triggered on every push to `main`), so the live site is regenerated from README on each change — even if a committed artifact was stale.
-2. **Drift gate (CI)** — `.github/workflows/pattern-validation.yml` runs `generate-patterns-data.py --check` on pushes and PRs and **fails** if the committed artifacts are out of sync, so drift is caught before merge.
+1. **Deploy rebuild (server)** — `.github/workflows/deploy-pages.yml` runs `scripts/build.sh` before each GitHub Pages publish. Pushes that change a site input trigger it; metadata-only pushes do not.
+2. **Drift gate (CI)** — `.github/workflows/pattern-validation.yml` runs `generate-patterns-data.py --check` in its single deterministic suite and **fails** if the committed artifacts are out of sync, so drift is caught before merge.
 3. **Pre-commit rebuild (local, optional)** — `pre-commit-patterns.sh` regenerates and stages artifacts at commit time.
 
 `tests/test_patterns_data.py::TestRefreshMechanism` guards this wiring so it cannot be silently removed.
@@ -189,11 +215,11 @@ chmod +x .git/hooks/pre-commit
 The pattern count automation is integrated into the GitHub Actions workflow:
 
 ### Pattern Count Validation
-- **Job**: `readme-accuracy`
-- **When**: On every push and pull request
+- **Job**: `deterministic-validation`
+- **When**: On relevant pushes, every pull request, weekly, and on demand
 - **Action**:
   1. Runs `update-pattern-count.py` to update the badge
-  2. Checks if any changes were made to README.md
+  2. Checks if any changes were made to README.md or index.html
   3. Fails the job if the badge was out of date (to remind developers to commit the update)
 
 ### Benefits
