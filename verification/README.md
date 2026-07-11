@@ -77,7 +77,8 @@ gh workflow run evidence-validation.yml
 After this workflow exists on the default branch, an administrator can idempotently install its
 required-check ruleset, scoped Actions publisher setting, and protected paid-research environment.
 The authenticated GitHub user becomes the required reviewer; the command is a dry run unless
-`--apply` is supplied:
+`--apply` is supplied. Apply mode also removes the retired generic provider secrets and unprefixed
+Anthropic federation variables so old workflow definitions remain credentialless:
 
 ```bash
 python3 scripts/configure-repository-rules.py
@@ -246,19 +247,45 @@ gh variable set OPENAI_EVIDENCE_MODEL --body gpt-5.6-luna  # optional explicit d
 ```
 
 Anthropic remains an explicit `provider=anthropic` option. That path prefers workload-identity
-federation when `ANTHROPIC_FEDERATION_RULE_ID`, `ANTHROPIC_ORGANIZATION_ID`, and optional
-service-account/workspace repository variables are configured, then uses `ANTHROPIC_API_KEY` only
-when federation is absent. Provider selection never silently falls back to the other provider.
+federation when `EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID`,
+`EVIDENCE_ANTHROPIC_ORGANIZATION_ID`, and optional evidence-specific
+service-account/workspace repository variables are configured, then uses
+`EVIDENCE_ANTHROPIC_API_KEY` only when federation is absent. The evidence-specific names keep old,
+ungated workflow definitions credentialless if someone re-runs them. Do not recreate the retired
+`ANTHROPIC_API_KEY` or unprefixed federation variables. Provider selection never silently falls
+back to the other provider.
+
+```bash
+gh secret set EVIDENCE_ANTHROPIC_API_KEY  # prompts without echoing the key
+# Or configure workload identity instead of a static evidence key:
+gh variable set EVIDENCE_ANTHROPIC_FEDERATION_RULE_ID --body '<rule-id>'
+gh variable set EVIDENCE_ANTHROPIC_ORGANIZATION_ID --body '<organization-id>'
+gh variable set EVIDENCE_ANTHROPIC_SERVICE_ACCOUNT_ID --body '<service-account-id>'
+gh variable set EVIDENCE_ANTHROPIC_WORKSPACE_ID --body '<workspace-id>'
+# Optional, independent capabilities:
+gh secret set CLAUDE_ASSISTANT_API_KEY
+gh secret set CLAUDE_REVIEW_API_KEY
+gh variable set ENABLE_ANTHROPIC_ASSISTANT --body true
+gh variable set ENABLE_ANTHROPIC_REVIEW --body true
+```
+
+Use distinct underlying provider keys or service accounts for these capabilities when possible.
+Copying one raw key into several secret names separates workflow lookup, but not billing, scope, or
+revocation.
+
 API-key runs use the same provider preflight helper as OpenAI. Federation runs use a one-turn,
 no-tools invocation of the same pinned Claude action as research, followed by the same fail-closed
 execution-result check, before the matrix is allowed to start.
 The Anthropic job root-locks the checkout except for the assigned unit path, uses `dontAsk` mode
 with an exact project-read/one-file-edit permission rule, restricts the built-in tool set, disables
 all MCP and Bash tools, and derives retrieval metadata afterward with an immutable trusted helper.
-This verifier provider is independent from the optional `Claude Code Review` workflow. That PR
-reviewer runs only when the `ENABLE_ANTHROPIC_REVIEW` repository variable is `true`; with the
-variable absent or `ANTHROPIC_API_KEY` unset, deterministic PR checks continue without Claude
-review.
+This verifier provider is independent from the optional `Claude Code Review` and `@claude`
+assistant workflows. The PR reviewer runs only when the `ENABLE_ANTHROPIC_REVIEW` repository
+variable is `true` and `CLAUDE_REVIEW_API_KEY` is set. The assistant uses the separate
+`CLAUDE_ASSISTANT_API_KEY`, runs only when `ENABLE_ANTHROPIC_ASSISTANT` is `true`, and accepts
+`@claude` requests only from the repository owner. Leave both enable variables absent or false for
+the no-provider default. When either dedicated key is absent, that optional workflow skips its
+provider action; deterministic PR checks continue without Claude review.
 No provider final-message or raw execution-file artifact is retained; normal action progress remains
 in GitHub's retained Actions log. For both providers, trusted hydration happens after the model and
 before export, so each immutable unit manifest binds the fetched resolved URLs, content hashes, and

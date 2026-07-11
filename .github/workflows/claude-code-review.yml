@@ -39,13 +39,13 @@ jobs:
       - name: Detect optional Anthropic credential
         id: anthropic-credential
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.CLAUDE_REVIEW_API_KEY }}
         run: |
           configured=false
           if [ -n "$ANTHROPIC_API_KEY" ]; then
             configured=true
           else
-            echo "Claude review skipped: ANTHROPIC_API_KEY is not configured." \
+            echo "Claude review skipped: CLAUDE_REVIEW_API_KEY is not configured." \
               >> "$GITHUB_STEP_SUMMARY"
           fi
           echo "configured=$configured" >> "$GITHUB_OUTPUT"
@@ -88,7 +88,7 @@ jobs:
         id: claude-review
         uses: anthropics/claude-code-action@28f83620103c48a57093dcc2837eec89e036bb9f # beta
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          anthropic_api_key: ${{ secrets.CLAUDE_REVIEW_API_KEY }}
           allowed_bots: "dependabot[bot]"
 
           # Optional: Specify model (defaults to Claude Sonnet 4, uncomment for Claude Opus 4)
