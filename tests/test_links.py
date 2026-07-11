@@ -354,3 +354,19 @@ class TestRepositoryMarkdownLinks:
                 f"Broken markdown links found: {len(errors)} total.\n"
                 f"First {min(len(errors), 25)}:\n{sample}"
             )
+
+    @pytest.mark.parametrize(
+        ("url", "expected"),
+        [
+            ("https://example.com/reference", True),
+            ("https://docs.example.com/reference", True),
+            ("https://example.com.evil.test/reference", False),
+            ("https://notexample.com/reference", False),
+        ],
+    )
+    def test_example_domain_ignore_is_hostname_bounded(
+        self, repo_root, url, expected
+    ):
+        validator = MarkdownLinkValidator(repo_root)
+
+        assert validator._should_ignore_link(url) is expected

@@ -13,6 +13,7 @@ import subprocess
 import sys
 
 import pytest
+import yaml
 
 from conftest import EXPECTED_PATTERNS, README_PATH, REPO_ROOT
 
@@ -309,11 +310,30 @@ class TestRefreshMechanism:
         text = self.BUILD.read_text(encoding="utf-8")
         assert "generate-patterns-data.py" in text
 
-    def test_deploy_rebuilds_on_every_push(self):
-        deploy = (self.WORKFLOWS / "deploy-pages.yml").read_text(encoding="utf-8")
-        # Triggers on push to main (covers any README.md change)…
-        assert re.search(r"push:\s*\n\s*branches:\s*\[?\s*main", deploy)
-        # …and rebuilds from README before publishing.
+    def test_deploy_rebuilds_for_site_inputs_only(self):
+        path = self.WORKFLOWS / "deploy-pages.yml"
+        deploy = path.read_text(encoding="utf-8")
+        workflow = yaml.load(deploy, Loader=yaml.BaseLoader)
+        push = workflow["on"]["push"]
+
+        assert push["branches"] == ["main"]
+        assert {
+            "README.md",
+            "index.html",
+            "*.md",
+            "LICENSE",
+            "patterns.yaml",
+            "assets/**",
+            "docs/**",
+            "examples/**",
+            "experiments/**",
+            "verification/**",
+            "scripts/build.sh",
+            "scripts/generate-patterns-data.py",
+            "scripts/update-pattern-count.py",
+            ".github/workflows/deploy-pages.yml",
+        } == set(push["paths"])
+        assert all(not item.startswith(".beads/") for item in push["paths"])
         assert "build.sh" in deploy or "generate-patterns-data.py" in deploy
 
     def test_validation_blocks_readme_drift(self):

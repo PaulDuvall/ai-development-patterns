@@ -1,6 +1,7 @@
 """Tests for exporting model output from an isolated research workspace."""
 
 import importlib.util
+import stat
 from pathlib import Path
 
 import pytest
@@ -39,6 +40,21 @@ def test_export_copies_only_fixed_paths(tmp_path):
     assert (destination / "README.md").read_text() == "candidate README.md\n"
     assert (destination / MODULE.EVIDENCE_DIR / "example-pattern.yaml").is_file()
     assert not (destination / ".github").exists()
+
+
+def test_exported_files_are_owner_only(tmp_path):
+    source = tmp_path / "isolated"
+    destination = tmp_path / "trusted"
+    source.mkdir()
+    destination.mkdir()
+    make_workspace(source)
+
+    MODULE.export_candidate(source, destination)
+
+    evidence_file = Path(MODULE.EVIDENCE_DIR) / "example-pattern.yaml"
+    for relative in (*MODULE.FIXED_FILES, evidence_file):
+        mode = stat.S_IMODE((destination / relative).stat().st_mode)
+        assert mode == 0o600
 
 
 @pytest.mark.parametrize("relative", ["README.md", "verification/evidence/bad.yaml"])

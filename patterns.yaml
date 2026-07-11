@@ -40,7 +40,7 @@ patterns:
     automatable: false
     description: >
       A staged, plan-first discipline for taking a single feature from problem to production with AI assistance.
-    related: [planned-implementation, spec-driven-development, atomic-decomposition, agent-observability]
+    related: [codified-rules, security-sandbox, planned-implementation, spec-driven-development, atomic-decomposition, agent-observability]
 
   - id: tool-integration
     name: Tool Integration
@@ -221,7 +221,7 @@ patterns:
     automatable: true
     description: >
       Answer technical questions with isolated agent-run experiments that produce executable, reviewable evidence.
-    related: [parallel-agents, agent-memory, adversarial-evaluator, bounded-autonomy]
+    related: [parallel-agents, agent-memory, tool-integration, adversarial-evaluator]
 
   - id: bounded-autonomy
     name: Bounded Autonomy

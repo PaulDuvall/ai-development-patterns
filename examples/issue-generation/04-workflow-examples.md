@@ -59,7 +59,7 @@ Goal: Continuous flow with rapid feedback cycles."
       "Store events in analytics_events table",
       "Return appropriate status codes"
     ],
-    "cycle_time_target": "6 hours",
+    "cycle_time_target": "45 minutes",
     "labels": ["backend", "api", "kanban-ready"],
     "dependencies": ["DASH-001"]
   }

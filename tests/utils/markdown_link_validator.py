@@ -324,7 +324,11 @@ class MarkdownLinkValidator:
             return True
         if "<" in url or ">" in url:
             return True
-        if "example.com" in lowered:
+        try:
+            hostname = (urlsplit(url).hostname or "").lower().rstrip(".")
+        except ValueError:
+            hostname = ""
+        if hostname == "example.com" or hostname.endswith(".example.com"):
             return True
         if "/path/to/" in lowered or lowered.startswith("path/to/"):
             return True

@@ -3,14 +3,29 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+    paths:
+      - README.md
+      - index.html
+      - "*.md"
+      - LICENSE
+      - patterns.yaml
+      - assets/**
+      - docs/**
+      - examples/**
+      - experiments/**
+      - verification/**
+      - scripts/build.sh
+      - scripts/generate-patterns-data.py
+      - scripts/update-pattern-count.py
+      - .github/workflows/deploy-pages.yml
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -25,9 +40,11 @@ jobs:
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.11'
+          cache: pip
+          cache-dependency-path: tests/requirements.txt
 
       - name: Install build dependencies
-        run: python3 -m pip install --upgrade pip pyyaml
+        run: python3 -m pip install pyyaml==6.0.3
 
       - name: Rebuild site from README.md (source of record)
         # README.md is the single source of record. scripts/build.sh refreshes

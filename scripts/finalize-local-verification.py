@@ -12,7 +12,12 @@ from pathlib import Path
 
 import yaml
 
-from local_verification import load_manifest
+from local_verification import (
+    load_manifest,
+    load_search_ledger,
+    reconcile_search_projection,
+    search_ledger_ref_for_id,
+)
 
 
 ROOT = Path(__file__).parent.parent.resolve()
@@ -85,6 +90,18 @@ def restore_files(root, snapshots):
         atomic_write_bytes(Path(root) / relative, content)
 
 
+def reconcile_selected_searches(root, ledger, selected):
+    """Reconcile every asserted evidence search against trusted events."""
+    for slug in selected:
+        path = Path(root) / "verification" / "evidence" / f"{slug}.yaml"
+        if path.is_symlink() or not path.is_file():
+            raise ValueError(f"{slug}: evidence output must be a regular non-symlink file")
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        search = data.get("search") if isinstance(data, dict) else None
+        modes = search.get("modes") if isinstance(search, dict) else None
+        reconcile_search_projection(ledger, slug, modes)
+
+
 def finalize(root, run_ref, manifest_sha):
     manifest, _, actual_sha = load_manifest(root, run_ref, manifest_sha)
     if actual_sha != manifest_sha:
@@ -96,6 +113,12 @@ def finalize(root, run_ref, manifest_sha):
         raise ValueError(
             "repository HEAD changed after planning; start a new local evaluation plan")
     execution = manifest["execution"]
+    ledger_ref = search_ledger_ref_for_id(manifest["run_id"])
+    ledger, _ = load_search_ledger(
+        root, ledger_ref, manifest, run_ref, manifest_sha,
+        require_complete=True)
+    selected = manifest["selected_slugs"]
+    reconcile_selected_searches(root, ledger, selected)
     expected = {
         "run_id": manifest["run_id"],
         "checked_date": manifest["checked_date"],
@@ -104,8 +127,8 @@ def finalize(root, run_ref, manifest_sha):
         "provider": execution["provider"],
         "model": execution["model"],
         "prompt_version": execution["prompt_version"],
+        "search_ledger_ref": ledger_ref,
     }
-    selected = manifest["selected_slugs"]
     kind = "discovery" if manifest["scope"] == "discovery" else "evidence"
     SCOPE.validate(
         root, kind, json.dumps(selected, separators=(",", ":")),

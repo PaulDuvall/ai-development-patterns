@@ -2,466 +2,260 @@ name: AI Development Patterns Validation
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
+    paths:
+      - README.md
+      - index.html
+      - pattern-spec.md
+      - patterns.yaml
+      - assets/**
+      - examples/**
+      - experiments/**
+      - scripts/**
+      - tests/**
+      - pyproject.toml
+      - pytest.ini
+      - .python-version
+      - .github/workflows/pattern-validation.yml
+      - .github/workflows/deploy-pages.yml
+  # Do not add a PR path filter: Validation gate is a required check and must
+  # be created for every pull request targeting main.
   pull_request:
-    branches: [ main ]
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
   workflow_dispatch:
+    inputs:
+      check_external_links:
+        description: Also check external README links
+        required: false
+        type: boolean
+        default: false
   schedule:
-    # Run weekly to catch external link issues
-    - cron: '0 6 * * 1'
+    # Network-backed checks run weekly rather than on every change.
+    - cron: "0 6 * * 1"
 
 permissions:
   contents: read
 
+concurrency:
+  group: pattern-validation-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  pattern-compliance:
+  deterministic-validation:
+    name: Deterministic validation suite
     runs-on: ubuntu-latest
-    name: Pattern Specification Compliance
-    
+    timeout-minutes: 20
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      with:
-        persist-credentials: false
-    
-    - name: Set up Python 3.11
-      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -r tests/requirements.txt
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
-    - name: Validate canonical two-word pattern names
-      run: python3 scripts/validate-pattern-names.py
-    
-    - name: Run pattern compliance tests
-      run: |
-        cd tests
-        python3 -m pytest test_pattern_compliance.py -v --tb=short
-    
-    - name: Upload compliance test results
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-      if: always()
-      with:
-        name: pattern-compliance-results
-        path: tests/test-results/
+      - name: Set up Python 3.11
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tests/requirements.txt
 
-  readme-accuracy:
-    runs-on: ubuntu-latest
-    name: README Accuracy & Consistency
+      - name: Set up Node.js 24
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: |
+            examples/centralized-rules/gateway-strategy/ai-dev-cli/package-lock.json
+            examples/centralized-rules/gateway-strategy/ai-gateway/package-lock.json
+            examples/centralized-rules/gateway-strategy/org-ai-client/package-lock.json
 
-    steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      with:
-        persist-credentials: false
+      - name: Install validation dependencies
+        run: python3 -m pip install --requirement tests/requirements.txt
 
-    - name: Set up Python 3.11
-      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-      with:
-        python-version: '3.11'
+      - name: Validate canonical two-word pattern names
+        run: python3 scripts/validate-pattern-names.py
 
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -r tests/requirements.txt
+      - name: Check generated pattern count
+        run: |
+          set -euo pipefail
+          python3 scripts/update-pattern-count.py
+          if ! git diff --exit-code -- README.md index.html; then
+            echo "::error::Pattern counts are stale. Run scripts/update-pattern-count.py and commit the results."
+            exit 1
+          fi
 
-    - name: Update pattern count badge
-      run: |
-        python3 scripts/update-pattern-count.py
+      - name: Check generated site data
+        run: >-
+          python3 scripts/generate-patterns-data.py --check
 
-    - name: Check for pattern count changes
-      run: |
-        if git diff --quiet README.md index.html; then
-          echo "✓ Pattern count badges are up to date"
-        else
-          echo "⚠️ Pattern count badges were updated"
-          git diff README.md index.html
-          # Fail the job if pattern count is wrong to remind developers to commit the change
-          echo "::error::Pattern count badges were out of date. Please run 'python3 scripts/update-pattern-count.py' and commit the changes."
-          exit 1
-        fi
+      - name: Install and build locked npm examples
+        run: |
+          set -euo pipefail
+          for directory in \
+            examples/centralized-rules/gateway-strategy/ai-dev-cli \
+            examples/centralized-rules/gateway-strategy/ai-gateway \
+            examples/centralized-rules/gateway-strategy/org-ai-client
+          do
+            echo "::group::Build ${directory}"
+            pushd "$directory"
+            npm ci --ignore-scripts --no-audit --no-fund
+            npm run build
+            npm run test --if-present
+            popd
+            echo "::endgroup::"
+          done
 
-    - name: Verify patterns dataset is in sync with README
-      run: |
-        python3 scripts/generate-patterns-data.py --check \
-          || { echo "::error::patterns-data.js/index.html are out of date. Run 'python3 scripts/generate-patterns-data.py' and commit."; exit 1; }
+      - name: Run deterministic repository tests once
+        id: tests
+        continue-on-error: true
+        run: |
+          mkdir -p tests/test-results
+          python3 -m pytest -m "not slow" -v --tb=short \
+            --junitxml=tests/test-results/junit.xml \
+            --html=tests/test-results/report.html --self-contained-html \
+            --cov=tests/utils --cov-report=html:tests/test-results/coverage \
+            --json-report --json-report-file=tests/test-results/report.json
 
-    - name: Run README accuracy tests
-      run: |
-        cd tests
-        python3 -m pytest test_readme_accuracy.py -v --tb=short
+      - name: Generate local-agent fix prompt
+        if: steps.tests.outcome == 'failure'
+        run: |
+          {
+            echo "## Local agent fix instructions"
+            echo
+            echo "Use this prompt in a signed-in local coding-agent session:"
+            echo
+            echo '````'
+            python3 scripts/generate-audit-prompt.py tests/test-results/report.json 2>/dev/null || true
+            echo '````'
+          } >> "$GITHUB_STEP_SUMMARY"
 
-    - name: Upload accuracy test results
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-      if: always()
-      with:
-        name: readme-accuracy-results
-        path: tests/test-results/
+      - name: Upload deterministic test reports
+        if: always() && steps.tests.outcome != 'skipped'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: deterministic-validation-report
+          path: tests/test-results/
+          if-no-files-found: error
+          retention-days: 14
 
-  link-validation:
-    runs-on: ubuntu-latest
-    name: Hyperlink Integrity
-    
-    steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      with:
-        persist-credentials: false
+      - name: Fail when repository tests fail
+        if: steps.tests.outcome == 'failure'
+        run: exit 1
 
-    - name: Set up Python 3.11
-      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -r tests/requirements.txt
-    
-    - name: Run link validation tests (fast)
-      run: |
-        cd tests
-        python3 -m pytest test_links.py -v --tb=short -m "not slow"
-    
-    - name: Run external link tests (slow)
-      run: |
-        cd tests
-        python3 -m pytest test_links.py -v --tb=short -m "slow"
-      continue-on-error: true  # External links may be temporarily unavailable
-    
-    - name: Upload link validation results
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-      if: always()
-      with:
-        name: link-validation-results
-        path: tests/test-results/
-
-  example-validation:
-    runs-on: ubuntu-latest
-    name: Example Code Validation
-    
-    steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      with:
-        persist-credentials: false
-
-    - name: Set up Python 3.11
-      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-      with:
-        python-version: '3.11'
-    
-    - name: Install bash for script validation
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y bash
-    
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -r tests/requirements.txt
-    
-    - name: Run example validation tests
-      run: |
-        cd tests
-        python3 -m pytest test_examples.py -v --tb=short
-    
-    - name: Upload example validation results
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-      if: always()
-      with:
-        name: example-validation-results
-        path: tests/test-results/
-
-  dependency-validation:
-    runs-on: ubuntu-latest
-    name: Pattern Dependencies
-
-    steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      with:
-        persist-credentials: false
-
-    - name: Set up Python 3.11
-      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-      with:
-        python-version: '3.11'
-
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -r tests/requirements.txt
-
-    - name: Run dependency validation tests
-      run: |
-        cd tests
-        python3 -m pytest test_dependencies.py -v --tb=short
-
-    - name: Upload dependency validation results
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-      if: always()
-      with:
-        name: dependency-validation-results
-        path: tests/test-results/
-
-  diagram-validation:
-    runs-on: ubuntu-latest
-    name: Diagram Accuracy
-
-    steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      with:
-        persist-credentials: false
-
-    - name: Set up Python 3.11
-      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-      with:
-        python-version: '3.11'
-
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -r tests/requirements.txt
-
-    - name: Run diagram validation tests
-      run: |
-        cd tests
-        python3 -m pytest test_diagram.py -v --tb=short
-
-    - name: Upload diagram validation results
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-      if: always()
-      with:
-        name: diagram-validation-results
-        path: tests/test-results/
-
-  yaml-readme-sync:
-    runs-on: ubuntu-latest
-    name: YAML-README Sync
-
-    steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      with:
-        persist-credentials: false
-
-    - name: Set up Python 3.11
-      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-      with:
-        python-version: '3.11'
-
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -r tests/requirements.txt
-
-    - name: Run YAML-README sync tests
-      run: |
-        cd tests
-        python3 -m pytest test_yaml_readme_sync.py -v --tb=short
-
-    - name: Upload sync test results
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-      if: always()
-      with:
-        name: yaml-readme-sync-results
-        path: tests/test-results/
-
-  comprehensive-validation:
-    runs-on: ubuntu-latest
-    name: Full Test Suite
-    needs: [pattern-compliance, readme-accuracy, link-validation, example-validation, dependency-validation, diagram-validation, yaml-readme-sync]
+  validation-gate:
+    name: Validation gate
+    needs: [deterministic-validation]
     if: always()
-    
-    steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      with:
-        persist-credentials: false
-
-    - name: Set up Python 3.11
-      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-      with:
-        python-version: '3.11'
-    
-    - name: Install bash for script validation
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y bash
-    
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -r tests/requirements.txt
-    
-    - name: Run complete test suite
-      id: tests
-      continue-on-error: true
-      run: |
-        cd tests
-        python3 -m pytest -v --tb=short -m "not slow" \
-          --html=report.html --self-contained-html \
-          --cov=utils --cov-report=html \
-          --json-report --json-report-file=.report.json
-
-    - name: Generate Claude Code fix prompt
-      if: steps.tests.outcome == 'failure'
-      run: |
-        {
-          echo "## Claude Code Fix Instructions"
-          echo
-          echo "Paste the prompt below into Claude Code to fix these failures:"
-          echo
-          echo '````'
-          python3 scripts/generate-audit-prompt.py tests/.report.json 2>/dev/null || true
-          echo '````'
-          echo
-          echo "Or run locally: \`/xaudit\`"
-        } >> "$GITHUB_STEP_SUMMARY"
-
-    - name: Fail if tests failed
-      if: steps.tests.outcome == 'failure'
-      run: exit 1
-
-    - name: Upload comprehensive test report
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-      if: always()
-      with:
-        name: comprehensive-test-report
-        path: |
-          tests/report.html
-          tests/htmlcov/
-          tests/test-results/
-          tests/.report.json
-
-  quality-gates:
     runs-on: ubuntu-latest
-    name: Quality Gate Enforcement
-    needs: [comprehensive-validation]
-    if: github.event_name == 'pull_request'
-    
+    timeout-minutes: 2
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      with:
-        persist-credentials: false
+      - name: Require every deterministic component
+        env:
+          DETERMINISTIC_VALIDATION_RESULT: ${{ needs.deterministic-validation.result }}
+        run: |
+          set -euo pipefail
+          if [ "$DETERMINISTIC_VALIDATION_RESULT" != "success" ]; then
+            echo "::error::Deterministic validation finished with: $DETERMINISTIC_VALIDATION_RESULT"
+            exit 1
+          fi
+          echo "All required deterministic validation components passed."
 
-    - name: Set up Python 3.11
-      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -r tests/requirements.txt
-    
-    - name: Run critical tests only (quality gates)
-      run: |
-        cd tests
-        # Run only critical tests that should block merges
-        python3 -m pytest test_pattern_compliance.py::TestPatternSpecCompliance::test_all_expected_patterns_exist -v
-        python3 -m pytest test_pattern_compliance.py::TestPatternSpecCompliance::test_pattern_header_structure -v
-        python3 -m pytest test_readme_accuracy.py::TestReadmeAccuracy::test_pattern_reference_table_matches_implementations -v
-        python3 -m pytest test_links.py::TestHyperlinkIntegrity::test_internal_anchor_links_valid -v
-        python3 -m pytest test_dependencies.py::TestPatternDependencies::test_no_circular_dependencies -v
-    
-    - name: Check critical test results
-      run: |
-        echo "Quality gates passed - PR can be merged"
+  external-links:
+    name: Weekly external link recheck
+    needs: [deterministic-validation]
+    if: >-
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && inputs.check_external_links)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
-# Notification job for failed builds
+      - name: Set up Python 3.11
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tests/requirements.txt
+
+      - name: Install validation dependencies
+        run: python3 -m pip install --requirement tests/requirements.txt
+
+      - name: Check external README links
+        continue-on-error: true
+        run: python3 -m pytest tests/test_links.py -m slow -v --tb=short
+
   notify-failure:
-    runs-on: ubuntu-latest
-    name: Notify on Failure
-    permissions:
-      issues: write
-    needs: [pattern-compliance, readme-accuracy, link-validation, example-validation, dependency-validation, diagram-validation, yaml-readme-sync, comprehensive-validation]
+    name: Notify on failure
+    needs: [deterministic-validation, validation-gate]
     if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-    - name: Create Issue on Failure (skip if duplicate)
-      uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-      with:
-        script: |
-          const { data: existing } = await github.rest.issues.listForRepo({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            labels: 'pattern-validation',
-            state: 'open'
-          });
-
-          if (existing.length > 0) {
-            const issue = existing[0];
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue.number,
-              body: `Still failing on commit ${context.sha}.\n\n[View failed run](${context.payload.repository.html_url}/actions/runs/${context.runId})`
-            });
-            core.info(`Skipped duplicate — added comment to #${issue.number}`);
-            return;
-          }
-
-          const title = `Pattern Validation Failed - ${new Date().toISOString().split('T')[0]}`;
-          const body = `## Pattern Validation Failure
-
-          The automated pattern validation failed on the main branch.
-
-          **Build**: ${context.runId}
-          **Commit**: ${context.sha}
-          **Workflow**: ${context.workflow}
-
-          Please review the failed checks and fix any issues with:
-          - Pattern specification compliance
-          - README accuracy and consistency
-          - Hyperlink integrity
-          - Example code validation
-          - Pattern dependencies
-          - Diagram accuracy
-
-          [View failed workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId})
-          `;
-
-              await github.rest.issues.create({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            title: title,
-            body: body,
-            labels: ['bug', 'automation', 'pattern-validation']
-          });
-
-# Auto-close validation issues when all checks pass
-  close-resolved-issues:
     runs-on: ubuntu-latest
-    name: Close Resolved Issues
     permissions:
       issues: write
-    needs: [pattern-compliance, readme-accuracy, link-validation, example-validation, dependency-validation, diagram-validation, yaml-readme-sync, comprehensive-validation]
-    if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
-
     steps:
-    - name: Close pattern-validation issues
-      uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-      with:
-        script: |
-          const { data: issues } = await github.rest.issues.listForRepo({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            labels: 'pattern-validation',
-            state: 'open'
-          });
-
-          for (const issue of issues) {
-            await github.rest.issues.createComment({
+      - name: Create issue on failure (skip if duplicate)
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const label = 'pattern-validation';
+            const { data: existing } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: issue.number,
-              body: `All pattern validation checks passed on commit ${context.sha}. Closing automatically.\n\n[View passing run](${context.payload.repository.html_url}/actions/runs/${context.runId})`
+              labels: label,
+              state: 'open'
             });
-
-            await github.rest.issues.update({
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            if (existing.length) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing[0].number,
+                body: `Still failing on commit ${context.sha}.\n\n${runUrl}`
+              });
+              return;
+            }
+            await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: issue.number,
-              state: 'closed',
-              state_reason: 'completed'
+              title: `Pattern Validation Failed - ${new Date().toISOString().split('T')[0]}`,
+              labels: ['bug', 'automation', label],
+              body: `Deterministic validation failed on commit ${context.sha}.\n\n${runUrl}`
             });
-          }
+
+  close-resolved-issues:
+    name: Close resolved issues
+    needs: [validation-gate]
+    if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Close pattern-validation issues
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'pattern-validation',
+              state: 'open'
+            });
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            for (const issue of issues) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `All deterministic pattern validation passed on commit ${context.sha}.\n\n${runUrl}`
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed',
+                state_reason: 'completed'
+              });
+            }

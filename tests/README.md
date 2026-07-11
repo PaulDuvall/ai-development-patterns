@@ -17,6 +17,7 @@ This test framework ensures that the AI Development Patterns repository maintain
 ### Prerequisites
 
 - Python 3.11+ (the repository pins `3.11` in `.python-version`)
+- Node.js 24 with npm 11 to reproduce the locked TypeScript example builds
 - Bash (for shell script validation)
 - Internet connection (for external link testing)
 
@@ -222,32 +223,26 @@ results = validator.validate_all_examples()
 The test framework integrates with GitHub Actions via `.github/workflows/pattern-validation.yml`:
 
 **Trigger Events:**
-- Push to main branch
+- Site, catalog, script, example, or test changes pushed to main
 - Pull requests to main
 - Weekly scheduled runs (external link validation)
 
 **Quality Gates:**
-- All critical tests must pass for PR merge approval
+- The result-only `Validation gate` fails closed unless the deterministic suite passes
 - Failed builds on main branch create GitHub issues automatically
-- Comprehensive test reports uploaded as artifacts
+- JUnit, HTML, JSON, and coverage reports are uploaded from the one test execution
 
 **Workflow Jobs:**
-1. **Pattern Compliance** - Fast pattern structure validation
-2. **README Accuracy** - Consistency and accuracy checks  
-3. **Link Validation** - Internal links (fast) and external links (slow)
-4. **Example Validation** - Code syntax and structure validation
-5. **Dependency Validation** - Dependency graph analysis
-6. **Comprehensive Validation** - Full test suite with coverage reporting
-7. **Quality Gates** - Critical test enforcement for PRs
+1. **Deterministic validation suite** - Generated-artifact checks, locked npm example builds, and the complete non-network Python test suite, executed once
+2. **Validation gate** - Stable required-check aggregation without another checkout or dependency install
+3. **Weekly external link recheck** - Non-blocking network checks on the schedule or explicit manual request
 
 ### Running in CI
 
 ```yaml
 # Example GitHub Actions usage
 - name: Run Pattern Validation
-  run: |
-    cd tests
-    python -m pytest -v --tb=short --html=report.html
+  run: python -m pytest -m "not slow" -v --tb=short
 ```
 
 ## Test Results and Reporting

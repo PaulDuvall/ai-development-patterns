@@ -98,12 +98,21 @@ def validate(root, kind, selected_json, expected, allow_discovery=False):
     }
     non_evidence = changed - {
         f"verification/evidence/{slug}.yaml" for slug in evidence_changed}
+    local_artifacts = set()
+    if expected.get("run_ref"):
+        ledger_ref = expected.get("search_ledger_ref")
+        if not isinstance(ledger_ref, str) or not ledger_ref:
+            raise ValueError("local research scope requires search_ledger_ref")
+        local_artifacts = {expected["run_ref"], ledger_ref}
+        missing_artifacts = local_artifacts - changed
+        if missing_artifacts:
+            raise ValueError(
+                f"local research scope is missing run artifacts: {sorted(missing_artifacts)}")
     if kind == "discovery":
         if selected or evidence_changed:
             raise ValueError("discovery unit must not select or change evidence")
         allowed_discovery = {DISCOVERY_PATH}
-        if expected.get("run_ref"):
-            allowed_discovery.add(expected["run_ref"])
+        allowed_discovery.update(local_artifacts)
         unexpected = non_evidence - allowed_discovery
         if unexpected:
             raise ValueError(f"discovery changed forbidden paths: {sorted(unexpected)}")
@@ -116,8 +125,7 @@ def validate(root, kind, selected_json, expected, allow_discovery=False):
         raise ValueError(
             f"evidence scope mismatch; missing={sorted(missing)}, extra={sorted(extra)}")
     allowed_non_evidence = {DISCOVERY_PATH} if allow_discovery else set()
-    if expected.get("run_ref"):
-        allowed_non_evidence.add(expected["run_ref"])
+    allowed_non_evidence.update(local_artifacts)
     unexpected = non_evidence - allowed_non_evidence
     if unexpected:
         raise ValueError(f"research changed forbidden paths: {sorted(unexpected)}")
@@ -136,6 +144,7 @@ def main():
     provenance.add_argument("--expected-run-url")
     provenance.add_argument("--expected-run-ref")
     parser.add_argument("--expected-run-manifest-sha256")
+    parser.add_argument("--expected-search-ledger-ref")
     parser.add_argument("--expected-provider", required=True)
     parser.add_argument("--expected-model", required=True)
     parser.add_argument("--expected-prompt-version", required=True)
@@ -155,6 +164,7 @@ def main():
         expected.update({
             "run_ref": args.expected_run_ref,
             "run_manifest_sha256": args.expected_run_manifest_sha256,
+            "search_ledger_ref": args.expected_search_ledger_ref,
         })
     else:
         if args.expected_run_manifest_sha256:

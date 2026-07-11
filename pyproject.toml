@@ -5,6 +5,8 @@ description = "Repository validation tooling for AI Development Patterns"
 requires-python = ">=3.11"
 dependencies = [
   "beautifulsoup4==4.15.0",
+  "idna==3.18",
   "PyYAML==6.0.3",
   "requests==2.34.2",
+  "urllib3==2.7.0",
 ]

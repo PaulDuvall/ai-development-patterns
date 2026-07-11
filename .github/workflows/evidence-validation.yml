@@ -30,8 +30,10 @@ on:
       - scripts/hydrate-evidence-content.py
       - scripts/local_verification.py
       - scripts/plan-local-verification.py
+      - scripts/record-local-search-event.py
       - scripts/finalize-local-verification.py
       - scripts/scan-candidate-secrets.py
+      - scripts/validate-workflow-policy.py
       - scripts/sync-verification-decisions.py
       - scripts/validate-research-scope.py
       - tests/test_evidence_files.py
@@ -41,6 +43,7 @@ on:
       - tests/test_local_verification.py
       - tests/test_verification_status.py
       - tests/test_candidate_secret_scan.py
+      - tests/test_workflow_policy.py
       - tests/test_repository_rules.py
       - tests/test_verification_workflows.py
       - tests/test_verification_units.py
@@ -48,6 +51,7 @@ on:
       - .agents/skills/evaluate-pattern-adoption/**
       - .codex/agents/**
       - .codex/config.toml
+      - .github/requirements.txt
       - .github/workflows/evidence-validation.yml
       - .github/workflows/trusted-evidence-validation.yml
   pull_request:
@@ -111,6 +115,7 @@ jobs:
           tests/test_local_verification.py
           tests/test_verification_status.py
           tests/test_candidate_secret_scan.py
+          tests/test_workflow_policy.py
           tests/test_repository_rules.py
           tests/test_verification_workflows.py
           tests/test_verification_units.py

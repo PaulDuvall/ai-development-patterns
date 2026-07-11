@@ -2,8 +2,8 @@
 """
 AI Issue Generation Tool
 
-Generates Kanban-optimized work items from high-level requirements using AI assistance.
-Focuses on 4-8 hour tasks for continuous flow and rapid feedback cycles.
+Generates methodology-neutral work items from high-level requirements using AI assistance.
+Focuses on deployable tasks that fit within a 60-minute AI-assisted cycle.
 """
 
 import json
@@ -15,9 +15,20 @@ from typing import Any
 
 class KanbanIssueGenerator:
     def __init__(self):
-        self.max_task_hours = 8
-        self.min_task_hours = 2
+        self.max_task_minutes = 60
+        self.min_task_minutes = 15
         self.templates_dir = Path("kanban-templates")
+
+    @staticmethod
+    def _estimate_minutes(estimate: str) -> int:
+        """Normalize a simple minute/hour estimate to whole minutes."""
+        value, unit = estimate.split()[:2]
+        minutes = int(value)
+        if unit.lower().startswith("hour"):
+            return minutes * 60
+        if unit.lower().startswith("minute"):
+            return minutes
+        raise ValueError("estimate unit must be minutes or hours")
         
     def generate_feature_issues(self, feature_description: str, platform: str = "github") -> list[dict[str, Any]]:
         """
@@ -85,7 +96,7 @@ Generated: {datetime.now().isoformat()}
         return self._apply_platform_format(epic, platform)
     
     def _break_down_feature(self, feature_description: str, platform: str) -> list[dict[str, Any]]:
-        """Break down feature into Kanban-optimized stories (4-8 hours each)."""
+        """Break down a feature into deployable stories of at most 60 minutes."""
         
         # Example breakdown for "Password reset via email"
         if "password reset" in feature_description.lower():
@@ -112,13 +123,13 @@ Generated: {datetime.now().isoformat()}
 - Clean up expired tokens automatically
 
 ## Cycle Time Target
-6-8 hours (includes testing)
+45-60 minutes (includes testing)
 
 ## Dependencies
 None - can start immediately
                 """,
                 "labels": ["backend", "security", "kanban-ready"],
-                "estimate": "8 hours",
+                "estimate": "60 minutes",
                 "priority": "high"
             },
             {
@@ -135,13 +146,13 @@ None - can start immediately
 - Track email delivery status
 
 ## Cycle Time Target
-4-6 hours
+30-45 minutes
 
 ## Dependencies
 None - parallel with token generation
                 """,
                 "labels": ["backend", "email", "kanban-ready"],
-                "estimate": "6 hours",
+                "estimate": "45 minutes",
                 "priority": "high"
             },
             {
@@ -158,13 +169,13 @@ None - parallel with token generation
 - Follow design system guidelines
 
 ## Cycle Time Target
-4-5 hours
+30-45 minutes
 
 ## Dependencies
 None - can develop independently
                 """,
                 "labels": ["frontend", "ui", "kanban-ready"],
-                "estimate": "5 hours",
+                "estimate": "45 minutes",
                 "priority": "medium"
             },
             {
@@ -181,7 +192,7 @@ None - can develop independently
 - Performance testing with realistic load
 
 ## Cycle Time Target
-3-4 hours
+30-45 minutes
 
 ## Dependencies
 - Backend token generation complete
@@ -189,7 +200,7 @@ None - can develop independently
 - Frontend form complete
                 """,
                 "labels": ["integration", "testing", "kanban-ready"],
-                "estimate": "4 hours",
+                "estimate": "45 minutes",
                 "priority": "high"
             }
         ]
@@ -208,13 +219,13 @@ None - can develop independently
 - [ ] Add response caching (5-minute TTL)
 
 ## Cycle Time Target
-6-7 hours
+45-60 minutes
 
 ## Dependencies
 None
                 """,
                 "labels": ["backend", "api", "kanban-ready"],
-                "estimate": "7 hours",
+                "estimate": "60 minutes",
                 "priority": "high"
             },
             {
@@ -226,13 +237,13 @@ None
 - [ ] Add loading and error states
 
 ## Cycle Time Target
-8 hours
+45-60 minutes
 
 ## Dependencies
 None - can use mock data initially
                 """,
                 "labels": ["frontend", "dashboard", "kanban-ready"],
-                "estimate": "8 hours",
+                "estimate": "60 minutes",
                 "priority": "medium"
             }
         ]
@@ -254,13 +265,13 @@ None - can use mock data initially
 {feature_description}
 
 ## Cycle Time Target
-6-8 hours
+45-60 minutes
 
 ## Dependencies
 To be determined during planning
                 """,
                 "labels": ["backend", "feature", "kanban-ready"],
-                "estimate": "8 hours",
+                "estimate": "60 minutes",
                 "priority": "high"
             },
             {
@@ -275,13 +286,13 @@ To be determined during planning
 {feature_description}
 
 ## Cycle Time Target
-6-8 hours
+45-60 minutes
 
 ## Dependencies
 Backend API completion recommended
                 """,
                 "labels": ["frontend", "ui", "kanban-ready"],
-                "estimate": "8 hours",
+                "estimate": "60 minutes",
                 "priority": "medium"
             }
         ]
@@ -303,13 +314,13 @@ Backend API completion recommended
 {feature_description}
 
 ## Cycle Time Target
-4-6 hours
+45-60 minutes
 
 ## Dependencies
 All feature development complete
                 """,
                 "labels": ["testing", "qa", "kanban-ready"],
-                "estimate": "6 hours",
+                "estimate": "60 minutes",
                 "priority": "medium"
             },
             {
@@ -324,13 +335,13 @@ All feature development complete
 {feature_description}
 
 ## Cycle Time Target
-2-3 hours
+30-45 minutes
 
 ## Dependencies
 Feature implementation complete
                 """,
                 "labels": ["documentation", "kanban-ready"],
-                "estimate": "3 hours",
+                "estimate": "45 minutes",
                 "priority": "low"
             }
         ]
@@ -366,6 +377,8 @@ Feature implementation complete
     
     def _format_for_jira(self, issue: dict[str, Any]) -> dict[str, Any]:
         """Format issue for JIRA API."""
+        estimate_minutes = self._estimate_minutes(
+            issue.get("estimate", "60 minutes"))
         return {
             "fields": {
                 "project": {"key": "PROJ"},
@@ -375,13 +388,15 @@ Feature implementation complete
                 "priority": {"name": issue.get("priority", "Medium")},
                 "labels": issue.get("labels", []),
                 "timetracking": {
-                    "originalEstimate": issue.get("estimate", "8h")
+                    "originalEstimate": f"{estimate_minutes}m"
                 }
             }
         }
     
     def _format_for_azure(self, issue: dict[str, Any]) -> dict[str, Any]:
         """Format issue for Azure DevOps API."""
+        estimate_minutes = self._estimate_minutes(
+            issue.get("estimate", "60 minutes"))
         return {
             "op": "add",
             "path": "/fields/System.Title",
@@ -389,8 +404,9 @@ Feature implementation complete
             "fields": {
                 "System.Description": issue["body"],
                 "System.Tags": "; ".join(issue.get("labels", [])),
-                "Microsoft.VSTS.Scheduling.OriginalEstimate": 
-                    issue.get("estimate", "8").split()[0]  # Extract number
+                # Azure's numeric OriginalEstimate field is measured in hours.
+                "Microsoft.VSTS.Scheduling.OriginalEstimate":
+                    estimate_minutes / 60
             }
         }
     
@@ -410,11 +426,15 @@ Feature implementation complete
             # Check cycle time estimates
             if "estimate" in issue:
                 try:
-                    hours = int(issue["estimate"].split()[0])
-                    if hours > self.max_task_hours:
-                        warnings.append(f"Issue {i+1}: Estimate {hours}h exceeds max {self.max_task_hours}h")
-                    elif hours < self.min_task_hours:
-                        warnings.append(f"Issue {i+1}: Estimate {hours}h below min {self.min_task_hours}h")
+                    minutes = self._estimate_minutes(issue["estimate"])
+                    if minutes > self.max_task_minutes:
+                        warnings.append(
+                            f"Issue {i+1}: Estimate {minutes}m exceeds max "
+                            f"{self.max_task_minutes}m")
+                    elif minutes < self.min_task_minutes:
+                        warnings.append(
+                            f"Issue {i+1}: Estimate {minutes}m below min "
+                            f"{self.min_task_minutes}m")
                 except ValueError:
                     warnings.append(f"Issue {i+1}: Invalid time estimate format")
             
@@ -435,8 +455,8 @@ def main():
     parser.add_argument("--bug", help="Bug report to create issues for")
     parser.add_argument("--platform", choices=["github", "jira", "azure"], 
                        default="github", help="Target platform")
-    parser.add_argument("--max-hours", type=int, default=8, 
-                       help="Maximum hours per task")
+    parser.add_argument("--max-minutes", type=int, default=60,
+                       help="Maximum minutes per task")
     parser.add_argument("--output", help="Output file for generated issues")
     parser.add_argument("--validate", action="store_true", 
                        help="Validate Kanban readiness")
@@ -448,7 +468,7 @@ def main():
         sys.exit(1)
     
     generator = KanbanIssueGenerator()
-    generator.max_task_hours = args.max_hours
+    generator.max_task_minutes = args.max_minutes
     
     # Generate issues based on input type
     if args.feature:

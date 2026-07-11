@@ -18,6 +18,8 @@ SPEC.loader.exec_module(SCOPE)
 
 LOCAL_UUID = "123e4567-e89b-42d3-a456-426614174000"
 LOCAL_REF = f"verification/local-runs/codex-local-{LOCAL_UUID}.yaml"
+LOCAL_LEDGER_REF = (
+    f"verification/local-runs/codex-local-{LOCAL_UUID}-search-events.yaml")
 
 
 def init_git(root):
@@ -36,6 +38,7 @@ def expected_local_run():
         "run_id": f"codex-local:{LOCAL_UUID}",
         "checked_date": datetime.date.today().isoformat(),
         "run_ref": LOCAL_REF,
+        "search_ledger_ref": LOCAL_LEDGER_REF,
         "run_manifest_sha256": "a" * 64,
         "provider": "openai",
         "model": "codex-managed",
@@ -61,6 +64,14 @@ def write_local_evidence(root, expected):
     }), encoding="utf-8")
 
 
+def write_local_artifacts(root):
+    manifest = root / LOCAL_REF
+    manifest.parent.mkdir(parents=True, exist_ok=True)
+    manifest.write_text("approved: manifest\n", encoding="utf-8")
+    (root / LOCAL_LEDGER_REF).write_text("events: sanitized\n", encoding="utf-8")
+    return manifest
+
+
 def local_repo(tmp_path):
     evidence = tmp_path / "verification" / "evidence"
     evidence.mkdir(parents=True)
@@ -79,9 +90,7 @@ def test_scope_includes_untracked_expected_local_manifest(tmp_path):
     root = local_repo(tmp_path)
     expected = expected_local_run()
     write_local_evidence(root, expected)
-    manifest = root / LOCAL_REF
-    manifest.parent.mkdir(parents=True)
-    manifest.write_text("approved: manifest\n", encoding="utf-8")
+    write_local_artifacts(root)
 
     changed = SCOPE.validate(
         root, "evidence", json.dumps(["sample-pattern"]), expected)
@@ -89,6 +98,7 @@ def test_scope_includes_untracked_expected_local_manifest(tmp_path):
     assert changed == {
         "verification/evidence/sample-pattern.yaml",
         LOCAL_REF,
+        LOCAL_LEDGER_REF,
     }
 
 
@@ -96,9 +106,7 @@ def test_scope_rejects_an_extra_untracked_local_manifest(tmp_path):
     root = local_repo(tmp_path)
     expected = expected_local_run()
     write_local_evidence(root, expected)
-    manifest = root / LOCAL_REF
-    manifest.parent.mkdir(parents=True)
-    manifest.write_text("approved: manifest\n", encoding="utf-8")
+    manifest = write_local_artifacts(root)
     (manifest.parent / "codex-local-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.yaml").write_text(
         "unexpected: manifest\n", encoding="utf-8")
 
@@ -107,13 +115,24 @@ def test_scope_rejects_an_extra_untracked_local_manifest(tmp_path):
             root, "evidence", json.dumps(["sample-pattern"]), expected)
 
 
-def test_scope_rejects_forbidden_staged_changes(tmp_path):
+def test_scope_requires_the_expected_search_ledger(tmp_path):
     root = local_repo(tmp_path)
     expected = expected_local_run()
     write_local_evidence(root, expected)
     manifest = root / LOCAL_REF
     manifest.parent.mkdir(parents=True)
     manifest.write_text("approved: manifest\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="missing run artifacts.*search-events"):
+        SCOPE.validate(
+            root, "evidence", json.dumps(["sample-pattern"]), expected)
+
+
+def test_scope_rejects_forbidden_staged_changes(tmp_path):
+    root = local_repo(tmp_path)
+    expected = expected_local_run()
+    write_local_evidence(root, expected)
+    write_local_artifacts(root)
     forbidden = root / "README.md"
     forbidden.write_text("staged unrelated change\n", encoding="utf-8")
     subprocess.run(["git", "add", "README.md"], cwd=root, check=True)
@@ -127,9 +146,7 @@ def test_scope_rejects_forbidden_untracked_files_anywhere(tmp_path):
     root = local_repo(tmp_path)
     expected = expected_local_run()
     write_local_evidence(root, expected)
-    manifest = root / LOCAL_REF
-    manifest.parent.mkdir(parents=True)
-    manifest.write_text("approved: manifest\n", encoding="utf-8")
+    write_local_artifacts(root)
     (root / "scratch.txt").write_text("unrelated\n", encoding="utf-8")
 
     with pytest.raises(ValueError, match="scratch.txt"):
@@ -141,9 +158,7 @@ def test_combined_discovery_allows_notes_but_rejects_shared_state_edits(tmp_path
     root = local_repo(tmp_path)
     expected = expected_local_run()
     write_local_evidence(root, expected)
-    manifest = root / LOCAL_REF
-    manifest.parent.mkdir(parents=True)
-    manifest.write_text("approved: manifest\n", encoding="utf-8")
+    write_local_artifacts(root)
     (root / "experiments" / "NOTES.md").write_text(
         "new discovery notes\n", encoding="utf-8")
 
@@ -165,21 +180,17 @@ def test_discovery_scope_allows_only_notes_and_expected_local_manifest(tmp_path)
     expected = expected_local_run()
     notes = root / "experiments" / "NOTES.md"
     notes.write_text("new discovery notes\n", encoding="utf-8")
-    manifest = root / LOCAL_REF
-    manifest.parent.mkdir(parents=True)
-    manifest.write_text("approved: manifest\n", encoding="utf-8")
+    write_local_artifacts(root)
 
     changed = SCOPE.validate(root, "discovery", "[]", expected)
 
-    assert changed == {"experiments/NOTES.md", LOCAL_REF}
+    assert changed == {"experiments/NOTES.md", LOCAL_REF, LOCAL_LEDGER_REF}
 
 
 def test_discovery_scope_rejects_an_extra_local_manifest(tmp_path):
     root = local_repo(tmp_path)
     expected = expected_local_run()
-    manifest = root / LOCAL_REF
-    manifest.parent.mkdir(parents=True)
-    manifest.write_text("approved: manifest\n", encoding="utf-8")
+    manifest = write_local_artifacts(root)
     (manifest.parent / "codex-local-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.yaml").write_text(
         "unexpected: manifest\n", encoding="utf-8")
 

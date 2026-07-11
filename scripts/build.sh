@@ -9,7 +9,7 @@
 #   - regenerates the branded dependency diagram injected into index.html
 #
 # Used by:
-#   - .github/workflows/deploy-pages.yml   (runs on every push to main)
+#   - .github/workflows/deploy-pages.yml   (runs when site inputs reach main)
 #   - scripts/pre-commit-patterns.sh        (keeps commits in sync locally)
 #   - any static host (set this as the build command, e.g. Vercel/Netlify)
 #

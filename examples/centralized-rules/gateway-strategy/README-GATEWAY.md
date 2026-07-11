@@ -26,7 +26,9 @@ Internal service that owns all org rules and calls the Claude API.
 
 **Features**:
 - Centralized system prompts with org rules
-- Request/response logging
+- Bounded, non-content event and token-usage logging
+- Bearer-token authentication, per-IP throttling, and a global provider request cap
+- Loopback-only binding unless remote exposure is explicitly acknowledged
 - Input/output filtering hooks
 
 ### 2. org-ai-client/
@@ -53,30 +55,44 @@ Developer CLI that calls the gateway or wrapper library.
 
 - Node.js 18+
 - `ANTHROPIC_API_KEY` environment variable
+- `AI_GATEWAY_TOKEN` containing at least 32 random bytes
 
 ### Install dependencies
 
 ```bash
-cd ai-gateway && npm install
-cd ../org-ai-client && npm install
-cd ../ai-dev-cli && npm install
+cd ai-gateway && npm ci && npm run build
+cd ../org-ai-client && npm ci && npm run build
+cd ../ai-dev-cli && npm ci && npm run build
 ```
+
+Run `npm test` in `ai-gateway/` to exercise authentication, per-IP throttling, window reset, and the
+cross-client provider request cap with an injected local stub; the test never contacts a provider.
 
 ### Run the gateway
 
 ```bash
 cd ai-gateway
+export AI_GATEWAY_TOKEN="$(openssl rand -hex 32)"
 npm start
-# Gateway running on http://localhost:3000
+# Gateway running on http://127.0.0.1:3000
 ```
 
 ### Use the CLI
 
 ```bash
 cd ai-dev-cli
+export AI_GATEWAY_TOKEN="<the same token used by ai-gateway>"
 npm link
 ai-dev plan "Implement idempotent refund API"
 ```
+
+The example binds to `127.0.0.1`, rate limits each source IP before authentication, and permits at
+most ten provider-backed requests per minute across the process. Treat those as development
+safeguards, not production controls. Remote binding additionally requires
+`ALLOW_REMOTE_AI_GATEWAY=true`; before
+enabling it, put the service behind organizational identity, distributed rate limiting, per-user
+request and token budgets, audit controls, and network policy.
+Never expose the example directly to an untrusted network.
 
 ## Customization
 

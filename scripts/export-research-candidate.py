@@ -89,7 +89,7 @@ def export_candidate(source, destination):
             raise ValueError(f"destination must not be a symbolic link: {relative}")
         destination_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source_path, destination_path, follow_symlinks=False)
-        os.chmod(destination_path, 0o644, follow_symlinks=False)
+        os.chmod(destination_path, 0o600, follow_symlinks=False)
     return len(files)
 
 
