@@ -399,6 +399,23 @@ def test_external_links_run_only_weekly_or_when_manually_requested():
         "continue-on-error"] == "true"
 
 
+def test_pattern_validation_failure_issue_has_remediation_checklist():
+    """New and repeat failure notices tell maintainers how to recover."""
+    workflow = load_workflow(PATTERN_VALIDATION)
+    notification = workflow["jobs"]["notify-failure"]
+    script = named_step(
+        notification, "Create issue on failure (skip if duplicate)"
+    )["with"]["script"]
+
+    assert "### Remediation checklist" in script
+    assert 'python3 -m pytest -m "not slow" -x -q' in script
+    assert "python3 scripts/validate-pattern-names.py" in script
+    assert "python3 scripts/generate-patterns-data.py --check" in script
+    assert "Local agent fix instructions" in script
+    assert "Validation gate" in script
+    assert script.count("${remediation}") == 2
+
+
 def test_pages_pushes_are_scoped_to_site_inputs():
     workflow = load_workflow(PAGES)
     paths = set(workflow["on"]["push"]["paths"])
