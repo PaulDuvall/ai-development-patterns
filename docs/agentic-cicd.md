@@ -36,7 +36,7 @@ deterministic control or an authorized human validates and disposes them.
 ### 1.1 Commit Verification
 **[SCI-001]** **THE SYSTEM SHALL** enforce cryptographic signing of all commits using Sigstore Gitsign **BEFORE** merge to protected branches.
 
-**[SCI-002]** **THE SYSTEM SHALL** verify commit signatures through a required status check **WHERE** repository rules separately identify and audit any authorized bypass actors.
+**[SCI-002]** **THE SYSTEM SHALL** verify commit signatures through a required status check **AND SHALL NOT** treat actor identity, administrator status, or repository bypass capability as a substitute for a valid signature.
 
 **[SCI-003]** **WHEN** a commit signature verification fails, **THE SYSTEM SHALL** block the merge and notify the committer with remediation steps **WITHIN** 30 seconds.
 
@@ -57,7 +57,7 @@ deterministic control or an authorized human validates and disposes them.
 
 **[SCI-010]** **THE SYSTEM SHALL** classify changes into categories (documentation, configuration, source code, dependencies) **WHERE** each category triggers specific tool subsets based on impact analysis.
 
-**[SCI-011]** **WHEN** a trusted path classifier confirms that a change contains only non-executable documentation, **THE SYSTEM SHALL** skip source build and dependency scans **WHILE** still executing documentation, link, secret, and workflow-policy validation.
+**[SCI-011]** **ONLY WHEN** a trusted classifier positively verifies every changed path and its content against an explicit, version-controlled allowlist of non-executable documentation **SHALL THE SYSTEM** skip source build and dependency scans **WHILE** still executing documentation, link, secret, and workflow-policy validation; classifier errors, ambiguity, symbolic links, unknown paths, or non-allowlisted content **SHALL** fail closed and trigger the complete validation suite.
 
 **[SCI-012]** **THE SYSTEM SHALL** maintain change pattern rules **WHERE** file extension patterns, directory paths, and commit message keywords determine tool execution scope.
 
