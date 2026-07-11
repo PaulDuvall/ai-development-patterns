@@ -1,6 +1,9 @@
 """Structural regression tests for evidence workflow trust boundaries."""
 
+import json
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 import yaml
@@ -475,8 +478,25 @@ def test_retired_hosted_fanout_helpers_are_absent():
     assert compatibility_anchor not in command
 
 
-def test_generated_repair_prompt_reproduces_the_non_network_suite():
-    source = (ROOT / "scripts" / "generate-audit-prompt.py").read_text(
-        encoding="utf-8")
-    assert 'python3 -m pytest -m \\"not slow\\" -x -q' in source
-    assert "python3 -m pytest -x -q" not in source
+def test_generated_repair_prompt_reproduces_the_non_network_suite(tmp_path):
+    report = tmp_path / "report.json"
+    report.write_text(json.dumps({
+        "summary": {"total": 1, "passed": 0, "failed": 1, "error": 0},
+        "tests": [{
+            "nodeid": "tests/test_pattern_compliance.py::test_example",
+            "outcome": "failed",
+            "call": {"longrepr": "example failure"},
+        }],
+    }), encoding="utf-8")
+
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "generate-audit-prompt.py"),
+         str(report)],
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+
+    assert completed.returncode == 1
+    assert 'python3 -m pytest -m "not slow" -x -q' in completed.stdout
+    assert "python3 -m pytest -x -q" not in completed.stdout

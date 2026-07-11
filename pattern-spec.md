@@ -247,7 +247,7 @@ Before finalizing an anti-pattern name, verify:
 - Avoid implementation details in the description
 
 ### Related Patterns
-- Link to 1-6 most relevant stable or experimental patterns using markdown hyperlinks, most-relevant first
+- Link to 1-6 most relevant stable or experimental patterns using Markdown hyperlinks, most-relevant first
 - Include patterns this one depends on or builds upon
 - Avoid circular references
 - Put Lens, category, and supporting-guide links in a separate `**See also**:` line

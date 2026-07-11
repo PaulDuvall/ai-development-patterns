@@ -46,15 +46,12 @@ For complete pattern documentation, see: [Debt Forecasting](../../README.md#debt
 The pattern combines deterministic trend data with an AI-assisted explanation instead of asking a model to guess debt from a snapshot:
 
 ```bash
+mkdir -p metrics
+
 # Collect deterministic trend data with standard tools
 python -m radon cc src --json > metrics/complexity.json
 python -m pytest --cov=src --cov-report=json:metrics/coverage.json
 git log --since='90 days ago' --numstat > metrics/churn.txt
-
-# AI-assisted ranking grounded in the collected metrics
-ai "Rank maintenance risks using the attached complexity, coverage, churn,
-dependency, and documentation-drift trends. Cite the metric behind every rank." \
-  > debt-forecast.md
 ```
 
-Review forecast accuracy against later incidents and maintenance work, then adjust weights rather than treating model rankings as objective measurements. [`debt_analysis.md`](debt_analysis.md) expands this approach with debt scan scripts, impact calculators, prioritization prompts, and dashboard KPIs to adapt to your own toolchain.
+Pass those files to your configured assistant and ask it to rank maintenance risks while citing the metric behind every rank; save the result as `debt-forecast.md`. Review forecast accuracy against later incidents and maintenance work, then adjust weights rather than treating model rankings as objective measurements. [`debt_analysis.md`](debt_analysis.md) expands this approach with debt scan scripts, impact calculators, prioritization prompts, and dashboard KPIs to adapt to your own toolchain.

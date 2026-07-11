@@ -44,7 +44,7 @@ TABLE_LINK_RE = re.compile(
 
 class ValidationError:
     def __init__(self, pattern_name: str, error_type: str, message: str,
-                 line_num: int = None, source: str = None):
+                 line_num: int | None = None, source: str | None = None):
         self.pattern_name = pattern_name
         self.error_type = error_type
         self.message = message
