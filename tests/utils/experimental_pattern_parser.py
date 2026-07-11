@@ -24,6 +24,7 @@ class ExperimentalPatternParser:
     """Parser for extracting pattern information from experiments/README.md"""
 
     def __init__(self, content: str):
+        """Store experimental catalog content as text and individual lines."""
         self.content = content
         self.lines = content.split('\n')
 
@@ -120,6 +121,7 @@ class ExperimentalPatternParser:
         return diagrams
 
     def _is_category_header(self, line: str) -> bool:
+        """Return whether a line is a recognized experimental category heading."""
         category_patterns = [
             r'^## Foundation Patterns$',
             r'^## Development Patterns$',
@@ -130,6 +132,7 @@ class ExperimentalPatternParser:
         return any(re.match(p, line) for p in category_patterns)
 
     def _extract_category_name(self, line: str) -> str:
+        """Map an experimental category heading to its catalog category."""
         if "Foundation" in line:
             return "Foundation"
         if "Development" in line:
@@ -141,6 +144,7 @@ class ExperimentalPatternParser:
         return ""
 
     def _is_pattern_header(self, line: str) -> bool:
+        """Return whether a heading introduces an experimental pattern."""
         if not re.match(r'^### [A-Za-z]', line):
             return False
         if self._is_category_header(line):
@@ -153,11 +157,13 @@ class ExperimentalPatternParser:
         return header_text not in excluded
 
     def _extract_pattern_name(self, line: str) -> str | None:
+        """Extract the pattern name from a third-level heading."""
         match = re.match(r'^### (.+)', line)
         return match.group(1).strip() if match else None
 
     def _parse_pattern(self, start_line: int, pattern_name: str,
                        category: str) -> ExperimentalPattern | None:
+        """Parse one experimental pattern section into structured fields."""
         pattern = ExperimentalPattern(
             name=pattern_name, line_number=start_line + 1, category=category
         )
@@ -206,16 +212,19 @@ class ExperimentalPatternParser:
         return pattern
 
     def _field_value(self, line: str, field: str) -> str:
+        """Extract and normalize a bold Markdown field value."""
         match = re.search(rf'\*\*{field}\*\*:\s*(.+)', line)
         if not match:
             return ""
         return re.sub(r'<br\s*/?>$', '', match.group(1).strip()).strip()
 
     def _parse_related(self, text: str) -> list[str]:
+        """Return every linked pattern name from a related-patterns field."""
         all_links = re.findall(r'\[([^\]]+)\]\(([^)]+)\)', text)
         return [name for name, _ in all_links]
 
     def _find_next_pattern_start(self, start_line: int) -> int:
+        """Find the next pattern or category heading after a line index."""
         for i in range(start_line, len(self.lines)):
             stripped = self.lines[i].strip()
             if self._is_pattern_header(stripped) or stripped.startswith('## '):

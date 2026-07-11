@@ -20,6 +20,7 @@ class Pattern:
     category: str = ""
     
     def __post_init__(self):
+        """Give each parsed pattern an independent related-pattern list."""
         if self.related_patterns is None:
             self.related_patterns = []
 
@@ -28,6 +29,7 @@ class PatternParser:
     """Parser for extracting pattern information from README.md"""
     
     def __init__(self, readme_content: str):
+        """Store the stable catalog as text and individual lines."""
         self.content = readme_content
         self.lines = readme_content.split('\n')
         
@@ -244,6 +246,7 @@ class ReferenceTableParser:
     """Parser specifically for the reference table validation"""
     
     def __init__(self, readme_content: str):
+        """Store catalog content for reference-table extraction."""
         self.content = readme_content
         self.lines = readme_content.split('\n')
     

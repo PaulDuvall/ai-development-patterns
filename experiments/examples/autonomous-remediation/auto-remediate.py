@@ -21,6 +21,7 @@ RETRY_BUDGET = 3
 
 
 def load_state() -> dict:
+    """Load retry counters, returning an empty state when unavailable."""
     if not STATE_FILE.exists():
         return {}
     try:
@@ -30,6 +31,7 @@ def load_state() -> dict:
 
 
 def save_state(state: dict) -> None:
+    """Persist retry counters without failing the invoking hook."""
     try:
         STATE_FILE.write_text(json.dumps(state))
     except OSError as exc:
@@ -37,6 +39,7 @@ def save_state(state: dict) -> None:
 
 
 def record_block(file_path: str) -> int:
+    """Record a recent block for a file and return its retry count."""
     state = load_state()
     entry = state.get(file_path, {"count": 0, "last": 0})
     if time.time() - entry["last"] > 600:
@@ -49,12 +52,14 @@ def record_block(file_path: str) -> int:
 
 
 def clear_block(file_path: str) -> None:
+    """Remove any retry state associated with a file."""
     state = load_state()
     state.pop(file_path, None)
     save_state(state)
 
 
 def read_event() -> dict:
+    """Read the hook event from standard input, tolerating invalid JSON."""
     try:
         return json.load(sys.stdin)
     except ValueError:
@@ -62,6 +67,7 @@ def read_event() -> dict:
 
 
 def safe_detect(file_path: str) -> list | None:
+    """Run detectors while treating detector crashes as a fail-open result."""
     try:
         return run_all_detectors(file_path)
     except Exception as exc:
@@ -70,6 +76,7 @@ def safe_detect(file_path: str) -> list | None:
 
 
 def emit_exhaustion_notice(file_path: str, blocks: int) -> None:
+    """Report retry-budget exhaustion and clear the file's retry state."""
     message = (
         f"auto-remediate: {file_path} has been blocked {blocks} times. "
         "Suggested actions: raise the rule threshold in thresholds.yml, "
@@ -80,6 +87,7 @@ def emit_exhaustion_notice(file_path: str, blocks: int) -> None:
 
 
 def emit_block(file_path: str, violations: list) -> None:
+    """Emit the structured hook response that blocks a violating edit."""
     print(json.dumps({
         "decision": "block",
         "reason": format_report(file_path, violations, FIX_HINTS),
@@ -87,6 +95,7 @@ def emit_block(file_path: str, violations: list) -> None:
 
 
 def main() -> int:
+    """Process one hook event and always return a valid hook exit status."""
     event = read_event()
     file_path = event.get("tool_input", {}).get("file_path", "")
     if not file_path or not os.path.isfile(file_path):

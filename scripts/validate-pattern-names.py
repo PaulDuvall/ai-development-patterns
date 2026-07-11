@@ -45,6 +45,7 @@ TABLE_LINK_RE = re.compile(
 class ValidationError:
     def __init__(self, pattern_name: str, error_type: str, message: str,
                  line_num: int | None = None, source: str | None = None):
+        """Capture one catalog validation failure and its source location."""
         self.pattern_name = pattern_name
         self.error_type = error_type
         self.message = message
@@ -52,6 +53,7 @@ class ValidationError:
         self.source = source
 
     def __str__(self):
+        """Render the failure with the most specific available location."""
         if self.source and self.line_num:
             location = f" ({self.source}:{self.line_num})"
         elif self.source:
@@ -63,6 +65,7 @@ class ValidationError:
 
 class PatternValidator:
     def __init__(self):
+        """Initialize empty validation findings and catalog counters."""
         self.errors: list[ValidationError] = []
         self.warnings: list[str] = []
         self.patterns_found: set[str] = set()

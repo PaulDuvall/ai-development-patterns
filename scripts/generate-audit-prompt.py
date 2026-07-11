@@ -96,6 +96,7 @@ def build_prompt(failures: list[dict]) -> str:
 
 
 def main():
+    """Generate and print a remediation prompt from a pytest JSON report."""
     if len(sys.argv) < 2:
         print(f"Usage: {sys.argv[0]} <pytest-json-report>", file=sys.stderr)
         sys.exit(1)

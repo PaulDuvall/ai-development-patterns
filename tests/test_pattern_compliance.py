@@ -314,12 +314,14 @@ class TestExperimentalPatternCompliance:
 
     @pytest.fixture
     def exp_content(self):
+        """Return the experimental catalog Markdown content."""
         readme_path = EXPERIMENTS_DIR / "README.md"
         with open(readme_path, 'r', encoding='utf-8') as f:
             return f.read()
 
     @pytest.fixture
     def exp_parser(self, exp_content):
+        """Build an experimental-pattern parser for the catalog content."""
         return ExperimentalPatternParser(exp_content)
 
     def test_all_experimental_patterns_have_headers(self, exp_parser):

@@ -24,6 +24,7 @@ ROOT = Path(__file__).parent.parent.resolve()
 
 
 def load_script(name):
+    """Load a repository script as a module by filename."""
     path = ROOT / "scripts" / name
     spec = importlib.util.spec_from_file_location(name.replace("-", "_"), path)
     module = importlib.util.module_from_spec(spec)
@@ -56,6 +57,7 @@ def atomic_write_bytes(path, content):
 
 
 def remove_pending(root, selected):
+    """Remove finalized slugs from the pending-evidence allowlist."""
     path = Path(root) / "verification" / "pending-evidence.yaml"
     text = path.read_text(encoding="utf-8")
     data = yaml.safe_load(text) or {}
@@ -74,6 +76,7 @@ def remove_pending(root, selected):
 
 
 def run(command, root):
+    """Run a required finalization command from the repository root."""
     subprocess.run(command, cwd=root, check=True)
 
 
@@ -86,6 +89,7 @@ def snapshot_files(root, relative_paths):
 
 
 def restore_files(root, snapshots):
+    """Restore finalizer-owned files from byte snapshots."""
     for relative, content in snapshots.items():
         atomic_write_bytes(Path(root) / relative, content)
 
@@ -103,6 +107,7 @@ def reconcile_selected_searches(root, ledger, selected):
 
 
 def finalize(root, run_ref, manifest_sha):
+    """Validate and finalize one approved local verification run."""
     manifest, _, actual_sha = load_manifest(root, run_ref, manifest_sha)
     if actual_sha != manifest_sha:
         raise ValueError("approved manifest digest changed before finalization")
@@ -168,6 +173,7 @@ def finalize(root, run_ref, manifest_sha):
 
 
 def main():
+    """Parse finalization arguments and report a safe command-line result."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", required=True)
     parser.add_argument("--manifest-sha256", required=True)
