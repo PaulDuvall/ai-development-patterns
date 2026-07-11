@@ -460,9 +460,12 @@ def main():
                         },
                         "obsolete_actions_environments": list(
                             OBSOLETE_ACTIONS_ENVIRONMENTS),
-                        "secret_protection": SECRET_PROTECTION_PAYLOAD,
-                        "best_effort_secret_protection_count": len(
-                            BEST_EFFORT_SECRET_PROTECTION),
+                        "secret_protection": {
+                            "required_control_count": len(
+                                REQUIRED_SECRET_PROTECTION),
+                            "best_effort_control_count": len(
+                                BEST_EFFORT_SECRET_PROTECTION),
+                        },
                         "codeql_default_setup": CODEQL_DEFAULT_SETUP_PAYLOAD,
                     },
                     indent=2,

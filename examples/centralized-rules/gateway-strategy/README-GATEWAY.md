@@ -27,7 +27,7 @@ Internal service that owns all org rules and calls the Claude API.
 **Features**:
 - Centralized system prompts with org rules
 - Bounded, non-content event and token-usage logging
-- Bearer-token authentication and a conservative in-process request cap
+- Bearer-token authentication, per-IP throttling, and a global provider request cap
 - Loopback-only binding unless remote exposure is explicitly acknowledged
 - Input/output filtering hooks
 
@@ -65,6 +65,9 @@ cd ../org-ai-client && npm ci && npm run build
 cd ../ai-dev-cli && npm ci && npm run build
 ```
 
+Run `npm test` in `ai-gateway/` to exercise authentication, per-IP throttling, window reset, and the
+cross-client provider request cap with an injected local stub; the test never contacts a provider.
+
 ### Run the gateway
 
 ```bash
@@ -83,11 +86,12 @@ npm link
 ai-dev plan "Implement idempotent refund API"
 ```
 
-The example binds to `127.0.0.1` and permits at most ten provider-backed requests per minute in one
-process. Treat those as development safeguards, not production controls. Remote binding additionally
-requires `ALLOW_REMOTE_AI_GATEWAY=true`; before enabling it, put the service behind organizational
-identity, distributed rate limiting, per-user request and token budgets, audit controls, and network
-policy. Never expose the example directly to an untrusted network.
+The example binds to `127.0.0.1`, rate limits authenticated source IPs, and permits at most ten
+provider-backed requests per minute across the process. Treat those as development safeguards, not
+production controls. Remote binding additionally requires `ALLOW_REMOTE_AI_GATEWAY=true`; before
+enabling it, put the service behind organizational identity, distributed rate limiting, per-user
+request and token budgets, audit controls, and network policy.
+Never expose the example directly to an untrusted network.
 
 ## Customization
 

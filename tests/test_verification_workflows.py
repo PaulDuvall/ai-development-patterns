@@ -175,13 +175,24 @@ def test_no_workflow_can_restore_a_legacy_shared_provider_secret():
 def test_trusted_pr_workflow_executes_only_base_branch_validation_code():
     workflow = load_workflow(TRUSTED)
     assert "pull_request_target" in workflow["on"]
+    assert "workflow_dispatch" not in workflow["on"]
+    assert workflow["permissions"] == {}
     job = workflow["jobs"]["trusted-evidence"]
+    assert job["if"] == "github.event_name == 'pull_request_target'"
+    assert job["permissions"] == {
+        "contents": "read",
+        "issues": "read",
+        "pull-requests": "read",
+        "statuses": "write",
+    }
     base_checkout = named_step(job, "Checkout trusted base")
     candidate_checkout = named_step(job, "Checkout candidate as inert data")
+    assert base_checkout["with"]["ref"] == (
+        "${{ github.event.pull_request.base.sha }}")
     assert candidate_checkout["with"]["repository"] == (
-        "${{ steps.resolve.outputs.head_repo }}")
+        "${{ github.event.pull_request.head.repo.full_name }}")
     assert candidate_checkout["with"]["ref"] == (
-        "${{ steps.resolve.outputs.head_sha }}")
+        "${{ github.event.pull_request.head.sha }}")
     assert candidate_checkout["with"]["allow-unsafe-pr-checkout"] == "true"
     assert "allow-unsafe-pr-checkout" not in base_checkout["with"]
     assert TRUSTED.read_text(encoding="utf-8").count(
@@ -216,6 +227,14 @@ def test_trusted_pr_workflow_executes_only_base_branch_validation_code():
     assert 'context="Trusted evidence checks"' in commands
     publish = named_step(
         job, "Publish trusted result on the candidate revision")
+    assert publish["env"]["HEAD_SHA"] == (
+        "${{ github.event.pull_request.head.sha }}")
+    assert "steps.resolve.outputs.head_sha" not in str(job)
+    assert "steps.resolve.outputs.head_repo" not in str(job)
+    assert "steps.resolve.outputs.base_sha" not in str(job)
+    assert "steps.resolve.outcome == 'failure'" in publish["if"]
+    assert "steps.resolve.outputs.eligible == 'true'" in publish["if"]
+    assert "steps.resolve.outcome != 'success'" in publish["env"]["FAILED"]
     assert "steps.workflow-policy.outcome != 'success'" in publish["env"][
         "FAILED"]
     assert "steps.install-policy.outcome != 'success'" in publish["env"][
@@ -247,23 +266,80 @@ def test_trusted_pr_workflow_no_ops_when_pr_is_no_longer_eligible():
 
 def test_trust_root_upgrade_requires_exact_commit_bound_owner_comment():
     workflow = load_workflow(TRUSTED)
-    job = workflow["jobs"]["trusted-evidence"]
-    resolve = named_step(job, "Resolve immutable pull request revisions")
+    validation = workflow["jobs"]["trusted-evidence"]
+    resolve = named_step(validation, "Resolve immutable pull request revisions")
+    rerun = workflow["jobs"]["rerun-trust-root-validation"]
+    rerun_step = named_step(
+        rerun, "Rerun completed validation for the current pull request head")
 
     assert workflow["on"]["issue_comment"]["types"] == [
         "created", "edited", "deleted"]
-    assert workflow["permissions"]["issues"] == "read"
-    assert "github.event.issue.pull_request != null" in job["if"]
-    assert "github.event.comment.author_association == 'OWNER'" in job["if"]
-    assert "startsWith" not in job["if"]
+    assert "github.event_name" in workflow["concurrency"]["group"]
     assert "github.event.issue.number" in workflow["concurrency"]["group"]
-    assert "github.event.issue.number" in resolve["env"]["PR_NUMBER"]
-    assert 'expected="APPROVE TRUST ROOT ${head_sha}"' in resolve["run"]
+    assert resolve["env"] == {
+        "GH_TOKEN": "${{ github.token }}",
+        "EVENT_PR_NUMBER": "${{ github.event.pull_request.number }}",
+        "EVENT_HEAD_SHA": "${{ github.event.pull_request.head.sha }}",
+        "EVENT_HEAD_REPO": (
+            "${{ github.event.pull_request.head.repo.full_name }}"),
+        "EVENT_BASE_SHA": "${{ github.event.pull_request.base.sha }}",
+        "EVENT_BASE_REF": "${{ github.event.pull_request.base.ref }}",
+    }
+    assert '[ "$current_head_sha" = "$EVENT_HEAD_SHA" ]' in resolve["run"]
+    assert '[ "$current_head_repo" = "$EVENT_HEAD_REPO" ]' in resolve["run"]
+    assert '[ "$current_base_sha" = "$EVENT_BASE_SHA" ]' in resolve["run"]
+    assert '[ "$current_base_ref" = "$EVENT_BASE_REF" ]' in resolve["run"]
+    assert 'expected="APPROVE TRUST ROOT ${EVENT_HEAD_SHA}"' in resolve["run"]
     assert "gh api --paginate --slurp" in resolve["run"]
     assert '.body == $expected' in resolve["run"]
     assert '.author_association == "OWNER"' in resolve["run"]
     assert "trust_root_approved=true" in resolve["run"]
     assert 'echo "trust_root_approved=$trust_root_approved"' in resolve["run"]
+    assert "head_sha=" not in "\n".join(
+        line.strip() for line in resolve["run"].splitlines()
+        if line.strip().startswith("echo "))
+
+    assert "github.event.issue.pull_request != null" in rerun["if"]
+    assert "github.event.comment.author_association == 'OWNER'" in rerun["if"]
+    assert "startsWith" not in rerun["if"]
+    assert rerun["permissions"] == {
+        "actions": "write",
+        "pull-requests": "read",
+        "statuses": "write",
+    }
+    assert all("uses" not in step for step in rerun["steps"])
+    assert rerun_step["env"]["PR_NUMBER"] == (
+        "${{ github.event.issue.number }}")
+    rerun_command = rerun_step["run"]
+    assert "pulls/${PR_NUMBER}" in rerun_command
+    invalidate = '"repos/${GITHUB_REPOSITORY}/statuses/${head_sha}"'
+    rerun_api = '"repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/rerun"'
+    assert invalidate in rerun_command
+    assert "-f state=failure" in rerun_command
+    assert '-f context="Trusted evidence checks"' in rerun_command
+    assert rerun_command.index(invalidate) < rerun_command.index(rerun_api)
+    assert rerun_step["env"]["RUN_URL"] == (
+        "${{ github.server_url }}/${{ github.repository }}/actions/runs/"
+        "${{ github.run_id }}")
+    assert "event=pull_request_target&status=completed" in rerun_command
+    assert "head_sha=${head_sha}" in rerun_command
+    assert ".number == $pr and .head.sha == $sha" in rerun_command
+    assert 'actions/runs/${run_id}/rerun' in rerun_command
+    assert "actions/checkout" not in str(rerun)
+    assert "candidate" not in rerun_command
+
+
+def test_trusted_validation_does_not_publish_success_for_stale_events():
+    workflow = load_workflow(TRUSTED)
+    validation = workflow["jobs"]["trusted-evidence"]
+    resolve = named_step(validation, "Resolve immutable pull request revisions")
+    publish = named_step(
+        validation, "Publish trusted result on the candidate revision")
+
+    assert "eligible=false" in resolve["run"]
+    assert "steps.resolve.outputs.eligible == 'true'" in publish["if"]
+    assert "steps.resolve.outcome == 'failure'" in publish["if"]
+    assert "steps.resolve.outputs.eligible != 'true'" not in publish["if"]
 
 
 def test_general_validation_runs_once_and_has_a_stable_result_only_gate():

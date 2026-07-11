@@ -173,10 +173,25 @@ def test_gateway_example_is_locked_local_and_cost_guarded():
     assert "AI_GATEWAY_TOKEN" in server and "timingSafeEqual" in server
     assert 'express.json({ limit: "32kb" })' in server
     assert "MAX_REQUESTS_PER_MINUTE = 10" in server
+    assert 'from "express-rate-limit"' in server
+    assert "rateLimit({" in server
+    assert 'requireGatewayAuth(expectedGatewayToken())' in server
+    assert "taskRateLimit" in server
+    assert "createRequestBudget" in server
     assert 'process.env.AI_GATEWAY_HOST || "127.0.0.1"' in server
     assert "ALLOW_REMOTE_AI_GATEWAY" in server
-    assert "app.listen(PORT, HOST" in server
+    assert "app.listen(port, host" in server
     assert '"Authorization": `Bearer ${gatewayToken()}`' in cli
     assert 'http://127.0.0.1:3000' in cli
     assert docs.count("npm ci && npm run build") == 3
     assert "Never expose the example directly to an untrusted network" in docs
+
+    package = json.loads(
+        (GATEWAY_ROOT / "ai-gateway" / "package.json").read_text(
+            encoding="utf-8"))
+    assert package["dependencies"]["express-rate-limit"] == "^8.5.2"
+    assert package["scripts"]["test"] == "node --test dist/server.test.js"
+
+    validation = DEPENDENCY_WORKFLOW.parent.joinpath(
+        "pattern-validation.yml").read_text(encoding="utf-8")
+    assert "npm run test --if-present" in validation

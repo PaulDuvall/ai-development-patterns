@@ -100,6 +100,7 @@ jobs:
             pushd "$directory"
             npm ci --ignore-scripts --no-audit --no-fund
             npm run build
+            npm run test --if-present
             popd
             echo "::endgroup::"
           done

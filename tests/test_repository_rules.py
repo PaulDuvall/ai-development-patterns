@@ -627,6 +627,10 @@ def test_dry_run_reports_safe_summaries_without_credential_names(
     assert f'"secret_count": {len(MODULE.RETIRED_ACTIONS_SECRETS)}' in output
     assert f'"variable_count": {len(MODULE.RETIRED_ACTIONS_VARIABLES)}' in output
     assert all(name not in output for name in MODULE.RETIRED_ACTIONS_SECRETS)
+    assert all(
+        setting not in output
+        for setting in MODULE.SECRET_PROTECTION_PAYLOAD["security_and_analysis"]
+    )
     assert all(name not in output for name in MODULE.RETIRED_ACTIONS_VARIABLES)
     assert '"evidence-paid-research"' in output
     assert '"query_suite": "extended"' in output

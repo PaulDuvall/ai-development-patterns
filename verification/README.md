@@ -103,8 +103,15 @@ APPROVE TRUST ROOT <head-sha>
 ```
 
 The approval is commit-bound: a new push requires a new exact comment. Creating, editing, or
-deleting an owner comment reruns the default branch's trusted workflow, so removing approval cannot
-leave a stale successful result. Candidate workflow code cannot manufacture the approval output.
+deleting an owner comment starts a no-checkout job that finds the completed
+`pull_request_target` run for that exact pull request and current head SHA, then requests its rerun.
+Before requesting the rerun, that job marks `Trusted evidence checks` failed on the current head;
+only a complete trusted validation can restore success. Resolver failures also publish failure, so
+an older success cannot survive an API or validation error.
+The rerun compares the API's current head repository, head SHA, base ref, and base SHA with its
+immutable event payload before validating or honoring the exact owner comment. Removing approval
+therefore cannot leave a stale successful result, and candidate workflow code cannot manufacture
+the approval output.
 
 ```bash
 gh workflow run evidence-validation.yml
