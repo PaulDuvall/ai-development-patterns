@@ -26,14 +26,10 @@ python -c "import yaml, sys; [yaml.safe_load(open(f)) for f in sys.argv[1:]]" \
   pipeline_tests/pipeline_tests.yaml unit_tests/unit_tests.yml
 ```
 
-An illustrative generation step — the `ai` command stands in for your AI assistant; no generator ships with this example:
-
-```bash
-# Illustrative — generate candidate unit tests from the declarative contract
-ai "Using unit_tests/unit_tests.yml as the authoritative contract, generate pytest
-tests for src.auth.service.authenticate_user covering the listed test cases,
-fixtures, and mocks. Treat coverage targets as minimums, not goals to relax."
-```
+No generator ships with this example. To exercise the contract, ask your own configured AI
+assistant to use `unit_tests/unit_tests.yml` as the authoritative contract and generate candidate
+pytest tests for `src.auth.service.authenticate_user`. The request should cover every listed test
+case, fixture, and mock, and treat coverage targets as minimums rather than goals to relax.
 
 Generated tests remain candidates: your runner evaluates them against the gates in `pipeline_tests/pipeline_tests.yaml` and a human reviews them before they join the protected baseline.
 

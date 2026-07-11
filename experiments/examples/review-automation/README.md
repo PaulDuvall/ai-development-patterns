@@ -30,10 +30,11 @@ example.
 Run the script from any location inside a Git repository and supply the exact change boundary:
 
 ```bash
-base_sha=$(git rev-parse HEAD^)
-head_sha=$(git rev-parse HEAD)
+repo_root=$(git rev-parse --show-toplevel)
+base_sha=$(git -C "$repo_root" rev-parse HEAD^)
+head_sha=$(git -C "$repo_root" rev-parse HEAD)
 
-experiments/examples/review-automation/automated-review.sh \
+"$repo_root/experiments/examples/review-automation/automated-review.sh" \
   --base "$base_sha" \
   --head "$head_sha" \
   --output /tmp/review-findings.json

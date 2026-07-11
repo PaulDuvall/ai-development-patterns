@@ -21,7 +21,7 @@ Single-agent workflows are synchronous: one agent, one task, one review. Orchest
 
 An orchestrator would dispatch on workflow type — parallel, sequential, or hybrid — behind a single execution interface:
 
-```python
+```text
 # Illustrative design — not shipped code
 class WorkflowOrchestrator:
     async def execute_workflow(self, spec: WorkflowSpec) -> WorkflowResult:

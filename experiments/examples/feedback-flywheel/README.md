@@ -97,10 +97,11 @@ For each proposed rule:
 2. Draft the rule in our standard format
 3. Add to the appropriate rules file"
 
-# 3. Exercise the rule in a later session and validate the result
-ai "Generate a database migration for adding a 'status' column to orders"
-# Inspect the generated migration; this example assumes no particular result.
 ```
+
+In a later session, exercise the rule by asking your own configured AI assistant to generate a
+database migration that adds a `status` column to `orders`. Inspect and validate the generated
+migration; this example assumes no particular result.
 
 ### Metrics Dashboard
 

@@ -26,7 +26,7 @@ python3 handoff_assessor.py --task "Redesign onboarding user experience" --debug
 
 Verified output for the first command:
 
-```
+```text
 Task Complexity Assessment
 ========================
 Strategy: Ai First
