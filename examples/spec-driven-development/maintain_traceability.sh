@@ -43,7 +43,7 @@ echo "🔍 Checking traceability links..."
 if command -v ./maintain_traceability.sh >/dev/null; then
     ./maintain_traceability.sh --validate-staged
 else
-    examples/ai-driven-traceability/maintain_traceability.sh --validate-staged
+    examples/spec-driven-development/maintain_traceability.sh --validate-staged
 fi
 EOF
     

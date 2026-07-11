@@ -228,10 +228,6 @@ config.local.*
 *.local
 
 # AI Development Specific
-.ai/logs/
-.ai/cache/
-.ai/temp/
-.ai/secrets/
 ai-output/
 generated/
 sandbox/

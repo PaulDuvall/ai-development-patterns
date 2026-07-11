@@ -2954,7 +2954,7 @@ recovery: ./recovery/restore-payment-worker.sh
 approval_required: true
 ```
 
-Execute the steady-state check before and after injection, stream telemetry through [Agent Observability](#agent-observability), and abort deterministically when a guardrail trips. See the existing [chaos scenario examples](examples/baseline-management/chaos/) for hypothesis and recovery templates.
+Execute the steady-state check before and after injection, stream telemetry through [Agent Observability](#agent-observability), and abort deterministically when a guardrail trips. See the [chaos scenario examples](examples/guided-chaos/) for hypothesis and recovery templates.
 
 **Anti-pattern: Random Chaos**
 
