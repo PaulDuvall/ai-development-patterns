@@ -5,7 +5,17 @@ This document defines the standard structure, content requirements, and formatti
 ## Document Structure Requirements
 
 ### Complete Pattern Reference Table
-The main documentation MUST include a comprehensive reference table at the beginning that:
+The main documentation MUST include a comprehensive reference table before the individual pattern
+definitions. The canonical document order is:
+
+1. Introduction and catalog overview
+2. Orientation sections, including the dependency diagram and non-pattern Lens sections
+3. Pattern Dependencies & Implementation Order
+4. Complete Pattern Reference
+5. Pattern definitions grouped by category
+
+The reference table:
+
 - Lists ALL patterns in the collection
 - Includes maturity level, category, type, description, and dependencies for each pattern
 - Provides internal reference links to each pattern using format:
@@ -14,6 +24,13 @@ The main documentation MUST include a comprehensive reference table at the begin
   ```
 - Organizes patterns by category (Foundation → Development → Operations)
 - Uses sub-category headers for Operations patterns (Security & Compliance, Deployment Automation, Monitoring & Maintenance)
+
+### Lens Sections
+
+Lens sections are non-pattern navigational overlays that group or sequence catalog patterns without
+creating another adoptable pattern. They may link to patterns and other lenses. A pattern may point
+to a Lens from a separate `**See also**:` line, but Lens and category links MUST NOT appear in a
+pattern's `**Related Patterns**:` field.
 
 ### Internal Reference Links
 - EVERY pattern mentioned in prose anywhere in the document MUST be hyperlinked to its section
@@ -25,22 +42,33 @@ The main documentation MUST include a comprehensive reference table at the begin
 
 ## Pattern Structure
 
-Each pattern MUST follow this exact structure:
+Each pattern MUST follow this metadata structure. Heading depth is relative to its enclosing category
+or sub-category: stable Foundation and Development patterns use `##`; stable Operations patterns use
+`###` beneath an Operations sub-category; experimental patterns use `###` beneath an experimental
+category.
 
 ### Pattern Header
 ```markdown
-### Pattern Name
+## Pattern Name
 
-**Maturity**: [Beginner|Intermediate|Advanced]  
+**Maturity**: [Beginner|Intermediate|Advanced]<br>
 **Description**: [One-sentence description of what the pattern accomplishes]
 
 **Related Patterns**: [List of hyperlinked related patterns]
+
+**See also**: [Optional links to non-pattern Lenses or supporting guidance]
+
+**Source**: [Optional source attribution]
 ```
+
+Use `### Pattern Name` where the enclosing category or sub-category is an H2 section.
+Use the explicit `<br>` after Maturity so the metadata renders on separate lines without invisible
+trailing whitespace.
 
 ### Required Content Sections
 
 1. **Implementation Section** - Primary examples showing pattern in action (flexible section naming: "Core Implementation", "Assessment Framework", "Workflow Implementation", etc.)
-2. **Anti-pattern** - What NOT to do, with specific example
+2. **Anti-pattern** - What NOT to do, with a specific example under an H4 heading formatted as `#### Anti-pattern: Descriptive Name`
 
 **Note**: Each pattern should focus on the most important implementation approaches without overwhelming detail. Complex patterns may include multiple focused examples if they demonstrate different aspects of the same core concept.
 
@@ -56,8 +84,9 @@ Patterns are organized into three main categories:
 To avoid taxonomy drift, use these metadata fields consistently:
 
 - **Category** (required): `Foundation | Development | Operations`
-- **Type** (required in reference table): `Foundation | Development | Workflow | Operations`
+- **Type** (required in each pattern's reference-table row): `Foundation | Development | Workflow | Operations`
 - **Rule**: Category determines placement in the progression (Foundation -> Development -> Operations). Type describes the pattern's operational nature (for example, process-centric patterns may use `Workflow` as Type while still belonging to a Category section).
+- **Grouping rows**: Category and sub-category grouping rows are navigational, not patterns. Their Type cells remain blank.
 
 ## Content Requirements
 
@@ -108,9 +137,9 @@ All pattern names MUST follow these strict naming conventions:
    - "Use the AI-Guided Blue-Green Deployment pattern to..." ❌ (too long)
    - The pattern name describes a principle, not a tool
 
-#### Antipattern Naming Rules
+#### Anti-pattern Naming Rules
 
-All antipattern names MUST follow these strict conventions:
+All anti-pattern names MUST follow these strict conventions:
 
 1. **Prefix with negative or cautionary modifier**
    - Use: "Broken", "Blind", "Over", "Under", "False"
@@ -131,9 +160,9 @@ All antipattern names MUST follow these strict conventions:
    - Example: "Lazy Testing" is judgmental (avoid)
 
 4. **Symmetrical with positive patterns where logical**
-   - Pattern: "Spec-Driven Development" → Antipattern: "Spec Neglect"
-   - Pattern: "Pipeline Synthesis" → Antipattern: "Manual Pipelines"
-   - Pattern: "Workflow Orchestration" → Antipattern: "Chaotic Orchestration"
+   - Pattern: "Spec-Driven Development" → Anti-pattern: "Spec Neglect"
+   - Pattern: "Pipeline Synthesis" → Anti-pattern: "Manual Pipelines"
+   - Pattern: "Workflow Orchestration" → Anti-pattern: "Chaotic Orchestration"
    - Symmetry helps learners understand the contrast
 
 5. **Technical focus, not judgmental or humorous**
@@ -162,9 +191,9 @@ All antipattern names MUST follow these strict conventions:
 | Rules as Code | 3 words, preposition | Codified Rules |
 | Constraint-Based AI Development | 3 words (hyphen compounds count as one), "AI" redundant | Constrained Generation |
 
-#### Examples of Good Antipattern Names
+#### Examples of Good Anti-pattern Names
 
-| Antipattern Name | Format | Why It Works |
+| Anti-pattern Name | Format | Why It Works |
 |------------------|--------|--------------|
 | Broken Context | Negative + Noun | "Broken" prefix, describes failure mode |
 | Blind Generation | Negative + Noun | "Blind" prefix, technical focus |
@@ -172,9 +201,9 @@ All antipattern names MUST follow these strict conventions:
 | Uncoordinated Agents | Negative + Noun | "Un-" prefix, symmetrical with "Parallel Agents" |
 | Spec Neglect | Noun + failure mode | Symmetrical with "Spec-Driven Development" pattern |
 
-#### Examples of Antipattern Names Violating Rules
+#### Examples of Anti-pattern Names Violating Rules
 
-| Bad Antipattern Name | Violation | Fixed Version |
+| Bad Anti-pattern Name | Violation | Fixed Version |
 |----------------------|-----------|---------------|
 | Rushing Into AI | 3 words, no clear prefix | Premature Adoption |
 | Test Generation Without Strategy | 4 words, no negative prefix | Scattered Testing |
@@ -196,9 +225,9 @@ Before finalizing a pattern name, verify:
 - [ ] Clear, concise, recognizable words
 - [ ] Describes principle or approach, not a tool
 
-#### Validation Checklist for Antipattern Names
+#### Validation Checklist for Anti-pattern Names
 
-Before finalizing an antipattern name, verify:
+Before finalizing an anti-pattern name, verify:
 
 - [ ] Exactly 2 words OR one hyphenated compound
 - [ ] Has negative/cautionary prefix or adjective
@@ -218,9 +247,10 @@ Before finalizing an antipattern name, verify:
 - Avoid implementation details in the description
 
 ### Related Patterns
-- Link to 1-3 most relevant patterns using markdown hyperlinks
+- Link to 1-6 most relevant stable or experimental patterns using markdown hyperlinks, most-relevant first
 - Include patterns this one depends on or builds upon
 - Avoid circular references
+- Put Lens, category, and supporting-guide links in a separate `**See also**:` line
 
 ### Implementation Sections
 - Provide concrete, focused examples that demonstrate the pattern's key concepts
@@ -240,10 +270,10 @@ Before finalizing an antipattern name, verify:
 ### Pattern Length Guidelines
 
 **Recommended maximum lengths (primary metric = words):**
-- **Complete pattern**: 1,200-2,400 words (target), 3,500 words (max before splitting)
-- **Description**: 1-2 sentences
-- **Core implementation**: 700-1,500 words
-- **Individual anti-patterns**: 250-500 words each
+- **Complete pattern**: 150-1,200 words (target), 3,500 words (max before splitting)
+- **Description**: 1 sentence
+- **Core implementation**: approximately 100-900 words
+- **Individual anti-patterns**: approximately 20-150 words each
 - **Code examples in README**: 30-50 lines max
 
 **When a pattern exceeds 3,500 words:**
@@ -253,13 +283,6 @@ Before finalizing an antipattern name, verify:
 4. Remove "nice-to-have" scenarios that don't demonstrate core concepts
 
 **Philosophy**: Patterns should be **scannable in 2-3 minutes**. Readers should grasp the core concept quickly and reference examples/ for deep implementation details.
-
-**Enforcement Strategy**
-
-For AI-generated patterns:
-1. **Auto-warning at 3,000+ words**: "This pattern is getting long. Review for bloat."
-2. **Hard review at 3,500+ words**: "Consider splitting or moving detail to examples/"
-3. **Guidance**: "Each additional 200 words should add significant new value"
 
 **Quality over quantity:**
 - ✅ 1,500 well-focused words > 3,500 words with repetition
@@ -360,9 +383,10 @@ For complex patterns requiring extensive implementation details:
 ### Experiments Directory Structure
 For experimental or future patterns not yet ready for the main documentation:
 
-- Create `experiments/examples/pattern-name/` directory for experimental implementations
-- Each experimental pattern should have its own subdirectory with descriptive naming
-- Include `README.md` in each experimental directory explaining:
+- `experiments/README.md` is the experimental catalog. It has its own reference table and follows the same pattern structure, naming, and formatting rules as the stable catalog.
+- `experiments/NOTES.md` holds pre-pattern ideas that are not yet catalog entries.
+- `experiments/examples/pattern-name/` directories are optional working implementations, not the canonical catalog.
+- When an example directory exists, include a `README.md` explaining:
   - The experimental concept being explored
   - Current implementation status
   - Known limitations or areas for development
@@ -373,7 +397,29 @@ For experimental or future patterns not yet ready for the main documentation:
   - Patterns dependent on emerging tools or techniques
   - Complex multi-pattern integrations being tested
 - Experimental patterns should follow the same code quality standards as main patterns
-- Consider adding experimental patterns to main documentation once they're validated and stable
+- Promote validated patterns to the main catalog and leave a redirect anchor in `experiments/README.md` so existing links remain valid
+
+## Machine Catalog (`patterns.yaml`)
+
+`patterns.yaml` is the machine-readable catalog for stable patterns. Its top-level `version` and
+`base_url` fields describe the schema version and public catalog location; `patterns` contains the
+ordered pattern records. Experimental patterns remain in `experiments/README.md` and are not listed
+in this file.
+
+Each stable record contains:
+
+- `id`: the kebab-case canonical pattern name
+- `name`: the exact two-word Title Case display name
+- `category`: lowercase `foundation | development | operations`, rendered in Title Case in README
+- `maturity`: lowercase `beginner | intermediate | advanced`, rendered in Title Case in README
+- `anchor`: `#` followed by `id`
+- `automatable`: a boolean indicating whether the core mechanism can be automated
+- `description`: the machine-readable one-sentence description
+- `related`: the ordered stable-pattern subset of the README `Related Patterns` links, expressed as IDs
+
+Record order, names, IDs, anchors, categories, and related lists MUST stay synchronized with the
+stable README reference table and pattern sections. Type is presentation metadata stored in the
+README reference-table row; it is not a `patterns.yaml` field.
 
 ## Quality Standards
 
@@ -401,7 +447,7 @@ For experimental or future patterns not yet ready for the main documentation:
 - Avoid circular dependencies between patterns
 
 ### Reference Table Requirements
-- MUST be the first major section after introduction/overview
+- MUST appear after the orientation, Lens, and dependency-order sections and before individual pattern definitions
 - Include maturity level, category, type, and brief description for each pattern
 - List primary dependencies for each pattern
 - Organize by logical grouping (Foundation → Development → Operations)
@@ -435,17 +481,25 @@ Before adding a new pattern, verify:
 
 ```bash
 python3 scripts/validate-pattern-names.py
+python3 -m pytest -m "not slow" -q
+python3 scripts/update-pattern-count.py
+bash scripts/build.sh
 ```
+
+`scripts/pre-commit-patterns.sh` runs the canonical build, which refreshes pattern-count badges and
+regenerates `index.html` and `assets/js/patterns-data.js`.
 
 - [ ] **Pattern name follows strict two-word naming convention**
 - [ ] **Pattern name uses Noun+Noun or Adj+Noun format**
 - [ ] **Pattern name passes "Use the X Y pattern to..." test**
 - [ ] **Pattern name is unique within catalog**
-- [ ] **Antipattern name has negative prefix and follows naming rules**
+- [ ] **Anti-pattern name has negative prefix and follows naming rules**
 - [ ] Follows exact header structure
 - [ ] Has clear, single-sentence description
 - [ ] Includes appropriate maturity level
 - [ ] Includes valid Category and Type metadata
+- [ ] Includes a synchronized `patterns.yaml` record (stable patterns only)
+- [ ] `patterns.yaml` related IDs equal the stable-pattern subset of Related Patterns in README order
 - [ ] Contains focused working examples that demonstrate the core concept
 - [ ] Defines specific anti-pattern with clear explanation
 - [ ] Uses correct markdown formatting

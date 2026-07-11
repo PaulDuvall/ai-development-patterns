@@ -46,7 +46,8 @@ def _write_catalog(
         "|---|---|\n"
         f"| **[{stable_display_name}](#{stable_display_slug})** | Example |\n\n"
         f"{stable_history}"
-        f"## {stable_name}\n",
+        f"## {stable_name}\n\n"
+        "#### Anti-pattern: Broken Context\n",
         encoding="utf-8",
     )
     (root / "experiments" / "README.md").write_text(
@@ -55,7 +56,8 @@ def _write_catalog(
         "| Pattern | Description |\n"
         "|---|---|\n"
         f"| **[{experimental_name}](#{experimental_slug})** | Example |\n\n"
-        f"### {experimental_section}\n",
+        f"### {experimental_section}\n\n"
+        "#### Anti-pattern: False Testing\n",
         encoding="utf-8",
     )
 
@@ -71,6 +73,9 @@ def test_repository_catalog_validates_all_47_active_names():
     assert validator.stable_count == 29
     assert validator.experimental_count == 18
     assert len(validator.patterns_found) == 47
+    assert validator.stable_antipattern_count == 45
+    assert validator.experimental_antipattern_count == 24
+    assert len(validator.antipatterns_found) == 69
     assert not validator.errors
 
 
@@ -116,6 +121,39 @@ def test_invalid_active_names_are_rejected(name, expected_error):
     validator = PatternValidator()
 
     assert not validator.validate_pattern_name(name)
+    assert expected_error in _error_types(validator)
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "Opaque Runs",
+        "False Consensus",
+        "Over-Alerting",
+        "Spec-Ignored",
+    ],
+)
+def test_valid_antipattern_names_are_accepted(name):
+    validator = PatternValidator()
+
+    assert validator.validate_antipattern_name(name)
+    assert not validator.errors
+
+
+@pytest.mark.parametrize(
+    ("name", "expected_error"),
+    [
+        ("Opaque Agent Runs", "Anti-pattern Word Count"),
+        ("Voting Theater", "Cautionary Modifier"),
+        ("Opaque runs", "Anti-pattern Title Case"),
+        ("Opaque", "Anti-pattern Word Count"),
+        ("", "Anti-pattern Word Count"),
+    ],
+)
+def test_invalid_antipattern_names_are_rejected(name, expected_error):
+    validator = PatternValidator()
+
+    assert not validator.validate_antipattern_name(name)
     assert expected_error in _error_types(validator)
 
 
@@ -240,6 +278,41 @@ def test_fenced_reference_heading_cannot_shadow_real_catalog(tmp_path):
             "|---|---|\n"
             "| **[Shadow Pattern](#shadow-pattern)** | Not active |\n"
             "```\n\n",
+        ),
+        encoding="utf-8",
+    )
+    validator = PatternValidator()
+
+    assert validator.validate_active_catalogs(tmp_path)
+    assert not validator.errors
+
+
+def test_antipattern_labels_must_use_h4_markup(tmp_path):
+    _write_catalog(tmp_path)
+    readme = (tmp_path / "README.md").read_text(encoding="utf-8")
+    (tmp_path / "README.md").write_text(
+        readme.replace(
+            "#### Anti-pattern: Broken Context\n",
+            "**Anti-pattern: Broken Context**\n",
+        ),
+        encoding="utf-8",
+    )
+    validator = PatternValidator()
+
+    assert not validator.validate_active_catalogs(tmp_path)
+    assert "Anti-pattern Markup" in _error_types(validator)
+
+
+def test_fenced_antipattern_labels_are_not_canonical(tmp_path):
+    _write_catalog(tmp_path)
+    readme = (tmp_path / "README.md").read_text(encoding="utf-8")
+    (tmp_path / "README.md").write_text(
+        readme.replace(
+            "# Catalog\n\n",
+            "# Catalog\n\n"
+            "```markdown\n"
+            "#### Anti-pattern: Voting Theater\n"
+            "````\n\n",
         ),
         encoding="utf-8",
     )

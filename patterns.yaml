@@ -20,7 +20,7 @@ patterns:
     automatable: true
     description: >
       Version and maintain AI coding standards as explicit configuration files.
-    related: [agent-readiness, security-sandbox, agent-memory, progressive-disclosure, agent-hooks, guided-refactoring]
+    related: [agent-readiness, agent-memory, progressive-disclosure, agent-hooks, custom-commands, centralized-rules]
 
   - id: security-sandbox
     name: Security Sandbox
@@ -30,7 +30,7 @@ patterns:
     automatable: true
     description: >
       Run AI tools in isolated environments without access to secrets or sensitive data.
-    related: [codified-rules, policy-generation, agent-hooks, bounded-autonomy]
+    related: [policy-generation, codified-rules, agent-hooks]
 
   - id: developer-lifecycle
     name: Developer Lifecycle

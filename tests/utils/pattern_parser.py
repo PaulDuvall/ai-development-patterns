@@ -220,7 +220,9 @@ class PatternParser:
         """Extract value from a field line (e.g., **Maturity**: Beginner)"""
         pattern = f'\\*\\*{field_name}\\*\\*:\\s*(.+)'
         match = re.search(pattern, line)
-        return match.group(1).strip() if match else ""
+        if not match:
+            return ""
+        return re.sub(r'<br\s*/?>$', '', match.group(1).strip()).strip()
     
     def _extract_related_patterns(self, text: str) -> list[str]:
         """Extract pattern names from related patterns text (only internal references)"""

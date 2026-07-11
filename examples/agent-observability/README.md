@@ -132,6 +132,6 @@ The bundle contains a cost/latency summary, failed span IDs, ordered model/tool/
 python -m pytest tests -q
 ```
 
-## Anti-pattern: Opaque Agent Runs
+## Anti-pattern: Opaque Runs
 
 A transcript alone is not an operational trace. Without span relationships, model and tool metadata, costs, handoffs, evaluation identity, and source-linked failures, reviewers cannot reconstruct what acted, what it touched, why it stopped, or whether the producer certified itself.

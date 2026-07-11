@@ -6,31 +6,31 @@ adoption evidence mature.
 
 ## Experimental Pattern Reference
 
-| Pattern | Maturity | Type | Description | Dependencies | Category |
+| Pattern | Maturity | Category | Type | Description | Dependencies |
 |---|---|---|---|---|---|
 | **Foundation** |  |  |  |  |  |
-| **[Handoff Protocols](#handoff-protocols)** | Intermediate | Foundation | Define how delegated work returns for review, approval, correction, or human takeover | [Developer Lifecycle](../README.md#developer-lifecycle) | Foundation |
+| **[Handoff Protocols](#handoff-protocols)** | Intermediate | Foundation | Foundation | Define how delegated work returns for review, approval, correction, or human takeover | [Developer Lifecycle](../README.md#developer-lifecycle) |
 | **Development** |  |  |  |  |  |
-| **[Testing Orchestration](#testing-orchestration)** | Intermediate | Workflow | Coordinate AI-assisted test generation, execution, and quality gates without weakening behavioral contracts | [Spec-Driven Development](../README.md#spec-driven-development) | Development |
-| **[Workflow Orchestration](#workflow-orchestration)** | Advanced | Workflow | Coordinate stateful sequential, parallel, and human-in-the-loop agent workflows | [Atomic Decomposition](../README.md#atomic-decomposition), [Tool Integration](../README.md#tool-integration) | Development |
-| **[Review Automation](#review-automation)** | Intermediate | Workflow | Apply AI-assisted pull-request and code review while deterministic checks remain authoritative | [Adversarial Evaluator](../README.md#adversarial-evaluator) | Development |
-| **[Test Promotion](#test-promotion)** | Intermediate | Development | Keep AI-generated candidate tests separate from human-approved behavioral baselines | [Testing Orchestration](#testing-orchestration), [Spec-Driven Development](../README.md#spec-driven-development) | Development |
-| **[Feedback Flywheel](#feedback-flywheel)** | Intermediate | Development | Turn recurring agent-session corrections into durable rules, skills, and commands | [Codified Rules](../README.md#codified-rules), [Agent Memory](../README.md#agent-memory) | Development |
-| **[Long-Running Orchestration](#long-running-orchestration)** | Advanced | Workflow | Maintain coherent state and checkpoints while agents work for hours or days | [Agent Memory](../README.md#agent-memory), [Bounded Autonomy](../README.md#bounded-autonomy) | Development |
-| **[Guided Architecture](#guided-architecture)** | Intermediate | Development | Apply explicit architecture frameworks and decision records during AI-assisted design | [Developer Lifecycle](../README.md#developer-lifecycle), [Codified Rules](../README.md#codified-rules) | Development |
-| **[Autonomous Remediation](#autonomous-remediation)** | Intermediate | Workflow | Pair deterministic detectors with bounded LLM repair loops | [Codified Rules](../README.md#codified-rules), [Bounded Autonomy](../README.md#bounded-autonomy) | Development |
+| **[Testing Orchestration](#testing-orchestration)** | Intermediate | Development | Workflow | Coordinate AI-assisted test generation, execution, and quality gates without weakening behavioral contracts | [Spec-Driven Development](../README.md#spec-driven-development) |
+| **[Workflow Orchestration](#workflow-orchestration)** | Advanced | Development | Workflow | Coordinate stateful sequential, parallel, and human-in-the-loop agent workflows | [Atomic Decomposition](../README.md#atomic-decomposition), [Tool Integration](../README.md#tool-integration) |
+| **[Review Automation](#review-automation)** | Intermediate | Development | Workflow | Apply AI-assisted pull-request and code review while deterministic checks remain authoritative | [Adversarial Evaluator](../README.md#adversarial-evaluator) |
+| **[Test Promotion](#test-promotion)** | Intermediate | Development | Development | Keep AI-generated candidate tests separate from human-approved behavioral baselines | [Testing Orchestration](#testing-orchestration), [Spec-Driven Development](../README.md#spec-driven-development) |
+| **[Feedback Flywheel](#feedback-flywheel)** | Intermediate | Development | Development | Turn recurring agent-session corrections into durable rules, skills, and commands | [Codified Rules](../README.md#codified-rules), [Agent Memory](../README.md#agent-memory) |
+| **[Long-Running Orchestration](#long-running-orchestration)** | Advanced | Development | Workflow | Maintain coherent state and checkpoints while agents work for hours or days | [Agent Memory](../README.md#agent-memory), [Bounded Autonomy](../README.md#bounded-autonomy) |
+| **[Guided Architecture](#guided-architecture)** | Intermediate | Development | Development | Apply explicit architecture frameworks and decision records during AI-assisted design | [Developer Lifecycle](../README.md#developer-lifecycle), [Codified Rules](../README.md#codified-rules) |
+| **[Autonomous Remediation](#autonomous-remediation)** | Intermediate | Development | Workflow | Pair deterministic detectors with bounded LLM repair loops | [Codified Rules](../README.md#codified-rules), [Bounded Autonomy](../README.md#bounded-autonomy) |
 | **Operations — Security & Compliance** |  |  |  |  |  |
-| **[ChatOps Security](#chatops-security)** | Beginner | Operations | Expose governed security checks through team chat commands | [Security Orchestration](#security-orchestration) | Operations |
-| **[Autonomous SOC](#autonomous-soc)** | Advanced | Operations | Use agents to investigate, triage, and respond to SOC alerts with policy-bounded escalation | [Security Orchestration](#security-orchestration), [Security Sandbox](../README.md#security-sandbox) | Operations |
-| **[Security Orchestration](#security-orchestration)** | Intermediate | Operations | Aggregate security tools and summarize findings into prioritized actions | [Tool Integration](../README.md#tool-integration), [Policy Generation](../README.md#policy-generation) | Operations |
+| **[ChatOps Security](#chatops-security)** | Beginner | Operations | Operations | Expose governed security checks through team chat commands | [Security Orchestration](#security-orchestration) |
+| **[Autonomous SOC](#autonomous-soc)** | Advanced | Operations | Operations | Use agents to investigate, triage, and respond to SOC alerts with policy-bounded escalation | [Security Orchestration](#security-orchestration), [Security Sandbox](../README.md#security-sandbox) |
+| **[Security Orchestration](#security-orchestration)** | Intermediate | Operations | Operations | Aggregate security tools and summarize findings into prioritized actions | [Tool Integration](../README.md#tool-integration), [Policy Generation](../README.md#policy-generation) |
 | **Operations — Deployment Automation** |  |  |  |  |  |
-| **[Autonomous Acceptance](#autonomous-acceptance)** | Advanced | Operations | Evaluate changes against separately owned executable acceptance policies and signed evidence | [Review Automation](#review-automation), [Test Promotion](#test-promotion) | Operations |
-| **[Pipeline Synthesis](#pipeline-synthesis)** | Intermediate | Workflow | Generate validated CI/CD pipelines from plain-language requirements, including deployment strategies | [Workflow Orchestration](#workflow-orchestration), [Tool Integration](../README.md#tool-integration) | Operations |
-| **[Dependency Migration](#dependency-migration)** | Intermediate | Operations | Have an agent analyze changelogs, compatibility, code edits, and validation for dependency migrations | [Autonomous Remediation](#autonomous-remediation), [Pipeline Synthesis](#pipeline-synthesis) | Operations |
+| **[Autonomous Acceptance](#autonomous-acceptance)** | Advanced | Operations | Operations | Evaluate changes against separately owned executable acceptance policies and signed evidence | [Review Automation](#review-automation), [Test Promotion](#test-promotion) |
+| **[Pipeline Synthesis](#pipeline-synthesis)** | Intermediate | Operations | Workflow | Generate validated CI/CD pipelines from plain-language requirements, including deployment strategies | [Workflow Orchestration](#workflow-orchestration), [Tool Integration](../README.md#tool-integration) |
+| **[Dependency Migration](#dependency-migration)** | Intermediate | Operations | Operations | Have an agent analyze changelogs, compatibility, code edits, and validation for dependency migrations | [Autonomous Remediation](#autonomous-remediation), [Pipeline Synthesis](#pipeline-synthesis) |
 | **Operations — Monitoring & Maintenance** |  |  |  |  |  |
-| **[Incident Automation](#incident-automation)** | Advanced | Operations | Derive and execute incident-response workflows from telemetry and incident history | [Agent Observability](../README.md#agent-observability) | Operations |
-| **[Flake Management](#flake-management)** | Intermediate | Operations | Detect, classify, quarantine, and suppress flaky tests from build history | [Testing Orchestration](#testing-orchestration) | Operations |
-| **[On-Call Handoff](#on-call-handoff)** | Intermediate | Operations | Generate structured on-call briefs from active incidents, alerts, deployments, and responder context | [Incident Automation](#incident-automation), [Handoff Protocols](#handoff-protocols) | Operations |
+| **[Incident Automation](#incident-automation)** | Advanced | Operations | Operations | Derive and execute incident-response workflows from telemetry and incident history | [Agent Observability](../README.md#agent-observability) |
+| **[Flake Management](#flake-management)** | Intermediate | Operations | Operations | Detect, classify, quarantine, and suppress flaky tests from build history | [Testing Orchestration](#testing-orchestration) |
+| **[On-Call Handoff](#on-call-handoff)** | Intermediate | Operations | Operations | Generate structured on-call briefs from active incidents, alerts, deployments, and responder context | [Incident Automation](#incident-automation), [Handoff Protocols](#handoff-protocols) |
 
 Early ideas that are not yet catalog patterns remain in [NOTES.md](NOTES.md).
 
@@ -64,7 +64,7 @@ the main catalog. These notices are redirects, not experimental catalog entries.
 
 ### Handoff Protocols
 
-**Maturity**: Intermediate
+**Maturity**: Intermediate<br>
 **Description**: Define how delegated work returns from an agent for review, approval, correction, escalation, or human takeover.
 
 **Related Patterns**: [Developer Lifecycle](../README.md#developer-lifecycle), [Workflow Orchestration](#workflow-orchestration), [Long-Running Orchestration](#long-running-orchestration)
@@ -103,7 +103,7 @@ work, hidden conflicts, and ambiguous approval authority.
 
 ### Testing Orchestration
 
-**Maturity**: Intermediate
+**Maturity**: Intermediate<br>
 **Description**: Coordinate AI-assisted test generation, execution, and quality gates without allowing generated tests to redefine expected behavior.
 
 **Related Patterns**: [Spec-Driven Development](../README.md#spec-driven-development), [Test Promotion](#test-promotion), [Flake Management](#flake-management)
@@ -134,7 +134,7 @@ duplicated coverage and false confidence.
 
 ### Workflow Orchestration
 
-**Maturity**: Advanced
+**Maturity**: Advanced<br>
 **Description**: Coordinate stateful sequential, parallel, and human-in-the-loop agent workflows through explicit contracts and synchronization points.
 
 **Related Patterns**: [Atomic Decomposition](../README.md#atomic-decomposition), [Parallel Agents](../README.md#parallel-agents), [Handoff Protocols](#handoff-protocols)
@@ -176,7 +176,7 @@ individually follows its instructions.
 
 ### Review Automation
 
-**Maturity**: Intermediate
+**Maturity**: Intermediate<br>
 **Description**: Apply AI-assisted pull-request and code review while deterministic checks and human-owned merge policy remain authoritative.
 
 **Related Patterns**: [Adversarial Evaluator](../README.md#adversarial-evaluator), [Workflow Orchestration](#workflow-orchestration), [Autonomous Acceptance](#autonomous-acceptance)
@@ -211,7 +211,7 @@ quality gate and hides missed defects behind a green status.
 
 ### Test Promotion
 
-**Maturity**: Intermediate
+**Maturity**: Intermediate<br>
 **Description**: Keep AI-generated candidate tests separate from human-approved behavioral baselines and promote them only through protected review.
 
 **Related Patterns**: [Testing Orchestration](#testing-orchestration), [Spec-Driven Development](../README.md#spec-driven-development), [Autonomous Acceptance](#autonomous-acceptance)
@@ -243,7 +243,7 @@ through another tool.
 
 ### Feedback Flywheel
 
-**Maturity**: Intermediate
+**Maturity**: Intermediate<br>
 **Description**: Turn recurring agent-session corrections into reviewed updates to durable rules, skills, prompts, and commands.
 
 **Related Patterns**: [Codified Rules](../README.md#codified-rules), [Agent Memory](../README.md#agent-memory), [Progressive Disclosure](../README.md#progressive-disclosure)
@@ -274,7 +274,7 @@ and makes every agent rediscover the same rule.
 
 ### Long-Running Orchestration
 
-**Maturity**: Advanced
+**Maturity**: Advanced<br>
 **Description**: Maintain coherent state, recovery points, and strategic checkpoints while agents work autonomously for hours or days.
 
 **Related Patterns**: [Agent Memory](../README.md#agent-memory), [Workflow Orchestration](#workflow-orchestration), [Bounded Autonomy](../README.md#bounded-autonomy)
@@ -321,7 +321,7 @@ survive compaction, restart, or provider failure.
 
 ### Guided Architecture
 
-**Maturity**: Intermediate
+**Maturity**: Intermediate<br>
 **Description**: Apply explicit architecture frameworks and decision records during AI-assisted design so generated systems remain coherent and reviewable.
 
 **Related Patterns**: [Developer Lifecycle](../README.md#developer-lifecycle), [Codified Rules](../README.md#codified-rules), [Planned Implementation](../README.md#planned-implementation)
@@ -351,7 +351,7 @@ that govern the system.
 
 ### Autonomous Remediation
 
-**Maturity**: Intermediate
+**Maturity**: Intermediate<br>
 **Description**: Pair deterministic rule-based detectors with bounded LLM repair loops so mechanical violations are fixed and rechecked immediately.
 
 **Related Patterns**: [Codified Rules](../README.md#codified-rules), [Guided Refactoring](../README.md#guided-refactoring), [Bounded Autonomy](../README.md#bounded-autonomy)
@@ -397,7 +397,7 @@ chance of convergence.
 
 ### ChatOps Security
 
-**Maturity**: Beginner
+**Maturity**: Beginner<br>
 **Description**: Expose governed security checks through team chat commands so developers can request immediate, attributable feedback.
 
 **Related Patterns**: [Security Orchestration](#security-orchestration), [Tool Integration](../README.md#tool-integration), [Handoff Protocols](#handoff-protocols)
@@ -428,7 +428,7 @@ encourages developers to merge before security results exist.
 <a id="autonomous-defense"></a>
 ### Autonomous SOC
 
-**Maturity**: Advanced
+**Maturity**: Advanced<br>
 **Description**: Use policy-bounded agents to investigate, enrich, triage, and respond to SOC alerts at machine speed while escalating sensitive actions.
 
 **Related Patterns**: [Security Orchestration](#security-orchestration), [Incident Automation](#incident-automation), [Security Sandbox](../README.md#security-sandbox)
@@ -467,7 +467,7 @@ false positive into an outage or security incident.
 
 ### Security Orchestration
 
-**Maturity**: Intermediate
+**Maturity**: Intermediate<br>
 **Description**: Aggregate multiple security tools and use AI to deduplicate, prioritize, and summarize findings into actionable review output.
 
 **Related Patterns**: [Tool Integration](../README.md#tool-integration), [Policy Generation](../README.md#policy-generation), [ChatOps Security](#chatops-security)
@@ -500,7 +500,7 @@ teaches developers to ignore the channel.
 
 ### Autonomous Acceptance
 
-**Maturity**: Advanced
+**Maturity**: Advanced<br>
 **Description**: Evaluate agent-authored changes against a separately owned executable acceptance policy and emit commit-bound signed evidence before release.
 
 **Related Patterns**: [Review Automation](#review-automation), [Test Promotion](#test-promotion), [Bounded Autonomy](../README.md#bounded-autonomy)
@@ -541,7 +541,7 @@ its own blind spots without reproducible evidence or separation of duties.
 <a id="deployment-synthesis"></a>
 ### Pipeline Synthesis
 
-**Maturity**: Intermediate
+**Maturity**: Intermediate<br>
 **Description**: Generate validated CI/CD pipeline configuration from plain-language requirements, including explicit build, deployment, rollback, and release constraints.
 
 **Related Patterns**: [Workflow Orchestration](#workflow-orchestration), [Tool Integration](../README.md#tool-integration), [Autonomous Acceptance](#autonomous-acceptance)
@@ -586,7 +586,7 @@ different from the stated requirement.
 
 ### Dependency Migration
 
-**Maturity**: Intermediate
+**Maturity**: Intermediate<br>
 **Description**: Have an agent analyze changelogs and compatibility, update dependent code, and validate a staged dependency migration.
 
 **Related Patterns**: [Autonomous Remediation](#autonomous-remediation), [Pipeline Synthesis](#pipeline-synthesis), [Code Research](../README.md#code-research)
@@ -632,7 +632,7 @@ evidence or rollback makes failures difficult to attribute and recover.
 
 ### Incident Automation
 
-**Maturity**: Advanced
+**Maturity**: Advanced<br>
 **Description**: Derive and execute governed incident-response workflows from telemetry, current system state, and historical incidents.
 
 **Related Patterns**: [Agent Observability](../README.md#agent-observability), [On-Call Handoff](#on-call-handoff), [Autonomous SOC](#autonomous-soc)
@@ -664,7 +664,7 @@ repeat obsolete or unsafe steps during an incident.
 <a id="suite-health"></a>
 ### Flake Management
 
-**Maturity**: Intermediate
+**Maturity**: Intermediate<br>
 **Description**: Detect, classify, quarantine, and suppress flaky tests from build history without silently treating real failures as noise.
 
 **Related Patterns**: [Testing Orchestration](#testing-orchestration), [Autonomous Remediation](#autonomous-remediation), [Agent Observability](../README.md#agent-observability)
@@ -697,7 +697,7 @@ dismissed as noise.
 <a id="handoff-automation"></a>
 ### On-Call Handoff
 
-**Maturity**: Intermediate
+**Maturity**: Intermediate<br>
 **Description**: Generate structured on-call briefs from active incidents, alerts, deployments, responder context, and explicit escalation needs.
 
 **Related Patterns**: [Incident Automation](#incident-automation), [Handoff Protocols](#handoff-protocols), [Agent Observability](../README.md#agent-observability)
