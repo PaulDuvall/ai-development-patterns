@@ -2,8 +2,8 @@ services:
   # Agent 1: Frontend Development
   agent-frontend:
     build:
-      context: ./docker
-      dockerfile: Dockerfile.ai-agent
+      context: .
+      dockerfile: docker/Dockerfile.ai-agent
     container_name: agent-frontend
     volumes:
       - ./workspace/frontend:/workspace:rw
@@ -21,8 +21,8 @@ services:
   # Agent 2: Backend API Development
   agent-backend:
     build:
-      context: ./docker
-      dockerfile: Dockerfile.ai-agent
+      context: .
+      dockerfile: docker/Dockerfile.ai-agent
     container_name: agent-backend
     volumes:
       - ./workspace/backend:/workspace:rw
@@ -40,8 +40,8 @@ services:
   # Agent 3: Database Schema Design
   agent-database:
     build:
-      context: ./docker
-      dockerfile: Dockerfile.ai-agent
+      context: .
+      dockerfile: docker/Dockerfile.ai-agent
     container_name: agent-database
     volumes:
       - ./workspace/database:/workspace:rw
@@ -59,8 +59,8 @@ services:
   # Agent 4: Test Generation
   agent-tests:
     build:
-      context: ./docker
-      dockerfile: Dockerfile.ai-agent
+      context: .
+      dockerfile: docker/Dockerfile.ai-agent
     container_name: agent-tests
     volumes:
       - ./workspace/tests:/workspace:rw
@@ -83,8 +83,8 @@ services:
   # Coordinator service to monitor progress
   coordinator:
     build:
-      context: ./docker
-      dockerfile: Dockerfile.ai-agent
+      context: .
+      dockerfile: docker/Dockerfile.ai-agent
     container_name: agent-coordinator
     volumes:
       - ./shared-memory:/shared:rw

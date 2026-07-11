@@ -11,10 +11,14 @@ import yaml
 ROOT = Path(__file__).parent.parent
 DEPENDABOT = ROOT / ".github" / "dependabot.yml"
 DEPENDENCY_WORKFLOW = ROOT / ".github" / "workflows" / "dependency-security.yml"
+PATTERN_VALIDATION_WORKFLOW = (
+    ROOT / ".github" / "workflows" / "pattern-validation.yml")
 PROJECT = ROOT / "pyproject.toml"
 TEST_REQUIREMENTS = ROOT / "tests" / "requirements.txt"
 GATEWAY_ROOT = (
     ROOT / "examples" / "centralized-rules" / "gateway-strategy")
+PARALLEL_AGENT_ROOT = ROOT / "examples" / "parallel-agents"
+SECURITY_SANDBOX_ROOT = ROOT / "examples" / "security-sandbox"
 
 PYTHON_DIRECTORIES = {
     "/",
@@ -96,6 +100,99 @@ def test_dependabot_groups_compatible_updates_without_grouping_majors():
     actions = dependabot_update("github-actions")["groups"]
     assert set(actions["actions-minor-patch"]["update-types"]) == {
         "minor", "patch"}
+
+
+def test_docker_examples_use_current_supported_python_base_families():
+    """Interpreter updates must not retain a near-EOL Debian base."""
+    parallel = (
+        PARALLEL_AGENT_ROOT / "docker" / "Dockerfile.ai-agent"
+    ).read_text(encoding="utf-8")
+    sandbox = (
+        SECURITY_SANDBOX_ROOT / "Dockerfile.ai-sandbox"
+    ).read_text(encoding="utf-8")
+
+    assert re.search(r"^FROM python:3\.14-slim$", parallel, re.MULTILINE)
+    assert re.search(
+        r"^FROM python:3\.13-slim-bookworm$", sandbox, re.MULTILINE)
+    assert "bullseye" not in parallel.casefold()
+    assert "bullseye" not in sandbox.casefold()
+
+
+def test_parallel_agent_build_context_contains_every_copied_path():
+    """Compose and the Dockerfile must agree on the example-root context."""
+    compose = yaml.safe_load(
+        (PARALLEL_AGENT_ROOT / "docker-compose.parallel-agents.yml").read_text(
+            encoding="utf-8"))
+    builds = {
+        (service["build"]["context"], service["build"]["dockerfile"])
+        for service in compose["services"].values()
+    }
+    assert builds == {(".", "docker/Dockerfile.ai-agent")}
+
+    dockerfile = (
+        PARALLEL_AGENT_ROOT / "docker" / "Dockerfile.ai-agent"
+    ).read_text(encoding="utf-8")
+    assert "COPY docker/requirements.txt /tmp/requirements.txt" in dockerfile
+    assert "COPY scripts/ /scripts/" in dockerfile
+    assert (PARALLEL_AGENT_ROOT / "docker" / "requirements.txt").is_file()
+    assert (PARALLEL_AGENT_ROOT / "scripts").is_dir()
+    assert (
+        PARALLEL_AGENT_ROOT / ".dockerignore"
+    ).read_text(encoding="utf-8").splitlines() == [
+        "**",
+        "!docker/",
+        "!docker/Dockerfile.ai-agent",
+        "!docker/requirements.txt",
+        "!scripts/",
+        "!scripts/*.py",
+    ]
+
+
+def test_parallel_agent_documentation_matches_the_build_and_orders_it_safely():
+    """The tutorial must generate copied scripts before building the image."""
+    docs = (PARALLEL_AGENT_ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert docs.count("FROM python:3.14-slim") == 1
+    assert "FROM python:3.11" not in docs
+    assert docs.count("setup_20.x") == 1
+    assert "setup_18.x" not in docs
+    assert "COPY docker/requirements.txt /tmp/requirements.txt" in docs
+    assert "`.env`, workspaces, shared memory, and reports never enter" in docs
+    build = (
+        "docker build --pull --tag ai-agent:latest \\\n"
+        "  --file docker/Dockerfile.ai-agent ."
+    )
+    assert docs.count(build) == 1
+    assert docs.index(build) > docs.index("cat > scripts/agent_runner.py")
+    assert docs.index(build) > docs.index("cat > scripts/coordinator.py")
+
+
+def test_deterministic_validation_builds_both_docker_examples():
+    """CI must exercise the exact Dockerfiles and contexts Dependabot updates."""
+    workflow = yaml.load(
+        PATTERN_VALIDATION_WORKFLOW.read_text(encoding="utf-8"),
+        Loader=yaml.BaseLoader,
+    )
+    steps = workflow["jobs"]["deterministic-validation"]["steps"]
+    step = next(
+        item for item in steps
+        if item.get("name") == "Build maintained Docker examples")
+    run = step["run"]
+
+    assert step["env"] == {"DOCKER_BUILDKIT": "1"}
+    assert run.count("docker build --pull") == 2
+    assert (
+        "docker build --pull \\\n"
+        "  --tag ai-development-patterns/parallel-agent:ci \\\n"
+        "  --file examples/parallel-agents/docker/Dockerfile.ai-agent \\\n"
+        "  examples/parallel-agents"
+    ) in run
+    assert (
+        "docker build --pull \\\n"
+        "  --tag ai-development-patterns/security-sandbox:ci \\\n"
+        "  --file examples/security-sandbox/Dockerfile.ai-sandbox \\\n"
+        "  examples/security-sandbox"
+    ) in run
 
 
 def test_node_example_manifests_have_consistent_lockfiles():

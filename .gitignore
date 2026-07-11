@@ -122,7 +122,6 @@ target/
 Cargo.lock
 
 # Docker
-.dockerignore
 *.dockerfile
 
 # Kubernetes

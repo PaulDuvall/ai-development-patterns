@@ -105,6 +105,20 @@ jobs:
             echo "::endgroup::"
           done
 
+      - name: Build maintained Docker examples
+        env:
+          DOCKER_BUILDKIT: "1"
+        run: |
+          set -euo pipefail
+          docker build --pull \
+            --tag ai-development-patterns/parallel-agent:ci \
+            --file examples/parallel-agents/docker/Dockerfile.ai-agent \
+            examples/parallel-agents
+          docker build --pull \
+            --tag ai-development-patterns/security-sandbox:ci \
+            --file examples/security-sandbox/Dockerfile.ai-sandbox \
+            examples/security-sandbox
+
       - name: Run deterministic repository tests once
         id: tests
         continue-on-error: true

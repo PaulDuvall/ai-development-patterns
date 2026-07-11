@@ -59,14 +59,14 @@ cp .env.example .env
 # Edit .env with your AI API keys
 ```
 
-### 2. Build the AI Agent Container
+### 2. Define the AI Agent Container
 
 First, create the Dockerfile for the AI agents:
 
 ```bash
 # Create the Dockerfile
 cat > docker/Dockerfile.ai-agent <<'EOF'
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -76,14 +76,14 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js for JavaScript/TypeScript support
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs
 
 # Create working directory
 WORKDIR /workspace
 
 # Install Python dependencies
-COPY requirements.txt /tmp/
+COPY docker/requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
 # Copy scripts
@@ -109,9 +109,6 @@ click>=8.0.0
 watchdog>=3.0.0
 aiofiles>=23.0.0
 EOF
-
-# Build the image
-docker build -t ai-agent:latest docker/
 ```
 
 ### 3. Create Agent Runner Script
@@ -426,7 +423,19 @@ EOF
 chmod +x scripts/coordinator.py
 ```
 
-### 5. Run the Parallel Agents
+### 5. Build the AI Agent Container
+
+Build only after creating both scripts so the image contains the runner and coordinator. The
+example directory—not `docker/`—is the build context because the Dockerfile copies both
+`docker/requirements.txt` and `scripts/`. The committed `.dockerignore` admits only those build
+inputs, so `.env`, workspaces, shared memory, and reports never enter the Docker context:
+
+```bash
+docker build --pull --tag ai-agent:latest \
+  --file docker/Dockerfile.ai-agent .
+```
+
+### 6. Run the Parallel Agents
 
 #### Using Docker Compose (Recommended)
 
@@ -462,7 +471,7 @@ cd ../agent-tests && ai-agent --task test-suite
 EOF
 ```
 
-### 6. Merge Parallel Work
+### 7. Merge Parallel Work
 
 After agents complete their tasks:
 
