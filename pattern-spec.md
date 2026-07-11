@@ -95,11 +95,11 @@ All pattern names MUST follow these strict naming conventions:
 6. **Unique within catalog**
    - No duplicate pattern names
    - Reuse root words ONLY for related sub-patterns
-   - Example: "Security Sandbox" and "Security Orchestration" share "Security" because they're related
+   - Example: "Agent Memory" and "Agent Hooks" share "Agent" because they're related
 
 7. **Parallel structure across related pattern sets**
-   - Synthesis family: "Pipeline Synthesis", "Deployment Synthesis", "Release Synthesis"
-   - Automation family: "Event Automation", "Review Automation", "Evidence Automation"
+   - Agent family: "Agent Memory", "Agent Hooks", "Agent Observability"
+   - Automation family: "Review Automation", "Evidence Automation"
    - Consistent naming helps users understand pattern relationships
 
 8. **Test: "Use the X Y pattern to..." must sound natural**
@@ -149,7 +149,7 @@ All antipattern names MUST follow these strict conventions:
 | Agent Memory | Noun + Noun | Technical term + clear benefit |
 | Guided Refactoring | Adj + Noun | Implies AI assistance in refactoring |
 | Error Resolution | Noun + Noun | Simple, clear problem-solving pattern |
-| Deployment Synthesis | Noun + Noun | Parallels "Pipeline Synthesis", clear meaning |
+| Model Routing | Noun + Noun | Clear mechanism and cost/quality purpose |
 
 #### Examples of Pattern Names Violating Rules
 
@@ -157,7 +157,7 @@ All antipattern names MUST follow these strict conventions:
 |------------------|-----------|---------------|
 | AI Readiness Assessment | 3 words, "AI" redundant | Agent Readiness |
 | Comprehensive AI Testing Strategy | 4 words, vague | Testing Orchestration |
-| AI-Guided Blue-Green Deployment | 3 words (hyphen compounds count as one), too specific | Deployment Synthesis |
+| AI-Guided Chaos Engineering | 3 words (hyphen compounds count as one), "AI" redundant | Guided Chaos |
 | Rules as Code | 3 words, preposition | Codified Rules |
 | Constraint-Based AI Development | 3 words (hyphen compounds count as one), "AI" redundant | Constrained Generation |
 
@@ -431,6 +431,10 @@ For experimental or future patterns not yet ready for the main documentation:
 ## Validation Checklist
 
 Before adding a new pattern, verify:
+
+```bash
+python3 scripts/validate-pattern-names.py
+```
 
 - [ ] **Pattern name follows strict two-word naming convention**
 - [ ] **Pattern name uses Noun+Noun or Adj+Noun format**

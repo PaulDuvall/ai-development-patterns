@@ -1,0 +1,103 @@
+schema_version: 2
+provenance_status: complete
+pattern: On-Call Handoff
+slug: on-call-handoff
+last_checked: '2026-07-10'
+search:
+  run_id: 'github-actions:29123202495'
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - handoff automation on-call summary AI
+      - '"Handoff Automation" on-call'
+      candidate_count: 2
+    mechanism:
+      queries:
+      - on-call handoff automated summary active alerts recent deployments incidents metrics product
+      - incident handoff automated summary on-call product
+      - site reliability engineering handoff report incidents alerts deployments automation
+      - outage incident automated summary large language model
+      candidate_count: 6
+    artifact:
+      queries:
+      - site:github.com "On-Call Handoff Summary"
+      - site:github.com "handoff summary" "active incidents"
+      - site:github.com "on-call handoff" "alerts" "incidents"
+      candidate_count: 3
+adoption_score: 13
+tier_counts:
+  T1: 2
+  T3: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: aliased
+terminology_variants:
+- term: handoff summary
+  used_by: Rootly
+  url: https://github.com/rootlyhq/rootly-mcp-server
+- term: shift notifications
+  used_by: FireHydrant
+  url: https://docs.firehydrant.com/docs/signals-shift-notifications
+- term: outage summary
+  used_by: Microsoft Research and University College London
+  url: https://discovery.ucl.ac.uk/id/eprint/10186655/
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: Active Incidents/Alerts Summary - A summary of any active incidents or alerts that the new on-call responder should be aware of, providing context for handoff.
+  source: FireHydrant Signals shift notifications
+  source_kind: shipped_product
+  organization: FireHydrant
+  independence_group: firehydrant
+  url: https://docs.firehydrant.com/docs/signals-shift-notifications
+  resolved_url: https://docs.firehydrant.com/docs/signals-shift-notifications
+  content_sha256: 5dbb6721b85a0e2e01487978648143face89dd7c91f23abac7debf86b703abaf
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: FireHydrant ships configurable shift notifications that summarize active incidents and alerts for the next on-call responder.
+- tier: T1
+  match: aliased
+  mechanism_quote: 'Complete handoff: current/next on-call + incidents during shifts.'
+  source: Rootly MCP Server
+  source_kind: open_source_implementation
+  organization: Rootly
+  independence_group: rootly
+  url: https://github.com/rootlyhq/rootly-mcp-server
+  resolved_url: https://github.com/rootlyhq/rootly-mcp-server
+  content_sha256: 2ff1a56c4292e1b8e6e7276347732f0f0d9743295645ccb6262e774038a36648
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Rootly provides a runnable MCP server tool that produces on-call handoff context from responders and incident history.
+- tier: T3
+  match: unnamed
+  mechanism_quote: Oasis first assesses the impact scope of an outage by aggregating relevant incidents via multiple techniques. Then, it generates a human-readable summary by leveraging fine-tuned large language models like GPT-3.x.
+  source: 'Oasis: Assess and Summarize: Improve Outage Understanding with Large Language Models'
+  source_kind: peer_reviewed_research
+  organization: Microsoft Research and University College London
+  independence_group: microsoft-ucl
+  url: https://discovery.ucl.ac.uk/id/eprint/10186655/
+  resolved_url: https://discovery.ucl.ac.uk/id/eprint/10186655/
+  content_sha256: 15fb42357212df0cf89f51dbfb2eed6e529cc93792c74b5c752bae7d7a0df20f
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: The peer-reviewed Oasis system demonstrates automated operational handoff-style summaries by aggregating outage incidents and generating human-readable summaries with LLMs.
+verdict: verified

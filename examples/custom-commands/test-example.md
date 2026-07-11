@@ -94,7 +94,7 @@ git diff --name-only HEAD~1 HEAD
 ## Test Health Monitoring
 
 ```markdown
-### Test Suite Health
+### Flake Management
 - Duration trend: ⬆️ +12% (last 7 days)
   - Suggestion: Investigate slow tests
 - Flaky tests detected: 3
@@ -105,4 +105,4 @@ git diff --name-only HEAD~1 HEAD
 ## Related Patterns
 
 - [Testing Orchestration](../../experiments/README.md#testing-orchestration)
-- [Suite Health](../../experiments/README.md#suite-health)
+- [Flake Management](../../experiments/README.md#flake-management)

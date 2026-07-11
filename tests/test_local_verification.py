@@ -133,11 +133,11 @@ def test_real_catalog_exposes_all_explicit_local_scopes():
         datetime.date(2026, 7, 10), 90)
 
     assert len(PLAN.selected_for_scope(
-        inventory, "stable", None, 10, inventory_module)) == 24
+        inventory, "stable", None, 10, inventory_module)) == 29
     assert len(PLAN.selected_for_scope(
-        inventory, "exploratory", None, 10, inventory_module)) == 25
+        inventory, "exploratory", None, 10, inventory_module)) == 18
     assert len(PLAN.selected_for_scope(
-        inventory, "all", None, 10, inventory_module)) == 49
+        inventory, "all", None, 10, inventory_module)) == 47
     assert len(PLAN.selected_for_scope(
         inventory, "stale", None, 10, inventory_module)) <= 10
     assert PLAN.selected_for_scope(

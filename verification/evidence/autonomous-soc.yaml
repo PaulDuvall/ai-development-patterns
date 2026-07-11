@@ -1,0 +1,156 @@
+schema_version: 2
+provenance_status: complete
+pattern: Autonomous SOC
+slug: autonomous-soc
+last_checked: '2026-07-10'
+search:
+  run_id: github-actions:29123202495
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - autonomous defense AI agents security threat detection automated response
+      - AI agents real-time threat detection automated response SOC autonomous defense
+      - Microsoft Security Copilot agents autonomous triage alerts automated response
+      - Dropzone AI autonomous SOC analyst triage alerts respond automatically
+      candidate_count: 7
+    mechanism:
+      queries:
+      - AI agents real-time threat detection automated response SOC
+      - autonomous SOC analyst AI agent security alerts triage response case study
+      - Google Security Operations AI investigation agent autonomously triage alerts
+      - agentic SOC security alerts autonomous investigation automated response
+      candidate_count: 8
+    artifact:
+      queries:
+      - site:github.com "Security Alert Triage Agent" "Microsoft Defender"
+      - site:github.com "autonomous SOC" "AI agents" security
+      - site:github.com ".security/autonomous-defense.yml"
+      - site:github.com "auto_respond" "human_escalate" "defense_agents"
+      candidate_count: 2
+adoption_score: 18
+tier_counts:
+  T1: 2
+  T2: 1
+  T4: 2
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 5
+naming_alignment: weak
+terminology_variants:
+- term: Security Copilot agents
+  used_by: Microsoft
+  url: https://learn.microsoft.com/en-us/defender-xdr/security-alert-triage-agent
+- term: agentic SOC
+  used_by: Google Cloud
+  url: https://cloud.google.com/solutions/security/agentic-soc
+- term: AI SOC analyst
+  used_by: Dropzone AI
+  url: https://www.dropzone.ai/
+- term: autonomous SOC
+  used_by: Palo Alto Networks
+  url: https://www.paloaltonetworks.com/blog/security-operations/2025-the-year-of-the-autonomous-soc-the-year-of-xsiam/
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: The Microsoft Security Copilot Security Alert Triage Agent is an autonomous agent embedded
+    in Microsoft Defender that helps security teams triage alerts at scale.
+  source: Microsoft Defender XDR documentation, Security Alert Triage Agent
+  source_kind: shipped_product
+  organization: Microsoft
+  independence_group: microsoft
+  url: https://learn.microsoft.com/en-us/defender-xdr/security-alert-triage-agent
+  resolved_url: https://learn.microsoft.com/en-us/defender-xdr/security-alert-triage-agent
+  content_sha256: 4000a78466862fc71d87165afdecc75f77f83547b30a2991709001aa8fd467b2
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Microsoft ships an autonomous Security Copilot agent embedded in Defender XDR that automatically
+    runs on eligible alerts and triages them at scale.
+- tier: T1
+  match: aliased
+  mechanism_quote: Dropzone AI deploys a team of AI agents that collaborate to investigate alerts, hunt attackers,
+    and respond to emerging threats without requiring humans in the critical path.
+  source: Dropzone AI product site
+  source_kind: shipped_product
+  organization: Dropzone AI
+  independence_group: dropzone-ai
+  url: https://www.dropzone.ai/
+  resolved_url: https://www.dropzone.ai/
+  content_sha256: ececbd852974805b21b1f4560e463f89487eb714fdc4a42b93ea872d802148a0
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Dropzone AI is a shipped autonomous SOC analyst product that uses collaborating AI agents to investigate
+    alerts, hunt threats, and respond without humans in the critical path.
+- tier: T2
+  match: aliased
+  mechanism_quote: The Triage and Investigation agent helps prioritize threats by autonomously investigating
+    alerts, enriching them with threat intelligence, and providing a verdict with comprehensive explanations–reducing
+    mean time to resolution.
+  source: Google Cloud Agentic SOC solution guide
+  source_kind: reference_architecture
+  organization: Google Cloud
+  independence_group: google
+  url: https://cloud.google.com/solutions/security/agentic-soc
+  resolved_url: https://cloud.google.com/solutions/security/agentic-soc
+  content_sha256: e0907358a872ce715a3d60d6af03dfcd00b86e1e335c6fc74e88085aa8744a33
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Google Cloud's canonical Agentic SOC guidance describes autonomous alert investigation, enrichment,
+    verdicting, and reduced response time as part of its security operations architecture.
+- tier: T4
+  match: aliased
+  mechanism_quote: Mysten Labs reduced thousands of monthly alerts needing human review to fewer than 20 per
+    month.
+  source: Dropzone AI case study, How Mysten Labs Eliminated Toil and Scaled Security with Dropzone AI
+  source_kind: case_study
+  organization: Mysten Labs
+  independence_group: mysten-labs
+  url: https://www.dropzone.ai/case-studies/how-mysten-labs-eliminated-toil-and-scaled-security-with-dropzone-ai
+  resolved_url: https://www.dropzone.ai/case-studies/how-mysten-labs-eliminated-toil-and-scaled-security-with-dropzone-ai
+  content_sha256: 745f2e7359e3a0454e7f267def5c362d8268e3579a304e7ae10842ed2cd6f02f
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Mysten Labs adopted an autonomous SOC analyst workflow and reduced the alert volume needing human
+    review from thousands per month to fewer than 20.
+- tier: T4
+  match: named
+  mechanism_quote: Customers moved beyond manual processes to a model where investigations unfold automatically,
+    analysts move at machine speed, and AI guides response with human oversight for sensitive actions.
+  source: Palo Alto Networks blog, 2025 the Year of the Autonomous SOC
+  source_kind: practitioner_report
+  organization: Palo Alto Networks
+  independence_group: palo-alto-networks
+  url: https://www.paloaltonetworks.com/blog/security-operations/2025-the-year-of-the-autonomous-soc-the-year-of-xsiam/
+  resolved_url: https://www.paloaltonetworks.com/blog/security-operations/2025-the-year-of-the-autonomous-soc-the-year-of-xsiam/
+  content_sha256: 9d222c23a3946ae298d45a60feea282a3e38655c41193a3cb2fc1684f500a717
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Palo Alto Networks reports customer movement to autonomous SOC workflows where investigations run
+    automatically, analysts operate at machine speed, and AI guides responses with human oversight for
+    sensitive actions.
+verdict: verified

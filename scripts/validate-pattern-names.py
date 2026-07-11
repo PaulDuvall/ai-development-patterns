@@ -2,8 +2,8 @@
 """
 Pattern Name Validation Script
 
-Validates that all patterns and antipatterns in the AI Development Patterns
-repository comply with the strict two-word naming convention.
+Validates that every active canonical pattern in the stable and experimental
+catalogs complies with the strict two-word naming convention.
 
 Usage:
     python3 scripts/validate-pattern-names.py
@@ -17,19 +17,13 @@ import re
 import sys
 from pathlib import Path
 
-# Negative prefixes and modifiers for antipatterns
-NEGATIVE_PREFIXES = {
-    'broken', 'blind', 'over', 'under', 'false', 'un', 'premature',
-    'reckless', 'static', 'manual', 'scattered', 'chaotic', 'unsafe',
-    'reactive', 'confused', 'ignored', 'wasteful', 'overwhelming',
-    'unchecked', 'redundant', 'shallow', 'hardcoded', 'contextless',
-    'unprotected', 'overlapping', 'unplanned', 'isolated', 'monolithic',
-    'bloated', 'unconstrained', 'constraint', 'delayed', 'undocumented',
-    'random', 'unrestricted'
-}
+import yaml
 
 # Words to avoid in pattern names (too generic or redundant in AI context)
 AVOID_WORDS = {'ai', 'pattern', 'helper', 'utility', 'common', 'general', 'manager', 'handler', 'service'}
+TECHNICAL_TITLE_WORDS = {'ChatOps'}
+TABLE_LINK_RE = re.compile(
+    r'^\|\s*\*\*\[([^\]]+)\]\(#([a-z0-9]+(?:-[a-z0-9]+)*)\)\*\*\s*\|')
 
 
 class ValidationError:
@@ -49,7 +43,8 @@ class PatternValidator:
         self.errors: list[ValidationError] = []
         self.warnings: list[str] = []
         self.patterns_found: set[str] = set()
-        self.antipatterns_found: set[str] = set()
+        self.stable_count = 0
+        self.experimental_count = 0
 
     def count_words(self, name: str) -> int:
         """Count words in a pattern name. Hyphenated words count as one word."""
@@ -57,26 +52,6 @@ class PatternValidator:
         # Split by spaces
         words = name.strip().split()
         return len(words)
-
-    def has_negative_indicator(self, name: str) -> bool:
-        """Check if antipattern name has a negative prefix or modifier."""
-        words = name.lower().split()
-        if not words:
-            return False
-
-        # Check first word for negative prefix
-        first_word = words[0].replace('-', '')
-
-        # Check if first word starts with negative prefix
-        for prefix in NEGATIVE_PREFIXES:
-            if first_word.startswith(prefix):
-                return True
-
-        # Check if first word IS a negative modifier
-        if first_word in NEGATIVE_PREFIXES:
-            return True
-
-        return False
 
     def has_avoid_words(self, name: str) -> list[str]:
         """Check if pattern name contains words to avoid."""
@@ -88,15 +63,29 @@ class PatternValidator:
         return found_avoid
 
     def is_title_case(self, name: str) -> bool:
-        """Check if name follows Title Case convention."""
+        """Check exact Title Case, while allowing catalog technical terms/acronyms."""
         words = name.split()
         for word in words:
-            # Handle hyphenated words (e.g., "Spec-Driven")
             parts = word.split('-')
             for part in parts:
-                if part and not part[0].isupper():
+                if not part or not (
+                        part.istitle() or part.isupper()
+                        or part in TECHNICAL_TITLE_WORDS):
                     return False
         return True
+
+    def has_ai_prefix(self, name: str) -> bool:
+        """Return True for the redundant AI/AI-* prefix forbidden by the spec."""
+        words = name.split()
+        if not words:
+            return False
+        first = words[0]
+        normalized = first.casefold()
+        return (
+            normalized == 'ai'
+            or normalized.startswith('ai-')
+            or bool(re.match(r'^AI[A-Z]', first))
+        )
 
     def validate_pattern_name(self, name: str, line_num: int = None) -> bool:
         """Validate a pattern name against all rules."""
@@ -121,7 +110,16 @@ class PatternValidator:
             ))
             valid = False
 
-        # Rule 3: Avoid generic words
+        # Rule 3: No redundant AI prefix
+        if self.has_ai_prefix(name):
+            self.errors.append(ValidationError(
+                name, "AI Prefix",
+                "Pattern name must not start with the redundant 'AI' prefix",
+                line_num
+            ))
+            valid = False
+
+        # Advisory: avoid other generic words from the naming specification.
         avoid_found = self.has_avoid_words(name)
         if avoid_found:
             self.warnings.append(
@@ -134,211 +132,284 @@ class PatternValidator:
 
         return valid
 
-    def validate_antipattern_name(self, name: str, line_num: int = None) -> bool:
-        """Validate an antipattern name against all rules."""
-        valid = True
+    @staticmethod
+    def canonical_slug(name: str) -> str:
+        """Convert a canonical display name to its required catalog slug."""
+        return re.sub(r'[^a-z0-9]+', '-', name.casefold()).strip('-')
 
-        # Rule 1: Exactly two words
-        word_count = self.count_words(name)
-        if word_count != 2:
-            self.errors.append(ValidationError(
-                name, "Word Count",
-                f"Must be exactly 2 words (found {word_count})",
-                line_num
-            ))
-            valid = False
+    @staticmethod
+    def line_for_value(content: str, field: str, value: str) -> int | None:
+        """Locate a simple YAML scalar for actionable diagnostics."""
+        pattern = re.compile(
+            rf'^\s*{re.escape(field)}:\s*["\']?{re.escape(value)}["\']?\s*$')
+        for line_num, line in enumerate(content.splitlines(), 1):
+            if pattern.fullmatch(line):
+                return line_num
+        return None
 
-        # Rule 2: Must have negative indicator
-        if not self.has_negative_indicator(name):
-            self.errors.append(ValidationError(
-                name, "Negative Indicator",
-                "Antipattern must have negative prefix or modifier (Broken, Blind, Over-, Under-, Un-, etc.)",
-                line_num
-            ))
-            valid = False
-
-        # Rule 3: Title Case
-        if not self.is_title_case(name):
-            self.errors.append(ValidationError(
-                name, "Title Case",
-                "Antipattern name must use Title Case",
-                line_num
-            ))
-            valid = False
-
-        # Track antipattern
-        if valid:
-            self.antipatterns_found.add(name)
-
-        return valid
-
-    def extract_patterns_from_reference_table(self, content: str, start_marker: str, end_marker: str) -> list[tuple[str, int]]:
-        """Extract pattern names from reference table in markdown."""
-        patterns = []
-        lines = content.split('\n')
-        in_table = False
-
-        for i, line in enumerate(lines, 1):
-            if start_marker in line:
-                in_table = True
+    @staticmethod
+    def markdown_headings(lines: list[str]) -> list[dict]:
+        """Return ATX headings outside CommonMark fenced code blocks."""
+        headings = []
+        in_fence = False
+        fence_marker = ""
+        for line_num, line in enumerate(lines, 1):
+            stripped = line.strip()
+            fence_open = re.match(r"^(`{3,}|~{3,})", stripped)
+            if not in_fence and fence_open:
+                in_fence = True
+                fence_marker = fence_open.group(1)
                 continue
-            if end_marker in line:
-                in_table = False
-                break
+            if in_fence:
+                fence_close = re.match(r"^(`{3,}|~{3,})\s*$", stripped)
+                if fence_close \
+                        and fence_close.group(1)[0] == fence_marker[0] \
+                        and len(fence_close.group(1)) >= len(fence_marker):
+                    in_fence = False
+                    fence_marker = ""
+                continue
+            match = re.match(r"^(#{1,6})\s+(.+?)\s*$", line)
+            if match:
+                headings.append({
+                    "line": line_num,
+                    "level": len(match.group(1)),
+                    "text": match.group(2).strip(),
+                })
+        return headings
 
-            if in_table and '|' in line:
-                # Parse markdown table row
-                # Expected format: | [Pattern Name](#anchor) | Maturity | Dependencies |
-                match = re.search(r'\|\s*\[([^\]]+)\]', line)
+    def load_stable_catalog(self, path: Path) -> list[dict]:
+        """Load canonical stable names from patterns.yaml and validate their IDs."""
+        if not path.is_file():
+            self.errors.append(ValidationError(
+                str(path), "Missing Catalog", "patterns.yaml does not exist"))
+            return []
+        content = path.read_text(encoding='utf-8')
+        try:
+            data = yaml.safe_load(content)
+        except yaml.YAMLError as exc:
+            self.errors.append(ValidationError(
+                str(path), "Invalid YAML", str(exc)))
+            return []
+        values = data.get('patterns') if isinstance(data, dict) else None
+        if not isinstance(values, list):
+            self.errors.append(ValidationError(
+                str(path), "Catalog Schema",
+                "patterns.yaml must contain a 'patterns' list"))
+            return []
+
+        records = []
+        for index, value in enumerate(values):
+            if not isinstance(value, dict):
+                self.errors.append(ValidationError(
+                    f"patterns[{index}]", "Catalog Schema",
+                    "Each stable pattern must be a mapping"))
+                continue
+            name = value.get('name')
+            slug = value.get('id')
+            anchor = value.get('anchor')
+            line_num = (
+                self.line_for_value(content, 'name', name)
+                if isinstance(name, str) else None)
+            if not isinstance(name, str) or not name.strip():
+                self.errors.append(ValidationError(
+                    repr(name), "Catalog Schema",
+                    f"patterns[{index}].name must be a non-empty string"))
+                continue
+            if name != name.strip() or name != ' '.join(name.split()):
+                self.errors.append(ValidationError(
+                    name, "Whitespace",
+                    "Pattern names must use single spaces with no surrounding whitespace",
+                    line_num))
+            expected_slug = self.canonical_slug(name)
+            if slug != expected_slug:
+                self.errors.append(ValidationError(
+                    name, "ID Mismatch",
+                    f"patterns.yaml id must be '{expected_slug}', found {slug!r}",
+                    line_num))
+            if anchor != f"#{expected_slug}":
+                self.errors.append(ValidationError(
+                    name, "Anchor Mismatch",
+                    f"patterns.yaml anchor must be '#{expected_slug}', found {anchor!r}",
+                    line_num))
+            records.append({
+                'name': name,
+                'slug': slug if isinstance(slug, str) else '',
+                'line': line_num,
+            })
+        return records
+
+    def extract_catalog_table(
+            self, path: Path, heading: str, label: str) -> list[dict]:
+        """Extract linked active names from one explicitly bounded reference table."""
+        if not path.is_file():
+            self.errors.append(ValidationError(
+                str(path), "Missing Catalog", f"{label} markdown file does not exist"))
+            return []
+        lines = path.read_text(encoding='utf-8').splitlines()
+        expected = re.fullmatch(r'(#{1,6})\s+(.+)', heading)
+        if not expected:
+            raise ValueError(f"Invalid catalog heading selector: {heading!r}")
+        match = next((
+            item for item in self.markdown_headings(lines)
+            if item['level'] == len(expected.group(1))
+            and item['text'] == expected.group(2)
+        ), None)
+        if match is None:
+            self.errors.append(ValidationError(
+                label, "Missing Reference Table",
+                f"Required heading {heading!r} was not found"))
+            return []
+        start = match['line'] - 1
+
+        records = []
+        table_started = False
+        for line_num, line in enumerate(lines[start + 1:], start + 2):
+            if line.startswith('|'):
+                table_started = True
+                match = TABLE_LINK_RE.match(line)
                 if match:
-                    pattern_name = match.group(1).strip()
-                    # Skip header rows
-                    if pattern_name not in ['Pattern', 'Pattern Name', '---', '']:
-                        patterns.append((pattern_name, i))
-
-        return patterns
-
-    def extract_patterns_from_headers(self, content: str, header_level: str = '##') -> list[tuple[str, int]]:
-        """Extract pattern names from section headers."""
-        patterns = []
-        lines = content.split('\n')
-
-        for i, line in enumerate(lines, 1):
-            if line.startswith(f'{header_level} ') and not line.startswith(f'{header_level}#'):
-                # Extract pattern name from header
-                pattern_name = line.replace(f'{header_level} ', '').strip()
-                # Skip common section headers
-                skip_headers = [
-                    'Foundation Patterns', 'Development Patterns', 'Operations Patterns',
-                    'Anti-Patterns', 'Pattern Categories', 'Overview', 'Introduction',
-                    'Experimental Patterns', 'Pattern Reference', 'Related Patterns',
-                    'Core Implementation', 'Benefits', 'Dependencies', 'Implementation',
-                    'Example', 'When to Use', 'How It Works', 'Anti-Pattern'
-                ]
-                if pattern_name not in skip_headers and len(pattern_name) < 50:
-                    patterns.append((pattern_name, i))
-
-        return patterns
-
-    def validate_readme(self, file_path: Path) -> bool:
-        """Validate patterns in README.md."""
-        print(f"\n📄 Validating {file_path}...")
-
-        if not file_path.exists():
-            print(f"❌ File not found: {file_path}")
-            return False
-
-        content = file_path.read_text(encoding='utf-8')
-
-        # Extract patterns from reference table (lines ~50-89)
-        table_patterns = self.extract_patterns_from_reference_table(
-            content,
-            '| Pattern | Maturity | Dependencies |',
-            '---'  # End after table section
-        )
-
-        print(f"  Found {len(table_patterns)} patterns in reference table")
-
-        for pattern_name, line_num in table_patterns:
-            self.validate_pattern_name(pattern_name, line_num)
-
-        # Extract patterns from section headers (## Pattern Name)
-        header_patterns = self.extract_patterns_from_headers(content, '##')
-
-        # Filter to only pattern headers (skip common sections)
-        pattern_headers = [p for p in header_patterns if self.count_words(p[0]) <= 4]
-
-        print(f"  Found {len(pattern_headers)} potential pattern sections")
-
-        # Extract antipatterns from ### Anti-Pattern: subsections
-        antipattern_matches = re.finditer(r'###\s*Anti-Pattern:\s*([^\n]+)', content)
-        antipatterns = [(m.group(1).strip(), content[:m.start()].count('\n') + 1) for m in antipattern_matches]
-
-        print(f"  Found {len(antipatterns)} antipatterns")
-
-        for antipattern_name, line_num in antipatterns:
-            self.validate_antipattern_name(antipattern_name, line_num)
-
-        return len(self.errors) == 0
-
-    def validate_experiments_readme(self, file_path: Path) -> bool:
-        """Validate patterns in experiments/README.md."""
-        print(f"\n📄 Validating {file_path}...")
-
-        if not file_path.exists():
-            print(f"❌ File not found: {file_path}")
-            return False
-
-        content = file_path.read_text(encoding='utf-8')
-
-        # Extract patterns from reference table
-        table_patterns = self.extract_patterns_from_reference_table(
-            content,
-            '| Pattern | Dependencies |',
-            '---'
-        )
-
-        print(f"  Found {len(table_patterns)} experimental patterns in reference table")
-
-        for pattern_name, line_num in table_patterns:
-            self.validate_pattern_name(pattern_name, line_num)
-
-        # Extract antipatterns
-        antipattern_matches = re.finditer(r'###\s*Anti-Pattern:\s*([^\n]+)', content)
-        antipatterns = [(m.group(1).strip(), content[:m.start()].count('\n') + 1) for m in antipattern_matches]
-
-        print(f"  Found {len(antipatterns)} experimental antipatterns")
-
-        for antipattern_name, line_num in antipatterns:
-            self.validate_antipattern_name(antipattern_name, line_num)
-
-        return len(self.errors) == 0
-
-    def check_for_old_names(self, repo_root: Path) -> list[tuple[str, str, int]]:
-        """Search for old pattern names that should have been renamed."""
-        old_names = [
-            "AI Readiness Assessment", "Readiness Assessment", "Rules as Code", "AI Security Sandbox",
-            "AI Developer Lifecycle", "AI Tool Integration", "AI Issue Generation",
-            "Specification Driven Development", "AI Plan-First Development",
-            "Progressive AI Enhancement", "Progressive Enhancement", "AI Choice Generation",
-            "Atomic Task Decomposition", "Parallelized AI Coding Agents",
-            "AI Context Persistence", "Context Persistence", "Constraint-Based AI Development",
-            "Observable AI Development", "AI-Driven Refactoring",
-            "AI-Driven Architecture Design", "AI-Driven Traceability",
-            "Policy-as-Code Generation", "Security Scanning Orchestration",
-            "Performance Baseline Management", "Human-AI Handoff Protocol",
-            "Comprehensive AI Testing Strategy", "AI Workflow Orchestration",
-            "AI Review Automation", "Technical Debt Forecasting",
-            "AI-Guided Blue-Green Deployment", "Drift Detection & Remediation",
-            "Release Note Synthesis", "Incident Response Automation",
-            "Test Suite Health Management", "Dependency Upgrade Advisor",
-            "On-Call Handoff Automation", "Chaos Engineering Scenarios",
-            "ChatOps Security Integration", "Compliance Evidence Automation",
-            "Context Window Optimization", "Visual Context Scaffolding",
-            "AI Event Automation", "Custom AI Commands"
-        ]
-
-        found_old = []
-        files_to_check = [
-            repo_root / 'README.md',
-            repo_root / 'experiments' / 'README.md',
-            repo_root / 'CLAUDE.md'
-            # pattern-spec.md excluded - contains intentional examples of old names
-        ]
-
-        for file_path in files_to_check:
-            if not file_path.exists():
+                    records.append({
+                        'name': match.group(1).strip(),
+                        'slug': match.group(2),
+                        'line': line_num,
+                    })
                 continue
+            if table_started and line.strip() == '':
+                break
+            if table_started:
+                break
+        return records
 
-            content = file_path.read_text(encoding='utf-8')
-            lines = content.split('\n')
+    def validate_unique_records(self, records: list[dict]) -> None:
+        """Reject duplicate active names and slugs, including cross-catalog copies."""
+        seen_names: dict[str, dict] = {}
+        seen_slugs: dict[str, dict] = {}
+        for record in records:
+            name_key = record['name'].casefold()
+            slug_key = record['slug'].casefold()
+            if name_key in seen_names:
+                first = seen_names[name_key]
+                self.errors.append(ValidationError(
+                    record['name'], "Duplicate Name",
+                    f"Active name duplicates {first['name']!r}", record.get('line')))
+            else:
+                seen_names[name_key] = record
+            if slug_key in seen_slugs:
+                first = seen_slugs[slug_key]
+                self.errors.append(ValidationError(
+                    record['name'], "Duplicate Slug",
+                    f"Active slug {record['slug']!r} is already used by "
+                    f"{first['name']!r}", record.get('line')))
+            else:
+                seen_slugs[slug_key] = record
 
-            for old_name in old_names:
-                for i, line in enumerate(lines, 1):
-                    if old_name in line and 'PATTERN_MIGRATION_GUIDE' not in line:
-                        found_old.append((str(file_path.relative_to(repo_root)), old_name, i))
+    def validate_table_matches(
+            self, canonical: list[dict], displayed: list[dict], label: str) -> None:
+        """Require a display table to exactly match its canonical catalog sequence."""
+        self.validate_unique_records(displayed)
+        canonical_pairs = [(item['name'], item['slug']) for item in canonical]
+        displayed_pairs = [(item['name'], item['slug']) for item in displayed]
+        if canonical_pairs == displayed_pairs:
+            return
 
-        return found_old
+        canonical_names = {item['name'] for item in canonical}
+        displayed_names = {item['name'] for item in displayed}
+        for name in sorted(canonical_names - displayed_names):
+            self.errors.append(ValidationError(
+                name, "Missing Display Name",
+                f"{label} reference table is missing this canonical pattern"))
+        for name in sorted(displayed_names - canonical_names):
+            item = next(item for item in displayed if item['name'] == name)
+            self.errors.append(ValidationError(
+                name, "Unexpected Display Name",
+                f"{label} reference table does not match the canonical catalog",
+                item.get('line')))
+        for expected, actual in zip(canonical, displayed):
+            if expected['name'] == actual['name'] \
+                    and expected['slug'] != actual['slug']:
+                self.errors.append(ValidationError(
+                    actual['name'], "Display Anchor Mismatch",
+                    f"{label} link must target '#{expected['slug']}', "
+                    f"found '#{actual['slug']}'", actual.get('line')))
+        if canonical_names == displayed_names and canonical_pairs != displayed_pairs:
+            self.errors.append(ValidationError(
+                label, "Display Order Mismatch",
+                "Reference table order must match its canonical catalog"))
+
+    def validate_section_headings(
+            self, path: Path, records: list[dict], levels: tuple[int, ...],
+            label: str, reject_unexpected: bool = False) -> None:
+        """Require exactly one canonical content section for every active name."""
+        # extract_catalog_table already emits the actionable missing-file error.
+        if not path.is_file():
+            return
+        lines = path.read_text(encoding='utf-8').splitlines()
+        heading_counts: dict[str, list[int]] = {}
+        for heading in self.markdown_headings(lines):
+            if heading['level'] in levels:
+                heading_counts.setdefault(
+                    heading['text'], []).append(heading['line'])
+        for record in records:
+            occurrences = heading_counts.get(record['name'], [])
+            if not occurrences:
+                self.errors.append(ValidationError(
+                    record['name'], "Missing Pattern Section",
+                    f"{label} must contain a level "
+                    f"{'/'.join(map(str, levels))} heading with the exact canonical name"))
+            elif len(occurrences) > 1:
+                self.errors.append(ValidationError(
+                    record['name'], "Duplicate Pattern Section",
+                    f"{label} contains {len(occurrences)} canonical headings",
+                    occurrences[1]))
+        if reject_unexpected:
+            expected = {record['name'] for record in records}
+            for name in sorted(heading_counts.keys() - expected):
+                self.errors.append(ValidationError(
+                    name, "Unexpected Pattern Section",
+                    f"{label} heading is not present in its active reference table",
+                    heading_counts[name][0]))
+
+    def validate_active_catalogs(self, repo_root: Path) -> bool:
+        """Validate every active stable and experimental canonical pattern."""
+        stable = self.load_stable_catalog(repo_root / 'patterns.yaml')
+        experimental = self.extract_catalog_table(
+            repo_root / 'experiments' / 'README.md',
+            '## Experimental Pattern Reference', 'experimental catalog')
+        stable_display = self.extract_catalog_table(
+            repo_root / 'README.md',
+            '## Complete Pattern Reference', 'stable catalog')
+
+        self.stable_count = len(stable)
+        self.experimental_count = len(experimental)
+        if not stable:
+            self.errors.append(ValidationError(
+                'patterns.yaml', "Empty Catalog",
+                "No active stable patterns were found; refusing zero-pattern success"))
+        if not experimental:
+            self.errors.append(ValidationError(
+                'experiments/README.md', "Empty Catalog",
+                "No active experimental patterns were found; refusing zero-pattern success"))
+
+        active = stable + experimental
+        self.validate_unique_records(active)
+        for record in active:
+            expected_slug = self.canonical_slug(record['name'])
+            if record['slug'] != expected_slug:
+                self.errors.append(ValidationError(
+                    record['name'], "Anchor Mismatch",
+                    f"Active anchor/slug must be '{expected_slug}', "
+                    f"found {record['slug']!r}", record.get('line')))
+            self.validate_pattern_name(record['name'], record.get('line'))
+
+        self.validate_table_matches(stable, stable_display, 'README.md')
+        if stable:
+            self.validate_section_headings(
+                repo_root / 'README.md', stable, (2, 3), 'README.md')
+        if experimental:
+            self.validate_section_headings(
+                repo_root / 'experiments' / 'README.md', experimental, (3,),
+                'experiments/README.md', reject_unexpected=True)
+        return not self.errors
 
     def print_report(self):
         """Print validation report."""
@@ -347,9 +418,10 @@ class PatternValidator:
         print("="*80)
 
         print(f"\n📊 Statistics:")
-        print(f"  Patterns found: {len(self.patterns_found)}")
-        print(f"  Antipatterns found: {len(self.antipatterns_found)}")
-        print(f"  Total: {len(self.patterns_found) + len(self.antipatterns_found)}")
+        print(f"  Stable patterns: {self.stable_count}")
+        print(f"  Experimental patterns: {self.experimental_count}")
+        print(f"  Active patterns found: {len(self.patterns_found)}")
+        print(f"  Total: {len(self.patterns_found)}")
 
         if self.warnings:
             print(f"\n⚠️  Warnings ({len(self.warnings)}):")
@@ -374,30 +446,15 @@ def main():
     print("🔍 AI Development Patterns - Name Validation")
     print("="*80)
 
-    # Validate main README.md
-    readme_valid = validator.validate_readme(repo_root / 'README.md')
-
-    # Validate experiments/README.md
-    experiments_valid = validator.validate_experiments_readme(repo_root / 'experiments' / 'README.md')
-
-    # Check for old pattern names
-    print("\n🔎 Checking for old pattern names...")
-    old_names_found = validator.check_for_old_names(repo_root)
-
-    if old_names_found:
-        print(f"\n⚠️  Found {len(old_names_found)} references to old pattern names:")
-        for file_path, old_name, line_num in old_names_found[:10]:  # Show first 10
-            print(f"  {file_path}:{line_num} - '{old_name}'")
-        if len(old_names_found) > 10:
-            print(f"  ... and {len(old_names_found) - 10} more")
-    else:
-        print("  ✅ No old pattern names found")
+    # Only active catalog sources define canonical names. Historical prose and
+    # compatibility anchors are intentionally outside this validation surface.
+    validator.validate_active_catalogs(repo_root)
 
     # Print final report
     validator.print_report()
 
     # Exit with appropriate code
-    if validator.errors or old_names_found:
+    if validator.errors:
         print("\n❌ Validation FAILED")
         return 1
     else:

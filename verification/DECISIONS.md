@@ -36,37 +36,76 @@ Alignment values come from each pattern's `evidence/<slug>.yaml`; rules are defi
 | Security Sandbox | strong | *sandboxing*, *devcontainer isolation*, *execution isolation*, *microVM sandbox* | Keep (most independently scoreable sources use our word; no spec-compliant candidate beats it) | Accepted 2026-07-04 |
 | Issue Generation | aliased | no dominant competing term | Keep | Accepted 2026-07-04 |
 | Developer Lifecycle | aliased | *AI-DLC* (AWS), spec-driven workflow framings | Keep (note the scope overlap with Spec-Driven Development) | Accepted 2026-07-04 |
-| Asynchronous Research | aliased | code research; async coding agents; cloud-based software engineering agent; coding agent / cloud agent | Review naming signal | — |
-| Atomic Decomposition | aliased | Task splitting and ownership; Sectioning; Contract-first fan-out | Review naming signal | — |
-| Autonomous Defense | aliased | Security Copilot agents; agentic SOC; AI SOC analyst; autonomous SOC | Review naming signal | — |
-| Autonomous Remediation | aliased | Copilot Autofix; Autofix; automated program repair | Review naming signal | — |
-| Bounded Autonomy | none | No stable industry term recorded | Review naming signal | — |
-| Centralized Rules | aliased | AI rules; AI instructions; AGENTS.md single source of truth | Review naming signal | — |
-| ChatOps Security | aliased | ChatOps solution; ChatOps for Security Operations | Review naming signal | — |
-| Context Optimization | aliased | LLM routing; dynamic model routing; choosing the right model | Review naming signal | — |
-| Error Resolution | aliased | Repairing Programs; Fix with Copilot; AI Root Cause Analysis | Review naming signal | — |
-| Event Automation | aliased | hooks; plugins; AI agent hooks | Review naming signal | — |
-| Feedback Flywheel | weak | harness engineering; living context | Review naming signal | — |
-| Guided Architecture | aliased | Domain modeling backbone pipeline; AWS Well-Architected reviews with Generative AI; Architectural design decisions | Review naming signal | — |
-| Guided Refactoring | aliased | AI CodeFix; agentic refactoring; MCP-guided refactoring | Review naming signal | — |
-| Handoff Automation | aliased | handoff summary; shift notifications; outage summary | Review naming signal | — |
-| Handoff Protocols | aliased | coding agent; human-in-the-loop; agent-generated PR | Review naming signal | — |
-| Image Spec | aliased | Screenshots and Files; Design to code; screenshot-to-code | Review naming signal | — |
-| Incident Automation | aliased | AI-generated runbook; AI SRE; Vibe OnCall | Review naming signal | — |
-| Long-Running Orchestration | aliased | cloud tasks; autonomous AI software engineer; Copilot cloud agent; background agents | Review naming signal | — |
-| Observable Development | aliased | LLM engineering platform; AI observability; tracing; agent observability; Harness Engineering | Review naming signal | — |
-| Pipeline Synthesis | aliased | Agentic Workflows; AutoPipelineAI | Review naming signal | — |
-| Policy Generation | weak | NL2Cedar; OPA AI assistant; Dynamic Kubernetes Policy Generator | Review naming signal | — |
-| Release Synthesis | aliased | release-please; release-notes-generator; automatically generated release notes; Semantic Release | Review naming signal | — |
-| Review Automation | aliased | automated PR reviews; automatic code review; AI code review | Review naming signal | — |
-| Suite Health | aliased | flaky test management; flaky test detection; automated detection and suppression | Review naming signal | — |
-| Testing Orchestration | aliased | automated unit test generation; writing tests with GitHub Copilot; automated unit test improvement | Review naming signal | — |
-| Upgrade Advisor | aliased | automated dependency update tool; Dependabot version updates / Dependabot security updates; Automatic Fix PRs; automatic pull requests with Renovate | Review naming signal | — |
-| Workflow Orchestration | weak | orchestration framework; workflow orchestration agents; human-in-the-loop AI agents | Review naming signal | — |
+| Code Research | weak | *code research*; async coding agents; cloud software-engineering agents | Keep — accepted rename from Asynchronous Research and promotion | Accepted 2026-07-11 |
+| Atomic Decomposition | aliased | task splitting and ownership; sectioning; contract-first fan-out | Keep + alias | Accepted 2026-07-11 — canonical principle retained |
+| Autonomous SOC | weak | Security Copilot agents; agentic SOC; AI SOC analyst; autonomous SOC | Keep — accepted rename from Autonomous Defense and SOC-specific narrowing | Accepted 2026-07-11 — remains experimental |
+| Autonomous Remediation | aliased | Copilot Autofix; Autofix; automated program repair | Keep experimental — accepted demotion pending independent evidence for the complete detector-to-same-session-repair loop | Accepted 2026-07-11 |
+| Bounded Autonomy | none | no stable industry term; implementations expose turn, cost, time, step, and termination caps | Keep — accepted promotion after making deterministic bounds the required core and advanced diagnostics optional | Accepted 2026-07-11 |
+| Centralized Rules | aliased | AI rules; AI instructions; AGENTS.md single source of truth | Keep + alias (distinct from repository-local Codified Rules because it distributes rules across projects) | Accepted 2026-07-11 — canonical name retained |
+| ChatOps Security | aliased | ChatOps solution; ChatOps for Security Operations | Keep + alias; retain as an experimental delivery interface | Accepted 2026-07-11 — canonical name retained |
+| Model Routing | aliased | LLM routing; dynamic model routing; choosing the right model | Keep — accepted rename from Context Optimization and promotion | Accepted 2026-07-11 |
+| Error Resolution | aliased | Repairing Programs; Fix with Copilot; AI Root Cause Analysis | Keep + alias; clarify the human review and validation boundary | Accepted 2026-07-11 — canonical name retained and scope narrowed |
+| Agent Hooks | aliased | hooks; plugins; AI agent hooks | Keep — accepted rename from Event Automation; cross-vendor implementations expose lifecycle hooks | Accepted 2026-07-11 |
+| Feedback Flywheel | weak | harness engineering; living context | Keep + alias; remain experimental until adoption is broader | Accepted 2026-07-11 — canonical name retained |
+| Guided Architecture | aliased | domain-modeling pipelines; Well-Architected review; architectural decision generation | Keep experimental; require a tighter framework-specific boundary before promotion | Accepted 2026-07-11 — canonical umbrella retained for exploration |
+| Guided Chaos | aliased | Smart Chaos; natural-language chaos engineering | Keep — accepted rename from Chaos Engineering and promotion | Accepted 2026-07-11 |
+| Guided Refactoring | aliased | AI CodeFix; agentic refactoring; MCP-guided refactoring | Keep + alias | Accepted 2026-07-11 — canonical principle retained |
+| On-Call Handoff | aliased | handoff summary; shift notifications; outage summary | Keep — accepted rename from Handoff Automation and narrowing to operational shift handoffs | Accepted 2026-07-11 — remains experimental |
+| Handoff Protocols | aliased | coding agent; human-in-the-loop; agent-generated PR | Keep + alias; define it as the return and approval boundary | Accepted 2026-07-11 — canonical name retained |
+| Image Spec | aliased | Screenshots and Files; design-to-code; screenshot-to-code | Keep + alias; narrow to screenshots and design mockups translated into UI code | Accepted 2026-07-11 — canonical name retained and scope narrowed |
+| Incident Automation | aliased | AI-generated runbook; AI SRE; Vibe OnCall | Keep + alias; distinguish response execution from On-Call Handoff | Accepted 2026-07-11 — canonical name retained |
+| Long-Running Orchestration | aliased | cloud tasks; autonomous software engineer; cloud agent; background agents | Keep + alias; define it by duration, persisted state, checkpoints, and recovery | Accepted 2026-07-11 — remains experimental |
+| Agent Observability | weak | LLM engineering platform; AI observability; tracing; agent observability; Harness Engineering | Keep — accepted rename from Observable Development and reframe around agent runs, tool events, traces, and evaluations | Accepted 2026-07-11 — application logging moved to Error Resolution |
+| Pipeline Synthesis | aliased | Agentic Workflows; AutoPipelineAI | Keep + alias; absorb deployment generation as a subtype | Accepted 2026-07-11 — Deployment Synthesis merged and retired |
+| Policy Generation | weak | NL2Cedar; OPA AI assistant; Dynamic Kubernetes Policy Generator | Keep + alias; narrow to natural-language or runtime context transformed into validated policy-as-code | Accepted 2026-07-11 — canonical name retained and scope narrowed |
+| Review Automation | aliased | automated PR reviews; automatic code review; AI code review | Keep + alias; narrow to automated pull-request and code review | Accepted 2026-07-11 — canonical two-word name retained |
+| Flake Management | aliased | flaky test management; flaky test detection; automated detection and suppression | Keep — accepted rename from Suite Health and narrowing to detection, quarantine, suppression, and tracked remediation | Accepted 2026-07-11 — remains experimental |
+| Testing Orchestration | aliased | automated unit-test generation; writing tests with coding agents; automated test improvement | Keep + alias; retain the test-generation and verification boundary | Accepted 2026-07-11 — remains experimental |
+| Workflow Orchestration | weak | orchestration framework; workflow orchestration agents; human-in-the-loop agents | Keep + alias; distinguish runtime coordination from pipeline-definition generation | Accepted 2026-07-11 — remains experimental |
+| Security Orchestration | none | no stable industry term recorded | Keep experimental — accepted demotion until exact evidence demonstrates multi-tool aggregation plus AI summarization | Accepted 2026-07-11 |
+| Autonomous Acceptance | aliased | Software Factory; executable acceptance gates; signed attestations | Keep experimental; do not promote without a shipped end-to-end implementation | Accepted 2026-07-11 — canonical name retained |
+| Test Promotion | aliased | golden tests; protected test baselines | Keep experimental; require evidence for the complete candidate-to-approved-baseline workflow | Accepted 2026-07-11 — canonical name retained |
 
 This ledger retains earlier human naming decisions while evidence is refreshed independently.
 Current coverage, provenance, verdicts, and freshness are generated in `STATUS.md`. A pattern may
 remain here after its alignment becomes `strong` when the row preserves accepted decision history.
+
+### 2026-07-11 — two-word taxonomy consolidation
+
+The maintainer accepted the evidence-led catalog review subject to `pattern-spec.md`'s exact
+two-word rule. Adoption evidence was accepted separately in PR #70; this decision changes catalog
+boundaries and names without claiming that a taxonomy edit is new research.
+
+Canonical renames:
+
+1. **Event Automation → Agent Hooks**
+2. **Observable Development → Agent Observability**
+3. **Context Optimization → Model Routing**
+4. **Asynchronous Research → Code Research**
+5. **Chaos Engineering → Guided Chaos**
+6. **Suite Health → Flake Management**
+7. **Handoff Automation → On-Call Handoff**
+8. **Autonomous Defense → Autonomous SOC**
+
+Maturity and boundary decisions:
+
+- Promote Bounded Autonomy, Model Routing, Code Research, Drift Remediation, Guided Chaos,
+  Evidence Automation, and Debt Forecasting to the main catalog.
+- Demote Security Orchestration and Autonomous Remediation to experiments until their complete
+  catalog mechanisms have exact independent evidence.
+- Merge Deployment Synthesis into Pipeline Synthesis and retire the former slug.
+- Retire Release Synthesis as a standalone AI pattern; retain deterministic release-note
+  automation only as supporting lifecycle/pipeline guidance.
+- Replace Upgrade Advisor with the materially different Dependency Migration experiment. Its old
+  dependency-update evidence is not reassigned; the new slug remains pending local evaluation.
+- Narrow Image Spec, Policy Generation, Review Automation, and Flake Management to the mechanisms
+  actually supported by their evidence. Clarify Error Resolution as human-gated.
+- Keep Autonomous Acceptance and Test Promotion experimental and weak; verification does not imply
+  promotion.
+
+Historical search queries, source titles, quotes, and provider provenance may retain retired names.
+Active registry IDs, evidence filenames, examples, links, generated data, and evaluator scopes use
+only the new canonical taxonomy.
 
 ### 2026-07-10 — three accepted evidence-led renames
 

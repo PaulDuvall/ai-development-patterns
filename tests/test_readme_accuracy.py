@@ -112,7 +112,7 @@ class TestReadmeAccuracy:
                 # Handle both plain text and markdown links
                 if '[' in dependencies:
                     # Extract from markdown links
-                    dep_matches = re.findall(r'\\[([^\\]]+)\\]', dependencies)
+                    dep_matches = re.findall(r'\[([^\]]+)\]', dependencies)
                     dep_names.extend(dep_matches)
                 else:
                     # Split by comma for plain text

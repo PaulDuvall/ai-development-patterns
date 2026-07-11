@@ -58,7 +58,7 @@ For complete pattern documentation, see: [Testing Orchestration](../../README.md
 - Coverage tracking across requirement lifecycle
 - Impact analysis for specification changes
 
-### Observable Development
+### [Agent Observability](../../../README.md#agent-observability)
 - Test execution monitoring and analysis
 - Performance testing with baseline comparison
 - Failure pattern recognition and prevention

@@ -1,0 +1,113 @@
+schema_version: 2
+provenance_status: complete
+pattern: Guided Chaos
+slug: guided-chaos
+last_checked: '2026-07-10'
+search:
+  run_id: github-actions:29123202495
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - '"AI" "chaos engineering" "experiments" "generate"'
+      - '"LLM" "chaos engineering" "experiments"'
+      - '"ChaosEater" "chaos engineering" LLM'
+      - '"generate" "Litmus" "chaos experiments" AI'
+      candidate_count: 9
+    mechanism:
+      queries:
+      - '"large language model" "fault injection" "experiment templates" architecture'
+      - '"generative AI" "failure scenarios" "blast radius" architecture diagram'
+      - '"LLM" "Chaos Mesh" "workflow manifests" "experimental plans"'
+      - '"Amazon Bedrock" "AWS FIS" "experiment templates" "natural language"'
+      candidate_count: 8
+    artifact:
+      queries:
+      - 'site:github.com "natural language generation of chaos engineering experiment templates"'
+      - 'site:github.com "ChaosEater" "hypothesis" "experiment" "analysis" "improvement"'
+      - 'site:github.com "krkn-ai" "generates" "scenarios" "SLOs"'
+      - 'site:github.com "ai-chaos-engineering-with-fis"'
+      candidate_count: 5
+adoption_score: 12
+tier_counts:
+  T1: 1
+  T2: 1
+  T3: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: aliased
+terminology_variants:
+- term: Smart Chaos
+  used_by: Conf42 Chaos Engineering 2024
+  url: https://www.conf42.com/Chaos_Engineering_2024_Indika_Wimalasuriya_smart_chaos_generative_AI
+- term: Natural Language Chaos Engineering
+  used_by: AWS sample-aws-genai-ops-demos
+  url: https://github.com/aws-samples/sample-aws-genai-ops-demos/blob/main/resilience/ai-chaos-engineering-with-fis/README.md
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: ChaosEater is an LLM-based system that fully automates the Chaos Engineering
+    (CE) cycle in Kubernetes systems.
+  source: ntt-dkiku, ChaosEater GitHub repository
+  source_kind: open_source_implementation
+  organization: NTT
+  independence_group: ntt
+  url: https://github.com/ntt-dkiku/chaos-eater
+  resolved_url: https://github.com/ntt-dkiku/chaos-eater
+  content_sha256: 3f7edd0c8537a009c46c826ce8555289fdf0f432010f2b6da9ad3fb25e193d5c
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Runnable open-source system uses LLM agents to automate the Kubernetes chaos-engineering
+    cycle, including hypothesis, experiment, analysis, and improvement phases.
+- tier: T2
+  match: aliased
+  mechanism_quote: AI agents, hosted on AgentCore Runtime for secure, scalable execution,
+    discover system dependencies automatically, analyze architectural patterns, and create
+    targeted experiments based on your actual risk profiles.
+  source: AWS Architecture Blog, Architecting AI-powered resilience framework on AWS
+  source_kind: reference_architecture
+  organization: Amazon Web Services
+  independence_group: amazon
+  url: https://aws.amazon.com/blogs/architecture/architecting-ai-powered-resilience-framework-on-aws/
+  resolved_url: https://aws.amazon.com/blogs/architecture/architecting-ai-powered-resilience-framework-on-aws/
+  content_sha256: 0d5f8a9025f3a0d48722fb25eae405a3d98dcd9c4114734daefb51aec55e64ca
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2026-06-22'
+  retrieved: '2026-07-10'
+  claim: AWS reference architecture describes agent-based dependency discovery, risk analysis,
+    targeted experiment generation, FIS execution, and CI/CD resilience validation.
+- tier: T3
+  match: aliased
+  mechanism_quote: I have given the architecture diagram link and I have asked generative
+    AI model to generate the hypothesis
+  source: Conf42 Chaos Engineering 2024, Smart Chaos
+  source_kind: conference_talk
+  organization: Conf42
+  independence_group: conf42
+  url: https://www.conf42.com/Chaos_Engineering_2024_Indika_Wimalasuriya_smart_chaos_generative_AI
+  resolved_url: https://www.conf42.com/Chaos_Engineering_2024_Indika_Wimalasuriya_smart_chaos_generative_AI
+  content_sha256: 736d84db54b7fef5c479c07bacb7ae603cd6a81df44c470aa9d1763230507611
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2024-02-15'
+  retrieved: '2026-07-10'
+  claim: Dated conference talk demonstrates using generative AI with an architecture diagram
+    to derive failure hypotheses, experiments, and blast-radius analysis.
+verdict: verified

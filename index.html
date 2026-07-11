@@ -151,26 +151,31 @@ graph LR
   subgraph sg_development["Development"]
     direction TB
     spec_driven_development["Spec-Driven Development"]
-    image_spec["Image Spec"]
     planned_implementation["Planned Implementation"]
     incremental_generation["Incremental Generation"]
-    adversarial_evaluator["Adversarial Evaluator"]
-    atomic_decomposition["Atomic Decomposition"]
-    parallel_agents["Parallel Agents"]
     agent_memory["Agent Memory"]
-    event_automation["Event Automation"]
+    agent_hooks["Agent Hooks"]
     custom_commands["Custom Commands"]
     progressive_disclosure["Progressive Disclosure"]
-    observable_development["Observable Development"]
+    atomic_decomposition["Atomic Decomposition"]
     guided_refactoring["Guided Refactoring"]
+    agent_observability["Agent Observability"]
+    image_spec["Image Spec"]
+    adversarial_evaluator["Adversarial Evaluator"]
+    parallel_agents["Parallel Agents"]
     error_resolution["Error Resolution"]
-    autonomous_remediation["Autonomous Remediation"]
+    model_routing["Model Routing"]
+    code_research["Code Research"]
+    bounded_autonomy["Bounded Autonomy"]
   end
   subgraph sg_operations["Operations"]
     direction TB
     policy_generation["Policy Generation"]
-    security_orchestration["Security Orchestration"]
+    evidence_automation["Evidence Automation"]
     centralized_rules["Centralized Rules"]
+    drift_remediation["Drift Remediation"]
+    debt_forecasting["Debt Forecasting"]
+    guided_chaos["Guided Chaos"]
   end
   agent_readiness --> codified_rules
   codified_rules --> security_sandbox
@@ -180,37 +185,45 @@ graph LR
   developer_lifecycle --> tool_integration
   agent_readiness --> issue_generation
   developer_lifecycle --> spec_driven_development
+  planned_implementation --> incremental_generation
+  codified_rules --> agent_memory
+  codified_rules --> agent_hooks
+  security_sandbox --> agent_hooks
+  agent_hooks --> custom_commands
+  spec_driven_development --> custom_commands
+  codified_rules --> progressive_disclosure
+  agent_memory --> progressive_disclosure
+  incremental_generation --> atomic_decomposition
+  codified_rules --> guided_refactoring
+  developer_lifecycle --> agent_observability
   spec_driven_development --> image_spec
   incremental_generation --> image_spec
   incremental_generation --> adversarial_evaluator
-  incremental_generation --> atomic_decomposition
   atomic_decomposition --> parallel_agents
-  codified_rules --> agent_memory
-  codified_rules --> event_automation
-  security_sandbox --> event_automation
-  event_automation --> custom_commands
-  spec_driven_development --> custom_commands
-  codified_rules --> custom_commands
-  codified_rules --> progressive_disclosure
-  agent_memory --> progressive_disclosure
-  developer_lifecycle --> observable_development
-  codified_rules --> guided_refactoring
   developer_lifecycle --> error_resolution
-  observable_development --> error_resolution
-  tool_integration --> error_resolution
-  codified_rules --> autonomous_remediation
-  event_automation --> autonomous_remediation
+  agent_observability --> error_resolution
+  tool_integration --> model_routing
+  agent_memory --> code_research
+  tool_integration --> code_research
+  parallel_agents --> bounded_autonomy
+  agent_observability --> bounded_autonomy
   security_sandbox --> policy_generation
-  security_sandbox --> security_orchestration
+  policy_generation --> evidence_automation
+  agent_observability --> evidence_automation
   codified_rules --> centralized_rules
   progressive_disclosure --> centralized_rules
-  security_orchestration --> centralized_rules
+  agent_observability --> drift_remediation
+  bounded_autonomy --> drift_remediation
+  guided_refactoring --> debt_forecasting
+  tool_integration --> debt_forecasting
+  agent_observability --> guided_chaos
+  bounded_autonomy --> guided_chaos
   classDef foundation fill:#e4f0e8,stroke:#2d5a3f,stroke-width:1.5px,color:#1a3a25,rx:4,ry:4;
   classDef development fill:#f7efcf,stroke:#b7950b,stroke-width:1.5px,color:#5c4a00,rx:4,ry:4;
   classDef operations fill:#f7e2df,stroke:#c0392b,stroke-width:1.5px,color:#78281f,rx:4,ry:4;
   class agent_readiness,codified_rules,security_sandbox,developer_lifecycle,tool_integration,issue_generation foundation;
-  class spec_driven_development,image_spec,planned_implementation,incremental_generation,adversarial_evaluator,atomic_decomposition,parallel_agents,agent_memory,event_automation,custom_commands,progressive_disclosure,observable_development,guided_refactoring,error_resolution,autonomous_remediation development;
-  class policy_generation,security_orchestration,centralized_rules operations;
+  class spec_driven_development,planned_implementation,incremental_generation,agent_memory,agent_hooks,custom_commands,progressive_disclosure,atomic_decomposition,guided_refactoring,agent_observability,image_spec,adversarial_evaluator,parallel_agents,error_resolution,model_routing,code_research,bounded_autonomy development;
+  class policy_generation,evidence_automation,centralized_rules,drift_remediation,debt_forecasting,guided_chaos operations;
   click agent_readiness openPatternFromDiagram "Open Agent Readiness"
   click codified_rules openPatternFromDiagram "Open Codified Rules"
   click security_sandbox openPatternFromDiagram "Open Security Sandbox"
@@ -218,23 +231,28 @@ graph LR
   click tool_integration openPatternFromDiagram "Open Tool Integration"
   click issue_generation openPatternFromDiagram "Open Issue Generation"
   click spec_driven_development openPatternFromDiagram "Open Spec-Driven Development"
-  click image_spec openPatternFromDiagram "Open Image Spec"
   click planned_implementation openPatternFromDiagram "Open Planned Implementation"
   click incremental_generation openPatternFromDiagram "Open Incremental Generation"
-  click adversarial_evaluator openPatternFromDiagram "Open Adversarial Evaluator"
-  click atomic_decomposition openPatternFromDiagram "Open Atomic Decomposition"
-  click parallel_agents openPatternFromDiagram "Open Parallel Agents"
   click agent_memory openPatternFromDiagram "Open Agent Memory"
-  click event_automation openPatternFromDiagram "Open Event Automation"
+  click agent_hooks openPatternFromDiagram "Open Agent Hooks"
   click custom_commands openPatternFromDiagram "Open Custom Commands"
   click progressive_disclosure openPatternFromDiagram "Open Progressive Disclosure"
-  click observable_development openPatternFromDiagram "Open Observable Development"
+  click atomic_decomposition openPatternFromDiagram "Open Atomic Decomposition"
   click guided_refactoring openPatternFromDiagram "Open Guided Refactoring"
+  click agent_observability openPatternFromDiagram "Open Agent Observability"
+  click image_spec openPatternFromDiagram "Open Image Spec"
+  click adversarial_evaluator openPatternFromDiagram "Open Adversarial Evaluator"
+  click parallel_agents openPatternFromDiagram "Open Parallel Agents"
   click error_resolution openPatternFromDiagram "Open Error Resolution"
-  click autonomous_remediation openPatternFromDiagram "Open Autonomous Remediation"
+  click model_routing openPatternFromDiagram "Open Model Routing"
+  click code_research openPatternFromDiagram "Open Code Research"
+  click bounded_autonomy openPatternFromDiagram "Open Bounded Autonomy"
   click policy_generation openPatternFromDiagram "Open Policy Generation"
-  click security_orchestration openPatternFromDiagram "Open Security Orchestration"
+  click evidence_automation openPatternFromDiagram "Open Evidence Automation"
   click centralized_rules openPatternFromDiagram "Open Centralized Rules"
+  click drift_remediation openPatternFromDiagram "Open Drift Remediation"
+  click debt_forecasting openPatternFromDiagram "Open Debt Forecasting"
+  click guided_chaos openPatternFromDiagram "Open Guided Chaos"
         </div>
         <!-- PATTERNS:DIAGRAM:END -->
                 </div>
@@ -257,7 +275,7 @@ graph LR
                     <p class="badges">
                         <a href="https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml"><img src="https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml/badge.svg" alt="Tests"></a>
                         <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
-                        <a href="https://github.com/PaulDuvall/ai-development-patterns#complete-pattern-reference"><img src="https://img.shields.io/badge/patterns-24-blue.svg" alt="Patterns"></a>
+                        <a href="https://github.com/PaulDuvall/ai-development-patterns#complete-pattern-reference"><img src="https://img.shields.io/badge/patterns-29-blue.svg" alt="Patterns"></a>
                     </p>
                 </div>
                 <div class="foot-links">

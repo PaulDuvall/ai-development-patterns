@@ -6,19 +6,16 @@ This directory contains working implementations of selected experimental pattern
 
 | Experimental Pattern | Example Directory | Notes |
 |----------------------|------------------|-------|
-| [Asynchronous Research](../README.md#asynchronous-research) | [`asynchronous-research/`](asynchronous-research/) | Fire-and-forget research workflows |
-| [Bounded Autonomy](../README.md#bounded-autonomy) | [`bounded-autonomy/`](bounded-autonomy/) | Bounded autonomous-loop wrapper with caps and evidence |
-| [Debt Forecasting](../README.md#debt-forecasting) | [`debt-forecasting/`](debt-forecasting/) | Proactive technical debt analysis |
-| [Deployment Synthesis](../README.md#deployment-synthesis) | [`deployment-synthesis/`](deployment-synthesis/) | Generate validated deployment configurations |
-| [Drift Remediation](../README.md#drift-remediation) | [`drift-remediation/`](drift-remediation/) | Detect and correct infrastructure drift |
+| [Autonomous Remediation](../README.md#autonomous-remediation) | [`autonomous-remediation/`](autonomous-remediation/) | Detector-driven remediation loop under further evaluation |
+| [Dependency Migration](../README.md#dependency-migration) | [`dependency-migration/`](dependency-migration/) | Agentic compatibility analysis and staged migration |
 | [Feedback Flywheel](../README.md#feedback-flywheel) | [`feedback-flywheel/`](feedback-flywheel/) | Retrospective-driven rule improvement |
 | [Handoff Protocols](../README.md#handoff-protocols) | [`handoff-protocols/`](handoff-protocols/) | Human ↔ AI handoff decisioning and procedures |
 | [Incident Automation](../README.md#incident-automation) | [`incident-automation/`](incident-automation/) | Generate incident response playbooks |
-| [Pipeline Synthesis](../README.md#pipeline-synthesis) | [`pipeline-synthesis/`](pipeline-synthesis/) | Convert build specs into pipeline configs |
+| [Pipeline Synthesis](../README.md#pipeline-synthesis) | [`pipeline-synthesis/`](pipeline-synthesis/) | Convert build specs into validated build, deployment, and release workflows |
 | [Review Automation](../README.md#review-automation) | [`review-automation/`](review-automation/) | Automate review of parallel outputs |
+| [Security Orchestration](../README.md#security-orchestration) | [`security-orchestration/`](security-orchestration/) | Aggregate security findings for review |
 | [Test Promotion](../README.md#test-promotion) | [`test-promotion/`](test-promotion/) | Separate generated tests from golden tests |
 | [Testing Orchestration](../README.md#testing-orchestration) | [`testing-orchestration/`](testing-orchestration/) | Coordinated testing strategy and automation |
-| [Upgrade Advisor](../README.md#upgrade-advisor) | [`upgrade-advisor/`](upgrade-advisor/) | Intelligent dependency upgrades |
 | [Workflow Orchestration](../README.md#workflow-orchestration) | [`workflow-orchestration/`](workflow-orchestration/) | Coordinate sequential and parallel workflows |
 
 ## Getting Started
@@ -29,3 +26,5 @@ This directory contains working implementations of selected experimental pattern
    - [Spec-Driven Development](../../README.md#spec-driven-development)
 2. Pick an experimental example directory from the table above.
 3. Follow the `README.md` in that directory.
+
+Examples for promoted patterns now live in the main [examples directory](../../examples/), including [Bounded Autonomy](../../examples/bounded-autonomy/), [Code Research](../../examples/code-research/), [Debt Forecasting](../../examples/debt-forecasting/), and [Drift Remediation](../../examples/drift-remediation/).

@@ -89,9 +89,9 @@ def test_real_catalog_contains_all_main_and_experimental_patterns():
     catalog = MODULE.load_catalog(
         root / "patterns.yaml", root / "experiments" / "README.md")
 
-    assert len(catalog) == 49
-    assert sum(item["location"] == "main" for item in catalog) == 24
-    assert sum(item["location"] == "experimental" for item in catalog) == 25
+    assert len(catalog) == 47
+    assert sum(item["location"] == "main" for item in catalog) == 29
+    assert sum(item["location"] == "experimental" for item in catalog) == 18
 
 
 def test_full_execution_matrix_assigns_every_pattern_exactly_once():
@@ -102,7 +102,7 @@ def test_full_execution_matrix_assigns_every_pattern_exactly_once():
     matrix, units = MODULE.build_execution_matrix(catalog, "full")
 
     evidence_units = [unit for unit in units if unit["kind"] == "evidence"]
-    assert len(evidence_units) == 49
+    assert len(evidence_units) == 47
     assert units[-1]["kind"] == "discovery"
     assert matrix["include"] == units
     selected = [json.loads(unit["selected_slugs_json"])[0]
@@ -136,7 +136,7 @@ def test_real_full_catalog_preserves_order_after_inflight_exclusions(tmp_path):
     catalog = MODULE.load_catalog(
         root / "patterns.yaml", root / "experiments" / "README.md")
     excluded = {
-        "agent-readiness", "event-automation", "handoff-protocols", "bounded-autonomy",
+        "agent-readiness", "agent-hooks", "handoff-protocols", "bounded-autonomy",
     }
     inventory = MODULE.build_inventory(
         catalog, root / "verification" / "evidence", excluded,
@@ -147,7 +147,7 @@ def test_real_full_catalog_preserves_order_after_inflight_exclusions(tmp_path):
     actual = [unit["slug"] for unit in units if unit["kind"] == "evidence"]
     expected = [item["slug"] for item in catalog if item["slug"] not in excluded]
 
-    assert len(actual) == 45
+    assert len(actual) == 43
     assert actual == expected
     assert not excluded.intersection(actual)
     assert units[-1]["kind"] == "discovery"

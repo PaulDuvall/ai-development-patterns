@@ -1,0 +1,103 @@
+schema_version: 2
+provenance_status: complete
+pattern: Flake Management
+slug: flake-management
+last_checked: 2026-07-10
+search:
+  run_id: github-actions:29123202495
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: 2026-07-10
+  modes:
+    name:
+      queries:
+        - '"Suite Health" "flaky tests"'
+        - '"suite health" "test reliability"'
+      candidate_count: 8
+    mechanism:
+      queries:
+        - flaky test detection build history product CI test suite reliability scores
+        - automated flaky test detection CI build history engineering blog
+        - site:docs.trunk.io flaky tests detect CI test results
+        - site:docs.gradle.com flaky test management build scan history
+      candidate_count: 13
+    artifact:
+      queries:
+        - '"develocity.testRetry" "failOnPassedAfterRetry" "CI"'
+        - '"TRUNK_API_TOKEN" "flaky" "github actions"'
+      candidate_count: 6
+adoption_score: 12
+tier_counts:
+  T1: 2
+  T4: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 3
+naming_alignment: aliased
+terminology_variants:
+  - term: flaky test management
+    used_by: Trunk
+    url: https://docs.trunk.io/flaky-tests/overview
+  - term: flaky test detection
+    used_by: Develocity
+    url: https://docs.develocity.ai/2026.1/guides/flaky-test-detection-guide/
+  - term: automated detection and suppression
+    used_by: Slack Engineering
+    url: https://slack.engineering/handling-flaky-tests-at-scale-auto-detection-suppression/
+evidence:
+  - tier: T1
+    match: aliased
+    mechanism_quote: Trunk Flaky Tests lets your teams detect, track, quarantine, and fix flaky tests in your codebase.
+    source: Trunk Flaky Tests overview
+    source_kind: shipped_product
+    organization: Trunk
+    independence_group: trunk
+    url: https://docs.trunk.io/flaky-tests/overview
+    resolved_url: https://docs.trunk.io/flaky-tests/overview
+    content_sha256: f2e61b4f168fd54ff34f39063d3ced064534182de6f97c3c725b807a64a21a7d
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Trunk ships a CI-oriented flaky test management product that detects, tracks, quarantines, and fixes flaky tests in a codebase.
+  - tier: T1
+    match: aliased
+    mechanism_quote: Develocity identifies flaky tests in a single build and across multiple builds.
+    source: Develocity flaky test detection guide
+    source_kind: shipped_product
+    organization: Develocity
+    independence_group: develocity
+    url: https://docs.develocity.ai/2026.1/guides/flaky-test-detection-guide/
+    resolved_url: https://docs.develocity.ai/2026.1/guides/flaky-test-detection-guide/
+    content_sha256: 7ddf2cde33d9255e53d4f89788c3e711871ea8bf5da0d6c354929092c189ea8d
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    retrieved: 2026-07-10
+    claim: Develocity ships flaky test detection that identifies flaky tests both within a single build and across multiple builds.
+  - tier: T4
+    match: aliased
+    mechanism_quote: We wanted to create a system that would detect flaky tests and calculate flakiness percentage based on the test history.
+    source: Slack Engineering - Handling flaky tests at scale
+    source_kind: case_study
+    organization: Slack Engineering
+    independence_group: slack
+    url: https://slack.engineering/handling-flaky-tests-at-scale-auto-detection-suppression/
+    resolved_url: https://slack.engineering/handling-flaky-tests-at-scale-auto-detection-suppression/
+    content_sha256: 5cbd307abb1a2307994c857bb87b1690487a79b8aa3fcb7843e2ee220527b7f6
+    verifier:
+      method: automated
+      model: gpt-5.5
+      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+    date: 2023-12-07
+    retrieved: 2026-07-10
+    claim: Slack implemented automated flaky-test detection and suppression that calculates flakiness percentage from test history.
+verdict: verified

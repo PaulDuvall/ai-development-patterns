@@ -3,7 +3,7 @@
 [![Tests](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml/badge.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/docs-comprehensive-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns#ai-development-patterns)
-[![Patterns](https://img.shields.io/badge/patterns-24-blue.svg)](#complete-pattern-reference)
+[![Patterns](https://img.shields.io/badge/patterns-29-blue.svg)](#complete-pattern-reference)
 [![Quality Gate](https://img.shields.io/badge/quality%20gate-passing-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/tree/main/tests)
 [![Hyperlinks](https://img.shields.io/badge/hyperlinks-validated-brightgreen.svg)](https://github.com/PaulDuvall/ai-development-patterns/actions/workflows/pattern-validation.yml)
 
@@ -15,82 +15,71 @@ Adoption verdicts are mechanically recomputed from structured, tiered evidence. 
 
 ```mermaid
 graph TB
-    %% ROW 1: Foundation start (left to right)
-    RDY([Agent<br/>Readiness]) --> CR([Codified<br/>Rules])
-    CR --> SS([Security<br/>Sandbox])
-    SS --> DL([Developer<br/>Lifecycle])
-    DL --> TI([Tool<br/>Integration])
+    subgraph F[Foundation]
+        RDY[Agent Readiness] --> CR[Codified Rules] --> SS[Security Sandbox]
+        SS --> DL[Developer Lifecycle] --> TI[Tool Integration]
+        RDY --> IG[Issue Generation]
+    end
 
-    %% ROW 2: Operations & branches (loops back)
-    SS --> SO([Security<br/>Orchestration])
-    SS --> PG([Policy<br/>Generation])
-    SO --> CZR([Centralized<br/>Rules])
+    subgraph D[Development]
+        DL --> SD[Spec-Driven Development]
+        DL --> PI[Planned Implementation] --> INCR[Incremental Generation]
+        INCR --> AD[Atomic Decomposition] --> PA[Parallel Agents]
+        INCR --> AE[Adversarial Evaluator]
+        CR --> AM[Agent Memory] --> PD[Progressive Disclosure]
+        CR --> AH[Agent Hooks] --> CC[Custom Commands]
+        SD --> IS[Image Spec]
+        CR --> GR[Guided Refactoring]
+        DL --> AO[Agent Observability] --> ER[Error Resolution]
+        TI --> MR[Model Routing]
+        PA --> CRES[Code Research]
+        PA --> BA[Bounded Autonomy]
+    end
 
-    %% ROW 3: Development patterns (flows forward again)
-    DL --> OD([Observable<br/>Development])
-    DL --> SD([Spec-Driven<br/>Development])
-    CR --> GR([Guided<br/>Refactoring])
-    CR --> AM([Agent<br/>Memory])
-    RDY --> IG([Issue<br/>Generation])
-    CR --> EA([Event<br/>Automation])
-    SS --> EA
-    EA --> CC([Custom<br/>Commands])
-    SD --> CC
-    AM --> PD([Progressive<br/>Disclosure])
-    CR --> PD
-    SD --> IS([Image<br/>Spec])
-    PD --> CZR
+    subgraph O[Operations]
+        SS --> PG[Policy Generation] --> EVA[Evidence Automation]
+        CR --> CZR[Centralized Rules]
+        AO --> DR[Drift Remediation]
+        GR --> DF[Debt Forecasting]
+        AO --> GC[Guided Chaos]
+    end
 
-    %% ROW 4: Development chain
-    INCR([Incremental<br/>Generation]) --> AD([Atomic<br/>Decomposition])
-    AD --> PA([Parallel<br/>Agents])
-    INCR --> IS
-
-    %% ROW 5: Additional development patterns
-    INCR --> AE([Adversarial<br/>Evaluator])
-    DL --> ER([Error<br/>Resolution])
-    OD --> ER
-    TI --> ER
-    EA --> AR([Autonomous<br/>Remediation])
-    CR --> AR
-    GR --> AR
-    ER --> AR
-    PI([Planned<br/>Implementation])
-
-    %% STYLING
     classDef foundation fill:#a8d5ba,stroke:#2d5a3f,stroke-width:2px,color:#1a3a25
     classDef development fill:#f9e79f,stroke:#b7950b,stroke-width:2px,color:#7d6608
     classDef operations fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,color:#78281f
-
     class RDY,CR,SS,DL,TI,IG foundation
-    class INCR,SD,AD,PA,OD,GR,EA,CC,PD,IS,AM,AE,ER,PI,AR development
-    class PG,SO,CZR operations
+    class SD,PI,INCR,AD,PA,AE,AM,PD,AH,CC,IS,GR,AO,ER,MR,CRES,BA development
+    class PG,EVA,CZR,DR,DF,GC operations
 
-    %% CLICKABLE LINKS
     click RDY "https://github.com/PaulDuvall/ai-development-patterns#agent-readiness"
     click CR "https://github.com/PaulDuvall/ai-development-patterns#codified-rules"
     click SS "https://github.com/PaulDuvall/ai-development-patterns#security-sandbox"
     click DL "https://github.com/PaulDuvall/ai-development-patterns#developer-lifecycle"
     click TI "https://github.com/PaulDuvall/ai-development-patterns#tool-integration"
     click IG "https://github.com/PaulDuvall/ai-development-patterns#issue-generation"
-    click AM "https://github.com/PaulDuvall/ai-development-patterns#agent-memory"
-    click INCR "https://github.com/PaulDuvall/ai-development-patterns#incremental-generation"
     click SD "https://github.com/PaulDuvall/ai-development-patterns#spec-driven-development"
-    click AD "https://github.com/PaulDuvall/ai-development-patterns#atomic-decomposition"
-    click PA "https://github.com/PaulDuvall/ai-development-patterns#parallel-agents"
-    click OD "https://github.com/PaulDuvall/ai-development-patterns#observable-development"
-    click GR "https://github.com/PaulDuvall/ai-development-patterns#guided-refactoring"
-    click EA "https://github.com/PaulDuvall/ai-development-patterns#event-automation"
+    click PI "https://github.com/PaulDuvall/ai-development-patterns#planned-implementation"
+    click INCR "https://github.com/PaulDuvall/ai-development-patterns#incremental-generation"
+    click AM "https://github.com/PaulDuvall/ai-development-patterns#agent-memory"
+    click AH "https://github.com/PaulDuvall/ai-development-patterns#agent-hooks"
     click CC "https://github.com/PaulDuvall/ai-development-patterns#custom-commands"
     click PD "https://github.com/PaulDuvall/ai-development-patterns#progressive-disclosure"
+    click AD "https://github.com/PaulDuvall/ai-development-patterns#atomic-decomposition"
+    click GR "https://github.com/PaulDuvall/ai-development-patterns#guided-refactoring"
+    click AO "https://github.com/PaulDuvall/ai-development-patterns#agent-observability"
     click IS "https://github.com/PaulDuvall/ai-development-patterns#image-spec"
-    click PG "https://github.com/PaulDuvall/ai-development-patterns#policy-generation"
-    click SO "https://github.com/PaulDuvall/ai-development-patterns#security-orchestration"
-    click CZR "https://github.com/PaulDuvall/ai-development-patterns#centralized-rules"
-    click PI "https://github.com/PaulDuvall/ai-development-patterns#planned-implementation"
     click AE "https://github.com/PaulDuvall/ai-development-patterns#adversarial-evaluator"
+    click PA "https://github.com/PaulDuvall/ai-development-patterns#parallel-agents"
     click ER "https://github.com/PaulDuvall/ai-development-patterns#error-resolution"
-    click AR "https://github.com/PaulDuvall/ai-development-patterns#autonomous-remediation"
+    click MR "https://github.com/PaulDuvall/ai-development-patterns#model-routing"
+    click CRES "https://github.com/PaulDuvall/ai-development-patterns#code-research"
+    click BA "https://github.com/PaulDuvall/ai-development-patterns#bounded-autonomy"
+    click PG "https://github.com/PaulDuvall/ai-development-patterns#policy-generation"
+    click EVA "https://github.com/PaulDuvall/ai-development-patterns#evidence-automation"
+    click CZR "https://github.com/PaulDuvall/ai-development-patterns#centralized-rules"
+    click DR "https://github.com/PaulDuvall/ai-development-patterns#drift-remediation"
+    click DF "https://github.com/PaulDuvall/ai-development-patterns#debt-forecasting"
+    click GC "https://github.com/PaulDuvall/ai-development-patterns#guided-chaos"
 ```
 
 **Legend**: 🟢 Foundation | 🟡 Development | 🔴 Operations
@@ -103,6 +92,12 @@ This repository provides a structured approach to AI-assisted development throug
 - **[Development Patterns](#development-patterns)** - Daily practice patterns for AI-assisted coding workflows  
 - **[Operations Patterns](#operations-patterns)** - CI/CD, security, and production management with AI
 - **[Experimental Patterns](experiments/)** - Advanced and experimental patterns under active development and/or consideration.
+
+<a id="security-orchestration"></a>
+- **Moved to experiments:** [Security Orchestration](experiments/README.md#security-orchestration)
+
+<a id="autonomous-remediation"></a>
+- **Moved to experiments:** [Autonomous Remediation](experiments/README.md#autonomous-remediation)
 
 ## Harness Engineering Lens
 
@@ -121,11 +116,12 @@ A healthy harness balances all four: feedforward-only agents never learn whether
 | [Spec-Driven Development](#spec-driven-development) | Feedforward | — | Behaviour |
 | [Planned Implementation](#planned-implementation) | Feedforward | — | Approach |
 | [Custom Commands](#custom-commands) | Feedforward | — | Workflow |
-| [Observable Development](#observable-development) | Feedforward + Feedback | Computational + Inferential | Architecture fitness |
+| [Agent Observability](#agent-observability) | Feedforward + Feedback | Computational + Inferential | Architecture fitness |
 | [Guided Refactoring](#guided-refactoring) | Feedback | Computational + Inferential | Maintainability |
 | [Adversarial Evaluator](#adversarial-evaluator) | Feedback | Inferential | Behaviour |
 | [Error Resolution](#error-resolution) | Feedback | Computational | Runtime |
-| [Autonomous Remediation](#autonomous-remediation) | Feedback | Computational + Inferential | Runtime |
+| [Agent Hooks](#agent-hooks) | Feedforward + Feedback | Computational | Workflow boundaries |
+| [Bounded Autonomy](#bounded-autonomy) | Feedforward + Feedback | Computational | Autonomous loops |
 
 Two principles from the source are worth stating directly:
 
@@ -146,11 +142,11 @@ Three principles set the lens's dimensions:
 
 | Principle | What the loop must have | Catalog patterns that satisfy it |
 |-----------|-------------------------|----------------------------------|
-| No executable done-check, no loop | An observable goal, acceptance criteria written first, and cheap reversal | [Spec-Driven Development](#spec-driven-development), [Planned Implementation](#planned-implementation), [Observable Development](#observable-development); reversible failure via [Parallel Agents](#parallel-agents) worktrees |
-| The test arbitrates, not the model | Tight scope, an independent verifier, and checks wired to fire on every change | [Atomic Decomposition](#atomic-decomposition), [Adversarial Evaluator](#adversarial-evaluator), [Test Promotion](experiments/README.md#test-promotion), [Autonomous Remediation](#autonomous-remediation), [Event Automation](#event-automation), [Autonomous Acceptance](experiments/README.md#autonomous-acceptance) |
-| Verification reach sets the autonomy ceiling | Hard bounds, state in git, and human-owned edges | [Bounded Autonomy](experiments/README.md#bounded-autonomy), [Agent Memory](#agent-memory), [Long-Running Orchestration](experiments/README.md#long-running-orchestration), [Centralized Rules](#centralized-rules), [Handoff Protocols](experiments/README.md#handoff-protocols) |
+| No executable done-check, no loop | An observable goal, acceptance criteria written first, and cheap reversal | [Spec-Driven Development](#spec-driven-development), [Planned Implementation](#planned-implementation), [Agent Observability](#agent-observability); reversible failure via [Parallel Agents](#parallel-agents) worktrees |
+| The test arbitrates, not the model | Tight scope, an independent verifier, and checks wired to fire on every change | [Atomic Decomposition](#atomic-decomposition), [Adversarial Evaluator](#adversarial-evaluator), [Test Promotion](experiments/README.md#test-promotion), [Agent Hooks](#agent-hooks), [Autonomous Acceptance](experiments/README.md#autonomous-acceptance) |
+| Verification reach sets the autonomy ceiling | Hard bounds, state in git, and human-owned edges | [Bounded Autonomy](#bounded-autonomy), [Agent Memory](#agent-memory), [Long-Running Orchestration](experiments/README.md#long-running-orchestration), [Centralized Rules](#centralized-rules), [Handoff Protocols](experiments/README.md#handoff-protocols) |
 
-The one part of Principle 3 that no other catalog pattern covers — bounding the loop (turn caps, spend caps, stall/divergence detection) and capturing an in-loop diagnostic trail — is what the [Bounded Autonomy](experiments/README.md#bounded-autonomy) experimental pattern adds.
+The [Bounded Autonomy](#bounded-autonomy) pattern supplies the control layer that caps turns, spend, and time, detects stalls and divergence, and captures an in-loop diagnostic trail.
 
 Two principles from the source are worth stating directly:
 
@@ -171,9 +167,9 @@ Most of this catalog reads like a menu: pick the patterns you need. The **Lifecy
 | 2-3. Plan & requirements | Architecture, tasks, and API specs | [Planned Implementation](#planned-implementation), [Issue Generation](#issue-generation) |
 | 4-5. Specifications & tests | Acceptance criteria written before any code | [Spec-Driven Development](#spec-driven-development) |
 | 6. Implementation | Working code in small, verifiable increments | [Atomic Decomposition](#atomic-decomposition), [Incremental Generation](#incremental-generation) |
-| 7. Testing & review | Test results, security scan, independent review | [Observable Development](#observable-development), [Adversarial Evaluator](#adversarial-evaluator) |
-| 8. Deployment | A shipped change | [Custom Commands](#custom-commands), [Event Automation](#event-automation) |
-| 9. Monitoring & correction | Runtime signals and validated fixes | [Observable Development](#observable-development), [Autonomous Remediation](#autonomous-remediation), [Error Resolution](#error-resolution) |
+| 7. Testing & review | Test results, security scan, independent review | [Agent Observability](#agent-observability), [Adversarial Evaluator](#adversarial-evaluator) |
+| 8. Deployment | A shipped change | [Custom Commands](#custom-commands), [Agent Hooks](#agent-hooks) |
+| 9. Monitoring & correction | Runtime signals and human-approved fixes | [Agent Observability](#agent-observability), [Drift Remediation](#drift-remediation), [Error Resolution](#error-resolution) |
 
 Read top to bottom it is a feedforward chain: each stage's output is the next stage's input. The catalog's three categories ([Foundation](#foundation-patterns) -> [Development](#development-patterns) -> [Operations](#operations-patterns)) are the same arc at coarser grain; this lens is the per-feature zoom of it.
 
@@ -195,22 +191,28 @@ graph TD
 
     subgraph "Phase 2: Development (Weeks 3-4)"
         D --> G[Spec-Driven Development]
-        H[Planned Implementation]
-        I[Incremental Generation]
+        D --> H[Planned Implementation]
+        H --> I[Incremental Generation]
         I --> J[Adversarial Evaluator]
-        Q[Event Automation]
+        Q[Agent Hooks]
         R[Custom Commands]
         S[Progressive Disclosure]
         U[Image Spec]
-        V[Autonomous Remediation]
         I --> K[Atomic Decomposition]
         K --> L[Parallel Agents]
+        D --> O[Agent Observability]
+        F --> MR[Model Routing]
+        L --> RS[Code Research]
+        L --> BA[Bounded Autonomy]
     end
 
     subgraph "Phase 3: Operations (Weeks 5-6)"
         C --> M[Policy Generation]
-        M --> N[Security Orchestration]
-        N --> T[Centralized Rules]
+        M --> EV[Evidence Automation]
+        B --> T[Centralized Rules]
+        O --> DR[Drift Remediation]
+        O --> GC[Guided Chaos]
+        B --> DF[Debt Forecasting]
     end
 
     B --> Q
@@ -223,42 +225,48 @@ graph TD
     S --> T
     G --> U
     I --> U
-    Q --> V
-    B --> V
 ```
 
 **Continuous Implementation Note**: Security patterns ([Security Sandbox](#security-sandbox), AI Security & Compliance) and deployment patterns should be implemented continuously throughout development, not delayed until specific phases. The dependencies shown represent learning prerequisites, not deployment gates.
 
 ## Complete Pattern Reference
 
-| Pattern | Maturity | Type | Description | Dependencies |
-|---------|----------|------|-------------|--------------|
-| **[Agent Readiness](#agent-readiness)** | Beginner | Foundation | Systematic evaluation of codebase and team readiness for AI integration | None |
-| **[Codified Rules](#codified-rules)** | Beginner | Foundation | Version and maintain AI coding standards as explicit configuration files | Agent Readiness |
-| **[Security Sandbox](#security-sandbox)** | Beginner | Foundation | Run AI tools in isolated environments without access to secrets or sensitive data | Codified Rules |
-| **[Developer Lifecycle](#developer-lifecycle)** | Intermediate | Workflow | A staged, plan-first discipline for taking a single feature from problem to production with AI assistance | Codified Rules, Security Sandbox |
-| **[Tool Integration](#tool-integration)** | Intermediate | Foundation | Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions | Security Sandbox, Developer Lifecycle |
-| **[Issue Generation](#issue-generation)** | Intermediate | Foundation | Generate Kanban-optimized work items (4-8 hours max) from requirements using AI to ensure continuous flow with clear acceptance criteria and dependencies | Agent Readiness |
-| **[Spec-Driven Development](#spec-driven-development)** | Intermediate | Development | Use executable specifications to guide AI code generation with clear acceptance criteria before implementation | Developer Lifecycle |
-| **[Image Spec](#image-spec)** | Intermediate | Development | Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context | Spec-Driven Development, Incremental Generation |
-| **[Planned Implementation](#planned-implementation)** | Beginner | Development | Interview, constrain, and plan before writing code so AI implementation matches actual requirements instead of confident-sounding assumptions | None |
-| **[Incremental Generation](#incremental-generation)** | Beginner | Development | Build complex features through small, deployable iterations rather than big-bang generation | None |
-| **[Adversarial Evaluator](#adversarial-evaluator)** | Intermediate | Development | Separate the generating agent from an independent judging agent (ideally a different model) and use adversarial pressure or cross-model divergence as eval signal for high-stakes decisions | Incremental Generation |
-| **[Atomic Decomposition](#atomic-decomposition)** | Intermediate | Development | Break complex features into atomic, independently implementable tasks for parallel AI agent execution | Incremental Generation |
-| **[Parallel Agents](#parallel-agents)** | Advanced | Development | Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration | Atomic Decomposition |
-| **[Agent Memory](#agent-memory)** | Intermediate | Development | Manage AI context as a finite resource through structured memory schemas, prompt pattern capture, and session continuity protocols | Codified Rules |
-| **[Event Automation](#event-automation)** | Intermediate | Development | Execute custom commands automatically at assistant lifecycle events to enforce policies and automate workflows | Codified Rules, Security Sandbox |
-| **[Custom Commands](#custom-commands)** | Intermediate | Development | Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and sophisticated workflows | Event Automation, Spec-Driven Development, Codified Rules |
-| **[Progressive Disclosure](#progressive-disclosure)** | Intermediate | Development | Load AI assistant rules incrementally based on task context to prevent instruction saturation and context bloat | Codified Rules, Agent Memory |
-| **[Observable Development](#observable-development)** | Intermediate | Development | Logging and tracing as a bidirectional control: feeds forward to steer the agent, feeds back as a sensor it reads to self-correct | Developer Lifecycle |
-| **[Guided Refactoring](#guided-refactoring)** | Intermediate | Development | Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics | Codified Rules |
-| **[Error Resolution](#error-resolution)** | Intermediate | Development | Automatically collect error context from logs, system state, and git history, then use AI to diagnose root causes and generate validated fixes | Developer Lifecycle, Observable Development, Tool Integration |
-| **[Autonomous Remediation](#autonomous-remediation)** | Intermediate | Development | Pair deterministic rule-based detectors with LLM remediators inside an event-driven loop so codified rule violations are caught and fixed automatically before the AI session continues | Codified Rules, Event Automation |
-| **Security & Compliance** | | Operations | *Category containing security and compliance patterns* | |
-| **[Policy Generation](#policy-generation)** | Advanced | Operations | Transform compliance requirements into executable Cedar/OPA policy files with AI assistance | Security Sandbox |
-| **[Security Orchestration](#security-orchestration)** | Intermediate | Workflow | Aggregate multiple security tools and use AI to summarize findings for actionable insights | Security Sandbox |
-| **[Centralized Rules](#centralized-rules)** | Advanced | Operations | Enforce organization-wide AI rules through a central Git repository that syncs to standard AI assistant configuration files with automatic language and framework detection | Codified Rules, Progressive Disclosure, Security Orchestration |
-| **Deployment Automation** | | Operations | *Category containing deployment and pipeline patterns* | |
+| Pattern | Maturity | Category | Type | Description | Dependencies |
+|---------|----------|----------|------|-------------|--------------|
+| **Foundation** | | Foundation | | *Team readiness and basic AI integration infrastructure* | |
+| **[Agent Readiness](#agent-readiness)** | Beginner | Foundation | Foundation | Evaluate codebase and team readiness for AI integration | None |
+| **[Codified Rules](#codified-rules)** | Beginner | Foundation | Foundation | Version and maintain AI coding standards as explicit configuration files | [Agent Readiness](#agent-readiness) |
+| **[Security Sandbox](#security-sandbox)** | Beginner | Foundation | Foundation | Run AI tools in isolated environments without access to secrets or sensitive data | [Codified Rules](#codified-rules) |
+| **[Developer Lifecycle](#developer-lifecycle)** | Intermediate | Foundation | Workflow | Take one feature from problem to production through a staged, plan-first discipline | [Codified Rules](#codified-rules), [Security Sandbox](#security-sandbox) |
+| **[Tool Integration](#tool-integration)** | Intermediate | Foundation | Foundation | Connect AI systems to external data, APIs, and tools | [Security Sandbox](#security-sandbox), [Developer Lifecycle](#developer-lifecycle) |
+| **[Issue Generation](#issue-generation)** | Intermediate | Foundation | Foundation | Generate flow-sized work items with acceptance criteria and dependencies | [Agent Readiness](#agent-readiness) |
+| **Development** | | Development | | *Daily coding workflows and tactical controls* | |
+| **[Spec-Driven Development](#spec-driven-development)** | Intermediate | Development | Development | Guide code generation with executable specifications and acceptance criteria | [Developer Lifecycle](#developer-lifecycle) |
+| **[Planned Implementation](#planned-implementation)** | Beginner | Development | Development | Interview, constrain, and plan before writing code | None |
+| **[Incremental Generation](#incremental-generation)** | Beginner | Development | Development | Build complex features through small, deployable iterations | [Planned Implementation](#planned-implementation) |
+| **[Agent Memory](#agent-memory)** | Intermediate | Development | Development | Preserve useful context and decisions across sessions | [Codified Rules](#codified-rules) |
+| **[Agent Hooks](#agent-hooks)** | Intermediate | Development | Development | Run commands and policy checks at assistant lifecycle hooks | [Codified Rules](#codified-rules), [Security Sandbox](#security-sandbox) |
+| **[Custom Commands](#custom-commands)** | Intermediate | Development | Development | Encode repeatable domain workflows in assistant commands | [Agent Hooks](#agent-hooks), [Spec-Driven Development](#spec-driven-development) |
+| **[Progressive Disclosure](#progressive-disclosure)** | Intermediate | Development | Development | Load only the task-specific rules needed for the current work | [Codified Rules](#codified-rules), [Agent Memory](#agent-memory) |
+| **[Atomic Decomposition](#atomic-decomposition)** | Intermediate | Development | Development | Split complex work into independently implementable agent tasks | [Incremental Generation](#incremental-generation) |
+| **[Guided Refactoring](#guided-refactoring)** | Intermediate | Development | Development | Improve code against measurable quality rules while preserving behavior | [Codified Rules](#codified-rules) |
+| **[Agent Observability](#agent-observability)** | Intermediate | Development | Development | Capture traces, tool events, evaluations, and runtime context for diagnosis and improvement | [Developer Lifecycle](#developer-lifecycle) |
+| **[Image Spec](#image-spec)** | Intermediate | Development | Development | Translate screenshots and design mockups into UI code with visual feedback | [Spec-Driven Development](#spec-driven-development), [Incremental Generation](#incremental-generation) |
+| **[Adversarial Evaluator](#adversarial-evaluator)** | Intermediate | Development | Development | Separate generation from independent adversarial evaluation | [Incremental Generation](#incremental-generation) |
+| **[Parallel Agents](#parallel-agents)** | Advanced | Development | Development | Run agents concurrently on isolated tasks or environments | [Atomic Decomposition](#atomic-decomposition) |
+| **[Error Resolution](#error-resolution)** | Intermediate | Development | Development | Diagnose failures and apply proposed fixes only after human review and deterministic validation | [Developer Lifecycle](#developer-lifecycle), [Agent Observability](#agent-observability) |
+| **[Model Routing](#model-routing)** | Advanced | Development | Development | Match task requirements to model capability, context, latency, and cost | [Tool Integration](#tool-integration) |
+| **[Code Research](#code-research)** | Intermediate | Development | Workflow | Answer technical questions with isolated executable experiments | [Agent Memory](#agent-memory), [Tool Integration](#tool-integration) |
+| **[Bounded Autonomy](#bounded-autonomy)** | Advanced | Development | Workflow | Bound agent loops by turns, spend, time, stalls, and verification reach | [Parallel Agents](#parallel-agents), [Agent Observability](#agent-observability) |
+| **Security & Compliance** | | Operations | Operations | *Policy, evidence, and organization-wide controls* | |
+| **[Policy Generation](#policy-generation)** | Advanced | Operations | Operations | Generate validated Cedar, Rego, OPA, or Gatekeeper policy-as-code | [Security Sandbox](#security-sandbox) |
+| **[Evidence Automation](#evidence-automation)** | Advanced | Operations | Operations | Continuously collect dated, audit-ready control evidence | [Policy Generation](#policy-generation), [Agent Observability](#agent-observability) |
+| **[Centralized Rules](#centralized-rules)** | Advanced | Operations | Operations | Synchronize organization-wide AI instructions from a central source | [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure) |
+| **Deployment Automation** | | Operations | Operations | *Infrastructure correction and controlled change* | |
+| **[Drift Remediation](#drift-remediation)** | Advanced | Operations | Operations | Detect declared-state drift and generate reviewable corrective patches | [Agent Observability](#agent-observability), [Bounded Autonomy](#bounded-autonomy) |
+| **Monitoring & Maintenance** | | Operations | Operations | *Reliability experiments and maintainability forecasting* | |
+| **[Debt Forecasting](#debt-forecasting)** | Intermediate | Operations | Operations | Forecast maintenance burden from code and repository trends | [Guided Refactoring](#guided-refactoring), [Tool Integration](#tool-integration) |
+| **[Guided Chaos](#guided-chaos)** | Advanced | Operations | Operations | Generate hypothesis-driven chaos experiments with explicit safety controls | [Agent Observability](#agent-observability), [Bounded Autonomy](#bounded-autonomy) |
 
 ---
 
@@ -371,9 +379,9 @@ graph TD
 
 **For Enterprise/Production (Month 2+)**:
 1. **[Policy Generation](#policy-generation)** - Compliance automation
-2. **[Security Orchestration](#security-orchestration)** - Integrated security
+2. **[Evidence Automation](#evidence-automation)** - Continuous, audit-ready control evidence
 3. **[Centralized Rules](#centralized-rules)** - Organization-wide AI standards
-4. **[Debt Forecasting](experiments/README.md#debt-forecasting)** - Proactive maintenance
+4. **[Debt Forecasting](#debt-forecasting)** - Proactive maintenance
 
 ### Project Type Recommendations
 
@@ -384,24 +392,24 @@ graph TD
 
 **Enterprise Applications**:
 - **Primary**: [Developer Lifecycle](#developer-lifecycle), [Policy Generation](#policy-generation)
-- **Secondary**: [Spec-Driven Development](#spec-driven-development), [Security Orchestration](#security-orchestration)
+- **Secondary**: [Spec-Driven Development](#spec-driven-development), [Evidence Automation](#evidence-automation)
 - **Essential**: All foundation patterns before development patterns
 
 **Research/Experimental Projects**:
-- **Primary**: [Adversarial Evaluator](#adversarial-evaluator), [Observable Development](#observable-development)
-- **Secondary**: [Agent Memory](#agent-memory), [Context Optimization](experiments/README.md#context-optimization)
+- **Primary**: [Code Research](#code-research), [Adversarial Evaluator](#adversarial-evaluator)
+- **Secondary**: [Agent Memory](#agent-memory), [Model Routing](#model-routing)
 - **Focus**: Learning and exploration over production readiness
 
 **High-Scale Production**:
-- **Primary**: [Parallel Agents](#parallel-agents), [Observable Development](#observable-development)
-- **Secondary**: Chaos Engineering, Incident Automation
+- **Primary**: [Parallel Agents](#parallel-agents), [Agent Observability](#agent-observability)
+- **Secondary**: [Guided Chaos](#guided-chaos), [Incident Automation](experiments/README.md#incident-automation)
 - **Critical**: All security and monitoring patterns
 
 ### Team Size Considerations
 
 **Solo Teams**:
 - Focus on **[Incremental Generation](#incremental-generation)** and **[Adversarial Evaluator](#adversarial-evaluator)**
-- Add **[Observable Development](#observable-development)** for debugging
+- Add **[Agent Observability](#agent-observability)** for debugging
 - Skip parallel orchestration patterns
 
 **Two-Pizza Teams** (small, autonomous teams):
@@ -420,19 +428,19 @@ graph TD
 ### Technology Stack Considerations
 
 **Cloud-Native Applications**:
-- Emphasize **[Policy Generation](#policy-generation)** and **Evidence Automation**
-- Implement **Drift Remediation** for infrastructure
-- Use **Deployment Synthesis** for safe releases
+- Emphasize **[Policy Generation](#policy-generation)** and **[Evidence Automation](#evidence-automation)**
+- Implement **[Drift Remediation](#drift-remediation)** for infrastructure
+- Use **[Pipeline Synthesis](experiments/README.md#pipeline-synthesis)** for safe delivery workflows
 
 **On-Premise Systems**:
 - Focus on **[Security Sandbox](#security-sandbox)** with network isolation
 - Implement **[Agent Memory](#agent-memory)** for institutional knowledge
-- Use **Debt Forecasting** for maintenance planning
+- Use **[Debt Forecasting](#debt-forecasting)** for maintenance planning
 
 **Microservices Architecture**:
 - **[Parallel Agents](#parallel-agents)** for service coordination
-- **[Observable Development](#observable-development)** across service boundaries
-- **[Autonomous Remediation](#autonomous-remediation)** for cross-service code-quality consistency
+- **[Agent Observability](#agent-observability)** across service boundaries
+- **[Agent Hooks](#agent-hooks)** for deterministic cross-service policy checks
 
 **Monolithic Applications**:
 - **[Incremental Generation](#incremental-generation)** for gradual modernization
@@ -496,7 +504,7 @@ Starting AI adoption without proper assessment leads to inconsistent practices, 
 **Maturity**: Beginner
 **Description**: Version and maintain AI coding standards as explicit configuration files that persist across sessions and team members.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Agent Memory](#agent-memory), [Progressive Disclosure](#progressive-disclosure), [Event Automation](#event-automation), [Custom Commands](#custom-commands), [Centralized Rules](#centralized-rules), [Harness Engineering Lens](#harness-engineering-lens)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Agent Memory](#agent-memory), [Progressive Disclosure](#progressive-disclosure), [Agent Hooks](#agent-hooks), [Custom Commands](#custom-commands), [Centralized Rules](#centralized-rules), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Source**: "[AGENTS.md](https://agents.md/)" open format specification (OpenAI, Google Jules, Cursor, Factory); Cursor, "[Rules](https://cursor.com/docs/rules)" documentation
 
@@ -540,7 +548,7 @@ Each developer maintains their own prompts and preferences, leading to inconsist
 **Maturity**: Beginner
 **Description**: Run AI tools in isolated environments without access to secrets or sensitive data to prevent credential leaks and maintain security compliance.
 
-**Related Patterns**: [Security & Compliance Patterns](#security--compliance-patterns), [Codified Rules](#codified-rules), [Event Automation](#event-automation)
+**Related Patterns**: [Security & Compliance Patterns](#security--compliance-patterns), [Codified Rules](#codified-rules), [Agent Hooks](#agent-hooks)
 
 **Source**: Anthropic, "[sandbox-runtime](https://github.com/anthropic-experimental/sandbox-runtime)"; Anthropic, "[Sandboxing](https://code.claude.com/docs/en/sandboxing)" (Claude Code documentation)
 
@@ -602,7 +610,7 @@ Allowing multiple parallel agents to write to the same directories creates race 
 **Maturity**: Intermediate
 **Description**: A staged, plan-first discipline for taking a single feature from problem to production with AI assistance.
 
-**Related Patterns**: [Lifecycle Lens](#lifecycle-lens), [Planned Implementation](#planned-implementation), [Spec-Driven Development](#spec-driven-development), [Atomic Decomposition](#atomic-decomposition), [Observable Development](#observable-development)
+**Related Patterns**: [Lifecycle Lens](#lifecycle-lens), [Planned Implementation](#planned-implementation), [Spec-Driven Development](#spec-driven-development), [Atomic Decomposition](#atomic-decomposition), [Agent Observability](#agent-observability)
 
 **Source**: GitHub, "[Spec Kit](https://github.com/github/spec-kit)"; AWS DevOps & Developer Productivity Blog, "[AI-Driven Development Life Cycle: Reimagining Software Engineering](https://aws.amazon.com/blogs/devops/ai-driven-development-life-cycle/)", July 31, 2025
 
@@ -663,7 +671,7 @@ Jumping straight to coding with AI without proper planning, requirements, or tes
 **Maturity**: Intermediate  
 **Description**: Connect AI systems to external data sources, APIs, and tools for enhanced capabilities beyond prompt-only interactions.
 
-**Related Patterns**: [Security Sandbox](#security-sandbox), [Developer Lifecycle](#developer-lifecycle), [Observable Development](#observable-development)
+**Related Patterns**: [Security Sandbox](#security-sandbox), [Developer Lifecycle](#developer-lifecycle), [Agent Observability](#agent-observability)
 
 **Source**: Anthropic, "[Introducing the Model Context Protocol](https://www.anthropic.com/news/model-context-protocol)", November 25, 2024; Model Context Protocol, "[modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)" reference servers
 
@@ -863,7 +871,7 @@ Specifications use authority levels to resolve conflicts and establish precedenc
 
 When requirements conflict, higher authority levels take precedence, enabling clear decision-making for AI implementation.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Tool Integration](#tool-integration), [Custom Commands](#custom-commands), [Image Spec](#image-spec), [Testing Orchestration](experiments/README.md#testing-orchestration), [Observable Development](#observable-development), [Harness Engineering Lens](#harness-engineering-lens)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Tool Integration](#tool-integration), [Custom Commands](#custom-commands), [Image Spec](#image-spec), [Testing Orchestration](experiments/README.md#testing-orchestration), [Agent Observability](#agent-observability), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Source**: GitHub, "[Spec Kit](https://github.com/github/spec-kit)"; Birgitta Böckeler, "[Understanding Spec-Driven-Development: Kiro, spec-kit, and Tessl](https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html)", October 15, 2025
 
@@ -991,26 +999,26 @@ Saving collections of prompts as if they were specifications. Prompts are implem
 ## Image Spec
 
 **Maturity**: Intermediate
-**Description**: Upload images (diagrams, mockups, flows) as primary specifications for AI coding tools to build accurate implementations from visual context.
+**Description**: Use screenshots and design mockups as visual specifications that coding agents translate into UI code and refine through visual feedback.
 
-**Related Patterns**: [Spec-Driven Development](#spec-driven-development), [Incremental Generation](#incremental-generation), [Context Optimization](experiments/README.md#context-optimization)
+**Related Patterns**: [Spec-Driven Development](#spec-driven-development), [Incremental Generation](#incremental-generation), [Model Routing](#model-routing)
+
+Industry implementations commonly call this practice *design-to-code* or *screenshot-to-code*. The pattern is deliberately scoped to UI visuals; architecture diagrams and data-flow diagrams remain useful supporting context, but the adoption evidence does not establish them as primary executable specifications.
 
 **Core Implementation**
 
-Use images as the source of truth for structure and intent, then supplement with minimal text constraints:
+Use a single screenshot or mockup as the source of truth for layout and visual intent, then supplement it with minimal behavioral and technology constraints:
 
 ```bash
-# 1. Prepare visual specifications
-# - architecture.png (components + labeled ports)
-# - data-model.png (fields + relationships)
-# - ui-mock.png (layout + key interactions)
+# 1. Prepare one focused visual specification
+# - checkout-mock.png (layout, states, and key interactions)
 
-# 2. Attach images and provide a minimal build request
+# 2. Attach the mockup and provide a minimal build request
 cat > build-request.txt << 'EOF'
-Build the system from the attached diagrams.
-Tech stack: Node.js + Express + PostgreSQL
-Start with the User Service exactly as shown.
-Include /health endpoints for every service.
+Implement the attached checkout mockup as a responsive React component.
+Match its layout, spacing, colors, and empty/error states.
+Use the existing design tokens and component library.
+Do not invent backend behavior; stub the submit handler.
 EOF
 
 # 3. Iterate with visual feedback
@@ -1021,11 +1029,11 @@ EOF
 
 **Complete Implementation**
 
-See [examples/image-spec/](examples/image-spec/) for prompt templates, diagram checklists, and a repeatable image-first iteration loop.
+See [examples/image-spec/](examples/image-spec/) for prompt templates and a repeatable screenshot-to-code iteration loop.
 
 **Anti-pattern: Overwhelming Visuals**
 
-Uploading many diagrams at once without hierarchy or a clear starting point overwhelms context, increases contradictions, and reduces accuracy. Start with one high-level diagram, implement one slice, then add more visuals progressively.
+Uploading many screenshots at once without a named target state overwhelms context and creates contradictory UI requirements. Start with one screen and one state, implement it, then add the next visual increment.
 
 ---
 
@@ -1414,7 +1422,7 @@ Running three models and treating majority rule as truth. Frontier models are tr
 
 ## Parallel Agents
 
-**Maturity**: Advanced  
+**Maturity**: Advanced
 **Description**: Run multiple AI agents concurrently on isolated tasks or environments to maximize development speed and exploration.
 
 **Related Patterns**: [Workflow Orchestration](experiments/README.md#workflow-orchestration), [Atomic Decomposition](#atomic-decomposition), [Security Sandbox](#security-sandbox)
@@ -1707,12 +1715,15 @@ Loading entire codebases, documentation, or conversation history into context ra
 
 ---
 
-## Event Automation
+<a id="event-automation"></a>
+## Agent Hooks
 
 **Maturity**: Intermediate
-**Description**: Execute custom commands automatically at assistant lifecycle events (pre/post tool use, session start, prompt submission) for workflow automation, validation, and policy enforcement.
+**Description**: Attach commands and policy checks to assistant lifecycle hooks so validation and workflow controls run automatically.
 
-**Related Patterns**: [Codified Rules](#codified-rules), [Security Sandbox](#security-sandbox), [Custom Commands](#custom-commands), [Autonomous Remediation](#autonomous-remediation)
+**Related Patterns**: [Codified Rules](#codified-rules), [Security Sandbox](#security-sandbox), [Custom Commands](#custom-commands), [Bounded Autonomy](#bounded-autonomy)
+
+Industry implementations call these controls *hooks*, *lifecycle hooks*, *agent hooks*, or event plugins. The compatibility anchor above preserves inbound links to the former catalog entry.
 
 **Core Concept**
 
@@ -1805,7 +1816,7 @@ Event commands run with full system access. Always review scripts before enablin
 
 **Complete Implementation**
 
-See [examples/event-automation/](examples/event-automation/) for a working implementation with security scanning and hooks.
+See [examples/agent-hooks/](examples/agent-hooks/) for a working implementation with security scanning and hooks.
 
 **Anti-pattern: Unchecked Events**
 
@@ -1818,11 +1829,11 @@ Running automation from untrusted sources without review exposes your system to 
 **Maturity**: Intermediate
 **Description**: Discover and use built-in command vocabularies, then extend them with custom commands that encode domain expertise and sophisticated workflows.
 
-**Related Patterns**: [Event Automation](#event-automation), [Spec-Driven Development](#spec-driven-development), [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure), [Harness Engineering Lens](#harness-engineering-lens)
+**Related Patterns**: [Agent Hooks](#agent-hooks), [Spec-Driven Development](#spec-driven-development), [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Core Concept**
 
-AI coding tools provide built-in commands for common operations and support custom commands (markdown files with AI instructions) for project-specific workflows. Commands are manual/on-demand (invoked like `/refactor`), while events fire automatically (see [Event Automation](#event-automation)).
+AI coding tools provide built-in commands for common operations and support custom commands (markdown files with AI instructions) for project-specific workflows. Commands are manual/on-demand (invoked like `/refactor`), while events fire automatically (see [Agent Hooks](#agent-hooks)).
 
 **Command Discovery**
 
@@ -1943,7 +1954,7 @@ Deploy to database: $1 (default: $STAGING_DB)
 **Maturity**: Intermediate
 **Description**: Load AI assistant rules incrementally based on task context rather than bundling all instructions upfront, preventing context bloat and improving instruction-following consistency.
 
-**Related Patterns**: [Codified Rules](#codified-rules), [Agent Memory](#agent-memory), [Custom Commands](#custom-commands), [Event Automation](#event-automation), [Centralized Rules](#centralized-rules), [Context Optimization](experiments/README.md#context-optimization)
+**Related Patterns**: [Codified Rules](#codified-rules), [Agent Memory](#agent-memory), [Custom Commands](#custom-commands), [Agent Hooks](#agent-hooks), [Centralized Rules](#centralized-rules), [Model Routing](#model-routing)
 
 **Core Problem**
 
@@ -1986,7 +1997,7 @@ The main file should explicitly tell the assistant what to load based on context
 
 **Automatic Loading with Hooks**
 
-Combine with [Event Automation](#event-automation) to auto-load the right rules before tool use:
+Combine with [Agent Hooks](#agent-hooks) to auto-load the right rules before tool use:
 
 ```bash
 #!/bin/bash
@@ -2028,7 +2039,7 @@ Creating specialized rule files but never documenting when/how to load them forc
 
 ## Atomic Decomposition
 
-**Maturity**: Intermediate  
+**Maturity**: Intermediate
 **Description**: Break complex features into atomic, independently implementable tasks for parallel AI agent execution.
 
 **Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Workflow Orchestration](experiments/README.md#workflow-orchestration), [Incremental Generation](#incremental-generation), [Issue Generation](#issue-generation), [Parallel Agents](#parallel-agents)
@@ -2160,126 +2171,12 @@ Breaking tasks so small that coordination overhead exceeds the benefits of paral
 
 ---
 
-## Observable Development
-
-**Maturity**: Intermediate  
-**Description**: Design systems with logging and tracing that make behavior visible to AI as a bidirectional control — observability feeds forward as a standard that steers the agent while it writes code, and feeds back as a sensor the agent reads (and grades) to self-correct.
-
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Tool Integration](#tool-integration), [Codified Rules](#codified-rules), [Autonomous Remediation](#autonomous-remediation), [Testing Orchestration](experiments/README.md#testing-orchestration), [Spec-Driven Development](#spec-driven-development), [Harness Engineering Lens](#harness-engineering-lens)
-
-**Observability as feedforward (a guide that steers)**
-
-Codify logging and tracing conventions as a [Codified Rule](#codified-rules) so the agent emits AI-legible, structured context *as it writes code* — before any failure occurs.
-
-```python
-# AI-friendly structured logging (the standard the agent writes against)
-def log_operation(operation, **context):
-    logging.info(json.dumps({
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "operation": operation,
-        "correlation_id": current_correlation_id(),
-        "context": context
-    }))
-
-# Observable business logic with comprehensive context
-def process_order(order):
-    log_operation("order_start", order_id=order.id, total=order.total)
-    try:
-        validate_order(order)
-        log_operation("validation_success")
-        result = charge_payment(order)
-        log_operation("payment_success", transaction_id=result.id)
-        return result
-    except PaymentError as e:
-        log_operation("payment_error", error=str(e), code=e.code)
-        raise
-```
-
-**Observability as feedback (a sensor the agent reads back)**
-
-Logs and traces are not write-only. They are a feedback signal the agent consumes to diagnose issues — and, critically, a signal the agent should **grade and improve**. After the agent resolves a failure, have it reflect on whether the logs it had were sufficient, then feed that judgment back into the logging standard:
-
-```bash
-ai "You just diagnosed this failure. Rate the logs you actually had to work with.
-What context was missing that would have made the root cause obvious in one pass?
-Emit the structured-logging changes that close that gap, and propose the update
-to .ai/rules/observability.md so the next operation is logged the same way."
-```
-
-This turns a feedback signal into a feedforward improvement — the harness gets better each time it is used, rather than the agent repeating the same blind spots. The human's job is to **steer by iterating on the standard**, not to hand-write every log line.
-
-**Enforce observability as a fitness function (computational sensor)**
-
-A standard that lives only in a doc is aspirational. Make it an enforced gate that runs on every change, alongside the agent, so black-box code fails fast ([Keep Quality Left](#guided-refactoring)):
-
-```python
-# Fitness function: every public operation must emit structured context
-def test_operations_are_observable():
-    for fn in public_operations(module):
-        assert emits_structured_log(fn), f"{fn.__name__} is a black box"
-        assert propagates_correlation_id(fn), f"{fn.__name__} drops correlation_id"
-```
-
-Pair the deterministic check with a probabilistic one. The two answer different questions:
-
-| Check | Type | Cost / reliability | Answers |
-|-------|------|--------------------|---------|
-| Structured log present, correlation ID propagates | Computational | ms, reliable | *Is it logged?* |
-| Are these logs actually useful for diagnosis? | Inferential (LLM-as-judge) | slow, probabilistic | *Is it useful?* |
-
-**Runtime feedback beyond the change lifecycle**
-
-Observability as a sensor does not stop at debug time. Extend it into production so the agent acts on drift: AI judges continuously sampling response quality and flagging log anomalies, and degrading SLOs that prompt the agent to suggest remediations (see [Autonomous Remediation](#autonomous-remediation)).
-
-**Complete Implementation**: See [examples/observable-development/](examples/observable-development/) for:
-- Full structured logging framework with correlation IDs
-- Performance monitoring decorators and utilities  
-- AI-friendly debug tools and log analysis scripts
-- Integration examples for e-commerce and authentication systems
-
-**Source**: "[Harness Engineering](https://martinfowler.com/articles/harness-engineering.html)", martinfowler.com — for the feedforward/feedback (guides vs. sensors) and computational/inferential control framing.
-
-**Anti-pattern: Blind Development**
-
-Building systems with minimal observability that provide insufficient context for AI to understand system behavior, diagnose issues, or suggest improvements.
-
-**Why it's problematic:** AI cannot debug systems with generic logs like "Payment failed" or "Something went wrong" - it needs specific context, timing, and error details.
-
-```python
-# Bad: Black box logging
-def process_payment(amount):
-    try:
-        result = payment_service.charge(amount)
-        logger.info("Payment processed")
-        return result
-    except Exception:
-        logger.error("Payment failed")
-        raise
-
-# Good: Observable implementation  
-def process_payment(amount):
-    log_operation("payment_start", amount=amount)
-    try:
-        result = payment_service.charge(amount)
-        log_operation("payment_success", transaction_id=result.id)
-        return result
-    except Exception as e:
-        log_operation("payment_error", error=str(e), amount=amount)
-        raise
-```
-
-**Anti-pattern: Write-Only Observability**
-
-Rich, structured logs exist, but nothing closes the loop. No agent reads them back to self-correct, no fitness function enforces the standard, and no runtime sensor watches them drift. Observability becomes a checkbox instead of a sensor — the logs feed forward but never feed back, so the harness never improves and the same blind spots recur.
-
----
-
 ## Guided Refactoring
 
 **Maturity**: Intermediate  
 **Description**: Systematic code improvement using AI to detect and resolve code smells with measurable quality metrics, following established refactoring rules and maintaining test coverage throughout the process.
 
-**Related Patterns**: [Codified Rules](#codified-rules), [Autonomous Remediation](#autonomous-remediation), [Testing Orchestration](experiments/README.md#testing-orchestration), [Debt Forecasting](experiments/README.md#debt-forecasting), [Harness Engineering Lens](#harness-engineering-lens)
+**Related Patterns**: [Codified Rules](#codified-rules), [Agent Hooks](#agent-hooks), [Testing Orchestration](experiments/README.md#testing-orchestration), [Debt Forecasting](#debt-forecasting), [Harness Engineering Lens](#harness-engineering-lens)
 
 **Code Smell Detection Framework**
 
@@ -2360,12 +2257,154 @@ Refactoring code for hypothetical future requirements rather than addressing cur
 
 ----
 
+<a id="observable-development"></a>
+## Agent Observability
+
+**Maturity**: Intermediate
+**Description**: Capture structured traces, model and tool events, handoffs, evaluations, cost, latency, and failure context so agent behavior can be diagnosed and improved.
+
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Error Resolution](#error-resolution), [Bounded Autonomy](#bounded-autonomy)
+
+Industry sources use *agent observability*, *AI observability*, and *tracing*. The compatibility anchor above preserves inbound links to the former catalog entry.
+
+**Agent Run Trace**
+
+Treat an agent invocation as a correlated trace rather than an unstructured transcript:
+
+```mermaid
+graph LR
+    R[Agent run span] --> M[Model call]
+    R --> T[Tool call]
+    T --> E[Error + artifact ref]
+    R --> H[Agent handoff]
+    H --> V[Independent evaluation]
+    R --> S[Cost, tokens, latency, outcome]
+```
+
+Every event carries a `trace_id`, unique `span_id`, `parent_span_id`, `run_id`, and `session_id`. Event-specific fields make the control flow reviewable:
+
+| Event | Required diagnostic fields |
+|-------|----------------------------|
+| Agent run | producer, repository, base/final commit, goal, status, duration |
+| Model call | model, input/output tokens, cost, latency, status, prompt/response artifact refs |
+| Tool call | tool name, input/output refs, exit code, latency, status |
+| Handoff | source actor, target actor, reason, artifact ref |
+| Evaluation | evaluator and producer identities, verdict, score, check ref |
+| Error | failed parent span, error type/message, immutable evidence ref |
+
+```json
+{
+  "trace_id": "trace_4c2d...",
+  "span_id": "span_a8e1...",
+  "parent_span_id": "span_root...",
+  "run_id": "run_f391...",
+  "session_id": "session_42",
+  "event_type": "tool.call",
+  "tool_name": "pytest",
+  "status": "error",
+  "duration_ms": 430,
+  "exit_code": 1,
+  "attributes": {
+    "input_ref": "tests/test_retry.py",
+    "output_ref": "artifacts/pytest.txt"
+  }
+}
+```
+
+**Collect, Validate, and Budget**
+
+Instrument the agent runner or orchestrator, outside the model process. The recorder redacts before writing and stores references instead of raw prompts, responses, tool payloads, source files, or environment values:
+
+```python
+# Run from examples/agent-observability/.
+from agent_tracing import TraceRecorder
+from trace_fitness import validate_trace
+from trace_metrics import budget_alerts, summarize_trace
+
+trace = TraceRecorder(session_id="session_42", output_path="artifacts/trace.jsonl")
+root = trace.start_run(
+    goal="Fix retry behavior",
+    producer="implementation-agent",
+    repository="acme/payments",
+    base_commit="9a17d2c",
+)
+trace.model_call(
+    parent_span_id=root,
+    model="reasoning-model",
+    input_tokens=1200,
+    output_tokens=280,
+    cost_usd=0.018,
+    duration_ms=610,
+    request_ref="sha256:request",
+    response_ref="sha256:response",
+)
+trace.tool_call(
+    parent_span_id=root,
+    tool_name="pytest",
+    duration_ms=430,
+    status="ok",
+    input_ref="tests/test_retry.py",
+    output_ref="artifacts/pytest.txt",
+    exit_code=0,
+)
+trace.handoff(
+    parent_span_id=root,
+    from_actor="implementation-agent",
+    to_actor="verification-agent",
+    reason="independent review",
+    artifact_ref="git:head:b82c119",
+)
+trace.evaluation(
+    parent_span_id=root,
+    evaluator="verification-agent",
+    producer="implementation-agent",
+    verdict="pass",
+    score=0.95,
+    check_ref="artifacts/verification.json",
+)
+trace.finish_run(
+    status="ok",
+    head_commit="b82c119",
+    duration_ms=1600,
+    summary_ref="artifacts/run-summary.json",
+)
+
+assert validate_trace(trace.events) == []
+summary = summarize_trace(trace.events)
+assert not budget_alerts(
+    summary, max_cost_usd=0.10, max_duration_ms=5000, max_output_tokens=1000
+)
+```
+
+Deterministic checks validate schema, span relationships, redaction, required cost/latency fields, and evaluator independence. A fresh reviewer may assess whether the valid trace is semantically useful, but must not reconstruct missing telemetry or share the producer identity.
+
+**Privacy and Retention**
+
+- Redact credentials, authorization headers, cookies, tokens, and sensitive tool arguments before persistence.
+- Prefer commit SHAs, content hashes, and access-controlled artifact references to raw content.
+- Apply explicit retention and access policies to traces; observability is not permission to archive every prompt.
+- Preserve missing fields as gaps. Never ask a model to invent an event that was not captured.
+
+**Failure Diagnosis**
+
+Build a redacted bundle containing the ordered model/tool/error/evaluation timeline, failed span IDs, cost and latency summary, and immutable artifact references. Pass that evidence into human-gated [Error Resolution](#error-resolution), where a proposed application or repository fix is reviewed and deterministically validated.
+
+**Complete Implementation**: See [examples/agent-observability/](examples/agent-observability/) for a provider-neutral trace recorder, metrics, redaction, schema fitness checks, independent quality interface, diagnostic-bundle builder, and executable tests.
+
+**Anti-pattern: Opaque Agent Runs**
+
+A transcript without trace/span relationships, model and tool metadata, costs, handoffs, evaluation identity, and source-linked failures cannot show what acted, what it touched, why it stopped, or whether the producer certified itself.
+
+---
+
 ## Error Resolution
 
 **Maturity**: Intermediate
-**Description**: Automatically collect comprehensive error context from logs, system state, and git history, then use AI to diagnose root causes and generate validated fixes.
+**Description**: Collect failure context, reproduce and diagnose the cause with AI, then apply a proposed fix only after human review and deterministic validation.
 
-**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Observable Development](#observable-development), [Tool Integration](#tool-integration), [Autonomous Remediation](#autonomous-remediation), [Testing Orchestration](experiments/README.md#testing-orchestration), [Harness Engineering Lens](#harness-engineering-lens)
+**Related Patterns**: [Developer Lifecycle](#developer-lifecycle), [Agent Observability](#agent-observability), [Tool Integration](#tool-integration), [Testing Orchestration](experiments/README.md#testing-orchestration), [Harness Engineering Lens](#harness-engineering-lens)
+
+The human approval node is part of the pattern, not an optional safeguard. Diagnosis and proposal generation may be automated; applying the patch remains human-gated and the deterministic checks arbitrate success.
 
 **[Error Resolution](#error-resolution) Workflow**
 
@@ -2418,6 +2457,25 @@ $(cat path/to/affected/file.ext)
 - Working Directory: $(pwd)
 EOF
 ```
+
+**Application Failure Context**
+
+Instrument application operations for diagnosis, but keep that telemetry distinct from the agent-run trace described by [Agent Observability](#agent-observability). A useful failure artifact records the operation, correlation ID, exact error type/message, safe reproduction inputs, source commit, and immutable log or trace references:
+
+```json
+{
+  "operation": "process_payment",
+  "correlation_id": "req_42",
+  "agent_trace_id": "trace_4c2d...",
+  "error_type": "PaymentError",
+  "error_message": "provider timeout",
+  "safe_inputs": {"order_id": "order_42"},
+  "source_commit": "9a17d2c",
+  "evidence_refs": ["logs/payment-order_42.jsonl", "traces/request-order_42.json"]
+}
+```
+
+Redact credentials and sensitive payloads before persistence. Use correlation IDs to join application logs and request traces, and use `agent_trace_id` only when an agent-run trace contributed to the diagnosis. Neither artifact authorizes applying a fix; the human review node below remains mandatory.
 
 **Step 2: AI-Powered Diagnosis**
 
@@ -2512,9 +2570,9 @@ Provide:
 
 **Complete Implementation**: See [examples/error-resolution/](examples/error-resolution/) for:
 - Reusable templates for error context collection and AI prompts
-- Common error scenarios (test failures, dependency conflicts, configuration errors)
-- GitHub Actions integration for CI/CD error diagnosis
-- Automated context extraction and diagnosis workflows
+- A redacted, source-linked application failure-context recorder
+- Optional correlation from application failures to separate agent-run traces
+- Executable redaction and persistence checks
 
 **Anti-pattern: Blind Diagnosis**
 
@@ -2600,263 +2658,309 @@ fi
 
 ---
 
-## Autonomous Remediation
+<a id="context-optimization"></a>
+## Model Routing
 
-**Maturity**: Intermediate
-**Description**: Pair deterministic rule-based detectors with LLM remediators inside an event-driven loop so codified rule violations are caught and fixed automatically before the AI session continues.
+**Maturity**: Advanced
+**Description**: Route each task to a model whose capability, context, latency, and cost profile matches the work.
 
-**Related Patterns**: [Codified Rules](#codified-rules), [Event Automation](#event-automation), [Guided Refactoring](#guided-refactoring), [Error Resolution](#error-resolution), [Harness Engineering Lens](#harness-engineering-lens)
+**Related Patterns**: [Tool Integration](#tool-integration), [Incremental Generation](#incremental-generation), [Adversarial Evaluator](#adversarial-evaluator)
 
-**Source**: Paul Duvall, "[Code Quality Gates: Using Claude Code Hooks to Block Code Smells on Every Write](https://www.paulmduvall.com/claude-code-hooks-code-quality-guardrails/)", February 24, 2026
+The compatibility anchor above preserves inbound links to the former catalog entry. The revised name describes the decision being automated: choose a model route from explicit task requirements instead of filling the largest available context window.
 
-**Core Loop**
+**Routing Policy**
 
-```mermaid
-graph TD
-    A[AI Writes or Edits File] --> B[PostToolUse Hook Fires]
-    B --> C[Deterministic Detector<br/>AST, Linter, Scanner, Policy Engine]
-    C --> D{Violations?}
-    D -->|No| E[AI Continues]
-    D -->|Yes| F[Structured Violation Report<br/>+ Prescribed Fix Hint]
-    F --> G[LLM Remediator<br/>Same Session Context]
-    G --> A
-    D -->|Retry Budget Exhausted| H[Escape Hatch<br/>Raise Threshold, Skip, or Suppress]
-
-    style C fill:#a8d5ba,stroke:#2d5a3f,color:#1a3a25
-    style G fill:#f9e79f,stroke:#b7950b,color:#7d6608
-    style H fill:#f5b7b1,stroke:#c0392b,color:#78281f
-```
-
-**Pattern Anatomy**
-
-Four components must be present for the loop to close:
-
-1. **Deterministic detector**. Codified rules executed by non-LLM logic (AST walker, linter, scanner, type checker, policy engine). Output is reproducible across runs.
-2. **Structured violation report**. Machine-parseable list of findings with file path, line number, rule ID, severity, and a prescribed fix hint.
-3. **LLM remediator**. The same model that produced the violation, fed the report as feedback. Runs in the same session so prior context carries forward.
-4. **Retry budget and escape hatch**. Bounded loop count, per-rule threshold override, or per-file suppression marker. Without this, the loop can run indefinitely on legitimate edge cases.
-
-**Core Implementation**
-
-PostToolUse hook (the mechanism comes from [Event Automation](#event-automation)):
-
-```python
-#!/usr/bin/env python3
-# ~/.claude/hooks/auto-remediate.py
-import json, os, sys
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from detectors import run_all_detectors
-from fixes import FIX_HINTS, format_report
-
-event = json.load(sys.stdin)
-file_path = event.get("tool_input", {}).get("file_path", "")
-if not file_path or not os.path.isfile(file_path):
-    sys.exit(0)
-
-violations = run_all_detectors(file_path)
-if not violations:
-    sys.exit(0)
-
-report = format_report(file_path, violations, FIX_HINTS)
-print(json.dumps({"decision": "block", "reason": report}))
-sys.exit(0)
-```
-
-Each detector emits both the finding AND the prescribed fix, so the LLM remediator gets a concrete starting point instead of guessing which technique to apply:
-
-```python
-# detectors/fixes.py
-FIX_HINTS = {
-    "complexity":      "Use extract-method, early returns, guard clauses, or lookup tables.",
-    "long_function":   "Extract helper functions for distinct logical steps.",
-    "deep_nesting":    "Use guard clauses and early returns to flatten control flow.",
-    "duplicate_block": "Extract repeated code into a shared helper function.",
-    "vuln_dependency": "Upgrade to the patched version listed in the advisory.",
-    "secret_leak":     "Move the value to a secret manager and reference via env var.",
-}
-```
-
-Loop semantics:
-
-| Condition | Behavior |
-|---|---|
-| Clean detector run | Exit 0, AI continues |
-| Violations found | Exit with `block` decision and structured report; LLM re-attempts |
-| Same file blocked more than 3 consecutive times | Surface to developer; suggest threshold raise or skip-list entry |
-| Hook itself crashes | Fail open (exit 0); never silently disable a rule without telling the developer |
-
-**When to Use**
-
-| Use Autonomous Remediation when... | Use plain [Event Automation](#event-automation) when... |
-|---|---|
-| Violation has a deterministic fix the LLM can apply | Violation is a hard policy ("never edit .env") with no fix path |
-| Rule is mechanical (complexity, nesting, dep version, secret pattern) | Rule requires human judgment (architecture, business logic, security tradeoff) |
-| Fix can be verified by re-running the same detector | Fix needs out-of-band verification (manual review, production test) |
-
-**Domain Instances**
-
-This pattern recurs across the catalog under domain-specific names. Each is a concrete instantiation of the same detect-fix-verify loop:
-
-| Domain | Detector | LLM Remediator Output | Existing Pattern |
-|---|---|---|---|
-| Code smells | AST or Lizard complexity rules | Refactored function | [Guided Refactoring](#guided-refactoring) |
-| Runtime errors | Stack trace + log scanner | Validated bug fix | [Error Resolution](#error-resolution) |
-| Infrastructure drift | Terraform plan diff | Corrective patch | [Drift Remediation](experiments/README.md#drift-remediation) |
-| Flaky tests | Build history analyzer | Stabilization patch | [Suite Health](experiments/README.md#suite-health) |
-| Stale or vulnerable deps | npm audit, pip-audit, dependabot | Staged upgrade PR | [Upgrade Advisor](experiments/README.md#upgrade-advisor) |
-| Security findings | Bandit, Semgrep, gitleaks | Patched code | New instance |
-
-**Complete Example**: See [examples/autonomous-remediation/](examples/autonomous-remediation/) for a working PostToolUse hook with code-smell detectors, fix-hint dictionary, retry budget, multi-language support via Lizard, and skip-list configuration.
-
-**Anti-pattern: Manual Remediation**
-
-Detecting violations with codified rules but leaving the fix to a human reviewer or a separate CI cycle. AI sessions write dozens of files between commits. Violations compound faster than humans can triage them. By the time a reviewer flags one issue, three more have been built on top of it. This converts AI write velocity from an asset into a liability.
-
-```bash
-# Bad: detect at commit time, human fixes later
-git commit  # pre-commit linter fails, dev manually fixes 12 files
-
-# Good: detect at write time, LLM fixes immediately
-# PostToolUse hook blocks, LLM remediates, next file starts clean
-```
-
-**Anti-pattern: Unbounded Loop**
-
-Configuring the loop without a retry budget or escape hatch. When the LLM and detector legitimately disagree (a 12-state machine that genuinely needs cyclomatic complexity 14, a wrapper function with 6 parameters mapping to an external API), they ping-pong indefinitely. Each retry costs roughly one model turn of tokens and wall-clock time.
+Keep model identifiers in configuration and route on durable capabilities:
 
 ```yaml
-# Bad: no exit condition
-retry_budget: unlimited
-suppression: none
+# .ai/model-routing.yml
+routes:
+  - when: {risk: low, context_tokens: "<8000", modality: text}
+    profile: fast-low-cost
+  - when: {risk: medium, context_tokens: "<64000", requires_tools: true}
+    profile: balanced-agent
+  - when: {risk: high, requires_independent_judge: true}
+    profile: strongest-reasoner
 
-# Good: bounded with explicit escape paths
-retry_budget: 3
-on_exhaustion: surface_to_developer
-suppression:
-  directory_skip_list: [tests/, generated/, vendored/]
-  threshold_override: .ai/thresholds.yml  # per-file or per-rule
-  inline_marker: "# rule: ignore"          # per-call-site
+profiles:
+  fast-low-cost: {model_env: FAST_MODEL, max_turns: 4}
+  balanced-agent: {model_env: AGENT_MODEL, max_turns: 20}
+  strongest-reasoner: {model_env: REVIEW_MODEL, max_turns: 8}
 ```
+
+Record the route and rationale with the task so a reviewer can reproduce the choice. Route high-risk output through an independent [Adversarial Evaluator](#adversarial-evaluator); model routing chooses a producer, not its own judge.
+
+**Anti-pattern: Maximal Routing**
+
+Sending every task to the largest, most expensive model increases cost and latency without improving routine edits. Route by measured requirements and fall back only when deterministic checks show the cheaper profile cannot complete the task.
+
+---
+
+<a id="asynchronous-research"></a>
+## Code Research
+
+**Maturity**: Intermediate
+**Description**: Answer technical questions with isolated agent-run experiments that produce executable, reviewable evidence.
+
+**Related Patterns**: [Parallel Agents](#parallel-agents), [Agent Memory](#agent-memory), [Adversarial Evaluator](#adversarial-evaluator)
+
+**Source**: Simon Willison, "[Code research projects with async coding agents](https://simonwillison.net/2025/Nov/6/async-code-research/)," November 6, 2025
+
+The compatibility anchor above preserves inbound links to the former catalog entry. Asynchrony is an execution option; executable evidence is the defining mechanism.
+
+**Research Contract**
+
+Put each question in a disposable repository or worktree, require a runnable proof, and keep production secrets out of the environment:
+
+```markdown
+# research-question.md
+Question: Can Redis Streams sustain 10,000 concurrent notification subscribers?
+
+Deliverables:
+1. Minimal reproducible benchmark
+2. Pinned dependencies and exact run command
+3. Raw measurements plus machine/environment metadata
+4. Conclusion that names limits and failed approaches
+
+Done check: ./run-benchmark.sh && ./verify-results.sh
+```
+
+Run independent investigations in parallel when useful, then have a fresh reviewer execute the artifacts rather than accepting the research agent's narrative. A result that cannot be rerun is a hypothesis, not evidence.
+
+**Complete Example**: See [examples/code-research/](examples/code-research/) for repository setup, research prompt templates, result parsing, and executable investigation examples.
+
+**Anti-pattern: Narrative Research**
+
+Accepting a confident prose answer without runnable artifacts preserves the model's hallucinations. Require code, pinned inputs, raw results, and a deterministic reproduction command.
+
+---
+
+## Bounded Autonomy
+
+**Maturity**: Advanced
+**Description**: Cap autonomous loops by turns, spend, and wall-clock time, detect stalls and divergence, and emit a machine-readable evidence trail.
+
+**Related Patterns**: [Parallel Agents](#parallel-agents), [Agent Observability](#agent-observability), [Agent Memory](#agent-memory)
+
+Autonomy must not exceed verification reach. Set limits before the loop starts, keep each writer in an isolated worktree, and let deterministic checks—not the agent—decide whether the goal converged.
+
+**Bounded Loop Contract**
+
+```yaml
+# bounded-loop.yml
+caps:
+  max_turns: 40
+  max_budget_usd: 5.00
+  max_wall_secs: 3600
+stop_conditions:
+  stall_window: 3
+  done_check: make verify
+  recoverable_exit_codes: [2, 124]
+state:
+  per_agent_worktree: true
+  commit_on_phase_boundary: true
+evidence:
+  run_summary: run-summary.json
+  failure_trail: logs/
+edges:
+  human_escape_hatch: true
+  downstream_merge: ci_gate_then_human
+```
+
+The wrapper enforces caps outside the model process. It aborts on the first exhausted cap, repeated no-progress turn, unrecoverable error, or divergence signal; it never raises its own budget. Humans own the upstream allow/deny policy and downstream merge.
+
+**Complete Example**: See [examples/bounded-autonomy/](examples/bounded-autonomy/) for a runnable loop wrapper, done check, stop hook, and settings template.
+
+**Anti-pattern: Unbounded Autonomy**
+
+A loop without turn, spend, time, and stall limits can consume resources while drifting from its goal. Allowing the same agent to write, declare completion, and merge also removes the independent control needed to contain that drift.
 
 ---
 
 # Operations Patterns
 
-Operations patterns focus on CI/CD, security, compliance, and production management with AI assistance, building on the foundation and development patterns.
+Operations patterns apply AI assistance to compliance, infrastructure, reliability, and ongoing maintenance while preserving deterministic validation and human-owned production boundaries.
 
 ## Security & Compliance Patterns
 
 ### Policy Generation
 
 **Maturity**: Advanced
-**Description**: Transform compliance requirements into executable policy files with AI assistance, ensuring regulatory requirements become testable code.
+**Description**: Convert natural-language policy intent or runtime context into validated policy-as-code such as Cedar, Rego, OPA, and Gatekeeper.
 
-**Related Patterns**: [Security Sandbox](#security-sandbox), [Codified Rules](#codified-rules), [Centralized Rules](#centralized-rules)
+**Related Patterns**: [Security Sandbox](#security-sandbox), [Evidence Automation](#evidence-automation), [Centralized Rules](#centralized-rules)
+
+Generate policy and its validation inputs together. Treat model output as a candidate artifact until the policy engine parses it and positive, negative, and boundary tests pass.
 
 ```bash
-# Transform compliance requirements into executable policies
-ai "Convert compliance requirements into Cedar policy code:
-SOC 2: Data at rest must be AES-256 encrypted" > encryption.cedar
+ai "Convert this requirement into Cedar policy plus allow/deny boundary tests:
+Only production deployers may update production services." > candidate-policy.txt
 
-# Validate generated Cedar policies
-cedar validate --schema schema.cedarschema encryption.cedar
+# Extract the reviewed policy, then let Cedar arbitrate validity.
+cedar validate --schema schema.cedarschema production.cedar
+cedar authorize --policies production.cedar --entities entities.json --request request.json
 ```
 
-**Complete Implementation**: See [examples/policy-generation/](examples/policy-generation/) for:
-- Complete policy generation pipeline with AI assistance
-- Cedar/OPA policy templates and compliance mapping
-- Policy testing and validation frameworks
-- CI/CD integration examples
+Industry implementations also describe the mechanism as *NL2Cedar*, an *OPA AI assistant*, or a dynamic policy generator. The canonical name stays vendor-neutral and the output stays policy-as-code.
+
+**Complete Implementation**: See [examples/policy-generation/](examples/policy-generation/) for Cedar and Rego templates, compliance mapping, generation scripts, and validation examples.
 
 **Anti-pattern: Untested Policies**
-Hand-coding policies from written requirements introduces inconsistencies and interpretation errors.
+
+Deploying generated policy without parser validation and adversarial allow/deny tests can silently grant access or block legitimate operations. A plausible policy explanation is not executable proof.
 
 ---
 
-### Security Orchestration
+### Evidence Automation
 
-**Maturity**: Intermediate  
-**Description**: Aggregate multiple security tools and use AI to summarize findings for actionable insights, reducing alert fatigue while maintaining security rigor.
+**Maturity**: Advanced
+**Description**: Continuously collect control evidence from logs and configuration changes into dated, audit-ready records.
 
-**Related Patterns**: [Policy Generation](#policy-generation), [Centralized Rules](#centralized-rules)
+**Related Patterns**: [Policy Generation](#policy-generation), [Agent Observability](#agent-observability), [Centralized Rules](#centralized-rules)
 
-```bash
-# Orchestrate multiple security tools
-snyk test --json > snyk.json
-bandit -r src -f json > bandit.json
-trivy fs --format json . > trivy.json
+Define each control's deterministic collector, immutable source, evaluation command, and retention policy before asking AI to summarize it. The model may classify and explain evidence; it must not invent missing artifacts or author its own compliance verdict.
 
-# AI-powered summarization for actionable insights
-ai "Summarize security findings; focus on CRITICAL issues" > pr-comment.txt
-gh pr comment --body-file pr-comment.txt
+```yaml
+# controls/evidence.yml
+controls:
+  - id: access-review
+    source: s3://audit-evidence/iam/
+    collector: ./collect-iam-changes.sh
+    verify: ./verify-iam-evidence.py
+    cadence: daily
+    required_fields: [commit, captured_at, actor, change, source_hash]
 ```
 
-**Complete Implementation**: See [examples/security-orchestration/](examples/security-orchestration/) for:
-- Complete security scanning pipeline with tool orchestration
-- AI-powered report summarization and prioritization
-- CI/CD integration and automated PR commenting
-- Custom security tool configurations and reporting
+Run collectors on a schedule, hash normalized artifacts, and record explicit gaps. Generate the audit matrix from those records so every claim traces to a dated source and a reproducible check.
 
-**Anti-pattern: Over-Alerting**
-Posting every low-severity finding buries real issues and frustrates developers.
+**Anti-pattern: Synthetic Evidence**
+
+Asking a model to write an audit narrative when source records are missing creates assurance theater. Missing evidence must remain a visible failure or gap, never a model-filled placeholder.
 
 ---
 
 ### Centralized Rules
 
 **Maturity**: Advanced
-**Description**: Enforce organization-wide AI rules through a central Git repository that syncs language- and framework-specific guidance into standard assistant configuration files.
+**Description**: Enforce organization-wide AI instructions from a central source that synchronizes standard assistant configuration files.
 
-**Related Patterns**: [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure), [Security Orchestration](#security-orchestration), [Harness Engineering Lens](#harness-engineering-lens)
+**Related Patterns**: [Codified Rules](#codified-rules), [Progressive Disclosure](#progressive-disclosure), [Evidence Automation](#evidence-automation)
 
-**Core Implementation**
+Use one versioned rules repository as the source of truth and generate tool-specific compatibility files from it:
 
-**Sync-based Architecture** (Recommended):
-
-```
-Central Rules Repository (Git)
+```text
+Central Rules Repository
   ├── base/universal-rules.md
-  ├── languages/ (python.md, typescript.md, go.md)
-  └── frameworks/ (react.md, django.md, fastapi.md)
-           ↓
-    [sync-ai-rules.sh]
-           ↓
-  Project Repository
-    ├── CLAUDE.md (auto-generated)
-    ├── AGENTS.md (auto-generated)
-    └── .cursorrules (auto-generated)
+  ├── languages/python.md
+  └── frameworks/react.md
+           ↓ sync-ai-rules.sh
+Project Repository
+  ├── AGENTS.md
+  ├── CLAUDE.md
+  └── .cursorrules
 ```
 
-**How it works**:
-1. A central repository stores organization rules organized by language/framework.
-2. A sync script detects the project language/framework (from files and dependencies).
-3. The script generates standard configuration files that common assistants read automatically.
+Validate generated files in CI and record the source rules revision in each output. Products may call these *AI rules*, *AI instructions*, or an `AGENTS.md` source of truth; central synchronization is the stable mechanism.
 
-**Key benefits**:
-- ✅ Works with existing AI tools (no gateway required)
-- ✅ Offline-friendly after initial sync
-- ✅ Version-controlled and auditable in Git
-- ✅ Language-aware via auto-detection
-
-**Alternative: Gateway Strategy** (advanced use cases)
-
-For organizations needing request/response filtering, policy enforcement, or usage logging, use the gateway approach:
-- [Gateway Strategy](examples/centralized-rules/gateway-strategy/README-GATEWAY.md)
-
-**Complete Implementation**
-
-- [Sync Strategy](examples/centralized-rules/sync-strategy/) - Simple Git-based sync (recommended)
-- [Gateway Strategy](examples/centralized-rules/gateway-strategy/README-GATEWAY.md) - Central policy + logging + filters
+**Complete Implementation**: See the [sync strategy](examples/centralized-rules/sync-strategy/) for a Git-based implementation and the [gateway strategy](examples/centralized-rules/gateway-strategy/README-GATEWAY.md) for centralized filtering and logging.
 
 **Anti-pattern: Scattered Configuration**
 
-Copying AI rules into every repository without a central source causes drift, inconsistent enforcement, and manual update toil across teams.
+Copying assistant instructions independently into every repository causes silent drift and inconsistent enforcement. Generate compatibility files from one reviewed source and fail validation when local copies diverge.
 
 ---
 
+## Deployment Automation Patterns
 
+### Drift Remediation
 
+**Maturity**: Advanced
+**Description**: Detect infrastructure drift against declared state and generate reviewable corrective patches with explicit approval gates.
 
+**Related Patterns**: [Agent Observability](#agent-observability), [Error Resolution](#error-resolution), [Bounded Autonomy](#bounded-autonomy)
+
+Keep detection deterministic and remediation reviewable. Capture the declared state, observed state, provider plan, and risk classification before generating a candidate correction:
+
+```bash
+terraform plan -detailed-exitcode -out=drift.tfplan || rc=$?
+[ "${rc:-0}" -eq 2 ] || exit "${rc:-0}"
+terraform show -json drift.tfplan > drift.json
+
+ai "Propose the smallest Terraform patch for drift.json.
+Do not apply it. Identify destructive changes and required approvals." > remediation.md
+
+terraform plan -out=candidate.tfplan  # deterministic re-check after review
+```
+
+Only a human-approved pipeline applies the resulting plan. The agent that proposes a patch cannot approve or apply it.
+
+**Complete Implementation**: See [examples/drift-remediation/](examples/drift-remediation/) for drift detection, risk classification, corrective plans, and approval controls.
+
+**Anti-pattern: Blind Reconciliation**
+
+Automatically applying a generated correction can destroy intentionally changed resources or propagate a compromised desired state. Preserve the diff, classify destructive actions, and require approval before apply.
+
+---
+
+## Monitoring & Maintenance Patterns
+
+### Debt Forecasting
+
+**Maturity**: Intermediate
+**Description**: Forecast maintenance burden from code, dependency, coverage, and documentation trends so teams can prioritize technical debt.
+
+**Related Patterns**: [Guided Refactoring](#guided-refactoring), [Tool Integration](#tool-integration), [Model Routing](#model-routing)
+
+Combine deterministic trend data with an AI-assisted explanation instead of asking a model to guess debt from a snapshot:
+
+```bash
+python -m radon cc src --json > metrics/complexity.json
+python -m pytest --cov=src --cov-report=json:metrics/coverage.json
+git log --since='90 days ago' --numstat > metrics/churn.txt
+
+ai "Rank maintenance risks using the attached complexity, coverage, churn,
+dependency, and documentation-drift trends. Cite the metric behind every rank." \
+  > debt-forecast.md
+```
+
+Review forecast accuracy against later incidents and maintenance work, then adjust weights rather than treating model rankings as objective measurements.
+
+**Complete Implementation**: See [examples/debt-forecasting/](examples/debt-forecasting/) for a technical-debt analysis and prioritized maintenance report.
+
+**Anti-pattern: Reactive Debt**
+
+Waiting for debt to cause outages or block delivery loses the lead time a trend forecast provides. A one-time subjective code review is also not a forecast; retain comparable measurements over time.
+
+---
+
+<a id="chaos-engineering"></a>
+### Guided Chaos
+
+**Maturity**: Advanced
+**Description**: Generate hypothesis-driven chaos experiments from architecture and dependency evidence with explicit blast-radius and recovery controls.
+
+**Related Patterns**: [Agent Observability](#agent-observability), [Bounded Autonomy](#bounded-autonomy), [Error Resolution](#error-resolution)
+
+The compatibility anchor above preserves inbound links to the former catalog entry. The new name emphasizes that AI proposes a bounded experiment; it does not receive open-ended authority to inject faults.
+
+```yaml
+# chaos-experiment.yml
+hypothesis: Checkout remains available when one payment worker is terminated.
+steady_state_check: ./checks/checkout-slo.sh
+fault: terminate_one_payment_worker
+blast_radius: {environment: staging, max_instances: 1}
+abort_when: {error_rate_percent: 2, latency_p95_ms: 800}
+recovery: ./recovery/restore-payment-worker.sh
+approval_required: true
+```
+
+Execute the steady-state check before and after injection, stream telemetry through [Agent Observability](#agent-observability), and abort deterministically when a guardrail trips. See the existing [chaos scenario examples](examples/baseline-management/chaos/) for hypothesis and recovery templates.
+
+**Anti-pattern: Random Chaos**
+
+Injecting faults without a falsifiable hypothesis, bounded target, abort condition, and tested recovery path creates an outage rather than an experiment.
+
+---
 
 # Anti-Patterns Reference
 
@@ -2905,10 +3009,11 @@ Copying AI rules into every repository without a central source causes drift, in
 
 ### Phase 3: Operations (Weeks 5-6)
 1. **[Policy Generation](#policy-generation)** - Codify compliance into executable policy files
-2. **[Security Orchestration](#security-orchestration)** - Aggregate scanner findings into actionable summaries
+2. **[Evidence Automation](#evidence-automation)** - Continuously collect dated control evidence
 3. **[Centralized Rules](#centralized-rules)** - Sync organization-wide AI standards from a central Git repo
+4. **[Drift Remediation](#drift-remediation)** - Detect and correct infrastructure drift through approval gates
 
-**Note**: For teams practicing continuous delivery, implement security ([Security Sandbox](#security-sandbox), Security Orchestration, Policy Generation) from week 1 alongside foundation patterns. The phases represent learning dependencies, not deployment sequences.
+**Note**: For teams practicing continuous delivery, implement [Security Sandbox](#security-sandbox), [Policy Generation](#policy-generation), and [Evidence Automation](#evidence-automation) from week 1 alongside foundation patterns. The phases represent learning dependencies, not deployment sequences.
 
 ## Success Metrics
 

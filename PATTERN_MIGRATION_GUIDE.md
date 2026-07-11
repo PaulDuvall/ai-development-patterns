@@ -4,8 +4,8 @@
 
 This guide documents the comprehensive renaming of patterns and antipatterns in the AI Development Patterns repository to comply with a strict two-word naming convention, including later evidence-led refinements to canonical names.
 
-**Migration Dates:** November 2025; July 2026 evidence-led refinements
-**Impact:** All 42 patterns and 56 antipatterns in the initial migration; 3 later canonical refinements
+**Migration Dates:** November 2025; July 2026 evidence-led refinements and taxonomy consolidation
+**Impact:** All 42 patterns and 56 antipatterns in the initial migration; 12 later canonical refinements; 47 active patterns after consolidation
 **Compliance:** 8% → 100% (98 naming changes)
 
 ---
@@ -58,7 +58,7 @@ This change aligns with established pattern naming conventions:
 | Parallelized AI Coding Agents | Parallel Agents | Simplified, removed "AI" | Agents are AI agents in this context |
 | AI Context Persistence | Agent Memory | Removed "AI" prefix, then evidence-led refinement | Aligns with industry memory terminology; the intermediate name was `Context Persistence` |
 | Constraint-Based AI Development | Constrained Generation | Simplified, focused | Emphasizes the generation constraint |
-| Observable AI Development | Observable Development | Removed "AI" prefix | Observability applies to AI development |
+| Observable AI Development | Agent Observability | Removed "AI" prefix, then evidence-led refinement | Aligns with agent tracing and evaluation evidence |
 | AI-Driven Refactoring | Guided Refactoring | Changed "AI-Driven" to "Guided" | More concise, maintains meaning |
 | AI-Driven Architecture Design | Guided Architecture | Changed "AI-Driven" to "Guided" | Parallel structure with Guided Refactoring |
 | AI-Driven Traceability | Automated Traceability | Changed "AI-Driven" to "Automated" | Emphasizes automation benefit |
@@ -110,19 +110,19 @@ This change aligns with established pattern naming conventions:
 | AI Review Automation | Review Automation | Removed "AI" prefix | Automation implies AI |
 | Technical Debt Forecasting | Debt Forecasting | Simplified | "Technical" is implicit |
 | Pipeline Synthesis | Pipeline Synthesis | No change | Already compliant |
-| AI-Guided Blue-Green Deployment | Deployment Synthesis | Simplified | "Synthesis" implies AI-guided generation |
+| AI-Guided Blue-Green Deployment | (merged) | Folded into Pipeline Synthesis | Deployment generation is a pipeline subtype |
 | Drift Detection & Remediation | Drift Remediation | Focused on key action | Remediation is the primary value |
-| Release Note Synthesis | Release Synthesis | Simplified | "Synthesis" implies note generation |
+| Release Note Synthesis | (retired) | Removed as standalone | Deterministic release-note automation is supporting lifecycle guidance |
 | Incident Response Automation | Incident Automation | Simplified | "Automation" implies response |
-| Test Suite Health Management | Suite Health | Simplified | "Test Suite" is clear from context |
-| Dependency Upgrade Advisor | Upgrade Advisor | Simplified | "Dependency" is implicit in upgrade context |
-| On-Call Handoff Automation | Handoff Automation | Simplified | "On-Call" is implicit in handoff context |
-| Chaos Engineering Scenarios | Chaos Engineering | Simplified | "Scenarios" is implicit |
+| Test Suite Health Management | Flake Management | Narrowed | Matches flaky-test detection, quarantine, and suppression evidence |
+| Dependency Upgrade Advisor | Dependency Migration | Reframed | Requires agentic compatibility analysis and code migration |
+| On-Call Handoff Automation | On-Call Handoff | Simplified | Retains the operational shift boundary |
+| Chaos Engineering Scenarios | Guided Chaos | Narrowed | Distinguishes agent-guided experiments from ordinary chaos engineering |
 | ChatOps Security Integration | ChatOps Security | Simplified | "Integration" is implicit |
 | Compliance Evidence Automation | Evidence Automation | Simplified | "Compliance" is implicit in evidence context |
-| Context Window Optimization | Context Optimization | Simplified | "Window" is implicit for context |
+| Context Window Optimization | Model Routing | Reframed | Matches cost/quality-aware model-selection evidence |
 | Visual Context Scaffolding | Image Spec | Simplified | More concise, "Image" specifies visual type |
-| AI Event Automation | Event Automation | Removed "AI" prefix | Automation implies AI |
+| AI Event Automation | Agent Hooks | Evidence-led refinement | Cross-vendor implementations use lifecycle hooks |
 | Custom AI Commands | Custom Commands | Removed "AI" prefix | Commands are AI commands in context |
 
 ### Experimental Antipatterns (25 antipatterns)
@@ -174,6 +174,60 @@ filenames, tests, and generated artifacts use the current names. The README pres
 legacy anchor for each immediately retired name so inbound links continue to resolve; decision
 history and evidence source text also retain retired terminology where necessary for auditability.
 
+## July 2026 Taxonomy Consolidation
+
+On July 11, 2026, the maintainer accepted the full-catalog evidence baseline and applied a second
+evidence-led migration under `pattern-spec.md`'s exact two-word rule. The active collection now has
+29 main patterns and 18 experimental patterns (47 total).
+
+### Canonical renames
+
+| Retired Name | Current Canonical Name | Retired Anchor | Current Anchor |
+|--------------|------------------------|----------------|----------------|
+| Event Automation | Agent Hooks | `#event-automation` | `#agent-hooks` |
+| Observable Development | Agent Observability | `#observable-development` | `#agent-observability` |
+| Context Optimization | Model Routing | `#context-optimization` | `#model-routing` |
+| Asynchronous Research | Code Research | `#asynchronous-research` | `#code-research` |
+| Chaos Engineering | Guided Chaos | `#chaos-engineering` | `#guided-chaos` |
+| Suite Health | Flake Management | `#suite-health` | `#flake-management` |
+| Handoff Automation | On-Call Handoff | `#handoff-automation` | `#on-call-handoff` |
+| Autonomous Defense | Autonomous SOC | `#autonomous-defense` | `#autonomous-soc` |
+
+These names supersede the corresponding current-name cells in the historical November 2025 table.
+Historical source titles, search queries, quotes, and issue records retain the wording that existed
+when they were created.
+
+### Material replacement
+
+| Retired Concept | New Experimental Pattern | Relationship |
+|-----------------|--------------------------|--------------|
+| Upgrade Advisor | Dependency Migration | Materially different mechanism; no alias or evidence reassignment |
+
+Unlike a canonical rename, this replacement has no compatibility anchor. `Dependency Migration`
+must establish its own evidence for agentic changelog analysis, compatibility edits, validation,
+and migration pull requests.
+
+### Boundary and maturity changes
+
+| Pattern | Change | Migration |
+|---------|--------|-----------|
+| Bounded Autonomy | Promoted | `experiments/README.md#bounded-autonomy` → `README.md#bounded-autonomy` |
+| Model Routing | Renamed + promoted | `experiments/README.md#context-optimization` → `README.md#model-routing` |
+| Code Research | Renamed + promoted | `experiments/README.md#asynchronous-research` → `README.md#code-research` |
+| Drift Remediation | Promoted | `experiments/README.md#drift-remediation` → `README.md#drift-remediation` |
+| Guided Chaos | Renamed + promoted | `experiments/README.md#chaos-engineering` → `README.md#guided-chaos` |
+| Evidence Automation | Promoted | `experiments/README.md#evidence-automation` → `README.md#evidence-automation` |
+| Debt Forecasting | Promoted | `experiments/README.md#debt-forecasting` → `README.md#debt-forecasting` |
+| Security Orchestration | Demoted | `README.md#security-orchestration` → `experiments/README.md#security-orchestration` |
+| Autonomous Remediation | Demoted | `README.md#autonomous-remediation` → `experiments/README.md#autonomous-remediation` |
+| Deployment Synthesis | Merged + retired | Folded into `experiments/README.md#pipeline-synthesis` |
+| Release Synthesis | Retired | Deterministic release-note automation retained as supporting lifecycle guidance |
+
+`Dependency Migration` is a new mechanism replacing the overly generic Upgrade Advisor concept.
+The old dependency-update evidence is not reassigned; the new canonical slug remains pending until
+a separately approved local evaluation validates agentic changelog analysis, compatibility edits,
+test execution, and migration pull requests.
+
 ## Summary Statistics
 
 ### Initial November 2025 Migration
@@ -188,6 +242,16 @@ history and evidence source text also retain retired terminology where necessary
 - **Main Antipatterns**: 28 renamed, 3 unchanged
 - **Experimental Patterns**: 19 renamed, 1 unchanged
 - **Experimental Antipatterns**: 22 renamed, 3 unchanged
+
+### July 11, 2026 Consolidation
+- **Active main patterns**: 29
+- **Active experimental patterns**: 18
+- **Active patterns total**: 47
+- **Canonical renames**: 8
+- **Promotions**: 7
+- **Demotions**: 2
+- **Merged or retired standalone patterns**: 2
+- **Pending replacement patterns**: 1 (`Dependency Migration`)
 
 ---
 
@@ -230,10 +294,12 @@ If you have external references to these patterns (documentation, presentations,
 
 ### Backward Compatibility
 
-Canonical IDs do not retain aliases. The README provides explicit compatibility anchors for the
-three July 2026 refinements (and for Cross-Model Validation) so existing inbound links still land on
-the replacement section. Retired names remain deprecated and are not used by internal links,
-registry entries, examples, evidence filenames, or generated pattern IDs.
+Canonical IDs do not retain aliases. The pattern documents provide explicit compatibility anchors
+for accepted July 2026 renames, the Deployment Synthesis merge, and Cross-Model Validation so
+existing inbound links still land on the replacement section. Retired names remain deprecated and
+are not used by internal links, registry entries, examples, active evidence filenames, or generated
+pattern IDs. Promotions and demotions also retain a linked redirect notice in the former document,
+so both the old file path and anchor continue to resolve.
 
 **Migration window:** Users should update their references to canonical names immediately. Compatibility
 anchors may be removed in a future major migration.
@@ -288,7 +354,7 @@ All GitHub markdown anchor links have changed. Update your hyperlinks:
 | `#parallelized-ai-coding-agents` | `#parallel-agents` |
 | `#ai-context-persistence` | `#agent-memory` |
 | `#constraint-based-ai-development` | `#constrained-generation` |
-| `#observable-ai-development` | `#observable-development` |
+| `#observable-ai-development` | `#agent-observability` |
 | `#ai-driven-refactoring` | `#guided-refactoring` |
 | `#ai-driven-architecture-design` | `#guided-architecture` |
 | `#ai-driven-traceability` | `#automated-traceability` |
@@ -305,19 +371,19 @@ All GitHub markdown anchor links have changed. Update your hyperlinks:
 | `#ai-workflow-orchestration` | `#workflow-orchestration` |
 | `#ai-review-automation` | `#review-automation` |
 | `#technical-debt-forecasting` | `#debt-forecasting` |
-| `#ai-guided-blue-green-deployment` | `#deployment-synthesis` |
+| `#ai-guided-blue-green-deployment` | `#pipeline-synthesis` (merged) |
 | `#drift-detection--remediation` | `#drift-remediation` |
-| `#release-note-synthesis` | `#release-synthesis` |
+| `#release-note-synthesis` | (retired; lifecycle guidance) |
 | `#incident-response-automation` | `#incident-automation` |
-| `#test-suite-health-management` | `#suite-health` |
-| `#dependency-upgrade-advisor` | `#upgrade-advisor` |
-| `#on-call-handoff-automation` | `#handoff-automation` |
-| `#chaos-engineering-scenarios` | `#chaos-engineering` |
+| `#test-suite-health-management` | `#flake-management` |
+| `#dependency-upgrade-advisor` | `#dependency-migration` (replacement; no compatibility anchor) |
+| `#on-call-handoff-automation` | `#on-call-handoff` |
+| `#chaos-engineering-scenarios` | `#guided-chaos` |
 | `#chatops-security-integration` | `#chatops-security` |
 | `#compliance-evidence-automation` | `#evidence-automation` |
-| `#context-window-optimization` | `#context-optimization` |
+| `#context-window-optimization` | `#model-routing` |
 | `#visual-context-scaffolding` | `#image-spec` |
-| `#ai-event-automation` | `#event-automation` |
+| `#ai-event-automation` | `#agent-hooks` |
 | `#custom-ai-commands` | `#custom-commands` |
 
 ---
@@ -334,7 +400,7 @@ All patterns now follow these strict rules:
 4. **Use concrete, domain-specific AI-native engineering terms**
 5. **Each word must be short, clear, and recognizable to engineers**
 6. **Unique within catalog**
-7. **Parallel structure across related pattern sets** (e.g., "Pipeline Synthesis", "Deployment Synthesis")
+7. **Parallel structure across related pattern sets** (e.g., "Agent Memory", "Agent Hooks")
 8. **Test: "Use the X Y pattern to..." must sound natural**
 
 ### Antipattern Naming Rules
@@ -389,6 +455,11 @@ For questions about this migration:
 
 ## Version History
 
+- **v1.2** (July 11, 2026): Recorded full-catalog taxonomy consolidation
+  - Applied 8 exact two-word canonical renames and 1 materially different replacement
+  - Promoted 7 and demoted 2 patterns
+  - Merged Deployment Synthesis and retired Release Synthesis
+  - Established the 29-main / 18-experimental / 47-total catalog
 - **v1.1** (July 10, 2026): Recorded evidence-led canonical refinements
   - Readiness Assessment → Agent Readiness
   - Progressive Enhancement → Incremental Generation
@@ -403,4 +474,4 @@ For questions about this migration:
 
 **Document Status**: Official Migration Guide
 **Maintained By**: AI Development Patterns Repository Maintainers
-**Last Updated**: July 10, 2026
+**Last Updated**: July 11, 2026

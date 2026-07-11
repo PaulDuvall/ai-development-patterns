@@ -1,0 +1,122 @@
+schema_version: 2
+provenance_status: complete
+pattern: Agent Hooks
+slug: agent-hooks
+last_checked: '2026-07-10'
+search:
+  run_id: 'github-actions:29123202495'
+  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  provider: openai
+  model: gpt-5.5
+  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+  checked_at: '2026-07-10'
+  modes:
+    name:
+      queries:
+      - '"Event Automation" "AI agent hooks"'
+      candidate_count: 2
+    mechanism:
+      queries:
+      - '"AI agent hooks" "PreToolUse" "PostToolUse"'
+      - '"Hooks are user-defined" "Claude Code" lifecycle'
+      - '"Gemini CLI" hooks lifecycle "BeforeTool"'
+      - '"Plugins allow you to extend OpenCode" events'
+      candidate_count: 11
+    artifact:
+      queries:
+      - 'site:github.com "PreToolUse" "PostToolUse" "hooks" "AI agent"'
+      - 'site:github.com ".opencode/plugins" "tool.execute.before"'
+      - 'site:github.com "preToolUse" "postToolUse" "AI Agent hooks"'
+      candidate_count: 23
+adoption_score: 17
+tier_counts:
+  T1: 3
+  T4: 1
+adoption_dimensions:
+  implementation_available: true
+  independent_adoption: true
+  independence_groups: 4
+naming_alignment: aliased
+terminology_variants:
+- term: hooks
+  used_by: Anthropic (Claude Code) and Google (Gemini CLI)
+  url: https://code.claude.com/docs/en/hooks
+- term: plugins
+  used_by: OpenCode
+  url: https://opencode.ai/docs/plugins/
+- term: AI agent hooks
+  used_by: Speakeasy
+  url: https://www.speakeasy.com/resources/ai-agent-hooks/
+evidence:
+- tier: T1
+  match: aliased
+  mechanism_quote: Hooks are user-defined shell commands, HTTP endpoints, or LLM prompts that execute automatically at specific points in Claude Code’s lifecycle.
+  source: 'Anthropic, Claude Code: Hooks reference'
+  source_kind: shipped_product
+  organization: Anthropic
+  independence_group: anthropic
+  url: https://code.claude.com/docs/en/hooks
+  resolved_url: https://code.claude.com/docs/en/hooks
+  content_sha256: a3aa57d79be3098fdcf54a9ebae641c6f0d10ad5eb79cd170a0ce2383dfa99c5
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  retrieved: '2026-07-10'
+  claim: Claude Code ships lifecycle-triggered hooks that automatically run command, HTTP, or prompt handlers.
+- tier: T1
+  match: aliased
+  mechanism_quote: Plugins allow you to extend OpenCode by hooking into various events and customizing behavior.
+  source: 'OpenCode: Plugins documentation'
+  source_kind: shipped_product
+  organization: OpenCode
+  independence_group: opencode
+  url: https://opencode.ai/docs/plugins/
+  resolved_url: https://opencode.ai/docs/plugins/
+  content_sha256: e804bac83f7dea5cfffa9e82aa6a0c06a6ee363cefac1763a7efd2b44123602e
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2026-07-10'
+  retrieved: '2026-07-10'
+  claim: OpenCode ships an event-plugin interface that lets users attach custom behavior to assistant events.
+- tier: T1
+  match: aliased
+  mechanism_quote: Hooks are scripts or programs that Gemini CLI executes at specific, predefined points in its lifecycle.
+  source: 'Google Developers Blog: Tailor Gemini CLI to your workflow with hooks'
+  source_kind: shipped_product
+  organization: Google
+  independence_group: google
+  url: https://developers.googleblog.com/tailor-gemini-cli-to-your-workflow-with-hooks/
+  resolved_url: https://developers.googleblog.com/tailor-gemini-cli-to-your-workflow-with-hooks/
+  content_sha256: 0240de640be0c878a804ba02833c97947425cc2673c42dcbb69c853f6690c852
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2026-01-28'
+  retrieved: '2026-07-10'
+  claim: Gemini CLI ships hooks that execute user scripts at predefined lifecycle points for validation, policy enforcement, logging, and notifications.
+- tier: T4
+  match: aliased
+  mechanism_quote: Claude Code, Cursor, and the other agentic clients run with hooks installed. PreToolUse and PostToolUse fire on every prompt and tool call.
+  source: 'Speakeasy: AI agent hooks'
+  source_kind: practitioner_report
+  organization: Speakeasy
+  independence_group: speakeasy
+  url: https://www.speakeasy.com/resources/ai-agent-hooks/
+  resolved_url: https://www.speakeasy.com/resources/ai-agent-hooks/
+  content_sha256: 0ae746f55d1d8f5616baeb366051e5f36723437f8af0cc3256aaa88d31705e1a
+  verifier:
+    method: automated
+    model: gpt-5.5
+    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
+    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  date: '2026-05-06'
+  retrieved: '2026-07-10'
+  claim: Speakeasy reports a hook-based governance architecture where managed coding agents run lifecycle hooks on prompts and tool calls.
+verdict: verified
