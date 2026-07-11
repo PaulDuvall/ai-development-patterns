@@ -892,6 +892,11 @@ def test_trusted_pr_workflow_executes_only_base_branch_validation_code():
     assert "trusted/scripts/generate-verification-status.py" in commands
     assert "candidate/scripts/" not in commands
     assert 'context="Trusted evidence checks"' in commands
+    status = named_step(job, "Recompute candidate status with trusted generator")
+    assert "trusted/scripts/generate-verification-status.py --root candidate" in status["run"]
+    assert 'marker = "\\n## How to refresh\\n"' in status["run"]
+    assert "submitted_derived != recomputed_derived" in status["run"]
+    assert "candidate/scripts/generate-verification-status.py" not in status["run"]
 
 
 def test_required_evidence_check_has_no_pull_request_path_filter():
