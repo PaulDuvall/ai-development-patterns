@@ -30,6 +30,10 @@ For complete pattern documentation, see: [Spec-Driven Development](../../README.
 - **`requirements.txt`** - Dependencies for testing and validation
 - **`pytest.ini`** - Pytest configuration with coverage tracking
 
+### Traceability Automation
+- **`maintain_traceability.sh`** - Automation for maintaining links between requirements, specifications, tests, and implementation
+- **`test_requirement_coverage.py`** - Tests that validate requirement-to-test coverage tracking
+
 ## Key Features
 
 ### Authority Level System
