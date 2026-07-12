@@ -51,11 +51,6 @@ SELECTED_ACTIONS_PAYLOAD = {
 FORK_PR_APPROVAL_PAYLOAD = {
     "approval_policy": "all_external_contributors",
 }
-GITHUB_MODELS_DOCUMENTATION_URL = (
-    "https://docs.github.com/en/repositories/managing-your-repositorys-settings-"
-    "and-features/managing-repository-settings/managing-github-models-in-your-"
-    "repository"
-)
 SECRET_PROTECTION_PAYLOAD = {
     "security_and_analysis": {
         "secret_scanning": {"status": "enabled"},
@@ -176,33 +171,6 @@ def workflow_permissions_payload():
         "default_workflow_permissions": "read",
         "can_approve_pull_request_reviews": False,
     }
-
-
-def github_models_manual_precondition(repo):
-    """Describe the fail-closed manual control for the preview Models feature."""
-    return {
-        "required_state": "disabled",
-        "verification": "manual_repository_settings_check",
-        "settings_url": f"https://github.com/{repo}/settings/models",
-        "documentation_url": GITHUB_MODELS_DOCUMENTATION_URL,
-        "apply_attestation_flag": "--attest-github-models-disabled",
-        "reason": (
-            "GitHub documents only a repository Settings UI control; no public "
-            "REST or GraphQL repository-setting endpoint is available"
-        ),
-    }
-
-
-def require_github_models_disabled_attestation(repo, attested):
-    """Stop before writes unless an administrator checked the documented UI."""
-    if attested:
-        return
-    precondition = github_models_manual_precondition(repo)
-    raise RuntimeError(
-        "GitHub Models must be disabled manually at "
-        f"{precondition['settings_url']} before apply; then rerun with "
-        f"{precondition['apply_attestation_flag']}"
-    )
 
 
 def find_existing(repo):
@@ -429,14 +397,6 @@ def main():
         action="store_true",
         help="write controls and remove retired automation configuration",
     )
-    parser.add_argument(
-        "--attest-github-models-disabled",
-        action="store_true",
-        help=(
-            "attest that an administrator verified GitHub Models is disabled "
-            "in repository Settings (required with --apply)"
-        ),
-    )
     args = parser.parse_args()
 
     try:
@@ -453,7 +413,6 @@ def main():
                         "selected_actions": SELECTED_ACTIONS_PAYLOAD,
                         "fork_pr_contributor_approval": FORK_PR_APPROVAL_PAYLOAD,
                         "workflow_permissions": workflow_permissions,
-                        "github_models": github_models_manual_precondition(repo),
                         "retired_actions_credentials": {
                             "secret_count": len(RETIRED_ACTIONS_SECRETS),
                             "variable_count": len(RETIRED_ACTIONS_VARIABLES),
@@ -473,8 +432,6 @@ def main():
             )
             print("Dry run only; pass --apply to update GitHub.")
             return 0
-        require_github_models_disabled_attestation(
-            repo, args.attest_github_models_disabled)
         removed_credentials = delete_retired_actions_credentials(repo)
         removed_environments = delete_obsolete_actions_environments(repo)
         apply_actions_permissions(repo)

@@ -95,23 +95,30 @@ closed. It posts the required commit-status context `Trusted evidence checks` on
 candidate revision.
 Closed or otherwise ineligible pull requests are successful no-ops rather than false failures.
 
-A legitimate trust-root upgrade requires a repository `OWNER` to comment on the pull request with
-the candidate's current 40-character head SHA in this exact form:
+A legitimate trust-root upgrade requires a repository `OWNER` to add a top-level comment in the pull
+request's **Conversation** tab with the candidate's current 40-character head SHA in this exact form:
 
 ```text
 APPROVE TRUST ROOT <head-sha>
 ```
 
+This is not a general PR approval and does not invoke a model, expose a provider credential, or incur
+model/provider API usage or charges. For that one commit, it waives only the byte-for-byte equality
+requirement for the protected trust-root inventory. Required-file presence, direct candidate-workflow
+policy checks, credential scanning of selected published and verification artifacts, evidence
+recomputation, status recomputation, and the separate deterministic validation gate must still pass.
+
 The approval is commit-bound: a new push requires a new exact comment. Creating, editing, or
 deleting an owner comment starts a no-checkout job that finds the completed
 `pull_request_target` run for that exact pull request and current head SHA, then requests its rerun.
-Before requesting the rerun, that job marks `Trusted evidence checks` failed on the current head;
-only a complete trusted validation can restore success. Resolver failures also publish failure, so
-an older success cannot survive an API or validation error.
+Before requesting the rerun, that job asks GitHub to mark `Trusted evidence checks` failed on the
+current head; only a complete trusted validation can restore success. Resolver and validation failures
+also attempt to publish failure. As with any GitHub-hosted control, an outage of the Statuses or Actions
+API can prevent that update or rerun, so maintainers must use the live required-check result rather than
+an earlier notification as the merge signal.
 The rerun compares the API's current head repository, head SHA, base ref, and base SHA with its
-immutable event payload before validating or honoring the exact owner comment. Removing approval
-therefore cannot leave a stale successful result, and candidate workflow code cannot manufacture
-the approval output.
+immutable event payload before validating or honoring the exact owner comment. Removing or editing
+the approval requests a fresh run, and candidate workflow code cannot manufacture the approval output.
 
 ```bash
 gh workflow run evidence-validation.yml
@@ -130,19 +137,34 @@ suite. CodeQL scans main, same-repository pull requests, and the weekly schedule
 native merge rule because GitHub default setup excludes public fork pull requests and would leave
 them unmergeable.
 
-[GitHub Models repository enablement is a public-preview Settings UI control](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/managing-github-models-in-your-repository);
-GitHub documents no public REST or GraphQL repository-setting endpoint that this script can verify.
-Before apply, an administrator must set **Settings → Models → Models in this repository** to
-**Disabled**. Apply mode fails before its first write unless the administrator supplies the explicit
-manual attestation flag below. The command remains a dry run unless `--apply` is supplied. Apply
-mode also removes retired evaluator and assistant credentials and the former paid-research
-environment so historical workflow definitions remain credentialless:
+[GitHub Models repository enablement is a public-preview feature](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/managing-github-models-in-your-repository)
+whose Settings route is not exposed for this repository. [GitHub also documents that some Models
+clients are outside organization policy enforcement](https://docs.github.com/en/github-models/github-models-at-scale/manage-models-at-scale#exceptions-to-your-organizations-model-settings).
+This repository therefore does
+not use that preview UI as a spend boundary or require an unverifiable manual attestation. For the
+checked-in default-branch workflows and pull-request candidates, the trusted workflow policy rejects
+GitHub Models permissions and direct model/provider action, endpoint, SDK, CLI, and credential surfaces
+in workflow YAML; repository Actions is limited to an exact SHA-pinned action allowlist. A changed
+protected script still requires the exact, commit-bound owner trust approval described above.
+
+These controls are not an account-wide or absolute Actions kill switch. A collaborator with direct
+write access could push a new same-repository branch workflow containing only `run:` steps before PR
+policy validation, and personal PAT, Marketplace, and local extension/CLI use are outside this
+repository's enforcement boundary. Keep direct write access restricted. Disabling repository Actions
+is the absolute Actions-level stop. For paid GitHub Models usage across clients, opt out of paid usage
+at the account or organization level, or use a budget with **Stop usage when budget limit is reached**
+where GitHub offers it; see [GitHub Models billing](https://docs.github.com/en/billing/concepts/product-billing/github-models)
+and [hard-stop budget configuration](https://docs.github.com/en/billing/how-tos/set-up-budgets).
+BYOK and direct OpenAI, Anthropic, or other provider API usage requires a separate hard limit or key
+revocation at that provider. This project keeps Actions enabled only for deterministic validation.
+
+The command remains a dry run unless `--apply` is supplied. Apply mode also removes the named retired
+evaluator and assistant credentials and the former paid-research environment, so historical workflow
+definitions cannot access those retired repository credentials or that environment:
 
 ```bash
 python3 scripts/configure-repository-rules.py
-python3 scripts/configure-repository-rules.py \
-  --apply \
-  --attest-github-models-disabled
+python3 scripts/configure-repository-rules.py --apply
 ```
 
 ### Network link and content check

@@ -6,7 +6,9 @@ from pathlib import Path
 import pytest
 
 
-SCRIPT = Path(__file__).parent.parent / "scripts" / "configure-repository-rules.py"
+ROOT = Path(__file__).parent.parent
+SCRIPT = ROOT / "scripts" / "configure-repository-rules.py"
+OPERATOR_DOCS = (ROOT / "scripts" / "README.md", ROOT / "verification" / "README.md")
 SPEC = importlib.util.spec_from_file_location("configure_repository_rules", SCRIPT)
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
@@ -237,19 +239,15 @@ def test_workflow_token_permissions_are_applied_and_verified(monkeypatch):
         ("api", "repos/owner/repo/actions/permissions/workflow"), None)
 
 
-def test_github_models_is_a_fail_closed_manual_precondition():
-    precondition = MODULE.github_models_manual_precondition("owner/repo")
+def test_configuration_and_docs_do_not_claim_unavailable_models_control():
+    """Apply and operator docs must not require an unverifiable preview UI route."""
+    sources = [
+        path.read_text(encoding="utf-8")
+        for path in (SCRIPT, *OPERATOR_DOCS)
+    ]
 
-    assert precondition["required_state"] == "disabled"
-    assert precondition["verification"] == "manual_repository_settings_check"
-    assert precondition["settings_url"] == (
-        "https://github.com/owner/repo/settings/models")
-    assert "no public REST or GraphQL" in precondition["reason"]
-    with pytest.raises(RuntimeError, match="must be disabled manually"):
-        MODULE.require_github_models_disabled_attestation(
-            "owner/repo", attested=False)
-    assert MODULE.require_github_models_disabled_attestation(
-        "owner/repo", attested=True) is None
+    assert all("attest-github-models-disabled" not in source for source in sources)
+    assert all("settings/models" not in source for source in sources)
 
 
 def test_retired_configuration_covers_every_hosted_evaluator_credential():
@@ -542,7 +540,7 @@ def test_apply_retires_evaluator_state_before_repository_controls(
     monkeypatch.setattr(
         MODULE.sys,
         "argv",
-        [str(SCRIPT), "--apply", "--attest-github-models-disabled"],
+        [str(SCRIPT), "--apply"],
     )
 
     assert MODULE.main() == 0
@@ -590,29 +588,12 @@ def test_apply_fails_closed_when_retired_state_cleanup_fails(
     monkeypatch.setattr(
         MODULE.sys,
         "argv",
-        [str(SCRIPT), "--apply", "--attest-github-models-disabled"],
+        [str(SCRIPT), "--apply"],
     )
 
     assert MODULE.main() == 1
     assert calls == ["credentials"]
     assert "credential cleanup rejected" in capsys.readouterr().err
-
-
-def test_apply_stops_before_writes_without_models_attestation(
-        monkeypatch, capsys):
-    calls = []
-    monkeypatch.setattr(
-        MODULE, "repository_name", lambda: "PaulDuvall/ai-development-patterns")
-    monkeypatch.setattr(
-        MODULE, "delete_retired_actions_credentials",
-        lambda *args: calls.append("write"))
-    monkeypatch.setattr(MODULE.sys, "argv", [str(SCRIPT), "--apply"])
-
-    assert MODULE.main() == 1
-    assert calls == []
-    error = capsys.readouterr().err
-    assert "settings/models" in error
-    assert "--attest-github-models-disabled" in error
 
 
 def test_dry_run_reports_safe_summaries_without_credential_names(
@@ -633,10 +614,10 @@ def test_dry_run_reports_safe_summaries_without_credential_names(
     )
     assert all(name not in output for name in MODULE.RETIRED_ACTIONS_VARIABLES)
     assert '"evidence-paid-research"' in output
+    assert '"github_models"' not in output
     assert '"query_suite": "extended"' in output
     assert '"threat_model": "remote"' in output
     assert '"allowed_actions": "selected"' in output
     assert '"sha_pinning_required": true' in output
     assert '"approval_policy": "all_external_contributors"' in output
     assert '"verified_allowed": false' in output
-    assert '"required_state": "disabled"' in output

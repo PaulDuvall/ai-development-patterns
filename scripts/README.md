@@ -180,14 +180,18 @@ python3 scripts/validate-workflow-policy.py \
 ### `configure-repository-rules.py`
 
 Audits or applies the main-branch ruleset, Actions allowlist/SHA pinning, fork approval policy,
-retired secret/variable cleanup, secret scanning, push protection, and CodeQL default setup. The
-GitHub Models repository toggle is a manual, fail-closed precondition because GitHub exposes no
-public repository-setting API for it. Primary caller: a maintainer from a clean `main` checkout.
+retired secret/variable cleanup, secret scanning, push protection, and CodeQL default setup. For
+checked-in workflows and PR candidates, direct hosted-model surfaces in workflow YAML are rejected by
+workflow policy, named retired credentials are removed, and Actions is limited to the selected
+SHA-pinned action allowlist; the unavailable public-preview Models Settings route is not treated as an
+attested control. A changed protected script requires the commit-bound owner trust approval documented
+in `verification/README.md`. These are not account-wide controls and cannot inspect an unreviewed
+same-repository branch before it runs. Primary caller: a maintainer from a clean `main` checkout. See
+`verification/README.md` for the enforcement boundary.
 
 ```bash
 python3 scripts/configure-repository-rules.py
-python3 scripts/configure-repository-rules.py \
-  --apply --attest-github-models-disabled
+python3 scripts/configure-repository-rules.py --apply
 ```
 
 ### `generate-audit-prompt.py`
