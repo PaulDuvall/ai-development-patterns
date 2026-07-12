@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate a Claude Code fix prompt from pytest JSON results.
+Generate a local coding-agent fix prompt from pytest JSON results.
 
 Usage:
     # In CI (after pytest --json-report):
@@ -9,11 +9,20 @@ Usage:
     # Locally:
     cd tests && python3 -m pytest --json-report --json-report-file=.report.json -q
     python3 ../scripts/generate-audit-prompt.py .report.json
+
+    # For an embedded suite:
+    python3 scripts/generate-audit-prompt.py \
+        --rerun-command 'cd examples/spec-driven-development && pytest -x -q' \
+        tests/test-results/spec-driven-report.json
 """
 
+import argparse
 import json
 import sys
 from pathlib import Path
+
+
+FAILURE_OUTCOMES = {"failed", "error"}
 
 
 def load_report(report_path: str) -> dict:
@@ -23,20 +32,50 @@ def load_report(report_path: str) -> dict:
 
 
 def extract_failures(report: dict) -> list[dict]:
-    """Extract actionable failure details from report."""
+    """Extract test, collection, and session failures from a pytest report."""
     failures = []
     for test in report.get("tests", []):
-        if test.get("outcome") != "passed":
-            entry = {
-                "test": test["nodeid"],
-                "outcome": test["outcome"],
-            }
-            for phase in ("call", "setup", "teardown"):
-                phase_data = test.get(phase, {})
-                if phase_data.get("longrepr"):
-                    entry["error"] = phase_data["longrepr"]
-                    break
-            failures.append(entry)
+        if test.get("outcome") not in FAILURE_OUTCOMES:
+            continue
+        entry = {
+            "test": test.get("nodeid", "pytest test"),
+            "outcome": test.get("outcome", "failed"),
+        }
+        for phase in ("call", "setup", "teardown"):
+            phase_data = test.get(phase, {})
+            if phase_data.get("longrepr"):
+                entry["error"] = phase_data["longrepr"]
+                break
+        failures.append(entry)
+
+    for collector in report.get("collectors", []):
+        if collector.get("outcome") not in FAILURE_OUTCOMES:
+            continue
+        entry = {
+            "test": f"collection: {collector.get('nodeid') or 'pytest session'}",
+            "outcome": collector.get("outcome", "failed"),
+        }
+        if collector.get("longrepr"):
+            entry["error"] = collector["longrepr"]
+        failures.append(entry)
+
+    exit_code = report.get("exitcode", 0)
+    summary = report.get("summary", {})
+    session_failed = bool(
+        exit_code
+        or summary.get("failed", 0)
+        or summary.get("error", 0)
+    )
+    if session_failed and not failures:
+        failures.append({
+            "test": "pytest session",
+            "outcome": f"exit code {exit_code or 'unknown'}",
+            "error": (
+                "Pytest exited unsuccessfully before reporting an actionable "
+                "test or collector failure. Re-run the prescribed command "
+                "locally to capture the complete import/configuration error."
+            ),
+        })
     return failures
 
 
@@ -57,8 +96,13 @@ def categorize(test_id: str) -> str:
     return "Other"
 
 
-def build_prompt(failures: list[dict]) -> str:
-    """Build a Claude Code prompt from failures."""
+DEFAULT_RERUN_COMMAND = 'python3 -m pytest -m "not slow" -x -q'
+
+
+def build_prompt(
+    failures: list[dict], rerun_command: str = DEFAULT_RERUN_COMMAND
+) -> str:
+    """Build a local coding-agent prompt from failures."""
     if not failures:
         return ""
 
@@ -71,7 +115,7 @@ def build_prompt(failures: list[dict]) -> str:
         "The CI audit found issues that need fixing. "
         "For each failure below, read the referenced files, "
         "diagnose the root cause, and fix it directly. "
-        "Run `python3 -m pytest -m \"not slow\" -x -q` after each fix to verify.",
+        f"Run `{rerun_command}` after each fix to verify.",
         "",
     ]
 
@@ -95,13 +139,18 @@ def build_prompt(failures: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def main():
+def main(argv=None):
     """Generate and print a remediation prompt from a pytest JSON report."""
-    if len(sys.argv) < 2:
-        print(f"Usage: {sys.argv[0]} <pytest-json-report>", file=sys.stderr)
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("report_path")
+    parser.add_argument(
+        "--rerun-command",
+        default=DEFAULT_RERUN_COMMAND,
+        help="exact local command the generated prompt should prescribe",
+    )
+    args = parser.parse_args(argv)
 
-    report_path = sys.argv[1]
+    report_path = args.report_path
     if not Path(report_path).exists():
         print(f"Report not found: {report_path}", file=sys.stderr)
         sys.exit(1)
@@ -121,9 +170,13 @@ def main():
         print("All audit checks passed.", file=sys.stderr)
         sys.exit(0)
 
-    print(f"{failed} failed, {errored} errors", file=sys.stderr)
+    print(
+        f"{failed} failed, {errored} errors, "
+        f"exit code {report.get('exitcode', 'unknown')}",
+        file=sys.stderr,
+    )
 
-    prompt = build_prompt(failures)
+    prompt = build_prompt(failures, rerun_command=args.rerun_command)
     print(prompt)
     sys.exit(1)
 

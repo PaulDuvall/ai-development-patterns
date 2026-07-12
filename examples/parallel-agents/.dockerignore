@@ -1,0 +1,7 @@
+**
+!docker/
+!docker/Dockerfile.ai-agent
+!docker/requirements.txt
+!scripts/
+!scripts/agent_runner.py
+!scripts/coordinator.py

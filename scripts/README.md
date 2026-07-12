@@ -197,10 +197,16 @@ python3 scripts/configure-repository-rules.py --apply
 ### `generate-audit-prompt.py`
 
 Converts the deterministic pytest JSON report into a bounded local-agent repair prompt. Primary
-caller: the failure-summary step in `.github/workflows/pattern-validation.yml`.
+caller: the failure-summary step in `.github/workflows/pattern-validation.yml`. The optional
+`--rerun-command` keeps a nested-suite prompt bound to that suite's exact local reproduction
+command instead of the repository-root default.
 
 ```bash
 python3 scripts/generate-audit-prompt.py tests/test-results/report.json
+python3 scripts/generate-audit-prompt.py \
+  --rerun-command \
+  'cd examples/spec-driven-development && python3 -m pytest -x -q' \
+  tests/test-results/spec-driven-report.json
 ```
 
 ## Routine consistency gate

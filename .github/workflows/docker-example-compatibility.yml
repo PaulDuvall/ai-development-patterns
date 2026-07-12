@@ -1,0 +1,208 @@
+name: Network-backed Docker Example Compatibility
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - examples/parallel-agents/**
+      - examples/security-sandbox/**
+      - tests/test_dependency_security.py
+      - tests/test_docker_examples.py
+      - .github/workflows/docker-example-compatibility.yml
+      - .github/workflows/pattern-validation.yml
+  push:
+    branches: [main]
+    paths:
+      - examples/parallel-agents/**
+      - examples/security-sandbox/**
+      - tests/test_dependency_security.py
+      - tests/test_docker_examples.py
+      - .github/workflows/docker-example-compatibility.yml
+      - .github/workflows/pattern-validation.yml
+  workflow_dispatch:
+  schedule:
+    # Recheck mutable upstream package and image compatibility once a week.
+    - cron: "30 6 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-example-compatibility-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker-compatibility:
+    name: Docker example compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Validate Compose definitions
+        run: |
+          set -euo pipefail
+          for compose_file in \
+            examples/parallel-agents/docker-compose.parallel-agents.yml \
+            examples/security-sandbox/docker-compose.basic.yml \
+            examples/security-sandbox/docker-compose.ai-sandbox.yml \
+            examples/security-sandbox/docker-compose.parallel-agents.yml
+          do
+            docker compose --file "$compose_file" config --quiet
+          done
+
+      - name: Build maintained Docker examples from live upstreams
+        env:
+          DOCKER_BUILDKIT: "1"
+        run: |
+          set -euo pipefail
+          docker build --pull \
+            --tag ai-development-patterns/parallel-agent:compatibility \
+            --file examples/parallel-agents/docker/Dockerfile.ai-agent \
+            examples/parallel-agents
+          docker build --pull \
+            --tag ai-development-patterns/security-sandbox:compatibility \
+            --file examples/security-sandbox/Dockerfile.ai-sandbox \
+            examples/security-sandbox
+
+      - name: Smoke-test parallel-agent entrypoints
+        run: |
+          set -euo pipefail
+          image=ai-development-patterns/parallel-agent:compatibility
+          docker run --rm \
+            "$image" \
+            python /scripts/agent_runner.py --help
+          docker run --rm \
+            "$image" \
+            python /scripts/coordinator.py --help
+          node_version="$({ docker run --rm \
+            "$image" \
+            node --version; } 2>/dev/null)"
+          case "$node_version" in
+            v24.*) ;;
+            *) echo "::error::Expected Node 24, found ${node_version}"; exit 1 ;;
+          esac
+          docker run --rm \
+            --volume \
+            "$GITHUB_WORKSPACE/examples/parallel-agents/config:/config:ro" \
+            --env AGENT_ID=compatibility-smoke \
+            "$image" /bin/bash -c '
+              set -euo pipefail
+              mkdir -p /tmp/workspace /tmp/shared /tmp/reports
+              python /scripts/agent_runner.py \
+                --task-file /config/tasks.yaml \
+                --task-id database-schema \
+                --workspace /tmp/workspace \
+                --shared-memory /tmp/shared/agent-memory.json
+              python /scripts/coordinator.py \
+                --watch-dir /tmp/workspace \
+                --report-dir /tmp/reports \
+                --shared-memory /tmp/shared/agent-memory.json \
+                --once
+              test -f /tmp/workspace/schema.prisma
+              grep -q "\"model_calls\": 0" \
+                /tmp/reports/parallel-agent-status.json
+              grep -q "\"provider_api_calls\": 0" \
+                /tmp/reports/parallel-agent-status.json
+              grep -q "\"execution\": \"simulated\"" \
+                /tmp/reports/parallel-agent-status.json
+              grep -q "\"status\": \"fixture_generated\"" \
+                /tmp/shared/agent-memory.json
+            '
+
+      - name: Smoke-test sandbox isolation and lifecycle
+        run: |
+          set -euo pipefail
+          image=ai-development-patterns/security-sandbox:compatibility
+          local_image=ai-development-patterns/security-sandbox:local
+          compose_file=examples/security-sandbox/docker-compose.ai-sandbox.yml
+          internal_network="sandbox-internal-negative-control-${GITHUB_RUN_ID}"
+          network_name="sandbox-negative-control-${GITHUB_RUN_ID}"
+          probe_container="sandbox-probe-${GITHUB_RUN_ID}"
+          cleanup() {
+            docker compose --file "$compose_file" down \
+              --volumes --remove-orphans >/dev/null 2>&1 || true
+            docker rm --force "$probe_container" >/dev/null 2>&1 || true
+            docker network rm "$internal_network" >/dev/null 2>&1 || true
+            docker network rm "$network_name" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          docker tag "$image" "$local_image"
+          docker compose --file "$compose_file" up \
+            --detach --no-build ai-development
+          sandbox_container="$(docker compose --file "$compose_file" \
+            ps --quiet ai-development)"
+          if [ -z "$sandbox_container" ]; then
+            echo "::error::Compose did not create the sandbox service."
+            exit 1
+          fi
+          for attempt in {1..20}; do
+            if [ "$(docker inspect --format '{{.State.Running}}' \
+                "$sandbox_container")" = true ]; then
+              break
+            fi
+            if [ "$attempt" -eq 20 ]; then
+              docker compose --file "$compose_file" logs ai-development
+              echo "::error::The Compose sandbox did not stay running."
+              exit 1
+            fi
+            sleep 1
+          done
+          docker compose --file "$compose_file" exec --no-TTY ai-development \
+            python /workspace/healthcheck.py
+          docker compose --file "$compose_file" exec --no-TTY ai-development \
+            /bin/bash -c '
+              set -euo pipefail
+              for directory in /workspace/generated /workspace/logs; do
+                probe="$directory/.compatibility-write"
+                printf "verified\n" > "$probe"
+                rm -- "$probe"
+              done
+            '
+          if docker compose --file "$compose_file" exec --no-TTY \
+              ai-development touch /workspace/src/.compatibility-write; then
+            echo "::error::The Compose source mount was unexpectedly writable."
+            exit 1
+          fi
+
+          docker network create --internal "$internal_network" >/dev/null
+          if docker run --rm --network "$internal_network" "$image" \
+              python /workspace/healthcheck.py --network-only; then
+            echo "::error::Health check accepted an attached internal bridge."
+            exit 1
+          fi
+          echo "Internal-bridge negative control failed closed as expected."
+
+          docker network create "$network_name" >/dev/null
+          docker run --detach --name "$probe_container" \
+            --network "$network_name" "$image" \
+            python -m http.server 8080 --bind 0.0.0.0 >/dev/null
+          probe_ip="$(docker inspect --format \
+            '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' \
+            "$probe_container")"
+          probe_ready=false
+          for attempt in {1..20}; do
+            if docker run --rm --network "$network_name" "$image" \
+                python -c "import socket; socket.create_connection(('$probe_ip', 8080), 1).close()"; then
+              probe_ready=true
+              break
+            fi
+            sleep 1
+          done
+          if [ "$probe_ready" != true ]; then
+            echo "::error::The network negative-control target was not reachable."
+            exit 1
+          fi
+          if docker run --rm --network "$network_name" \
+              --env SANDBOX_NETWORK_PROBE_HOST="$probe_ip" \
+              --env SANDBOX_NETWORK_PROBE_PORT=8080 \
+              "$image" python /workspace/healthcheck.py; then
+            echo "::error::Health check accepted a network-enabled container."
+            exit 1
+          fi
+          echo "Network-enabled negative control failed closed as expected."

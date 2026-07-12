@@ -1,125 +1,67 @@
 # IAM Policy Generator Specification {#iam_policy_gen}
 
 ## Overview {#overview}
-This specification defines the IAM Policy Generator behavior, establishing the contract between user requirements and system implementation for automated AWS IAM policy generation.
 
-**Strategic Goals:**
-- Generate syntactically correct AWS IAM policies
-- Validate input parameters against AWS constraints  
-- Provide clear error messages for invalid inputs
-- Support multiple policy types and resource patterns
+This executable specification defines the behavior implemented by
+`iam_policy_generator.py`. Its seven normative requirements are intentionally
+limited to behavior covered by the checked-in test suite; proposed capabilities
+without implementation or tests do not appear as requirements.
 
 ## Definitions {#definitions}
 
-**Policy Type**: A predefined template for IAM policy generation (e.g., s3-read, ec2-admin, lambda-execute)  
-**Resource ARN**: Amazon Resource Name identifying AWS resources following ARN syntax  
-**IAM Policy**: JSON document defining permissions using AWS IAM policy language  
-**CLI Interface**: Command-line interface accepting parameters and returning policies or errors
+- **Policy type**: A supported IAM action template such as `s3-read` or `ec2-admin`.
+- **Resource ARN**: An identifier in the standard `aws` partition with at least six colon-separated components.
+- **Policy document**: JSON containing the IAM version and one or more generated statements.
 
-## CLI Requirements {#cli_requirements authority=system}
+## CLI Contract {#cli_contract authority=system}
 
-The system MUST provide a command-line interface that:
-- Accepts policy type via `--policy-type` flag with validation [^test_cli_policy_type]
-- Accepts resource specification via `--resource` flag [^test_cli_resource]
-- Validates input parameters against AWS IAM constraints [^test_input_validation]
-- Generates syntactically correct IAM policy JSON [^test_iam_syntax]
-- Returns exit code 0 for success, 1 for validation errors [^test_exit_codes]
-- Displays help information when called with `--help` [^test_cli_help]
+- **REQ-001**: The CLI MUST require `--policy-type` and `--resource`, display help, return zero for a valid request, and return non-zero for missing or invalid input. [^test_cli_policy_type] [^test_cli_resource] [^test_cli_help] [^test_exit_codes] [^test_missing_arguments]
 
 ## Input Validation {#input_validation authority=platform}
 
-The system MUST:
-- Reject invalid AWS service names with clear error messages [^test_invalid_service]
-- Validate resource ARN format before policy generation [^test_arn_validation]
-- Implement input sanitization to prevent injection attacks [^test_input_sanitization]
-- Validate policy type against supported templates [^test_policy_type_validation]
-- Check resource permissions compatibility with policy type [^test_compatibility_check]
+- **REQ-002**: The generator MUST accept only a policy type present in its reviewed template registry. [^test_policy_type_validation]
+- **REQ-003**: The generator MUST reject empty, structurally incomplete, syntactically invalid, unsupported-service, or invalid general-purpose S3 bucket ARNs with an actionable error. [^test_empty_input] [^test_arn_validation] [^test_arn_components] [^test_invalid_service] [^test_s3_bucket_naming]
+- **REQ-004**: The generator MUST reject a resource whose AWS service is incompatible with the selected policy type. [^test_compatibility]
+- **REQ-005**: The generator MUST reject unsafe characters and values longer than 500 characters without rewriting resource identity, and JSON serialization MUST preserve every accepted resource value exactly. [^test_unsafe_input] [^test_json_round_trip]
 
 ## Policy Generation {#policy_generation authority=system}
 
-The system MUST:
-- Generate IAM policies conforming to AWS IAM policy grammar [^test_policy_grammar]
-- Include appropriate actions for the specified policy type [^test_action_mapping]
-- Set correct effect (Allow/Deny) based on policy template [^test_effect_setting]
-- Include proper version field ("2012-10-17") [^test_version_field]
-- Escape special characters in resource ARNs [^test_arn_escaping]
-
-## Error Handling {#error_handling authority=platform}
-
-The system MUST:
-- Return structured error messages with error codes [^test_error_structure]
-- Log validation failures for debugging purposes [^test_error_logging]
-- Provide suggested corrections for common input errors [^test_error_suggestions]
-- Handle malformed ARNs gracefully without crashes [^test_malformed_arn]
-- Timeout gracefully for slow operations [^test_timeout_handling]
+- **REQ-006**: A generated policy MUST use IAM version `2012-10-17`; non-S3 templates MUST copy their effect and actions to the validated resource, while S3 templates MUST place bucket actions on the bucket ARN and object actions on the object ARN, constrain `ListBucket` to wildcard prefixes, and omit `ListBucket` for exact-object scope. [^test_policy_shape] [^test_s3_resource_pairing] [^test_s3_prefix_scope] [^test_s3_exact_scope]
 
 ## Output Format {#output_format authority=feature}
 
-The system SHOULD:
-- Output policies in properly formatted JSON with indentation [^test_json_formatting]
-- Support compact JSON output via `--compact` flag [^test_compact_output]
-- Include policy validation status in output [^test_validation_status]
-
-## Security Controls {#security_controls authority=system}
-
-The system MUST:
-- Never log sensitive information like resource ARNs in plain text [^test_secure_logging]
-- Validate all inputs against injection attack patterns [^test_injection_protection]
-- Implement rate limiting for policy generation requests [^test_rate_limiting]
-- Sanitize output to prevent information disclosure [^test_output_sanitization]
-
-## Performance Requirements {#performance_requirements authority=platform}
-
-The system SHOULD:
-- Generate policies within 100ms for simple requests [^test_performance_simple]
-- Handle concurrent requests efficiently [^test_concurrent_requests]
-- Cache policy templates for faster generation [^test_template_caching]
+- **REQ-007**: Output MUST be valid JSON, support compact formatting, include validation metadata by default, and omit that metadata only when requested. [^test_compact_output] [^test_validation_status] [^test_no_validation_info]
 
 ## Evaluation Cases {#evaluation}
 
-The following test references link specifications to automated validation:
+Each citation below names a test that exists. The traceability fitness test
+checks these requirement IDs independently, while `spec_validator.py` verifies
+that the cited test nodes resolve.
 
-[^test_cli_policy_type]: tests/test_cli.py::test_policy_type_flag
-[^test_cli_resource]: tests/test_cli.py::test_resource_flag  
-[^test_input_validation]: tests/test_validation.py::test_input_validation
-[^test_iam_syntax]: tests/test_iam_policy.py::test_policy_syntax
-[^test_exit_codes]: tests/test_cli.py::test_exit_codes
-[^test_cli_help]: tests/test_cli.py::test_help_display
-[^test_invalid_service]: tests/test_validation.py::test_invalid_service_names
-[^test_arn_validation]: tests/test_validation.py::test_arn_format_validation
-[^test_input_sanitization]: tests/test_security.py::test_input_sanitization
-[^test_policy_type_validation]: tests/test_validation.py::test_policy_type_validation
-[^test_compatibility_check]: tests/test_validation.py::test_resource_policy_compatibility
-[^test_policy_grammar]: tests/test_iam_policy.py::test_policy_grammar_compliance
-[^test_action_mapping]: tests/test_iam_policy.py::test_action_mapping
-[^test_effect_setting]: tests/test_iam_policy.py::test_effect_setting
-[^test_version_field]: tests/test_iam_policy.py::test_version_field
-[^test_arn_escaping]: tests/test_iam_policy.py::test_arn_escaping
-[^test_error_structure]: tests/test_error_handling.py::test_error_structure
-[^test_error_logging]: tests/test_error_handling.py::test_error_logging
-[^test_error_suggestions]: tests/test_error_handling.py::test_error_suggestions
-[^test_malformed_arn]: tests/test_error_handling.py::test_malformed_arn_handling
-[^test_timeout_handling]: tests/test_error_handling.py::test_timeout_handling
-[^test_json_formatting]: tests/test_output.py::test_json_formatting
-[^test_compact_output]: tests/test_output.py::test_compact_output
-[^test_validation_status]: tests/test_output.py::test_validation_status
-[^test_secure_logging]: tests/test_security.py::test_secure_logging
-[^test_injection_protection]: tests/test_security.py::test_injection_protection
-[^test_rate_limiting]: tests/test_security.py::test_rate_limiting
-[^test_output_sanitization]: tests/test_security.py::test_output_sanitization
-[^test_performance_simple]: tests/test_performance.py::test_simple_request_performance
-[^test_concurrent_requests]: tests/test_performance.py::test_concurrent_requests
-[^test_template_caching]: tests/test_performance.py::test_template_caching
+[^test_cli_policy_type]: tests/test_cli.py::TestCLIRequirements::test_policy_type_flag
+[^test_cli_resource]: tests/test_cli.py::TestCLIRequirements::test_resource_flag
+[^test_cli_help]: tests/test_cli.py::TestCLIRequirements::test_help_display
+[^test_exit_codes]: tests/test_cli.py::TestCLIRequirements::test_exit_codes
+[^test_missing_arguments]: tests/test_cli.py::TestCLIRequirements::test_missing_required_arguments
+[^test_policy_type_validation]: tests/test_validation.py::TestInputValidation::test_policy_type_validation
+[^test_empty_input]: tests/test_validation.py::TestInputValidation::test_empty_input_validation
+[^test_arn_validation]: tests/test_validation.py::TestInputValidation::test_arn_format_validation
+[^test_arn_components]: tests/test_validation.py::TestInputValidation::test_arn_component_validation
+[^test_invalid_service]: tests/test_validation.py::TestInputValidation::test_invalid_service_names
+[^test_s3_bucket_naming]: tests/test_generator_runtime.py::test_s3_generation_rejects_invalid_or_reserved_bucket_names
+[^test_compatibility]: tests/test_validation.py::TestInputValidation::test_resource_policy_compatibility
+[^test_unsafe_input]: tests/test_validation.py::TestInputValidation::test_unsafe_input_rejected_without_rewriting
+[^test_json_round_trip]: tests/test_validation.py::TestInputValidation::test_json_serialization_preserves_accepted_resource
+[^test_policy_shape]: tests/test_validation.py::TestInputValidation::test_generated_policy_matches_template
+[^test_s3_resource_pairing]: tests/test_validation.py::TestInputValidation::test_s3_actions_use_matching_resource_types
+[^test_s3_prefix_scope]: tests/test_validation.py::TestInputValidation::test_s3_prefix_scope_constrains_bucket_listing
+[^test_s3_exact_scope]: tests/test_validation.py::TestInputValidation::test_s3_exact_object_scope_omits_bucket_listing
+[^test_compact_output]: tests/test_cli.py::TestCLIRequirements::test_compact_flag
+[^test_validation_status]: tests/test_cli.py::TestCLIRequirements::test_policy_validation_in_output
+[^test_no_validation_info]: tests/test_cli.py::TestCLIRequirements::test_no_validation_info_flag
 
 ## Authority Conflict Resolution
 
-When requirements conflict between sections, authority levels determine precedence:
-
-1. **System authority** (security_controls, cli_requirements, policy_generation): Highest precedence
-2. **Platform authority** (input_validation, error_handling, performance_requirements): Medium precedence  
-3. **Feature authority** (output_format): Lowest precedence
-
-Example conflict resolution:
-- `output_format` (feature) specifies compact JSON
-- `security_controls` (system) requires readable formatting for security review
-- **Resolution**: Security requirement takes precedence, policies output with readable formatting
+When requirements conflict, system authority takes precedence over platform
+authority, which takes precedence over feature authority. No conflict exists in
+the current seven-requirement scope.

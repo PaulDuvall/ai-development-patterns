@@ -6,10 +6,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.ai-sandbox
+    image: ai-development-patterns/security-sandbox:local
     container_name: ai-dev-sandbox
 
     # Complete network isolation - no egress or ingress
     network_mode: none
+    init: true
 
     # Security constraints
     security_opt:
@@ -18,11 +20,12 @@ services:
       - ALL
     read_only: true
 
-    # Volume mounts - read-only source, read/write for AI outputs and logs
+    # Read-only source plus Docker-managed writable output/log volumes.
+    # Named volumes preserve the image's non-root ownership on every host.
     volumes:
       - ./src:/workspace/src:ro
-      - ./generated:/workspace/generated:rw
-      - ./logs:/workspace/logs:rw
+      - sandbox-generated:/workspace/generated
+      - sandbox-logs:/workspace/logs
 
       # DO NOT mount sensitive directories:
       # - ~/.aws (AWS credentials)
@@ -60,10 +63,14 @@ services:
     user: "1000:1000"
 
     # Keep container running for interactive use
-    command: ["/bin/bash", "-c", "/workspace/init-workspace.sh && tail -f /dev/null"]
+    command: ["/bin/bash", "-c", "/workspace/init-workspace.sh && exec tail -f /dev/null"]
 
     labels:
       - "ai.sandbox=true"
       - "ai.network.isolated=true"
       - "ai.security.level=high"
       - "version=1.0"
+
+volumes:
+  sandbox-generated:
+  sandbox-logs:

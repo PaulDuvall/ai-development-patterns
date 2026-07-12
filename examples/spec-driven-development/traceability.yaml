@@ -1,0 +1,8 @@
+schema_version: 1
+specification_files:
+  - iam_policy_spec.md
+implementation_files:
+  - iam_policy_generator.py
+quality_gates:
+  min_test_coverage_traceability: 90
+  min_backward_traceability: 70

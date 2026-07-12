@@ -156,7 +156,10 @@ at the account or organization level, or use a budget with **Stop usage when bud
 where GitHub offers it; see [GitHub Models billing](https://docs.github.com/en/billing/concepts/product-billing/github-models)
 and [hard-stop budget configuration](https://docs.github.com/en/billing/how-tos/set-up-budgets).
 BYOK and direct OpenAI, Anthropic, or other provider API usage requires a separate hard limit or key
-revocation at that provider. This project keeps Actions enabled only for deterministic validation.
+revocation at that provider. This project keeps Actions model-free: required deterministic gates,
+advisory read-only link/content checks and live Docker compatibility builds, Pages deployment, and
+issue/reconciliation housekeeping. No workflow receives a model-provider credential or invokes a
+model.
 
 The command remains a dry run unless `--apply` is supplied. Apply mode also removes the named retired
 evaluator and assistant credentials and the former paid-research environment, so historical workflow
@@ -169,7 +172,7 @@ python3 scripts/configure-repository-rules.py --apply
 
 ### Network link and content check
 
-Run the slow, read-only checks locally or request the deterministic Actions workflow:
+Run the slow, read-only checks locally or request the Adoption Evidence Actions workflow:
 
 ```bash
 python3 -m pytest tests/test_evidence_files.py tests/test_evidence_content.py -m slow

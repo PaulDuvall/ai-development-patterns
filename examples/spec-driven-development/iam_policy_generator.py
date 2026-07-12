@@ -18,19 +18,38 @@ import sys
 import time
 import logging
 
+# Implements: REQ-001, REQ-002, REQ-003, REQ-004, REQ-005, REQ-006, REQ-007
+
 
 class IAMPolicyGenerator:
     """Generates AWS IAM policies based on policy types and resource specifications"""
-    
+
+    MAX_INPUT_LENGTH = 500
+    UNSAFE_INPUT_CHARACTERS = re.compile(r"[<>\"';\\]|[\x00-\x1f\x7f]")
+    S3_RESERVED_BUCKET_PREFIXES = ("xn--", "sthree-", "amzn-s3-demo-")
+    S3_RESERVED_BUCKET_SUFFIXES = (
+        "-s3alias",
+        "--ol-s3",
+        ".mrap",
+        "--x-s3",
+        "--table-s3",
+    )
+
     # Policy templates with actions mapped to policy types
     POLICY_TEMPLATES = {
         "s3-read": {
-            "actions": ["s3:GetObject", "s3:ListBucket"],
+            "bucket_actions": ["s3:ListBucket"],
+            "object_actions": ["s3:GetObject"],
             "effect": "Allow",
             "description": "Read-only access to S3 resources"
         },
         "s3-write": {
-            "actions": ["s3:PutObject", "s3:DeleteObject", "s3:GetObject", "s3:ListBucket"],
+            "bucket_actions": ["s3:ListBucket"],
+            "object_actions": [
+                "s3:PutObject",
+                "s3:DeleteObject",
+                "s3:GetObject",
+            ],
             "effect": "Allow",
             "description": "Read-write access to S3 resources"
         },
@@ -82,22 +101,41 @@ class IAMPolicyGenerator:
             return False, f"Unsupported policy type '{policy_type}'. Available: {available}"
         
         return True, None
-    
+
+    def validate_input_safety(
+        self, value: str, field_name: str
+    ) -> tuple[bool, str | None]:
+        """Reject unsafe or unbounded input without changing its identity."""
+        if value is None:
+            return False, f"{field_name} cannot be empty"
+        if len(value) > self.MAX_INPUT_LENGTH:
+            return False, (
+                f"{field_name} exceeds the {self.MAX_INPUT_LENGTH}-character limit"
+            )
+        if self.UNSAFE_INPUT_CHARACTERS.search(value):
+            return False, f"{field_name} contains unsafe characters"
+        return True, None
+
     def validate_arn_format(self, arn: str) -> tuple[bool, str | None]:
         """Validate ARN format according to AWS ARN syntax"""
         if not arn:
             return False, "Resource ARN cannot be empty"
-        
-        # AWS ARN format: arn:partition:service:region:account-id:resource-type/resource-id
-        arn_pattern = r'^arn:aws:[a-zA-Z0-9\-]+:[a-zA-Z0-9\-]*:[0-9]*:[a-zA-Z0-9\-\./*:_]*$'
-        
-        if not re.match(arn_pattern, arn):
-            return False, f"Invalid ARN format. Expected: arn:aws:service:region:account:resource"
-        
-        # Extract service from ARN
-        arn_parts = arn.split(':')
+
+        # Split at most five times because the resource component may itself
+        # contain colons. Report structural truncation before the generic
+        # character/partition error so callers receive the actionable reason.
+        arn_parts = arn.split(':', 5)
         if len(arn_parts) < 6:
             return False, "ARN must have at least 6 components separated by colons"
+        
+        # AWS ARN format: arn:partition:service:region:account-id:resource-type/resource-id
+        arn_pattern = (
+            r"^arn:aws:[a-zA-Z0-9\-]+:[a-zA-Z0-9\-]*:[0-9]*:"
+            r"[a-zA-Z0-9\-\./*:_]+$"
+        )
+        
+        if not re.match(arn_pattern, arn):
+            return False, "Invalid ARN format. Expected: arn:aws:service:region:account:resource"
         
         service = arn_parts[2]
         if service not in self.VALID_SERVICES:
@@ -124,34 +162,60 @@ class IAMPolicyGenerator:
         
         return True, None
     
-    def sanitize_input(self, input_str: str) -> str:
-        """Sanitize input to prevent injection attacks"""
-        if not input_str:
-            return ""
-        
-        # Remove potentially dangerous characters
-        sanitized = re.sub(r'[<>"\';]', '', input_str)
-        
-        # Limit length to prevent DoS
-        if len(sanitized) > 500:
-            sanitized = sanitized[:500]
-        
-        return sanitized.strip()
-    
-    def escape_arn_for_json(self, arn: str) -> str:
-        """Escape special characters in ARN for JSON output"""
-        # JSON escape characters that might appear in ARNs
-        escaped = arn.replace('\\', '\\\\').replace('"', '\\"')
-        return escaped
-    
-    def generate_policy(self, policy_type: str, resource_arn: str, compact: bool = False) -> dict:
+    @classmethod
+    def _valid_s3_bucket_name(cls, bucket_name: str) -> bool:
+        """Apply the relevant general-purpose S3 bucket naming rules."""
+        if not re.fullmatch(
+            r"[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]", bucket_name
+        ):
+            return False
+        if ".." in bucket_name or ".-" in bucket_name or "-." in bucket_name:
+            return False
+        if re.fullmatch(r"\d{1,3}(?:\.\d{1,3}){3}", bucket_name):
+            return False
+        if bucket_name.startswith(cls.S3_RESERVED_BUCKET_PREFIXES):
+            return False
+        if bucket_name.endswith(cls.S3_RESERVED_BUCKET_SUFFIXES):
+            return False
+        return True
+
+    @classmethod
+    def _s3_resource_scope(
+        cls, resource_arn: str
+    ) -> tuple[str, str, str | None]:
+        """Return bucket ARN, object ARN, and optional ListBucket scope."""
+        prefix = "arn:aws:s3:::"
+        if not resource_arn.startswith(prefix):
+            raise ValueError(
+                "S3 resource ARN must use arn:aws:s3:::bucket[/object] format"
+            )
+        resource = resource_arn.removeprefix(prefix)
+        bucket_name, separator, object_selector = resource.partition("/")
+        if not cls._valid_s3_bucket_name(bucket_name):
+            raise ValueError(
+                "S3 resource ARN must name a valid general-purpose bucket")
+
+        bucket_arn = f"{prefix}{bucket_name}"
+        if not separator:
+            return bucket_arn, f"{bucket_arn}/*", "*"
+        if not object_selector:
+            raise ValueError("S3 resource ARN must name an object or prefix")
+
+        list_prefix = object_selector if "*" in object_selector else None
+        return bucket_arn, resource_arn, list_prefix
+
+    def generate_policy(self, policy_type: str, resource_arn: str) -> dict:
         """Generate IAM policy JSON based on policy type and resource"""
         start_time = time.time()
-        
-        # Input validation
-        policy_type = self.sanitize_input(policy_type)
-        resource_arn = self.sanitize_input(resource_arn)
-        
+
+        for value, field_name in (
+            (policy_type, "Policy type"),
+            (resource_arn, "Resource ARN"),
+        ):
+            safe, safety_error = self.validate_input_safety(value, field_name)
+            if not safe:
+                raise ValueError(f"Input validation failed: {safety_error}")
+
         # Validate policy type
         valid_type, type_error = self.validate_policy_type(policy_type)
         if not valid_type:
@@ -170,16 +234,39 @@ class IAMPolicyGenerator:
         # Get policy template
         template = self.POLICY_TEMPLATES[policy_type]
         
-        # Generate policy document
-        policy = {
-            "Version": "2012-10-17",
-            "Statement": [
+        if policy_type.startswith("s3-"):
+            bucket_arn, object_arn, list_prefix = self._s3_resource_scope(
+                resource_arn)
+            statements = []
+            if list_prefix is not None:
+                bucket_statement = {
+                    "Effect": template["effect"],
+                    "Action": template["bucket_actions"],
+                    "Resource": bucket_arn,
+                }
+                if list_prefix != "*":
+                    bucket_statement["Condition"] = {
+                        "StringLike": {"s3:prefix": list_prefix}}
+                statements.append(bucket_statement)
+            statements.append({
+                "Effect": template["effect"],
+                "Action": template["object_actions"],
+                "Resource": object_arn,
+            })
+        else:
+            statements = [
                 {
                     "Effect": template["effect"],
                     "Action": template["actions"],
-                    "Resource": self.escape_arn_for_json(resource_arn)
+                    "Resource": resource_arn,
                 }
             ]
+
+        # JSON serialization in ``format_output`` performs all required
+        # escaping. Keeping raw values here avoids double-escaping resources.
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": statements,
         }
         
         # Log generation (without exposing sensitive ARN details)
@@ -288,7 +375,7 @@ Examples:
     
     try:
         # Generate policy
-        policy = generator.generate_policy(args.policy_type, args.resource, args.compact)
+        policy = generator.generate_policy(args.policy_type, args.resource)
         
         # Format output
         output = generator.format_output(

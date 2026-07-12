@@ -15,6 +15,7 @@ VERIFY = WORKFLOWS / "verify-patterns.yml"
 TRUSTED = WORKFLOWS / "trusted-evidence-validation.yml"
 EVIDENCE = WORKFLOWS / "evidence-validation.yml"
 PATTERN_VALIDATION = WORKFLOWS / "pattern-validation.yml"
+DOCKER_COMPATIBILITY = WORKFLOWS / "docker-example-compatibility.yml"
 PAGES = WORKFLOWS / "deploy-pages.yml"
 
 
@@ -396,10 +397,28 @@ def test_general_validation_runs_once_and_has_a_stable_result_only_gate():
         assert directory.removesuffix("/package-lock.json") in npm_build["run"]
     test_steps = [
         step for step in validation["steps"]
-        if "python3 -m pytest" in str(step.get("run", ""))
+        if step.get("id") == "tests"
     ]
     assert [step["name"] for step in test_steps] == [
-        "Run deterministic repository tests once"]
+        "Run deterministic repository test suites"]
+    test_command = test_steps[0]["run"]
+    assert "cd examples/spec-driven-development" in test_command
+    assert "spec-driven-junit.xml" in test_command
+    assert "spec-driven-report.json" in test_command
+    assert 'if [ "$spec_status" -ne 0 ] || ' in test_command
+    assert '"$repository_status" -ne 0' in test_command
+    assert 'echo "spec_status=$spec_status"' in test_command
+    assert 'echo "repository_status=$repository_status"' in test_command
+    prompt = named_step(validation, "Generate local-agent fix prompt")
+    assert prompt["env"] == {
+        "SPEC_STATUS": "${{ steps.tests.outputs.spec_status }}",
+        "REPOSITORY_STATUS": "${{ steps.tests.outputs.repository_status }}",
+    }
+    assert "embedded Spec-Driven Development gate failed" in prompt["run"]
+    assert "cd examples/spec-driven-development" in prompt["run"]
+    assert "spec-driven-report.json" in prompt["run"]
+    assert "--rerun-command" in prompt["run"]
+    assert "tests/test-results/report.json" in prompt["run"]
     report = named_step(validation, "Upload deterministic test reports")
     assert report["with"]["path"] == "tests/test-results/"
     assert report["with"]["if-no-files-found"] == "error"
@@ -416,6 +435,53 @@ def test_external_links_run_only_weekly_or_when_manually_requested():
         "continue-on-error"] == "true"
 
 
+def test_live_docker_builds_are_optional_network_compatibility_checks():
+    """Mutable image/package pulls stay outside the required deterministic gate."""
+    deterministic_text = PATTERN_VALIDATION.read_text(encoding="utf-8")
+    compatibility_text = DOCKER_COMPATIBILITY.read_text(encoding="utf-8")
+    workflow = load_workflow(DOCKER_COMPATIBILITY)
+
+    assert "docker build --pull" not in deterministic_text
+    assert workflow["on"]["workflow_dispatch"] == ""
+    assert workflow["on"]["schedule"] == [{"cron": "30 6 * * 1"}]
+    assert workflow["permissions"] == {"contents": "read"}
+    assert set(workflow["jobs"]) == {"docker-compatibility"}
+    pull_request = workflow["on"]["pull_request"]
+    assert pull_request["branches"] == ["main"]
+    assert pull_request["types"] == [
+        "opened", "synchronize", "reopened", "ready_for_review"]
+    assert {
+        "examples/parallel-agents/**",
+        "examples/security-sandbox/**",
+        ".github/workflows/docker-example-compatibility.yml",
+    } <= set(pull_request["paths"])
+
+    job = workflow["jobs"]["docker-compatibility"]
+    assert job["name"] == "Docker example compatibility"
+    assert job["timeout-minutes"] == "30"
+    commands = "\n".join(
+        step.get("run", "") for step in job["steps"])
+    assert commands.count("docker build --pull") == 2
+    assert "python /scripts/agent_runner.py --help" in commands
+    assert "python /scripts/coordinator.py --help" in commands
+    assert "--task-id database-schema" in commands
+    assert "--shared-memory /tmp/shared/agent-memory.json" in commands
+    assert "parallel-agent-status.json" in commands
+    assert r'\"execution\": \"simulated\"' in commands
+    assert r'\"status\": \"fixture_generated\"' in commands
+    assert "python /workspace/healthcheck.py" in commands
+    assert "docker compose --file \"$compose_file\" up" in commands
+    assert "--detach --no-build ai-development" in commands
+    assert "/workspace/generated /workspace/logs" in commands
+    assert "touch /workspace/src/.compatibility-write" in commands
+    assert "down" in commands and "--volumes --remove-orphans" in commands
+    assert "docker network create --internal" in commands
+    assert "accepted an attached internal bridge" in commands
+    assert "SANDBOX_NETWORK_PROBE_HOST" in commands
+    assert "${{ secrets." not in compatibility_text
+    assert "${{ vars." not in compatibility_text
+
+
 def test_pattern_validation_failure_issue_has_remediation_checklist():
     """New and repeat failure notices tell maintainers how to recover."""
     workflow = load_workflow(PATTERN_VALIDATION)
@@ -426,6 +492,10 @@ def test_pattern_validation_failure_issue_has_remediation_checklist():
 
     assert "### Remediation checklist" in script
     assert 'python3 -m pytest -m "not slow" -x -q' in script
+    assert (
+        "cd examples/spec-driven-development && python3 -m pytest -x -q"
+        in script
+    )
     assert "python3 scripts/validate-pattern-names.py" in script
     assert "python3 scripts/generate-patterns-data.py --check" in script
     assert "Local agent fix instructions" in script
@@ -474,16 +544,12 @@ def test_retired_hosted_fanout_helpers_are_absent():
     retired = (
         "scripts/activate-verification-unit.py",
         "scripts/assemble-verification-units.py",
+        "scripts/export-research-candidate.py",
         "scripts/export-verification-unit.py",
         "tests/test_research_candidate_export.py",
         "tests/test_verification_units.py",
     )
-    compatibility_anchor = "scripts/export-research-candidate.py"
     assert all(not (ROOT / relative).exists() for relative in retired)
-    # The old trusted validator on main requires this byte-identical file for
-    # the transition PR. It has no caller and is deleted after that validator
-    # no longer lists it as required.
-    assert (ROOT / compatibility_anchor).is_file()
 
     workflow = load_workflow(EVIDENCE)
     watched = set(workflow["on"]["push"]["paths"])
@@ -492,8 +558,6 @@ def test_retired_hosted_fanout_helpers_are_absent():
         "Run fast evidence tests")["run"]
     assert not watched.intersection(retired)
     assert all(relative not in command for relative in retired)
-    assert compatibility_anchor not in watched
-    assert compatibility_anchor not in command
 
 
 def test_generated_repair_prompt_reproduces_the_non_network_suite(tmp_path):
@@ -519,3 +583,138 @@ def test_generated_repair_prompt_reproduces_the_non_network_suite(tmp_path):
     assert completed.returncode == 1
     assert 'python3 -m pytest -m "not slow" -x -q' in completed.stdout
     assert "python3 -m pytest -x -q" not in completed.stdout
+
+
+def test_generated_repair_prompt_can_target_an_embedded_suite(tmp_path):
+    """Nested-suite reports prescribe their own exact local reproduction."""
+    report = tmp_path / "spec-report.json"
+    report.write_text(json.dumps({
+        "summary": {"total": 1, "passed": 0, "failed": 1, "error": 0},
+        "tests": [{
+            "nodeid": "tests/test_validation.py::test_example",
+            "outcome": "failed",
+            "call": {"longrepr": "embedded failure"},
+        }],
+    }), encoding="utf-8")
+    rerun = (
+        "cd examples/spec-driven-development && "
+        "python3 -m pytest -x -q"
+    )
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "generate-audit-prompt.py"),
+            "--rerun-command", rerun,
+            str(report),
+        ],
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+
+    assert completed.returncode == 1
+    assert rerun in completed.stdout
+    assert '-m "not slow"' not in completed.stdout
+
+
+def test_generated_repair_prompt_ignores_successful_skips_and_xfails(tmp_path):
+    """Expected non-pass outcomes do not become false remediation failures."""
+    report = tmp_path / "successful-non-pass-report.json"
+    report.write_text(json.dumps({
+        "exitcode": 0,
+        "summary": {
+            "total": 3,
+            "passed": 1,
+            "skipped": 1,
+            "xfailed": 1,
+            "failed": 0,
+            "error": 0,
+        },
+        "collectors": [{
+            "nodeid": "tests/test_optional.py",
+            "outcome": "skipped",
+        }],
+        "tests": [
+            {
+                "nodeid": "tests/test_optional.py::test_platform_only",
+                "outcome": "skipped",
+            },
+            {
+                "nodeid": "tests/test_expected.py::test_known_limitation",
+                "outcome": "xfailed",
+            },
+        ],
+    }), encoding="utf-8")
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "generate-audit-prompt.py"),
+            str(report),
+        ],
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+
+    assert completed.returncode == 0
+    assert completed.stdout == ""
+    assert "All audit checks passed." in completed.stderr
+
+
+def test_generated_repair_prompt_reports_collection_failures(tmp_path):
+    """Import/collection errors cannot be mislabeled as an all-passing audit."""
+    report = tmp_path / "collection-report.json"
+    report.write_text(json.dumps({
+        "exitcode": 2,
+        "summary": {"total": 0, "passed": 0, "failed": 0, "error": 1},
+        "collectors": [{
+            "nodeid": "tests/test_broken.py",
+            "outcome": "failed",
+            "longrepr": "ImportError: broken test module",
+        }],
+        "tests": [],
+    }), encoding="utf-8")
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "generate-audit-prompt.py"),
+            str(report),
+        ],
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+
+    assert completed.returncode == 1
+    assert "collection: tests/test_broken.py" in completed.stdout
+    assert "ImportError: broken test module" in completed.stdout
+    assert "All audit checks passed" not in completed.stderr
+
+
+def test_generated_repair_prompt_reports_unclassified_session_failures(tmp_path):
+    """A nonzero pytest exit without nodes still yields useful remediation."""
+    report = tmp_path / "session-report.json"
+    report.write_text(json.dumps({
+        "exitcode": 3,
+        "summary": {"total": 0, "passed": 0, "failed": 0, "error": 0},
+        "collectors": [],
+        "tests": [],
+    }), encoding="utf-8")
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "generate-audit-prompt.py"),
+            str(report),
+        ],
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+
+    assert completed.returncode == 1
+    assert "pytest session" in completed.stdout
+    assert "exit code 3" in completed.stdout
