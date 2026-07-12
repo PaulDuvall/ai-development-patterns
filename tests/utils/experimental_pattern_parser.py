@@ -24,6 +24,7 @@ class ExperimentalPatternParser:
     """Parser for extracting pattern information from experiments/README.md"""
 
     def __init__(self, content: str):
+        """Store experimental catalog content as text and individual lines."""
         self.content = content
         self.lines = content.split('\n')
 
@@ -57,34 +58,46 @@ class ExperimentalPatternParser:
         """Extract the experimental pattern reference table"""
         table_data = {}
         in_table = False
+        columns = None
 
         for line in self.lines:
             stripped = line.strip()
 
-            if "| Pattern | Maturity | Type | Description | Dependencies |" in stripped:
-                in_table = True
-                continue
-
-            if in_table and stripped.startswith('|---'):
-                continue
-
             if in_table and (not stripped or not stripped.startswith('|')):
                 break
 
-            if in_table and stripped.startswith('|'):
-                parts = [p.strip() for p in stripped.split('|')[1:-1]]
-                if len(parts) >= 5:
-                    pattern_match = re.search(r'\*\*\[(.+?)\]\((.+?)\)\*\*', parts[0])
-                    if pattern_match:
-                        pattern_name = pattern_match.group(1)
-                        anchor_link = pattern_match.group(2)
-                        table_data[pattern_name] = {
-                            'maturity': parts[1],
-                            'type': parts[2],
-                            'description': parts[3],
-                            'dependencies': parts[4],
-                            'anchor_link': anchor_link
-                        }
+            if not stripped.startswith('|'):
+                continue
+
+            parts = [p.strip() for p in stripped.split('|')[1:-1]]
+            if parts and parts[0] == "Pattern":
+                columns = {name.lower(): index for index, name in enumerate(parts)}
+                required = {
+                    "pattern", "maturity", "category", "type", "description",
+                    "dependencies",
+                }
+                if not required <= set(columns):
+                    return {}
+                in_table = True
+                continue
+            if in_table and parts and set(parts[0]) <= {'-', ':'}:
+                continue
+            if not in_table or columns is None or max(columns.values()) >= len(parts):
+                continue
+
+            pattern_match = re.search(
+                r'\*\*\[(.+?)\]\((.+?)\)\*\*', parts[columns["pattern"]])
+            if pattern_match:
+                pattern_name = pattern_match.group(1)
+                anchor_link = pattern_match.group(2)
+                table_data[pattern_name] = {
+                    'maturity': parts[columns['maturity']],
+                    'category': parts[columns['category']],
+                    'type': parts[columns['type']],
+                    'description': parts[columns['description']],
+                    'dependencies': parts[columns['dependencies']],
+                    'anchor_link': anchor_link,
+                }
 
         return table_data
 
@@ -108,23 +121,30 @@ class ExperimentalPatternParser:
         return diagrams
 
     def _is_category_header(self, line: str) -> bool:
+        """Return whether a line is a recognized experimental category heading."""
         category_patterns = [
-            r'^## Advanced Workflows',
-            r'^## Operations Automation',
-            r'^## Monitoring & Intelligence'
+            r'^## Foundation Patterns$',
+            r'^## Development Patterns$',
+            r'^## Security & Compliance Patterns$',
+            r'^## Deployment Automation Patterns$',
+            r'^## Monitoring & Maintenance Patterns$',
         ]
         return any(re.match(p, line) for p in category_patterns)
 
     def _extract_category_name(self, line: str) -> str:
-        if "Advanced Workflows" in line:
-            return "Advanced Workflows"
-        elif "Operations Automation" in line:
-            return "Operations Automation"
-        elif "Monitoring" in line:
-            return "Monitoring & Intelligence"
+        """Map an experimental category heading to its catalog category."""
+        if "Foundation" in line:
+            return "Foundation"
+        if "Development" in line:
+            return "Development"
+        if any(label in line for label in (
+                "Security & Compliance", "Deployment Automation",
+                "Monitoring & Maintenance")):
+            return "Operations"
         return ""
 
     def _is_pattern_header(self, line: str) -> bool:
+        """Return whether a heading introduces an experimental pattern."""
         if not re.match(r'^### [A-Za-z]', line):
             return False
         if self._is_category_header(line):
@@ -137,11 +157,13 @@ class ExperimentalPatternParser:
         return header_text not in excluded
 
     def _extract_pattern_name(self, line: str) -> str | None:
+        """Extract the pattern name from a third-level heading."""
         match = re.match(r'^### (.+)', line)
         return match.group(1).strip() if match else None
 
     def _parse_pattern(self, start_line: int, pattern_name: str,
                        category: str) -> ExperimentalPattern | None:
+        """Parse one experimental pattern section into structured fields."""
         pattern = ExperimentalPattern(
             name=pattern_name, line_number=start_line + 1, category=category
         )
@@ -190,14 +212,19 @@ class ExperimentalPatternParser:
         return pattern
 
     def _field_value(self, line: str, field: str) -> str:
+        """Extract and normalize a bold Markdown field value."""
         match = re.search(rf'\*\*{field}\*\*:\s*(.+)', line)
-        return match.group(1).strip() if match else ""
+        if not match:
+            return ""
+        return re.sub(r'<br\s*/?>$', '', match.group(1).strip()).strip()
 
     def _parse_related(self, text: str) -> list[str]:
+        """Return every linked pattern name from a related-patterns field."""
         all_links = re.findall(r'\[([^\]]+)\]\(([^)]+)\)', text)
         return [name for name, _ in all_links]
 
     def _find_next_pattern_start(self, start_line: int) -> int:
+        """Find the next pattern or category heading after a line index."""
         for i in range(start_line, len(self.lines)):
             stripped = self.lines[i].strip()
             if self._is_pattern_header(stripped) or stripped.startswith('## '):

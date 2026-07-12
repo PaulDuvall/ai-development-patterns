@@ -1,6 +1,10 @@
 # Feedback Flywheel Implementation
 
-This directory contains a complete implementation of the Feedback Flywheel pattern, enabling teams to systematically improve AI-assisted development through structured retrospectives that feed corrections back into codified rules and custom commands.
+This example implements the experimental [Feedback Flywheel](../../README.md#feedback-flywheel) pattern: teams improve AI-assisted development through structured retrospectives that feed corrections back into codified rules and custom commands.
+
+## Current Status
+
+The session log schema, analysis script, and worked example are a functional reference implementation. The script runs standalone with Python 3.9+ and PyYAML. Session logging itself is a manual discipline — nothing here captures outcomes automatically, and adopters supply their own rules directory and command tooling.
 
 ## Overview
 
@@ -10,21 +14,17 @@ Feedback Flywheel enables teams to:
 - Propose updates to codified rules, custom commands, and progressive disclosure routing
 - Track first-pass acceptance rate as a leading indicator of AI collaboration maturity
 
-## Files in this Implementation
+## Files in this Example
 
-- `README.md` - Complete pattern documentation (this file)
-- `session-log-schema.md` - Structured format for capturing session outcomes
-- `retro-analysis.py` - Script to extract correction patterns from session logs
-- `example-retro/` - Worked example showing a full retrospective cycle
+- `README.md` - Usage documentation (this file)
+- [`session-log-schema.md`](session-log-schema.md) - Structured format for capturing session outcomes
+- [`retro-analysis.py`](retro-analysis.py) - Script to extract correction patterns from session logs
+- [`example-retro/sample-session.yaml`](example-retro/sample-session.yaml) - Example session log
+- [`example-retro/retro-output.md`](example-retro/retro-output.md) - Annotated worked report based on the sample log; its no-repeat note and Analysis section are human additions beyond the analyzer's output
 
 ## Pattern Definition
 
-### Feedback Flywheel
-
-**Maturity**: Intermediate
-**Description**: Systematically improve AI collaboration effectiveness by analyzing session outcomes and feeding corrections back into team rules and commands.
-
-**Related Patterns**: [Codified Rules](../../../README.md#codified-rules), [Agent Memory](../../../README.md#agent-memory), [Progressive Disclosure](../../../README.md#progressive-disclosure)
+For the pattern definition, maturity, related patterns, and source, see [Feedback Flywheel](../../README.md#feedback-flywheel) in the experiments catalog.
 
 ## Core Implementation
 
@@ -78,41 +78,15 @@ python retro-analysis.py --period 7d --output retro-report.md
 python retro-analysis.py --period 30d --trend --output monthly-trend.md
 ```
 
-```python
-# retro-analysis.py (core logic)
-import yaml
-from pathlib import Path
-from collections import Counter
-
-def analyze_sessions(log_dir: Path, period_days: int) -> dict:
-    """Analyze session logs and extract improvement opportunities."""
-    corrections = []
-    total_accepted = 0
-    total_generations = 0
-
-    for log_file in log_dir.glob("*.yaml"):
-        session = yaml.safe_load(log_file.read_text())
-        total_accepted += session["outcomes"]["first_pass_accepted"]
-        total_generations += session["outcomes"]["total_generations"]
-        corrections.extend(session.get("corrections", []))
-
-    root_causes = Counter(c["root_cause"] for c in corrections)
-
-    return {
-        "acceptance_rate": total_accepted / max(total_generations, 1),
-        "top_root_causes": root_causes.most_common(5),
-        "proposed_rules": [c["proposed_rule"] for c in corrections],
-        "total_corrections": len(corrections),
-    }
-```
+[`retro-analysis.py`](retro-analysis.py) loads session logs from `--log-dir` (default: `.ai/session-logs`), computes the aggregate first-pass acceptance rate, ranks root causes by frequency, flags corrections whose proposed rule recurs across sessions, and writes a markdown report to `--output` (default: stdout). It requires Python 3.9+ and PyYAML (`pip install pyyaml`). See [`example-retro/retro-output.md`](example-retro/retro-output.md) for an annotated worked report; the analyzer does not generate its explicit no-repeat note or Analysis section.
 
 ### Feeding Back Into Rules
 
 The retrospective output drives concrete updates:
 
 ```bash
-# 1. Review proposed rules from retro
-cat retro-report.md | grep "proposed_rule"
+# 1. Review the proposed-rule section from the retro
+sed -n '/^## Proposed Rule Updates/,/^## /p' retro-report.md
 
 # 2. Add validated rules to project configuration
 ai "Review these proposed rules from our retrospective:
@@ -123,10 +97,11 @@ For each proposed rule:
 2. Draft the rule in our standard format
 3. Add to the appropriate rules file"
 
-# 3. Verify rules are applied in next session
-ai "Generate a database migration for adding a 'status' column to orders"
-# Expected: uses ORM migration (new rule applied), not raw SQL
 ```
+
+In a later session, exercise the rule by asking your own configured AI assistant to generate a
+database migration that adds a `status` column to `orders`. Inspect and validate the generated
+migration; this example assumes no particular result.
 
 ### Metrics Dashboard
 
@@ -207,9 +182,9 @@ Session Outcomes → Session Logs → Retrospective Analysis
 # 1. Create session log directory
 mkdir -p .ai/session-logs
 
-# 2. After each AI session, log outcomes
-cp session-log-schema.md .ai/session-logs/$(date +%Y-%m-%d).yaml
-# Edit with actual session data
+# 2. Start from the real sample YAML, then replace every sample value
+cp example-retro/sample-session.yaml .ai/session-logs/$(date +%Y-%m-%d).yaml
+# Set session.date to the filename date and record the actual session outcomes.
 
 # 3. Run weekly retrospective
 python retro-analysis.py --period 7d
@@ -218,4 +193,21 @@ python retro-analysis.py --period 7d
 # Review and add validated rules to .ai/rules/
 ```
 
-**Complete Implementation**: This directory contains the full feedback flywheel system with session log schema, analysis scripts, and a worked example showing how retrospective analysis drives rule improvements.
+This directory provides a runnable file-based analyzer, a session schema, and a worked example. It
+does not capture sessions or apply proposed rules automatically.
+
+## Known Limitations
+
+- Session capture is manual, so missing or selectively recorded outcomes can bias the retrospective.
+- The analyzer summarizes file-based logs and does not integrate with assistant telemetry or issue
+  trackers.
+- Acceptance-rate movement does not by itself prove improved correctness; teams must pair it with
+  deterministic quality and outcome measures.
+- The worked metrics and proposed rules are illustrative and must not be treated as adoption
+  evidence or universal targets.
+
+## Promotion Path
+
+Promotion requires privacy-aware automated capture, validation across multiple teams and toolchains,
+and evidence that reviewed rule changes reduce repeated corrections while preserving correctness,
+security, and human ownership of policy changes.

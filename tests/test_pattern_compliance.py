@@ -244,18 +244,84 @@ class TestPatternSpecCompliance:
 
         assert not issues, f"Reference table completeness issues: {issues}"
 
+    def test_stable_catalog_metadata_format_is_normalized(self, readme_content):
+        """Metadata and anti-pattern labels use the canonical Markdown form."""
+        maturity_lines = [
+            line for line in readme_content.splitlines()
+            if line.startswith("**Maturity**:")
+        ]
+        assert len(maturity_lines) == 29
+        assert all(line.endswith("<br>") for line in maturity_lines)
+        assert not re.search(r"(?m)^\*\*Anti-pattern:", readme_content)
+        assert len(re.findall(r"(?m)^#### Anti-pattern: .+$", readme_content)) == 45
+
+    def test_stable_related_patterns_exclude_navigation_overlays(
+            self, readme_content):
+        """Related Patterns contains only a focused set of catalog patterns."""
+        lines = [
+            line for line in readme_content.splitlines()
+            if line.startswith("**Related Patterns**:")
+        ]
+        assert len(lines) == 29
+        for line in lines:
+            links = re.findall(r"\[[^\]]+\]\([^)]+\)", line)
+            assert 1 <= len(links) <= 6, line
+            assert " Lens]" not in line
+            assert "Security & Compliance Patterns" not in line
+
+    def test_stable_example_links_use_one_label(self, readme_content):
+        """Every shipped stable example is introduced consistently."""
+        assert len(re.findall(
+            r"(?m)^Complete Example: See ", readme_content)) == 24
+        assert "**Complete Example**" not in readme_content
+        assert "**Complete Implementation**" not in readme_content
+        assert "**Implementation Examples**" not in readme_content
+
+    def test_operations_patterns_have_named_implementation_sections(
+            self, readme_content):
+        """Compact Operations entries still name their implementation mechanism."""
+        expected = {
+            "**Generation and Validation Workflow**",
+            "**Evidence Contract**",
+            "**Sync Architecture**",
+            "**Detection and Remediation Flow**",
+            "**Trend Collection**",
+            "**Experiment Contract**",
+        }
+        assert all(label in readme_content for label in expected)
+
+    def test_reference_table_group_rows_have_blank_type(self, readme_content):
+        """Navigational grouping rows do not advertise pattern Type metadata."""
+        group_names = {
+            "Foundation", "Development", "Security & Compliance",
+            "Deployment Automation", "Monitoring & Maintenance",
+        }
+        rows = [
+            [cell.strip() for cell in line.strip("|").split("|")]
+            for line in readme_content.splitlines()
+            if line.startswith("| **") and "](" not in line
+        ]
+        matched = {
+            re.sub(r"\*", "", row[0]): row for row in rows
+            if re.sub(r"\*", "", row[0]) in group_names
+        }
+        assert set(matched) == group_names
+        assert all(row[3] == "" for row in matched.values())
+
 
 class TestExperimentalPatternCompliance:
     """Validate experimental patterns in experiments/README.md against pattern-spec.md"""
 
     @pytest.fixture
     def exp_content(self):
+        """Return the experimental catalog Markdown content."""
         readme_path = EXPERIMENTS_DIR / "README.md"
         with open(readme_path, 'r', encoding='utf-8') as f:
             return f.read()
 
     @pytest.fixture
     def exp_parser(self, exp_content):
+        """Build an experimental-pattern parser for the catalog content."""
         return ExperimentalPatternParser(exp_content)
 
     def test_all_experimental_patterns_have_headers(self, exp_parser):
@@ -337,3 +403,41 @@ class TestExperimentalPatternCompliance:
             elif not all(w[0].isupper() for w in words):
                 naming_issues.append({'pattern': name, 'issue': 'not Title Case'})
         assert not naming_issues, f"Experimental pattern naming issues: {naming_issues}"
+
+    def test_experimental_catalog_metadata_format_is_normalized(self, exp_content):
+        """Experimental metadata follows the same formatting as stable entries."""
+        maturity_lines = [
+            line for line in exp_content.splitlines()
+            if line.startswith("**Maturity**:")
+        ]
+        assert len(maturity_lines) == 18
+        assert all(line.endswith("<br>") for line in maturity_lines)
+        assert not re.search(r"(?m)^\*\*Anti-pattern:", exp_content)
+        assert len(re.findall(r"(?m)^#### Anti-pattern: .+$", exp_content)) == 24
+        assert len(re.findall(r"(?m)^Complete Example: See ", exp_content)) == 11
+
+    def test_experimental_reference_table_uses_canonical_column_order(
+            self, exp_content, exp_parser):
+        """Both catalogs expose reference-table metadata in the same order."""
+        assert (
+            "| Pattern | Maturity | Category | Type | Description | Dependencies |"
+            in exp_content
+        )
+        patterns = exp_parser.extract_patterns()
+        assert patterns
+        assert {pattern.category for pattern in patterns.values()} <= {
+            "Foundation", "Development", "Operations",
+        }
+        assert all(pattern.category for pattern in patterns.values())
+
+    def test_experimental_related_patterns_are_focused(self, exp_content):
+        """Experimental Related Patterns lines use the catalog-only link budget."""
+        lines = [
+            line for line in exp_content.splitlines()
+            if line.startswith("**Related Patterns**:")
+        ]
+        assert len(lines) == 18
+        for line in lines:
+            links = re.findall(r"\[[^\]]+\]\([^)]+\)", line)
+            assert 1 <= len(links) <= 6, line
+            assert " Lens]" not in line

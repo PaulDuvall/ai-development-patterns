@@ -51,8 +51,8 @@ Output only valid Rego policy code."
 # Main execution
 case "$POLICY_TYPE" in
     "cedar")
-        echo "# Generated Cedar policy from $REQUIREMENTS_FILE"
-        echo "# Generated on: $(date)"
+        echo "// Generated Cedar policy from $REQUIREMENTS_FILE"
+        echo "// Generated on: $(date)"
         echo ""
         generate_cedar_policy "$REQUIREMENTS_FILE"
         ;;
@@ -67,4 +67,4 @@ case "$POLICY_TYPE" in
         echo "Supported types: cedar, opa" >&2
         exit 1
         ;;
-esac
+esac > "$OUTPUT_FILE"

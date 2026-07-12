@@ -1,14 +1,22 @@
 # Codified Rules Example
 
-Comprehensive rules framework for enforcing development standards, quality gates, and delivery practices through machine-readable rule files.
+Example rule documents for expressing development standards, quality gates, and delivery practices
+as version-controlled guidance.
 
 ## Overview
 
-This example demonstrates the **Codified Rules** pattern through three rule files that establish mandatory guardrails for AI-assisted development:
+This example demonstrates the **Codified Rules** pattern through three rule files that describe
+guardrails for AI-assisted development:
 
 1. **DEVELOPMENT_RULES.md** - Test-first specification-driven development
 2. **QUALITY_RULES.md** - Code quality standards and observability
 3. **PIPELINE_RULES.md** - CI/CD pipeline and deployment requirements
+
+The example is runnable with Bash and Python 3 using only the Python standard library. It includes
+three executable enforcement wrappers, a bounded validator that never executes candidate project
+code, and `sample-project/` with specifications, traced tests and implementation, plus an ORR
+checklist. The scripts validate deterministic structure and evidence; they do not replace code
+review or authorize deployment.
 
 ## Quick Start
 
@@ -21,33 +29,56 @@ cat QUALITY_RULES.md      # Code standards, SOLID principles, logging
 cat PIPELINE_RULES.md     # CI/CD, deployment safety, monitoring
 ```
 
-### 2. Integrate with CLAUDE.md
+### 2. Run the Checked-In Enforcement
 
-Copy `CLAUDE.md` to your project root to enforce rules automatically:
+The default target is the checked-in sample project. Each command exits nonzero when its evidence
+is missing, ambiguous, duplicated, oversized, non-UTF-8, or hidden behind a symbolic link:
 
 ```bash
-# For new projects
-cp CLAUDE.md /path/to/your/project/.claude/CLAUDE.md
-
-# Claude Code will automatically enforce these rules
+./check_specifications.sh
+./check_traceability.sh
+./run_orr_checklist.sh
+python3 -m unittest discover \
+  -s sample-project/tests \
+  -t sample-project
 ```
 
-### 3. Reference in AI Interactions
+The ORR command validates checklist completeness and evidence fields. Its success is not human
+release approval.
+
+### 3. Integrate with CLAUDE.md
+
+Copy the sample summary and all three rule documents into the target project:
+
+```bash
+# Demonstrate the complete copy without modifying an existing project
+target_project="$(mktemp -d)"
+cp CLAUDE.md *_RULES.md check_specifications.sh check_traceability.sh \
+  run_orr_checklist.sh "$target_project/"
+cp -R scripts sample-project "$target_project/"
+printf 'Copied runnable example to %s\n' "$target_project"
+```
+
+The assistant can load `CLAUDE.md` as guidance and follow explicit `@..._RULES.md` references. It
+does not execute checks or guarantee compliance. The checked-in scripts provide deterministic
+local checks; projects should make the same commands required CI checks and retain human ownership
+of policy decisions.
+
+### 4. Reference in AI Interactions
 
 When working with AI coding assistants:
 
-```bash
-# Explicitly reference rules
-"Please implement this feature following @DEVELOPMENT_RULES.md"
-"Review this code against @QUALITY_RULES.md standards"
-"Validate deployment readiness per @PIPELINE_RULES.md"
+```text
+Please implement this feature following @DEVELOPMENT_RULES.md.
+Review this code against @QUALITY_RULES.md standards.
+Validate deployment readiness per @PIPELINE_RULES.md.
 ```
 
 ## Rule File Descriptions
 
 ### DEVELOPMENT_RULES.md
 
-**Purpose**: Enforce test-first, specification-driven development
+**Purpose**: Describe test-first, specification-driven development expectations
 
 **Key Rules**:
 - ✅ Write specifications before code (SPEC-XXX format)
@@ -58,34 +89,35 @@ When working with AI coding assistants:
 
 **Enforcement**:
 ```bash
-# Before starting any feature
-./check_specifications.sh  # Verify specs exist
-pytest tests/ --cov=src    # Run test suite
-./check_traceability.sh    # Verify spec-test-code links
+# Validate the checked-in sample or pass another project root as argument 1
+./check_specifications.sh
+./check_traceability.sh
+python3 -m unittest discover -s sample-project/tests -t sample-project
 ```
 
 ### QUALITY_RULES.md
 
-**Purpose**: Enforce code quality, clean architecture, and observability
+**Purpose**: Describe code quality, clean architecture, and observability expectations
 
 **Key Rules**:
 - ✅ Method length < 20 lines, complexity < 10
 - ✅ Class size < 250 lines, < 20 methods
-- ✅ SOLID principles enforced
+- ✅ SOLID principles required by the guidance
 - ✅ Structured JSON logging with correlation IDs
 - ✅ Comprehensive error handling with remediation
 
 **Enforcement**:
 ```bash
-# Code quality checks
-radon cc src/ -a         # Cyclomatic complexity
-radon mi src/ -s         # Maintainability index
-pylint src/ --max-line-length=100
+# Exercise the sample implementation with no third-party dependency
+python3 -m unittest discover -s sample-project/tests -t sample-project
 ```
+
+The rule document's complexity and lint thresholds require a project-selected analyzer. These
+three validators deliberately do not pretend that Markdown policy alone measured source quality.
 
 ### PIPELINE_RULES.md
 
-**Purpose**: Enforce CI/CD safety, deployment practices, monitoring
+**Purpose**: Describe CI/CD safety, deployment practices, and monitoring expectations
 
 **Key Rules**:
 - ✅ Branch age < 2 days
@@ -96,17 +128,15 @@ pylint src/ --max-line-length=100
 
 **Enforcement**:
 ```bash
-# Before deployment
-./run_orr_checklist.sh        # Complete ORR
-./validate_deployment.sh      # Pre-deploy checks
-./check_feature_flags.sh      # Verify flags configured
+# Validate required checklist items and non-placeholder evidence
+./run_orr_checklist.sh
 ```
 
 ## How This Example Works
 
 ### CLAUDE.md Integration
 
-The `CLAUDE.md` file serves as the enforcement mechanism:
+The `CLAUDE.md` file provides a concise assistant-facing summary:
 
 ```markdown
 ## 🚨 MANDATORY RULE ENFORCEMENT
@@ -131,66 +161,49 @@ The `CLAUDE.md` file serves as the enforcement mechanism:
 **If ANY rule violation is detected, STOP and report the issue immediately.**
 ```
 
-When placed in `.claude/CLAUDE.md`, Claude Code automatically:
-1. Reads these rules before every interaction
-2. Validates proposed changes against all three rule files
-3. Rejects or warns about rule violations
-4. Suggests corrections to align with rules
+When placed at the target project root, an assistant can use this summary as guidance, while the
+three copied rule files remain available for explicit review. Instruction following is
+probabilistic: deterministic tools must validate measurable requirements and required CI/human
+policy must decide whether a change is acceptable.
 
 ## Example Workflow
 
 ### 1. Feature Development
 
+The checked-in sample carries one specification through traced tests, implementation, and readiness
+evidence. Run the complete workflow from this directory:
+
 ```bash
-# Step 1: Create specification (DEVELOPMENT_RULES.md)
-cat > specs/feature-123.md << 'EOF'
-Feature ID: FEAT-123
-Acceptance Criteria:
-- AC-001: User can view subscription list
-- AC-002: System sends reminders 7 days in advance
-EOF
+# Step 1: Validate specifications and rule-document integration
+./check_specifications.sh sample-project
 
-# Step 2: Write tests first (DEVELOPMENT_RULES.md)
-cat > tests/test_feature_123.py << 'EOF'
-def test_subscription_list():
-    """Implements: specs/feature-123.md#AC-001"""
-    assert subscription_service.get_list() is not None
-EOF
+# Step 2: Require every acceptance criterion in both tests and source
+./check_traceability.sh sample-project
 
-# Step 3: Implement (QUALITY_RULES.md)
-# - Keep methods < 20 lines
-# - Follow SOLID principles
-# - Add structured logging
+# Step 3: Execute the traced implementation tests
+python3 -m unittest discover -s sample-project/tests -t sample-project
 
-# Step 4: Validate locally (PIPELINE_RULES.md)
-pytest tests/ --cov=src --cov-fail-under=90
-./check_traceability.sh
-pre-commit run --all-files
-
-# Step 5: Deploy safely (PIPELINE_RULES.md)
-./run_orr_checklist.sh
-./validate_deployment.sh
+# Step 4: Validate ORR structure and evidence fields (not release authorization)
+./run_orr_checklist.sh sample-project/ORR_CHECKLIST.md
 ```
 
 ### 2. Code Review
 
-AI assistant validates against all rules:
+Use the rule files to build a review checklist. The unchecked items below are illustrative criteria,
+not observed output; deterministic tools or human reviewers must supply the result:
 
-```bash
-# AI checks DEVELOPMENT_RULES.md
-- ✅ Specification exists (FEAT-123)
-- ✅ Tests written first
-- ✅ Traceability maintained
+```markdown
+Development
+- [ ] Specification exists and has a stable identifier
+- [ ] Tests and traceability links are present
 
-# AI checks QUALITY_RULES.md
-- ✅ Methods < 20 lines
-- ✅ Structured logging present
-- ✅ Error handling included
+Quality
+- [ ] Complexity thresholds pass in the configured analyzer
+- [ ] Logging and error handling meet project policy
 
-# AI checks PIPELINE_RULES.md
-- ✅ Branch < 2 days old
-- ✅ All tests passing
-- ✅ ORR complete
+Pipeline
+- [ ] Required tests and readiness checks pass
+- [ ] A human-owned deployment policy authorizes release
 ```
 
 ## Rule Customization
@@ -199,9 +212,9 @@ AI assistant validates against all rules:
 
 1. **Copy rule files to your project**:
    ```bash
-   cp DEVELOPMENT_RULES.md /your/project/docs/
-   cp QUALITY_RULES.md /your/project/docs/
-   cp PIPELINE_RULES.md /your/project/docs/
+   target_rules="$(mktemp -d)"
+   cp DEVELOPMENT_RULES.md QUALITY_RULES.md PIPELINE_RULES.md "$target_rules/"
+   printf 'Copied customizable rules to %s\n' "$target_rules"
    ```
 
 2. **Modify thresholds** to match your standards:
@@ -224,39 +237,27 @@ AI assistant validates against all rules:
 
 ### Automated Validation
 
+The three checked-in wrappers are intentionally narrow and compose cleanly in CI:
+
 ```bash
-#!/bin/bash
-# check_rules.sh - Validate all rules
-
-echo "Checking DEVELOPMENT_RULES.md..."
-./check_specifications.sh
-./check_traceability.sh
-
-echo "Checking QUALITY_RULES.md..."
-radon cc src/ -a -nb
-pylint src/ --max-line-length=100
-
-echo "Checking PIPELINE_RULES.md..."
-./check_branch_age.sh
-./validate_build_time.sh
+./check_specifications.sh sample-project
+./check_traceability.sh sample-project
+./run_orr_checklist.sh sample-project/ORR_CHECKLIST.md
 ```
 
-### Pre-commit Hook
+`check_specifications.sh` and `check_traceability.sh` accept a project root. The ORR wrapper accepts
+a checklist path. Set `PYTHON_BIN` when `python3` is not the desired interpreter. There are no
+third-party runtime dependencies.
+
+### CI and Hook Integration
+
+Run the first two commands on every change and require them in CI. Run the ORR check before a
+release, then route its structural result to the human-owned release policy. A hook can invoke the
+same checked-in commands; it must not silently weaken their failures.
 
 ```bash
-# .git/hooks/pre-commit
-#!/bin/bash
-
-# Enforce DEVELOPMENT_RULES.md
-pytest tests/ --cov=src --cov-fail-under=90 || exit 1
-
-# Enforce QUALITY_RULES.md
-radon cc src/ -a -nb || exit 1
-
-# Enforce PIPELINE_RULES.md
-./check_branch_age.sh || exit 1
-
-echo "✅ All rules validated"
+./check_specifications.sh sample-project
+./check_traceability.sh sample-project
 ```
 
 ## Benefits
@@ -264,13 +265,13 @@ echo "✅ All rules validated"
 ### For AI Assistants
 - Clear, unambiguous rules to follow
 - Consistent code generation
-- Automatic validation of suggestions
+- Explicit criteria for reviewing suggestions
 - Reduced back-and-forth on standards
 
 ### For Development Teams
 - Codified best practices
 - Consistent code quality
-- Automated enforcement
+- Checked-in deterministic enforcement primitives
 - Reduced code review time
 - Easier onboarding
 
@@ -283,10 +284,9 @@ echo "✅ All rules validated"
 ## Integration with Main Patterns
 
 This example demonstrates:
-- **[Codified Rules](../../README.md#codified-rules)** - Machine-readable development standards
+- **[Codified Rules](../../README.md#codified-rules)** - Version-controlled development standards
 - **[Spec-Driven Development](../../README.md#spec-driven-development)** - Test-first with traceability
 - **[Agent Observability](../../README.md#agent-observability)** - Structured tracing and diagnostic requirements
-- **[Spec-Driven Development](../../README.md#spec-driven-development)** - Spec-test-code linking
 
 ## Related Patterns
 

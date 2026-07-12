@@ -208,12 +208,21 @@ jobs:
               state: 'open'
             });
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const remediation = [
+              '### Remediation checklist',
+              '',
+              '- [ ] Open the failed run and identify the first deterministic failure.',
+              '- [ ] Reproduce it locally with `python3 -m pytest -m "not slow" -x -q`.',
+              '- [ ] For catalog changes, run `python3 scripts/validate-pattern-names.py` and `python3 scripts/generate-patterns-data.py --check`.',
+              '- [ ] Use the `Local agent fix instructions` in the job summary from a signed-in local coding-agent session if useful.',
+              '- [ ] Commit the correction and confirm the required `Validation gate` check passes.'
+            ].join('\n');
             if (existing.length) {
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: existing[0].number,
-                body: `Still failing on commit ${context.sha}.\n\n${runUrl}`
+                body: `Still failing on commit ${context.sha}.\n\n${runUrl}\n\n${remediation}`
               });
               return;
             }
@@ -222,7 +231,7 @@ jobs:
               repo: context.repo.repo,
               title: `Pattern Validation Failed - ${new Date().toISOString().split('T')[0]}`,
               labels: ['bug', 'automation', label],
-              body: `Deterministic validation failed on commit ${context.sha}.\n\n${runUrl}`
+              body: `Deterministic validation failed on commit ${context.sha}.\n\n${runUrl}\n\n${remediation}`
             });
 
   close-resolved-issues:

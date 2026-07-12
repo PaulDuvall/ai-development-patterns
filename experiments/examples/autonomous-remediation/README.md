@@ -4,6 +4,12 @@ A working PostToolUse hook that detects code-quality violations after the AI wri
 
 This is a concrete instantiation of the [Autonomous Remediation](../../README.md#autonomous-remediation) pattern.
 
+## Current Status
+
+The tracked hook, detectors, configuration, and thresholds form a runnable Claude Code reference
+for Python files. It requires Python and PyYAML, and it reports proposed corrections to
+the active assistant rather than applying changes outside that session.
+
 ## Files
 
 | File | Purpose |
@@ -26,8 +32,8 @@ cp -r . ~/.claude/hooks/autonomous-remediation/
 # 2. Make the entry point executable
 chmod +x ~/.claude/hooks/autonomous-remediation/auto-remediate.py
 
-# 3. Install detector dependencies
-pip install lizard pyyaml
+# 3. Install the configuration dependency
+pip install pyyaml
 
 # 4. Register the hook in ~/.claude/settings.json
 #    (merge the contents of claude-settings.json into your existing settings)
@@ -54,11 +60,10 @@ AI receives report in same session → applies fix → loop
 
 ## Retry budget
 
-The hook tracks consecutive blocks per file in `/tmp/.auto-remediate-state.json`. After 3 blocks on the same file, the hook surfaces a warning to the developer instead of blocking again, with one of three suggested actions:
+The hook tracks consecutive blocks per file in `/tmp/.auto-remediate-state.json`. After 3 blocks on the same file, the hook surfaces a warning to the developer instead of blocking again, with two configured actions:
 
 1. Raise the threshold for this rule in `thresholds.yml`
 2. Add the file or directory to the skip list
-3. Add an inline `# rule: ignore` marker
 
 This is the escape hatch from the "Unbounded Loop" anti-pattern documented in [Autonomous Remediation](../../README.md#autonomous-remediation).
 
@@ -78,7 +83,28 @@ Generated code, test fixtures, and vendored dependencies are common sources of f
 
 ## Extending
 
-To add a new detector, drop a module into `detectors/` exposing `detect(file_path) -> list[Violation]`. Register the module name in `detectors/__init__.py`. Each `Violation` must include `rule_id`, `file`, `line`, `severity`, and a `fix_hint` keyed in `FIX_HINTS`.
+To add a detector, import it explicitly in `detectors/__init__.py` and call its `detect` function
+from `run_all_detectors`. The Python-smell detector receives `(file_path, config)` while the secret
+detector receives `file_path`; a new detector must define and wire its arguments explicitly. Each
+finding includes `rule_id`, `file`, `line`, `severity`, and `message`. Add a matching `rule_id` entry
+to `FIX_HINTS` when the report should include a remediation hint.
+
+## Known Limitations
+
+- The hook event and settings file target Claude Code; other assistants need an adapter.
+- Python smell detection and regex-based secret detection are examples, not a complete quality or
+  credential-scanning system.
+- Retry state is local to one machine under `/tmp` and is not suitable for distributed execution.
+- Detector output can contain false positives, so the retry limit and developer escape hatch remain
+  mandatory.
+- A detector exception is logged and fails open; production use needs an explicit fail-closed or
+  quarantine policy for scanner outages.
+
+## Promotion Path
+
+Promotion requires portable lifecycle adapters, concurrent and crash-safe retry state, adversarial
+tests for detector bypasses, and evidence that bounded self-correction improves validated outcomes
+without hiding failures or weakening human review.
 
 ## See also
 

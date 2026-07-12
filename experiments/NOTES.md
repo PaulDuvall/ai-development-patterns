@@ -5,6 +5,53 @@ This file tracks ideas that are not yet full catalog patterns. Formal experiment
 
 ## Pattern Exploration Queue
 
+### Team Compression
+
+**Status**: Early exploration
+**Date Added**: 2025-07-05
+
+**Description**: Explore whether AI-assisted development can let a smaller cross-functional team
+own intent, implementation, and validation without weakening quality, operational coverage, or
+human accountability.
+
+**Potential Use Cases**:
+
+- Testing whether one small team can own a narrowly bounded product slice end to end
+- Measuring which coordination tasks agents can reduce without hiding decisions
+- Identifying the point at which specialist expertise remains necessary
+- Comparing throughput and defect escape rates before changing team structure
+
+**Research Lead**:
+
+- [AI Engineer World's Fair 2025: Tiny Teams](https://www.youtube.com/watch?v=xhKgTkzSmuQ) — a
+  source to evaluate, not verified adoption evidence.
+
+**Research Questions**:
+
+1. Which work can a smaller team own without losing security, accessibility, operations, or domain
+   expertise?
+2. Do lead time and coordination cost improve after controlling for product scope and team
+   experience?
+3. What quality, reliability, and workload signals should prevent further team-size reduction?
+4. When should the team add a specialist instead of adding another agent or automation step?
+
+**Related Patterns**:
+
+- [Agent Readiness](../README.md#agent-readiness) — establishes whether the codebase and team can
+  support more AI-assisted work.
+- [Developer Lifecycle](../README.md#developer-lifecycle) — keeps end-to-end ownership explicit.
+- [Parallel Agents](../README.md#parallel-agents) — provides isolated concurrency without implying
+  that human roles are interchangeable.
+- [Handoff Protocols](README.md#handoff-protocols) — preserves review and takeover boundaries.
+
+**Anti-patterns to Avoid**:
+
+- Reducing headcount before measuring delivery quality, operational load, and failure recovery
+- Treating generated output as a substitute for missing security or domain expertise
+- Reporting revenue or throughput changes as an AI effect without controlling for scope and market
+
+---
+
 ### Voice-to-Code Interface
 
 **Status**: Early exploration

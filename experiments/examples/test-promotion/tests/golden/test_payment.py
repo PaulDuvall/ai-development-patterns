@@ -1,8 +1,8 @@
 """
 Golden Test: Payment Idempotency
 
-This test is IMMUTABLE (444 permissions).
-AI cannot modify this file - it serves as a behavioral contract.
+This test is a protected behavioral contract when the example's required CI
+and CODEOWNERS controls are installed. Local 444 mode is advisory only.
 
 Tests that duplicate payment transactions are properly rejected.
 """

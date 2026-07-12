@@ -71,7 +71,7 @@ def build_prompt(failures: list[dict]) -> str:
         "The CI audit found issues that need fixing. "
         "For each failure below, read the referenced files, "
         "diagnose the root cause, and fix it directly. "
-        "Run `cd tests && python3 -m pytest -x -q` after each fix to verify.",
+        "Run `python3 -m pytest -m \"not slow\" -x -q` after each fix to verify.",
         "",
     ]
 
@@ -96,6 +96,7 @@ def build_prompt(failures: list[dict]) -> str:
 
 
 def main():
+    """Generate and print a remediation prompt from a pytest JSON report."""
     if len(sys.argv) < 2:
         print(f"Usage: {sys.argv[0]} <pytest-json-report>", file=sys.stderr)
         sys.exit(1)

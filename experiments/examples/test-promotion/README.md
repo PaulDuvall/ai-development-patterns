@@ -1,30 +1,45 @@
 # Test Promotion Example
 
-Complete implementation of the Test Promotion pattern demonstrating how to prevent AI from weakening test assertions through immutable golden tests and human-approved promotion workflow.
+This example implements the experimental [Test Promotion](../../README.md#test-promotion) pattern:
+protected golden tests serve as behavioral contracts, candidate tests remain mutable, and a
+separate human-owned workflow decides which validated additions become golden.
+
+## Current Status
+
+The local permission and promotion scripts are runnable. The AI hook, CI workflow, and CODEOWNERS
+file are installation templates: their nested paths are inert in this repository and adopters must
+copy or merge them into their own assistant and repository-root configuration. Git stores the
+golden test as ordinary `100644`; `scripts/enforce-permissions.sh` applies advisory `444` mode only
+to the active checkout. The example ships one golden test against a small payment module and no
+generated tests.
 
 ## Quick Start
 
 ```bash
-# 1. Set up permissions
+# 1. Install and run the example
+python -m pip install -r requirements.txt
+pytest tests/golden -q
+
+# 2. Create a candidate test in the mutable area, then edit/review it
+mkdir -p tests/generated
+cp tests/golden/test_payment.py tests/generated/test_payment_contract.py
+chmod 644 tests/generated/test_payment_contract.py
+
+# 3. Apply the advisory local read-only mode to golden tests
 ./scripts/enforce-permissions.sh
 
-# 2. AI generates test in mutable area
-# tests/generated/test_example.py
-
-# 3. Human promotes validated test to golden
-./scripts/promote-test.sh tests/generated/test_example.py
+# 4. A human runs the interactive add-only promotion
+./scripts/promote-test.sh tests/generated/test_payment_contract.py
 ```
 
 ## Directory Structure
 
 ```
 tests/
-├── golden/          # Immutable (444 permissions)
-│   ├── auth/       # AI cannot modify these
-│   └── api/        # Human approval required
-└── generated/       # Mutable
-    ├── test_*.py   # AI can freely generate/modify
-    └── README.md   # Auto-generated test index
+├── golden/              # Protected contracts — human approval required
+│   └── test_payment.py  # Payment behavioral contract
+└── generated/           # Mutable local candidates; created by the adopter
+    └── test_*.py        # Generated or written locally, then reviewed
 ```
 
 ## The Problem: Self-Grading Student
@@ -46,10 +61,11 @@ def test_payment_idempotency():
 
 ## The Solution: Test Promotion
 
-**Golden tests are immutable** - AI physically cannot modify them:
-- File permissions: `444` (read-only)
-- CI/CD blocks: Rejects PRs that modify golden tests
-- AI hooks: Blocks Edit/Write tools on golden paths
+**Golden tests are protected contracts** when the templates are installed:
+- Local `444` mode discourages accidental edits in one checkout
+- Required CI rejects direct modification, rename, or deletion
+- Required CODEOWNERS review governs add-only promotion pull requests
+- An assistant hook can block normal Edit/Write tools on golden paths
 
 **Generated tests are mutable** - AI can experiment freely:
 - AI generates tests in `tests/generated/`
@@ -90,7 +106,8 @@ cat tests/generated/test_payment.py
 # ✓ Is it properly documented?
 ```
 
-Result: Test copied to `tests/golden/test_payment.py` with 444 permissions
+Result: A new test is copied under `tests/golden/` with advisory `444` mode and committed for
+CODEOWNERS review. The script refuses to overwrite an existing golden contract.
 
 ### 4. CI Protection
 
@@ -100,9 +117,7 @@ echo "# comment" >> tests/golden/test_payment.py
 git add tests/golden/test_payment.py
 git commit -m "modify golden test"
 
-# CI blocks the commit:
-# ❌ BLOCKED: Golden tests cannot be modified
-# Use: ./scripts/promote-test.sh <test-file>
+# After the root templates are installed, the required check rejects this PR.
 ```
 
 ## Enforcement Mechanisms (Defense-in-Depth)
@@ -113,18 +128,19 @@ git commit -m "modify golden test"
 
 ```bash
 # Set read-only permissions on all golden tests
-chmod 444 tests/golden/**/*.py
+chmod 444 tests/golden/*.py
 
 # ⚠️  WARNING: Not sufficient alone!
 # AI can bypass: chmod 644 tests/golden/test.py && edit && chmod 444
 ```
 
-**Purpose**: Prevents accidental modifications, provides visual indicator of immutability.
-**Limitation**: Can be bypassed via Bash commands.
+**Purpose**: Prevents accidental modifications in the configured checkout.
+**Limitation**: Git does not preserve `444` across clones, and Bash can change the mode.
 
 ### Layer 2: AI Hooks - Blocks Edit/Write Tools
 
-See `.ai/hooks/protect-golden.sh`:
+The template at `.ai/hooks/protect-golden.sh` must be installed in the assistant's active hook
+configuration. When installed, it:
 - Executes before Edit/Write tool use
 - Blocks operations on `tests/golden/**` paths
 - Returns exit code 2 (BLOCK) with helpful message
@@ -134,27 +150,31 @@ See `.ai/hooks/protect-golden.sh`:
 
 ### Layer 3: CI/CD Protection - **PRIMARY ENFORCEMENT**
 
-See `.github/workflows/test-protection.yml`:
-- Detects **ANY** modifications to `tests/golden/**` via git diff
-- Blocks PR merge if golden tests changed
-- Catches modifications regardless of method (Edit, Write, Bash, manual)
+Copy `.github/workflows/test-protection.yml` to the target repository's root
+`.github/workflows/` directory and make its check required. It:
+- Rejects golden changes without the `test-promotion` label
+- Allows labeled additions to proceed to human review
+- Rejects modifications, renames, and deletions even on a promotion pull request
 
 **Purpose**: Detect all golden test modifications before merge.
-**Reliability**: ✅ Catches all changes regardless of bypass method.
+**Reliability**: High only when the root workflow and its required-check configuration are protected
+from the candidate pull request.
 
 ### Layer 4: CODEOWNERS - **FINAL GATE**
 
-See `.github/CODEOWNERS`:
+Merge the sample `.github/CODEOWNERS` rule into the target repository's root CODEOWNERS file,
+replace its placeholder teams, and require code-owner review:
 ```
 tests/golden/**  @tech-leads @qa-leads
 ```
 
-- Requires explicit human approval for ANY changes to golden tests
-- Even if AI commits changes, PR cannot merge without approval
+- Requires explicit human approval for additions to golden tests
+- Keeps the promotion decision separate from the generating agent
 - Provides human review before behavioral contracts change
 
 **Purpose**: Human gate prevents unauthorized changes from reaching main branch.
-**Reliability**: ✅ Requires human decision, cannot be automated away.
+**Reliability**: High only when branch protection requires code-owner review and protects the
+workflow, CODEOWNERS, and ruleset from unreviewed changes.
 
 ### Threat Model Coverage
 
@@ -162,10 +182,11 @@ tests/golden/**  @tech-leads @qa-leads
 |---------------|-----------|-------------|
 | Accidental edit | File permissions (444) | Medium |
 | AI Edit/Write tool | AI hooks | Medium |
-| AI Bash bypass (chmod) | CI/CD git diff | **High** |
-| Committed changes | CODEOWNERS approval | **High** |
+| AI Bash bypass (chmod) | Required root CI diff check | **High when installed** |
+| Committed additions | Required CODEOWNERS approval | **High when installed** |
 
-**Bottom Line**: CI/CD + CODEOWNERS are the real enforcement. File permissions and AI hooks provide defense-in-depth but can be bypassed.
+**Bottom Line**: A protected root CI workflow plus required CODEOWNERS review are the binding
+controls. File permissions and hooks are optional defense-in-depth.
 
 ## Promotion Workflow
 
@@ -189,13 +210,15 @@ graph LR
 
 ## Example Tests Included
 
-### Golden Tests (Immutable)
-- `tests/golden/auth/test_jwt_validation.py` - JWT signature validation
-- `tests/golden/api/test_payment.py` - Payment idempotency
+### Golden Tests (Protected)
+- `tests/golden/test_payment.py` - Payment behavioral contract with three tests:
+  - `test_payment_idempotency` - duplicate transaction IDs must raise `DuplicateTransactionError`
+  - `test_payment_validation` - payment amount must be positive
+  - `test_payment_requires_transaction_id` - a valid transaction ID is required
 
 ### Generated Tests (Mutable)
-- `tests/generated/test_edge_cases.py` - AI-generated edge case tests
-- `tests/generated/test_performance.py` - Performance boundary tests
+No generated tests ship with the example. Adopters or their assistants create candidates in
+`tests/generated/`, where they stay until deterministic validation and human promotion.
 
 ## Running the Example
 
@@ -203,20 +226,20 @@ graph LR
 # Run all tests
 pytest tests/ -v
 
-# Run only golden tests (immutable baseline)
+# Run only golden tests (protected baseline)
 pytest tests/golden/ -v
 
-# Run only generated tests (AI experiments)
+# Run generated tests after you create candidates locally
 pytest tests/generated/ -v
 
-# Try to modify golden test (will fail)
-echo "# test" >> tests/golden/api/test_payment.py
+# Try to modify a golden test after enforce-permissions.sh (will fail locally)
+echo "# test" >> tests/golden/test_payment.py
 # Permission denied (444 permissions)
 ```
 
 ## Key Benefits
 
-1. **Prevents Self-Grading** - AI cannot weaken tests to pass buggy code
+1. **Separates Grading** - The generator does not own approval of golden contracts
 2. **Enables AI Experimentation** - AI freely generates tests in `generated/`
 3. **Human Quality Gate** - Only validated tests become golden
 4. **Audit Trail** - Promotion workflow tracked in git
@@ -231,16 +254,31 @@ echo "# test" >> tests/golden/api/test_payment.py
 ## Troubleshooting
 
 ### "Permission denied" on golden test
-✓ **Expected behavior** - Golden tests are read-only (444)
-→ Use promotion workflow to update
+✓ **Expected after running the local permission script** - Golden tests are read-only in that
+checkout
+→ Use the add-only promotion path for a new contract
 
 ### CI blocks my PR
-✓ **Expected behavior** - Golden tests cannot be modified directly
-→ Create new test in `generated/`, then promote
+✓ **Expected after installing and requiring the root workflow** - Existing golden tests cannot be
+modified through the add-only promotion path
+→ Create a new test in `generated/`, then promote it for CODEOWNERS review
 
-### AI cannot write to `tests/golden/`
-✓ **Expected behavior** - AI hooks block golden modification
-→ AI should use `tests/generated/` instead
+### The configured assistant hook blocks writes to `tests/golden/`
+✓ **Expected after installing the hook in the active assistant** - Normal Edit/Write tools are
+blocked
+→ The assistant should use `tests/generated/` instead
+
+## Known Limitations
+
+- File permissions and the AI hook are advisory layers; anything with shell access can bypass them. Git restores tracked files as writable in a fresh checkout.
+- The nested workflow and CODEOWNERS files are inactive templates until copied or merged into repository-root `.github/` paths. Their checks must be required and their trust-root configuration protected.
+- `.github/CODEOWNERS` names placeholder teams (`@tech-leads`, `@qa-leads`) that adopters must replace, and branch protection must require code-owner review for the gate to bind.
+- `.ai/hooks/protect-golden.sh` assumes a pre-tool-use hook interface that supplies `TOOL_NAME` and `TOOL_INPUT_FILE_PATH`; wiring differs across AI coding assistants.
+- The example covers one module and one golden test; suite-scale concerns such as batch promotion and flake quarantine are out of scope.
+
+## Promotion Path
+
+Promotion of the underlying pattern requires evidence from real repositories: adopters wiring the CI gate and CODEOWNERS into live branch protection, promotion commits observed in practice, demonstrated prevention of assertion-weakening, and integration with [Flake Management](../../README.md#flake-management) so unstable tests are not promoted.
 
 ## References
 

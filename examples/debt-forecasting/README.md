@@ -1,24 +1,19 @@
-# Debt Forecasting Implementation
+# Debt Forecasting Example
 
-This directory contains a complete implementation of the Debt Forecasting pattern, proactively identifying and prioritizing technical debt using AI-powered code analysis.
+Supporting material for the [Debt Forecasting](../../README.md#debt-forecasting) pattern: forecast maintenance burden from code, dependency, coverage, and documentation trends so teams can prioritize technical debt.
 
-## Overview
+## Files in This Directory
 
-Debt Forecasting enables teams to:
+- **[`debt_analysis.md`](debt_analysis.md)** - Technical debt analysis and forecasting reference covering a debt detection framework (quality metrics and automated discovery), debt categorization (architecture, testing, performance, and security debt), business impact analysis with AI-assisted prioritization, remediation strategies, predictive forecasting models, and debt metrics dashboards. Its scripts, configurations, and code samples are illustrative implementations to adapt, not tooling shipped in this directory.
+
+For complete pattern documentation, see: [Debt Forecasting](../../README.md#debt-forecasting)
+
+## What Debt Forecasting Provides
+
 - Proactively identify technical debt before it becomes critical
 - Prioritize debt remediation by business impact and maintenance cost
 - Forecast future maintenance burden and resource requirements
 - Track technical debt trends and improvement progress
-
-## Files in this Implementation
-
-For complete pattern documentation, see: [Debt Forecasting](../../README.md#debt-forecasting)
-
-- `debt_analysis.md` - Complete technical debt forecasting documentation
-- `analyzers/` - Code quality and complexity analysis tools
-- `forecasting_models/` - AI-powered debt growth prediction models
-- `prioritization_engines/` - Business impact and cost analysis tools
-- `tracking_dashboards/` - Technical debt monitoring and reporting
 
 ## Technical Debt Categories
 
@@ -46,23 +41,17 @@ For complete pattern documentation, see: [Debt Forecasting](../../README.md#debt
 - Missing integration tests
 - Outdated test dependencies
 
-## Quick Start
+## Illustrative Workflow
+
+The pattern combines deterministic trend data with an AI-assisted explanation instead of asking a model to guess debt from a snapshot:
 
 ```bash
-# Analyze current technical debt state
-./analyze-technical-debt.sh --full-scan
+mkdir -p metrics
 
-# Generate debt forecast
-ai "Analyze codebase for technical debt indicators and forecast maintenance burden:
-1. Code complexity hotspots
-2. Cyclomatic complexity trends  
-3. Dependency staleness
-4. Test coverage gaps
-5. Documentation drift
-Prioritize by maintenance cost and business impact."
-
-# Create remediation roadmap
-./create-roadmap.sh --prioritize-by impact --timeline quarters
+# Collect deterministic trend data with standard tools
+python -m radon cc src --json > metrics/complexity.json
+python -m pytest --cov=src --cov-report=json:metrics/coverage.json
+git log --since='90 days ago' --numstat > metrics/churn.txt
 ```
 
-**Complete Implementation**: This directory contains the full technical debt forecasting system with automated analysis, AI-powered prediction models, and prioritized remediation planning.
+Pass those files to your configured assistant and ask it to rank maintenance risks while citing the metric behind every rank; save the result as `debt-forecast.md`. Review forecast accuracy against later incidents and maintenance work, then adjust weights rather than treating model rankings as objective measurements. [`debt_analysis.md`](debt_analysis.md) expands this approach with debt scan scripts, impact calculators, prioritization prompts, and dashboard KPIs to adapt to your own toolchain.

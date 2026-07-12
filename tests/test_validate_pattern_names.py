@@ -46,7 +46,8 @@ def _write_catalog(
         "|---|---|\n"
         f"| **[{stable_display_name}](#{stable_display_slug})** | Example |\n\n"
         f"{stable_history}"
-        f"## {stable_name}\n",
+        f"## {stable_name}\n\n"
+        "#### Anti-pattern: Broken Context\n",
         encoding="utf-8",
     )
     (root / "experiments" / "README.md").write_text(
@@ -55,26 +56,58 @@ def _write_catalog(
         "| Pattern | Description |\n"
         "|---|---|\n"
         f"| **[{experimental_name}](#{experimental_slug})** | Example |\n\n"
-        f"### {experimental_section}\n",
+        f"### {experimental_section}\n\n"
+        "#### Anti-pattern: False Testing\n",
         encoding="utf-8",
     )
 
 
 def _error_types(validator: PatternValidator) -> set[str]:
+    """Return the distinct error categories reported by the validator."""
     return {error.error_type for error in validator.errors}
 
 
 def test_repository_catalog_validates_all_47_active_names():
+    """The repository catalogs expose every canonical pattern and anti-pattern."""
     validator = PatternValidator()
 
     assert validator.validate_active_catalogs(REPO_ROOT)
     assert validator.stable_count == 29
     assert validator.experimental_count == 18
     assert len(validator.patterns_found) == 47
+    assert validator.stable_antipattern_count == 45
+    assert validator.experimental_antipattern_count == 24
+    assert len(validator.antipatterns_found) == 69
+    assert not validator.errors
+
+
+def test_public_antipattern_reference_reuses_valid_canonical_names():
+    """The downstream summary may only display canonical validated labels."""
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    experiments = (REPO_ROOT / "experiments" / "README.md").read_text(
+        encoding="utf-8")
+    section = re.search(
+        r"(?ms)^# Anti-Patterns Reference\s*$\n(.*?)(?=^---\s*$)", readme)
+    assert section, "README anti-pattern reference section is missing"
+    displayed = re.findall(
+        r"(?m)^- \*\*\[([^\]]+)\]\(([^)]+)\)\*\*:", section.group(1))
+    assert len(displayed) == 16
+    assert len({name for name, _ in displayed}) == len(displayed)
+
+    canonical = {
+        item["name"]
+        for content in (readme, experiments)
+        for item in PatternValidator.antipattern_labels(content.splitlines())
+    }
+    validator = PatternValidator()
+    for name, target in displayed:
+        assert validator.validate_antipattern_name(name), (name, target)
+        assert name in canonical, f"{name!r} is not a canonical H4 anti-pattern"
     assert not validator.errors
 
 
 def test_name_validator_runs_weekly_and_on_demand_in_actions():
+    """The validation workflow supports scheduled and manual name checks."""
     workflow = (REPO_ROOT / ".github" / "workflows" /
                 "pattern-validation.yml").read_text(encoding="utf-8")
 
@@ -94,6 +127,7 @@ def test_name_validator_runs_weekly_and_on_demand_in_actions():
     ],
 )
 def test_exact_two_word_title_case_names_are_valid(name):
+    """Canonical two-word Title Case pattern names are accepted."""
     validator = PatternValidator()
 
     assert validator.validate_pattern_name(name)
@@ -113,13 +147,50 @@ def test_exact_two_word_title_case_names_are_valid(name):
     ],
 )
 def test_invalid_active_names_are_rejected(name, expected_error):
+    """Malformed active pattern names report the expected error category."""
     validator = PatternValidator()
 
     assert not validator.validate_pattern_name(name)
     assert expected_error in _error_types(validator)
 
 
+@pytest.mark.parametrize(
+    "name",
+    [
+        "Opaque Runs",
+        "False Consensus",
+        "Over-Alerting",
+        "Spec-Ignored",
+    ],
+)
+def test_valid_antipattern_names_are_accepted(name):
+    """Canonical cautionary anti-pattern names are accepted."""
+    validator = PatternValidator()
+
+    assert validator.validate_antipattern_name(name)
+    assert not validator.errors
+
+
+@pytest.mark.parametrize(
+    ("name", "expected_error"),
+    [
+        ("Opaque Agent Runs", "Anti-pattern Word Count"),
+        ("Voting Theater", "Cautionary Modifier"),
+        ("Opaque runs", "Anti-pattern Title Case"),
+        ("Opaque", "Anti-pattern Word Count"),
+        ("", "Anti-pattern Word Count"),
+    ],
+)
+def test_invalid_antipattern_names_are_rejected(name, expected_error):
+    """Malformed anti-pattern names report the expected error category."""
+    validator = PatternValidator()
+
+    assert not validator.validate_antipattern_name(name)
+    assert expected_error in _error_types(validator)
+
+
 def test_empty_catalogs_never_report_success(tmp_path):
+    """Empty stable and experimental catalogs fail validation explicitly."""
     (tmp_path / "experiments").mkdir()
     (tmp_path / "patterns.yaml").write_text("patterns: []\n", encoding="utf-8")
     (tmp_path / "README.md").write_text(
@@ -139,6 +210,7 @@ def test_empty_catalogs_never_report_success(tmp_path):
 
 
 def test_missing_markdown_catalog_fails_without_crashing(tmp_path):
+    """A missing stable catalog is reported as an error without an exception."""
     (tmp_path / "experiments").mkdir()
     (tmp_path / "patterns.yaml").write_text(
         "patterns:\n"
@@ -162,6 +234,7 @@ def test_missing_markdown_catalog_fails_without_crashing(tmp_path):
 
 
 def test_cross_catalog_duplicate_name_and_slug_are_rejected(tmp_path):
+    """Names and slugs must remain unique across stable and experimental catalogs."""
     _write_catalog(
         tmp_path,
         experimental_name="Stable Pattern",
@@ -174,6 +247,7 @@ def test_cross_catalog_duplicate_name_and_slug_are_rejected(tmp_path):
 
 
 def test_catalog_ids_display_links_and_sections_must_match(tmp_path):
+    """Catalog metadata, links, display names, and sections must agree."""
     _write_catalog(
         tmp_path,
         stable_id="wrong-id",
@@ -197,6 +271,7 @@ def test_catalog_ids_display_links_and_sections_must_match(tmp_path):
 
 
 def test_legacy_history_and_compatibility_anchors_are_not_active_names(tmp_path):
+    """Historical prose and compatibility anchors do not create active patterns."""
     _write_catalog(
         tmp_path,
         stable_history=(
@@ -212,6 +287,7 @@ def test_legacy_history_and_compatibility_anchors_are_not_active_names(tmp_path)
 
 
 def test_fenced_heading_cannot_substitute_for_missing_pattern_section(tmp_path):
+    """A heading inside a code fence cannot satisfy a catalog section."""
     _write_catalog(tmp_path)
     readme = (tmp_path / "README.md").read_text(encoding="utf-8")
     (tmp_path / "README.md").write_text(
@@ -228,6 +304,7 @@ def test_fenced_heading_cannot_substitute_for_missing_pattern_section(tmp_path):
 
 
 def test_fenced_reference_heading_cannot_shadow_real_catalog(tmp_path):
+    """A fenced reference-table example cannot shadow the real catalog."""
     _write_catalog(tmp_path)
     readme = (tmp_path / "README.md").read_text(encoding="utf-8")
     (tmp_path / "README.md").write_text(
@@ -240,6 +317,43 @@ def test_fenced_reference_heading_cannot_shadow_real_catalog(tmp_path):
             "|---|---|\n"
             "| **[Shadow Pattern](#shadow-pattern)** | Not active |\n"
             "```\n\n",
+        ),
+        encoding="utf-8",
+    )
+    validator = PatternValidator()
+
+    assert validator.validate_active_catalogs(tmp_path)
+    assert not validator.errors
+
+
+def test_antipattern_labels_must_use_h4_markup(tmp_path):
+    """Canonical anti-pattern labels require the prescribed H4 markup."""
+    _write_catalog(tmp_path)
+    readme = (tmp_path / "README.md").read_text(encoding="utf-8")
+    (tmp_path / "README.md").write_text(
+        readme.replace(
+            "#### Anti-pattern: Broken Context\n",
+            "**Anti-pattern: Broken Context**\n",
+        ),
+        encoding="utf-8",
+    )
+    validator = PatternValidator()
+
+    assert not validator.validate_active_catalogs(tmp_path)
+    assert "Anti-pattern Markup" in _error_types(validator)
+
+
+def test_fenced_antipattern_labels_are_not_canonical(tmp_path):
+    """Anti-pattern examples inside code fences are ignored as canonical labels."""
+    _write_catalog(tmp_path)
+    readme = (tmp_path / "README.md").read_text(encoding="utf-8")
+    (tmp_path / "README.md").write_text(
+        readme.replace(
+            "# Catalog\n\n",
+            "# Catalog\n\n"
+            "```markdown\n"
+            "#### Anti-pattern: Voting Theater\n"
+            "````\n\n",
         ),
         encoding="utf-8",
     )

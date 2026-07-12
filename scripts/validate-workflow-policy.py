@@ -40,7 +40,6 @@ REQUIRED_TRUST_ROOT_FILES = (
     "scripts/build-verification-inventory.py",
     "scripts/configure-repository-rules.py",
     "scripts/evidence_content.py",
-    "scripts/export-research-candidate.py",
     "scripts/finalize-local-verification.py",
     "scripts/generate-verification-status.py",
     "scripts/hydrate-evidence-content.py",
@@ -202,6 +201,7 @@ class WorkflowLoader(yaml.SafeLoader):
     """Safe YAML 1.2-like loader that rejects aliases and duplicate keys."""
 
     def compose_node(self, parent, index):
+        """Compose one YAML node while rejecting aliases."""
         if self.check_event(yaml.AliasEvent):
             event = self.peek_event()
             raise WorkflowPolicyError(
@@ -209,6 +209,7 @@ class WorkflowLoader(yaml.SafeLoader):
         return super().compose_node(parent, index)
 
     def construct_mapping(self, node, deep=False):
+        """Construct a mapping with string, unique, non-merge keys."""
         if not isinstance(node, yaml.MappingNode):
             raise WorkflowPolicyError("only standard YAML mappings are supported")
         seen = set()
@@ -264,6 +265,7 @@ def iter_workflow_files(directory):
     paths = []
 
     def walk_error(exc):
+        """Convert directory traversal failures into policy errors."""
         raise WorkflowPolicyError(
             f"cannot enumerate workflow directory: {root}") from exc
 
@@ -551,6 +553,7 @@ def trust_root_inventory(root_path):
     total_bytes = 0
 
     def add_file(path, relative, required):
+        """Validate and add one bounded regular file to the inventory."""
         nonlocal file_count, entry_count, total_bytes
         if relative in inventory:
             return
@@ -611,6 +614,7 @@ def trust_root_inventory(root_path):
         entry_count += 1
 
         def walk_error(exc):
+            """Convert protected-directory traversal failures to policy errors."""
             raise WorkflowPolicyError(
                 f"cannot enumerate protected trust-root directory: {directory}") from exc
 
@@ -708,6 +712,7 @@ def validate_candidate_repository(
 
 
 def main(argv=None):
+    """Validate a candidate workflow directory from command-line arguments."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--candidate-root",

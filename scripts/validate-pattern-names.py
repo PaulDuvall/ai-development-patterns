@@ -2,8 +2,8 @@
 """
 Pattern Name Validation Script
 
-Validates that every active canonical pattern in the stable and experimental
-catalogs complies with the strict two-word naming convention.
+Validates that every active canonical pattern and anti-pattern in the stable
+and experimental catalogs complies with the naming specification.
 
 Usage:
     python3 scripts/validate-pattern-names.py
@@ -22,29 +22,58 @@ import yaml
 # Words to avoid in pattern names (too generic or redundant in AI context)
 AVOID_WORDS = {'ai', 'pattern', 'helper', 'utility', 'common', 'general', 'manager', 'handler', 'service'}
 TECHNICAL_TITLE_WORDS = {'ChatOps'}
+# Anti-pattern semantics cannot be inferred reliably from capitalization alone.
+# Keep the accepted cautionary modifiers explicit so adding a neutral label is
+# an intentional specification change rather than an accidental bypass.
+CAUTIONARY_MODIFIERS = {
+    'blind', 'bloated', 'brittle', 'broken', 'chaotic', 'conflicting',
+    'confused', 'delayed', 'disconnected', 'false', 'hardcoded', 'ignored',
+    'manual', 'maximal', 'missing', 'monolithic', 'mutable', 'narrative',
+    'opaque', 'over-alerting', 'over-analysis', 'over-architecting',
+    'over-constrained', 'over-decomposition', 'over-documentation',
+    'over-prompting', 'overwhelming', 'passive', 'permission-only',
+    'premature', 'random', 'reactive', 'reckless', 'redundant', 'scattered',
+    'self-grading', 'shallow', 'single-model', 'spec-ignored', 'static',
+    'synthetic', 'unbounded', 'unchecked', 'unconstrained', 'uncoordinated',
+    'under-specified', 'undocumented', 'unmonitored', 'unplanned',
+    'unrestricted', 'unsafe', 'untested',
+}
 TABLE_LINK_RE = re.compile(
     r'^\|\s*\*\*\[([^\]]+)\]\(#([a-z0-9]+(?:-[a-z0-9]+)*)\)\*\*\s*\|')
 
 
 class ValidationError:
-    def __init__(self, pattern_name: str, error_type: str, message: str, line_num: int = None):
+    def __init__(self, pattern_name: str, error_type: str, message: str,
+                 line_num: int | None = None, source: str | None = None):
+        """Capture one catalog validation failure and its source location."""
         self.pattern_name = pattern_name
         self.error_type = error_type
         self.message = message
         self.line_num = line_num
+        self.source = source
 
     def __str__(self):
-        location = f" (line {self.line_num})" if self.line_num else ""
+        """Render the failure with the most specific available location."""
+        if self.source and self.line_num:
+            location = f" ({self.source}:{self.line_num})"
+        elif self.source:
+            location = f" ({self.source})"
+        else:
+            location = f" (line {self.line_num})" if self.line_num else ""
         return f"❌ {self.error_type}: '{self.pattern_name}'{location}\n   {self.message}"
 
 
 class PatternValidator:
     def __init__(self):
+        """Initialize empty validation findings and catalog counters."""
         self.errors: list[ValidationError] = []
         self.warnings: list[str] = []
         self.patterns_found: set[str] = set()
+        self.antipatterns_found: set[str] = set()
         self.stable_count = 0
         self.experimental_count = 0
+        self.stable_antipattern_count = 0
+        self.experimental_antipattern_count = 0
 
     def count_words(self, name: str) -> int:
         """Count words in a pattern name. Hyphenated words count as one word."""
@@ -132,6 +161,38 @@ class PatternValidator:
 
         return valid
 
+    def validate_antipattern_name(
+            self, name: str, line_num: int = None, source: str = None) -> bool:
+        """Validate one canonical anti-pattern label."""
+        valid = True
+        word_count = self.count_words(name)
+        is_single_compound = word_count == 1 and '-' in name.strip('-')
+        if word_count != 2 and not is_single_compound:
+            self.errors.append(ValidationError(
+                name, "Anti-pattern Word Count",
+                "Must be exactly 2 words or one hyphenated compound",
+                line_num, source))
+            valid = False
+
+        if not name or not self.is_title_case(name):
+            self.errors.append(ValidationError(
+                name, "Anti-pattern Title Case",
+                "Anti-pattern name must use Title Case",
+                line_num, source))
+            valid = False
+
+        first_word = name.split()[0].casefold() if name.split() else ''
+        if first_word not in CAUTIONARY_MODIFIERS:
+            self.errors.append(ValidationError(
+                name, "Cautionary Modifier",
+                "Anti-pattern name must begin with an approved negative or cautionary modifier",
+                line_num, source))
+            valid = False
+
+        if valid:
+            self.antipatterns_found.add(name)
+        return valid
+
     @staticmethod
     def canonical_slug(name: str) -> str:
         """Convert a canonical display name to its required catalog slug."""
@@ -176,6 +237,68 @@ class PatternValidator:
                     "text": match.group(2).strip(),
                 })
         return headings
+
+    @staticmethod
+    def antipattern_labels(lines: list[str]) -> list[dict]:
+        """Return anti-pattern labels outside CommonMark fenced code blocks."""
+        labels = []
+        in_fence = False
+        fence_marker = ""
+        for line_num, line in enumerate(lines, 1):
+            stripped = line.strip()
+            fence_open = re.match(r"^(`{3,}|~{3,})", stripped)
+            if not in_fence and fence_open:
+                in_fence = True
+                fence_marker = fence_open.group(1)
+                continue
+            if in_fence:
+                fence_close = re.match(r"^(`{3,}|~{3,})\s*$", stripped)
+                if fence_close \
+                        and fence_close.group(1)[0] == fence_marker[0] \
+                        and len(fence_close.group(1)) >= len(fence_marker):
+                    in_fence = False
+                    fence_marker = ""
+                continue
+
+            heading = re.match(
+                r"^(#{1,6})\s+Anti-pattern:\s*(.*?)\s*$", stripped)
+            if heading:
+                labels.append({
+                    'name': heading.group(2),
+                    'level': len(heading.group(1)),
+                    'line': line_num,
+                })
+                continue
+            bold = re.match(r"^\*\*Anti-pattern:\s*(.*?)\*\*$", stripped)
+            if bold:
+                labels.append({
+                    'name': bold.group(1),
+                    'level': 0,
+                    'line': line_num,
+                })
+        return labels
+
+    def validate_antipattern_catalog(self, path: Path, label: str) -> int:
+        """Validate every canonical anti-pattern label in one catalog."""
+        if not path.is_file():
+            return 0
+        labels = self.antipattern_labels(
+            path.read_text(encoding='utf-8').splitlines())
+        if not labels:
+            self.errors.append(ValidationError(
+                label, "Missing Anti-patterns",
+                "Catalog must contain canonical anti-pattern labels",
+                source=label))
+            return 0
+        for item in labels:
+            if item['level'] != 4:
+                self.errors.append(ValidationError(
+                    item['name'], "Anti-pattern Markup",
+                    "Canonical anti-pattern labels must use an H4 heading",
+                    item['line'], label))
+            self.validate_antipattern_name(
+                item['name'], item['line'], label)
+        return len(labels)
 
     def load_stable_catalog(self, path: Path) -> list[dict]:
         """Load canonical stable names from patterns.yaml and validate their IDs."""
@@ -409,6 +532,10 @@ class PatternValidator:
             self.validate_section_headings(
                 repo_root / 'experiments' / 'README.md', experimental, (3,),
                 'experiments/README.md', reject_unexpected=True)
+        self.stable_antipattern_count = self.validate_antipattern_catalog(
+            repo_root / 'README.md', 'README.md')
+        self.experimental_antipattern_count = self.validate_antipattern_catalog(
+            repo_root / 'experiments' / 'README.md', 'experiments/README.md')
         return not self.errors
 
     def print_report(self):
@@ -421,7 +548,10 @@ class PatternValidator:
         print(f"  Stable patterns: {self.stable_count}")
         print(f"  Experimental patterns: {self.experimental_count}")
         print(f"  Active patterns found: {len(self.patterns_found)}")
-        print(f"  Total: {len(self.patterns_found)}")
+        print(f"  Stable anti-patterns: {self.stable_antipattern_count}")
+        print(f"  Experimental anti-patterns: {self.experimental_antipattern_count}")
+        print(f"  Active anti-pattern names found: {len(self.antipatterns_found)}")
+        print(f"  Total names: {len(self.patterns_found) + len(self.antipatterns_found)}")
 
         if self.warnings:
             print(f"\n⚠️  Warnings ({len(self.warnings)}):")

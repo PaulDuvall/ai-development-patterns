@@ -1,6 +1,9 @@
 """Structural regression tests for evidence workflow trust boundaries."""
 
+import json
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 import yaml
@@ -21,14 +24,17 @@ def workflow_paths():
 
 
 def load_workflow(path):
+    """Load a workflow while preserving YAML scalar values as strings."""
     return yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.BaseLoader)
 
 
 def named_step(job, name):
+    """Return the job step with the requested display name."""
     return next(step for step in job["steps"] if step.get("name") == name)
 
 
 def test_every_external_action_is_pinned_to_a_commit_sha():
+    """Every third-party workflow action is pinned to an immutable commit."""
     unpinned = []
     for path in workflow_paths():
         for line_number, line in enumerate(
@@ -44,6 +50,7 @@ def test_every_external_action_is_pinned_to_a_commit_sha():
 
 
 def test_model_backed_pattern_evaluation_is_local_only():
+    """Hosted workflows contain no model-backed evaluation path or credentials."""
     assert not VERIFY.exists()
 
     workflow_text = {
@@ -95,6 +102,7 @@ def test_model_backed_pattern_evaluation_is_local_only():
 
 
 def test_deterministic_evidence_workflow_has_no_model_credentials_or_actions():
+    """Deterministic evidence validation remains model- and secret-free."""
     text = EVIDENCE.read_text(encoding="utf-8")
     workflow = load_workflow(EVIDENCE)
     jobs_text = str(workflow["jobs"]).casefold()
@@ -111,6 +119,7 @@ def test_deterministic_evidence_workflow_has_no_model_credentials_or_actions():
 
 
 def test_weekly_actions_only_recompute_and_recheck_committed_evidence():
+    """The weekly workflow only validates and rechecks committed evidence."""
     workflow = load_workflow(EVIDENCE)
     assert workflow["on"]["schedule"] == [{"cron": "0 6 * * 1"}]
     assert workflow["permissions"] == {"contents": "read"}
@@ -143,6 +152,7 @@ def test_weekly_actions_only_recompute_and_recheck_committed_evidence():
 
 
 def test_local_evaluator_inputs_are_watched_but_never_executed_by_actions():
+    """Local evaluator changes trigger validation without running the evaluator."""
     workflow = load_workflow(EVIDENCE)
     watched = set(workflow["on"]["push"]["paths"])
     assert {
@@ -166,6 +176,7 @@ def test_local_evaluator_inputs_are_watched_but_never_executed_by_actions():
 
 
 def test_no_workflow_can_restore_a_legacy_shared_provider_secret():
+    """No workflow references legacy shared model-provider secrets."""
     workflow_text = "\n".join(
         path.read_text(encoding="utf-8") for path in workflow_paths())
     assert "secrets.OPENAI_API_KEY" not in workflow_text
@@ -173,6 +184,7 @@ def test_no_workflow_can_restore_a_legacy_shared_provider_secret():
 
 
 def test_trusted_pr_workflow_executes_only_base_branch_validation_code():
+    """Trusted PR validation executes code exclusively from the base revision."""
     workflow = load_workflow(TRUSTED)
     assert "pull_request_target" in workflow["on"]
     assert "workflow_dispatch" not in workflow["on"]
@@ -247,6 +259,7 @@ def test_trusted_pr_workflow_executes_only_base_branch_validation_code():
 
 
 def test_trusted_pr_workflow_no_ops_when_pr_is_no_longer_eligible():
+    """Trusted validation stops before privileged steps for ineligible PRs."""
     workflow = load_workflow(TRUSTED)
     trigger_types = workflow["on"]["pull_request_target"]["types"]
     job = workflow["jobs"]["trusted-evidence"]
@@ -265,6 +278,7 @@ def test_trusted_pr_workflow_no_ops_when_pr_is_no_longer_eligible():
 
 
 def test_trust_root_upgrade_requires_exact_commit_bound_owner_comment():
+    """Trust-root upgrades require an owner approval bound to the exact commit."""
     workflow = load_workflow(TRUSTED)
     validation = workflow["jobs"]["trusted-evidence"]
     resolve = named_step(validation, "Resolve immutable pull request revisions")
@@ -330,6 +344,7 @@ def test_trust_root_upgrade_requires_exact_commit_bound_owner_comment():
 
 
 def test_trusted_validation_does_not_publish_success_for_stale_events():
+    """A stale validation event cannot publish a successful commit status."""
     workflow = load_workflow(TRUSTED)
     validation = workflow["jobs"]["trusted-evidence"]
     resolve = named_step(validation, "Resolve immutable pull request revisions")
@@ -343,6 +358,7 @@ def test_trusted_validation_does_not_publish_success_for_stale_events():
 
 
 def test_general_validation_runs_once_and_has_a_stable_result_only_gate():
+    """General validation runs once and exposes only its stable aggregate gate."""
     workflow = load_workflow(PATTERN_VALIDATION)
     jobs = workflow["jobs"]
     validation = jobs["deterministic-validation"]
@@ -390,6 +406,7 @@ def test_general_validation_runs_once_and_has_a_stable_result_only_gate():
 
 
 def test_external_links_run_only_weekly_or_when_manually_requested():
+    """External link checks run only on schedule or explicit manual request."""
     workflow = load_workflow(PATTERN_VALIDATION)
     links = workflow["jobs"]["external-links"]
 
@@ -399,7 +416,25 @@ def test_external_links_run_only_weekly_or_when_manually_requested():
         "continue-on-error"] == "true"
 
 
+def test_pattern_validation_failure_issue_has_remediation_checklist():
+    """New and repeat failure notices tell maintainers how to recover."""
+    workflow = load_workflow(PATTERN_VALIDATION)
+    notification = workflow["jobs"]["notify-failure"]
+    script = named_step(
+        notification, "Create issue on failure (skip if duplicate)"
+    )["with"]["script"]
+
+    assert "### Remediation checklist" in script
+    assert 'python3 -m pytest -m "not slow" -x -q' in script
+    assert "python3 scripts/validate-pattern-names.py" in script
+    assert "python3 scripts/generate-patterns-data.py --check" in script
+    assert "Local agent fix instructions" in script
+    assert "Validation gate" in script
+    assert script.count("${remediation}") == 2
+
+
 def test_pages_pushes_are_scoped_to_site_inputs():
+    """Pages deployment push triggers are limited to site-relevant inputs."""
     workflow = load_workflow(PAGES)
     paths = set(workflow["on"]["push"]["paths"])
 
@@ -412,15 +447,18 @@ def test_pages_pushes_are_scoped_to_site_inputs():
 
 
 def test_required_evidence_check_has_no_pull_request_path_filter():
+    """The required evidence check runs for every pull request path."""
     workflow = load_workflow(EVIDENCE)
     assert workflow["on"]["pull_request"] == {"branches": ["main"]}
 
 
 def test_workflow_policy_changes_run_in_deterministic_evidence_validation():
+    """Workflow policy changes trigger deterministic evidence validation."""
     workflow = load_workflow(EVIDENCE)
     watched = set(workflow["on"]["push"]["paths"])
     assert {
         ".github/requirements.txt",
+        "scripts/configure-repository-rules.py",
         "scripts/validate-workflow-policy.py",
         "tests/test_workflow_policy.py",
     } <= watched
@@ -428,3 +466,56 @@ def test_workflow_policy_changes_run_in_deterministic_evidence_validation():
         workflow["jobs"]["deterministic-evidence"],
         "Run fast evidence tests")["run"]
     assert "tests/test_workflow_policy.py" in command
+    assert "tests/test_repository_rules.py" in command
+
+
+def test_retired_hosted_fanout_helpers_are_absent():
+    """Retired hosted-evaluation fanout helpers remain removed."""
+    retired = (
+        "scripts/activate-verification-unit.py",
+        "scripts/assemble-verification-units.py",
+        "scripts/export-verification-unit.py",
+        "tests/test_research_candidate_export.py",
+        "tests/test_verification_units.py",
+    )
+    compatibility_anchor = "scripts/export-research-candidate.py"
+    assert all(not (ROOT / relative).exists() for relative in retired)
+    # The old trusted validator on main requires this byte-identical file for
+    # the transition PR. It has no caller and is deleted after that validator
+    # no longer lists it as required.
+    assert (ROOT / compatibility_anchor).is_file()
+
+    workflow = load_workflow(EVIDENCE)
+    watched = set(workflow["on"]["push"]["paths"])
+    command = named_step(
+        workflow["jobs"]["deterministic-evidence"],
+        "Run fast evidence tests")["run"]
+    assert not watched.intersection(retired)
+    assert all(relative not in command for relative in retired)
+    assert compatibility_anchor not in watched
+    assert compatibility_anchor not in command
+
+
+def test_generated_repair_prompt_reproduces_the_non_network_suite(tmp_path):
+    """Generated repair prompts prescribe the reproducible non-network suite."""
+    report = tmp_path / "report.json"
+    report.write_text(json.dumps({
+        "summary": {"total": 1, "passed": 0, "failed": 1, "error": 0},
+        "tests": [{
+            "nodeid": "tests/test_pattern_compliance.py::test_example",
+            "outcome": "failed",
+            "call": {"longrepr": "example failure"},
+        }],
+    }), encoding="utf-8")
+
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "generate-audit-prompt.py"),
+         str(report)],
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+
+    assert completed.returncode == 1
+    assert 'python3 -m pytest -m "not slow" -x -q' in completed.stdout
+    assert "python3 -m pytest -x -q" not in completed.stdout
