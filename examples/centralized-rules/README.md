@@ -46,7 +46,7 @@ chmod +x sync-ai-rules.sh
 1. **Detects your stack** - Finds Python, TypeScript, React, Django, etc.
 2. **Fetches relevant rules** - Pulls universal + language + framework rules
 3. **Generates config files** - Creates CLAUDE.md, .cursorrules, etc.
-4. **Your AI assistant reads them** - Claude Code, Cursor, Gemini automatically follow the rules
+4. **Your coding agent reads them** - Claude Code, Cursor, Gemini automatically follow the rules
 
 **Key benefits:**
 - ✅ **Works with all AI tools** - Claude Code, Cursor, Gemini (uses standard config files)
@@ -195,7 +195,7 @@ EOF
 To update: ./sync-ai-rules.sh
 ```
 
-### Step 4: AI Assistants Automatically Follow Rules
+### Step 4: Coding Agents Automatically Follow Rules
 
 - **Claude Code** reads `CLAUDE.md`
 - **Cursor IDE** reads `.cursorrules`

@@ -72,7 +72,7 @@ A canonical, enumerated list of best practices derived from comprehensive analys
 
 29. **Modular Command Architecture**: Organize AI tools into clear categories with well-defined scopes (project-specific vs. machine-wide) for flexible workflows.
 
-30. **Use Specialized Subagents**: Use [subagents](https://docs.anthropic.com/en/docs/claude-code/sub-agents) to offload specialized tasks to isolated AI assistants with custom prompts, tools, and context for consistent, focused execution.
+30. **Use Specialized Subagents**: Use [subagents](https://docs.anthropic.com/en/docs/claude-code/sub-agents) to offload specialized tasks to isolated coding agents with custom prompts, tools, and context for consistent, focused execution.
 
 31. **Experimental Design Frameworks**: Treat experimental AI development features as sophisticated specifications that map future advanced workflows.
 

@@ -14,7 +14,7 @@ This directory ships documentation only: this README plus two specification docu
 
 ## Quick Start
 
-Use the shipped specification as the input contract, then validate the generated output with platform-native tooling. The `ai` command below stands in for whichever AI assistant CLI you use.
+Use the shipped specification as the input contract, then validate the generated output with platform-native tooling. The `ai` command below stands in for whichever coding-agent CLI you use.
 
 ```bash
 # Generate pipeline configuration from the shipped specification

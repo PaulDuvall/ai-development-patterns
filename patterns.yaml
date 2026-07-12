@@ -130,7 +130,7 @@ patterns:
     anchor: "#progressive-disclosure"
     automatable: true
     description: >
-      Load AI assistant rules incrementally based on task context to prevent instruction saturation and context bloat.
+      Load coding-agent rules incrementally based on task context to prevent instruction saturation and context bloat.
     related: [codified-rules, agent-memory, custom-commands, agent-hooks, centralized-rules, model-routing]
 
   - id: atomic-decomposition

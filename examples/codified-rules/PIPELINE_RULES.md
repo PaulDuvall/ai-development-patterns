@@ -549,7 +549,7 @@ echo "✓ All checks passed"
 
 ---
 
-## FOR CLAUDE CODE / AI ASSISTANTS
+## FOR CLAUDE CODE / CODING AGENTS
 
 When reviewing changes:
 

@@ -11,6 +11,10 @@
 
 A comprehensive collection of patterns based on my experience for building software with AI assistance, organized by implementation maturity and development lifecycle phases. These patterns are subject to change as the field evolves.
 
+**Terminology**
+
+This catalog uses **coding agent** for tools such as Claude Code, OpenAI Codex, and Google Jules that can generate and execute code, run checks, and iterate on results. **Agentic engineering** is the professional practice of building software with those agents. The broader terms **AI assistant** and **AI coding assistant** are reserved for systems that may provide suggestions or chat without independently executing and validating changes.
+
 Adoption verdicts are mechanically recomputed from structured, tiered evidence. Model-backed evidence research runs only on demand in a signed-in local Codex session with an explicit plan approval; GitHub Actions never calls an evaluator model or receives an evaluator API key. CI performs deterministic schema, provenance, derivation, status-drift, link, and content checks, including a weekly read-only freshness check. See [verification/STATUS.md](verification/STATUS.md) for every stable and exploratory pattern's assessed, pending, and freshness state, and [verification/](verification/README.md) for the local-agent workflow and trust model.
 
 ```mermaid
@@ -590,7 +594,7 @@ Modern AI development platforms provide enterprise-grade implementations of thes
 
 **Cloud-Based Sandboxes**:
 - **[Claude Code for the web](https://www.claude.ai/code)**: Sandboxed AI coding with isolated execution environments
-- **[Google Jules](https://jules.google/)**: Google's AI coding assistant with secure development environments
+- **[Google Jules](https://jules.google/)**: Google's coding agent with secure development environments
 - **[OpenAI Codex](https://chatgpt.com/codex)**: Cloud-based AI coding with secure execution environments
 - **[Google Vertex AI Agent Engine Code Execution](https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/code-execution)**: Managed secure runtimes for AI agent code execution
 - **[GitHub Codespaces](https://docs.github.com/en/codespaces/overview)**: Isolated cloud development VMs with configurable security policies
@@ -1736,7 +1740,7 @@ Industry implementations call these controls *hooks*, *lifecycle hooks*, *agent 
 
 **Core Concept**
 
-Attach shell commands to AI assistant lifecycle events. Commands receive context via environment variables (file paths, tool names, user prompts) and return exit codes to allow/block/warn.
+Attach shell commands to coding-agent lifecycle events. Commands receive context via environment variables (file paths, tool names, user prompts) and return exit codes to allow/block/warn.
 
 **Event Flow Example**
 
@@ -1959,13 +1963,13 @@ Deploy to database: $1 (default: $STAGING_DB)
 ## Progressive Disclosure
 
 **Maturity**: Intermediate<br>
-**Description**: Load AI assistant rules incrementally based on task context rather than bundling all instructions upfront, preventing context bloat and improving instruction-following consistency.
+**Description**: Load coding-agent rules incrementally based on task context rather than bundling all instructions upfront, preventing context bloat and improving instruction-following consistency.
 
 **Related Patterns**: [Codified Rules](#codified-rules), [Agent Memory](#agent-memory), [Custom Commands](#custom-commands), [Agent Hooks](#agent-hooks), [Centralized Rules](#centralized-rules), [Model Routing](#model-routing)
 
 **Core Problem**
 
-AI coding assistants already consume part of their context window with built-in system instructions. When a project loads a single, monolithic rules file (hundreds of lines) for every task, instruction-following accuracy drops and irrelevant guidance crowds out what the model needs right now.
+Coding agents already consume part of their context window with built-in system instructions. When a project loads a single, monolithic rules file (hundreds of lines) for every task, instruction-following accuracy drops and irrelevant guidance crowds out what the model needs right now.
 
 **Implementation Strategy: Three-Tier Rule Architecture**
 

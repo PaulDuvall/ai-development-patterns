@@ -58,7 +58,7 @@ developer-lifecycle/
 
 - Bash shell (macOS, Linux, or WSL on Windows)
 - Basic command line knowledge
-- AI assistant access (Claude, ChatGPT, etc.) for implementing generated templates
+- Coding-agent access (Claude Code, Codex, etc.) for implementing generated templates
 
 ## Quick Start
 
@@ -123,7 +123,7 @@ The `lifecycle-workflow.sh` script creates a `lifecycle-output/` directory with:
 # 2. Review generated templates in lifecycle-output/
 ls -la lifecycle-output/
 
-# 3. Use AI assistant to flesh out the templates
+# 3. Use a coding agent to flesh out the templates
 # 4. Import Kanban issues to your project management tool
 # 5. Follow the implementation guide
 ```
@@ -142,7 +142,7 @@ ls -la lifecycle-output/
 ## Script Features
 
 - **Complete automation** of all 9 lifecycle stages
-- **Template generation** for immediate use with AI assistants  
+- **Template generation** for immediate use with coding agents
 - **Structured output** organized by stage and file type
 - **Command-line interface** with help and validation
 - **Colored output** for clear stage progression
@@ -162,7 +162,7 @@ The generated templates work well with:
 - **Testing**: Implement test plans using generated `testing/test-plan.md`
 - **CI/CD**: Adapt `deployment/deploy.sh` for your pipeline
 
-### AI Assistants
+### Coding Agents
 - Use generated templates as context for Claude, ChatGPT, or Copilot
 - Feed stage outputs into AI for detailed implementation
 - Leverage structured prompts for consistent results
