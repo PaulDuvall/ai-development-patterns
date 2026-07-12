@@ -11,6 +11,9 @@ import yaml
 ROOT = Path(__file__).parent.parent
 DEPENDABOT = ROOT / ".github" / "dependabot.yml"
 DEPENDENCY_WORKFLOW = ROOT / ".github" / "workflows" / "dependency-security.yml"
+TRUSTED_EVIDENCE_WORKFLOW = (
+    ROOT / ".github" / "workflows" / "trusted-evidence-validation.yml")
+LIFECYCLE_VALIDATOR = ROOT / "scripts" / "validate-package-lifecycle.py"
 PATTERN_VALIDATION_WORKFLOW = (
     ROOT / ".github" / "workflows" / "pattern-validation.yml")
 DOCKER_COMPATIBILITY_WORKFLOW = (
@@ -83,6 +86,26 @@ def test_dependabot_covers_all_dependency_manifest_directories():
         if "node_modules" not in path.parts
     }
     assert discovered_npm == NPM_DIRECTORIES
+
+
+def test_trusted_validation_rejects_package_lifecycle_hook_changes():
+    """Fork content must be inspected by trusted code before acceptance."""
+    workflow = TRUSTED_EVIDENCE_WORKFLOW.read_text(encoding="utf-8")
+    validator = LIFECYCLE_VALIDATOR.read_text(encoding="utf-8")
+
+    assert "trusted/scripts/validate-package-lifecycle.py" in workflow
+    assert "--trusted-root trusted" in workflow
+    assert "--candidate-root candidate" in workflow
+    assert "steps.package-lifecycle.outcome != 'success'" in workflow
+    for hook in (
+        "preinstall",
+        "install",
+        "postinstall",
+        "prepare",
+        "prepublish",
+        "prepublishOnly",
+    ):
+        assert f'"{hook}"' in validator
 
 
 def test_dependabot_groups_compatible_updates_without_grouping_majors():

@@ -168,6 +168,14 @@ jobs:
           candidate/experiments/NOTES.md
           candidate/verification
 
+      - name: Reject introduced or modified package lifecycle hooks
+        id: package-lifecycle
+        if: steps.resolve.outputs.eligible == 'true'
+        run: >-
+          python3 trusted/scripts/validate-package-lifecycle.py
+          --trusted-root trusted
+          --candidate-root candidate
+
       - name: Recompute candidate evidence with trusted validator
         id: evidence
         if: steps.resolve.outputs.eligible == 'true'
@@ -231,6 +239,7 @@ jobs:
               steps.workflow-policy.outcome != 'success' ||
               steps.install.outcome != 'success' ||
               steps.secret-scan.outcome != 'success' ||
+              steps.package-lifecycle.outcome != 'success' ||
               steps.evidence.outcome != 'success' ||
               steps.status.outcome != 'success'
             }}
