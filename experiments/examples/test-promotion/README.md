@@ -145,7 +145,7 @@ configuration. When installed, it:
 - Blocks operations on `tests/golden/**` paths
 - Returns exit code 2 (BLOCK) with helpful message
 
-**Purpose**: Blocks AI coding assistants from using Edit/Write tools on golden tests.
+**Purpose**: Blocks coding agents from using Edit/Write tools on golden tests.
 **Limitation**: AI can still modify files via Bash (chmod + cat/echo/sed).
 
 ### Layer 3: CI/CD Protection - **PRIMARY ENFORCEMENT**
@@ -273,7 +273,7 @@ blocked
 - File permissions and the AI hook are advisory layers; anything with shell access can bypass them. Git restores tracked files as writable in a fresh checkout.
 - The nested workflow and CODEOWNERS files are inactive templates until copied or merged into repository-root `.github/` paths. Their checks must be required and their trust-root configuration protected.
 - `.github/CODEOWNERS` names placeholder teams (`@tech-leads`, `@qa-leads`) that adopters must replace, and branch protection must require code-owner review for the gate to bind.
-- `.ai/hooks/protect-golden.sh` assumes a pre-tool-use hook interface that supplies `TOOL_NAME` and `TOOL_INPUT_FILE_PATH`; wiring differs across AI coding assistants.
+- `.ai/hooks/protect-golden.sh` assumes a pre-tool-use hook interface that supplies `TOOL_NAME` and `TOOL_INPUT_FILE_PATH`; wiring differs across coding-agent platforms.
 - The example covers one module and one golden test; suite-scale concerns such as batch promotion and flake quarantine are out of scope.
 
 ## Promotion Path

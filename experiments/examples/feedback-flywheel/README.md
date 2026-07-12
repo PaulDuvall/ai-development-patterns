@@ -99,7 +99,7 @@ For each proposed rule:
 
 ```
 
-In a later session, exercise the rule by asking your own configured AI assistant to generate a
+In a later session, exercise the rule by asking your own configured coding agent to generate a
 database migration that adds a `status` column to `orders`. Inspect and validate the generated
 migration; this example assumes no particular result.
 

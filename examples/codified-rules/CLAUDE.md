@@ -291,7 +291,7 @@ pre-commit run --all-files
 
 ---
 
-## AI Assistant Instructions
+## Coding Agent Instructions
 
 When reviewing or implementing code:
 

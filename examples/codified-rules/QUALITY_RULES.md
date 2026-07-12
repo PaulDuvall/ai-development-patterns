@@ -520,7 +520,7 @@ grep -r "class.*AI" . --include="*.py" | xargs grep -L "Protocol\|Contract\|ABC"
 
 ---
 
-## FOR CLAUDE CODE / AI ASSISTANTS
+## FOR CLAUDE CODE / CODING AGENTS
 
 When reviewing code changes:
 
