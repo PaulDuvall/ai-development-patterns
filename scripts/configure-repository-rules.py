@@ -317,15 +317,17 @@ def apply_secret_protection(repo):
 
 def apply_codeql_default_setup(repo):
     """Configure CodeQL default setup and verify GitHub retained core settings."""
-    result = gh_json(
+    endpoint = f"repos/{repo}/code-scanning/default-setup"
+    gh_json(
         "api",
         "--method",
         "PATCH",
-        f"repos/{repo}/code-scanning/default-setup",
+        endpoint,
         "--input",
         "-",
         input_data=CODEQL_DEFAULT_SETUP_PAYLOAD,
     )
+    result = gh_json("api", endpoint)
     expected = {
         key: CODEQL_DEFAULT_SETUP_PAYLOAD[key]
         for key in ("state", "query_suite", "threat_model")

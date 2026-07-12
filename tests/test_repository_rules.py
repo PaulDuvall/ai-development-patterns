@@ -405,10 +405,10 @@ def test_security_configuration_fails_when_github_does_not_retain_core(
 def test_codeql_default_setup_uses_extended_relevant_language_suite(
         monkeypatch):
     calls = []
-    monkeypatch.setattr(
-        MODULE, "gh_json",
-        lambda *args, input_data=None: (
-            calls.append((args, input_data)) or {
+    def fake_gh_json(*args, input_data=None):
+        calls.append((args, input_data))
+        if input_data is None:
+            return {
                 "state": "configured",
                 "query_suite": "extended",
                 "threat_model": "remote",
@@ -416,7 +416,9 @@ def test_codeql_default_setup_uses_extended_relevant_language_suite(
                     "actions", "javascript", "javascript-typescript",
                     "python", "typescript"],
             }
-        ))
+        return None
+
+    monkeypatch.setattr(MODULE, "gh_json", fake_gh_json)
 
     MODULE.apply_codeql_default_setup("owner/repo")
 
@@ -433,7 +435,8 @@ def test_codeql_default_setup_uses_extended_relevant_language_suite(
                 "threat_model": "remote",
                 "languages": ["actions", "javascript-typescript", "python"],
             },
-        )
+        ),
+        (("api", "repos/owner/repo/code-scanning/default-setup"), None),
     ]
 
 
