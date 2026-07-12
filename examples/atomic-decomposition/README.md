@@ -110,7 +110,7 @@ python task-monitor.py \
 ## Integration
 
 This system integrates with:
-- **AI Agent Platforms**: Works with multiple AI coding assistants
+- **Coding-Agent Platforms**: Works with multiple coding agents
 - **Container Orchestration**: Docker/Kubernetes for agent isolation
 - **Git Workflows**: Branch-per-task with automated merging
 - **CI/CD Pipelines**: Automated testing and integration

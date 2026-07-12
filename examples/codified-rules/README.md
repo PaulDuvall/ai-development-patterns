@@ -66,7 +66,7 @@ of policy decisions.
 
 ### 4. Reference in AI Interactions
 
-When working with AI coding assistants:
+When working with coding agents:
 
 ```text
 Please implement this feature following @DEVELOPMENT_RULES.md.
@@ -262,7 +262,7 @@ same checked-in commands; it must not silently weaken their failures.
 
 ## Benefits
 
-### For AI Assistants
+### For Coding Agents
 - Clear, unambiguous rules to follow
 - Consistent code generation
 - Explicit criteria for reviewing suggestions

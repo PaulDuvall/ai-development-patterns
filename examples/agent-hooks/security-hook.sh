@@ -1,6 +1,6 @@
 #!/bin/bash
 # security-hook.sh
-# Simple security automation for AI coding assistants
+# Simple security automation for coding agents
 #
 # Usage: Attach to PreToolUse and PostToolUse events
 # Exit codes: 0=allow, 2=block, 1=warn
