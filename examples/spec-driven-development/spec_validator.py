@@ -13,10 +13,13 @@ Usage:
 """
 
 import argparse
+import ast
+from collections import Counter
+import os
 import re
+import subprocess
 import sys
 from pathlib import Path
-import ast
 
 
 class SpecificationValidator:
@@ -26,6 +29,40 @@ class SpecificationValidator:
         self.spec_file = Path(spec_file)
         self.test_dir = Path(test_dir)
         self.authority_levels = {"system": 3, "platform": 2, "feature": 1}
+
+    @staticmethod
+    def _identifier_uniqueness_errors(content: str) -> list[str]:
+        """Return duplicate declaration errors across the entire spec."""
+        normative_requirement_ids = []
+        for line in content.splitlines():
+            if re.search(r'\b(?:MUST|SHOULD|MAY)\b', line):
+                normative_requirement_ids.extend(
+                    re.findall(r'\bREQ-\d{3}\b', line))
+        heading_anchors = re.findall(
+            r'^#{1,6}\s+.+?\s+\{#([^}\s]+)(?:\s+[^}]*)?\}\s*$',
+            content,
+            re.MULTILINE,
+        )
+        footnote_definitions = re.findall(
+            r'^\[\^([^\]]+)\]:', content, re.MULTILINE)
+
+        errors = []
+        for requirement_id, count in sorted(
+            Counter(normative_requirement_ids).items()):
+            if count > 1:
+                errors.append(
+                    f"Duplicate requirement ID: {requirement_id} "
+                    f"({count} declarations)")
+        for anchor, count in sorted(Counter(heading_anchors).items()):
+            if count > 1:
+                errors.append(
+                    f"Duplicate section anchor: {anchor} ({count} definitions)")
+        for footnote, count in sorted(Counter(footnote_definitions).items()):
+            if count > 1:
+                errors.append(
+                    f"Duplicate footnote definition: [^{footnote}] "
+                    f"({count} definitions)")
+        return errors
         
     def extract_specifications(self) -> dict[str, dict]:
         """Extract specifications with authority levels and test references"""
@@ -34,6 +71,12 @@ class SpecificationValidator:
             return {}
             
         content = self.spec_file.read_text(encoding="utf-8")
+        uniqueness_errors = self._identifier_uniqueness_errors(content)
+        if uniqueness_errors:
+            print("❌ Ambiguous specification identifiers:")
+            for error in uniqueness_errors:
+                print(f"  {error}")
+            return {}
         specifications = {}
 
         section_pattern = re.compile(
@@ -58,20 +101,32 @@ class SpecificationValidator:
             section_body = content[match.end():section_end]
             requirements = []
             unlinked_requirements = []
-            cited_reference_ids = []
+            test_references = []
 
             for line in section_body.splitlines():
                 if not re.search(r'\b(?:MUST|SHOULD|MAY)\b', line):
                     continue
                 requirement = re.sub(r'\s*\[\^[^\]]+\]', '', line)
                 requirement = requirement.strip().lstrip('-').strip()
-                requirements.append(requirement)
                 line_references = re.findall(r'\[\^([^\]]+)\]', line)
-                if not line_references:
+                requirement_match = re.search(r'\bREQ-\d{3}\b', requirement)
+                requirement_id = (
+                    requirement_match.group(0) if requirement_match else None
+                )
+                requirement_data = {
+                    "id": requirement_id,
+                    "text": requirement,
+                    "reference_ids": line_references,
+                }
+                requirements.append(requirement_data)
+                if requirement_id is None or not line_references:
                     unlinked_requirements.append(requirement)
                 for reference_id in line_references:
-                    if reference_id not in cited_reference_ids:
-                        cited_reference_ids.append(reference_id)
+                    test_references.append({
+                        "requirement_id": requirement_id,
+                        "id": reference_id,
+                        "path": test_definitions.get(reference_id),
+                    })
 
             # Anchored explanatory sections are useful documentation but are
             # not coverage units. Only normative sections enter the report.
@@ -82,30 +137,20 @@ class SpecificationValidator:
                 "title": title,
                 "authority": authority,
                 "authority_level": self.authority_levels.get(authority, 1),
-                "test_references": [
-                    {"id": reference_id,
-                     "path": test_definitions.get(reference_id)}
-                    for reference_id in cited_reference_ids
-                ],
+                "test_references": test_references,
                 "requirements": requirements,
                 "unlinked_requirements": unlinked_requirements,
             }
 
         return specifications
     
-    def find_test_files(self) -> set[str]:
-        """Find all test files in the test directory"""
-        test_files = set()
-        if self.test_dir.exists():
-            for test_file in self.test_dir.rglob("*.py"):
-                if test_file.name.startswith("test_"):
-                    test_files.add(str(test_file))
-        return test_files
-
     @staticmethod
-    def _node_exists(nodes: list[ast.AST], node_path: list[str]) -> bool:
-        """Return whether an AST contains a pytest ``Class::method`` path."""
+    def _find_node(
+        nodes: list[ast.AST], node_path: list[str]
+    ) -> ast.AST | None:
+        """Return the AST node identified by a pytest ``Class::method`` path."""
         current_nodes = nodes
+        matching_node = None
         for node_name in node_path:
             matching_node = next(
                 (
@@ -117,54 +162,178 @@ class SpecificationValidator:
                 None,
             )
             if matching_node is None:
-                return False
+                return None
             current_nodes = matching_node.body
+        return matching_node
+
+    @staticmethod
+    def _normalize_node_path(node_path: list[str]) -> tuple[str, ...]:
+        """Normalize parametrized pytest node suffixes for stable citations."""
+        if not node_path:
+            return ()
+        normalized = list(node_path)
+        normalized[-1] = normalized[-1].split("[", 1)[0]
+        return tuple(normalized)
+
+    def _collect_pytest_nodes(
+        self,
+    ) -> tuple[set[tuple[Path, tuple[str, ...]]], str | None]:
+        """Collect executable pytest nodes under the configured test directory."""
+        test_root = self.test_dir.resolve()
+        if not test_root.is_dir():
+            return set(), f"Test directory not found: {self.test_dir}"
+
+        spec_root = self.spec_file.resolve().parent
+        environment = os.environ.copy()
+        environment["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "pytest",
+                "--collect-only",
+                "-q",
+                "-o",
+                "addopts=",
+                "--rootdir",
+                str(spec_root),
+                str(test_root),
+            ],
+            cwd=spec_root,
+            capture_output=True,
+            text=True,
+            env=environment,
+            check=False,
+        )
+        if result.returncode != 0:
+            details = (result.stderr or result.stdout).strip().splitlines()
+            summary = details[-1] if details else "unknown collection error"
+            return set(), f"Pytest collection failed: {summary}"
+
+        collected = set()
+        for raw_line in result.stdout.splitlines():
+            line = raw_line.strip()
+            if "::" not in line:
+                continue
+            file_name, *node_path = line.split("::")
+            if not file_name.endswith(".py"):
+                continue
+            file_path = Path(file_name)
+            if not file_path.is_absolute():
+                file_path = spec_root / file_path
+            collected.add((
+                file_path.resolve(),
+                self._normalize_node_path(node_path),
+            ))
+        return collected, None
+
+    @staticmethod
+    def _is_within(path: Path, directory: Path) -> bool:
+        """Return whether ``path`` is contained by ``directory``."""
+        try:
+            path.relative_to(directory)
+        except ValueError:
+            return False
         return True
-    
-    def validate_test_references(self, specifications: dict[str, dict]) -> dict[str, list[str]]:
-        """Validate that referenced test files and functions exist"""
+
+    def validate_test_references(
+        self, specifications: dict[str, dict]
+    ) -> dict[str, dict]:
+        """Validate collected pytest nodes and per-requirement bindings."""
         validation_results = {}
+        collected_nodes, collection_error = self._collect_pytest_nodes()
+        test_root = self.test_dir.resolve()
 
         for spec_id, spec_data in specifications.items():
-            missing_tests = [
-                f"Requirement has no test reference: {requirement}"
-                for requirement in spec_data["unlinked_requirements"]
-            ]
+            result = {
+                "validated_references": 0,
+                "reference_errors": [],
+                "unlinked_requirements": list(
+                    spec_data["unlinked_requirements"]),
+                "collection_error": collection_error,
+            }
+
+            if collection_error:
+                validation_results[spec_id] = result
+                continue
 
             for test_ref in spec_data["test_references"]:
                 test_path = test_ref["path"]
+                requirement_id = test_ref["requirement_id"]
 
                 if not test_path:
-                    missing_tests.append(
+                    result["reference_errors"].append(
                         f"Undefined test reference: [^{test_ref['id']}]")
+                    continue
+
+                if requirement_id is None:
+                    result["reference_errors"].append(
+                        f"Test reference [^{test_ref['id']}] cannot bind to "
+                        "a requirement without a REQ-NNN identifier")
                     continue
 
                 path_parts = test_path.split("::")
                 file_path = path_parts[0]
                 node_path = path_parts[1:]
+                if not node_path:
+                    result["reference_errors"].append(
+                        f"Test reference must name a pytest node: {test_path}")
+                    continue
                 full_path = Path(file_path)
                 if not full_path.is_absolute():
                     full_path = self.spec_file.resolve().parent / full_path
+                full_path = full_path.resolve()
 
-                # Check if file exists
-                if not full_path.is_file():
-                    missing_tests.append(f"Missing test file: {file_path}")
+                if not self._is_within(full_path, test_root):
+                    result["reference_errors"].append(
+                        f"Test reference is outside test directory: {test_path}")
                     continue
 
-                if node_path:
-                    try:
-                        tree = ast.parse(full_path.read_text(encoding="utf-8"))
-                        if not self._node_exists(tree.body, node_path):
-                            missing_tests.append(
-                                f"Missing test node: {'::'.join(node_path)} "
-                                f"in {file_path}")
-                    except (OSError, SyntaxError) as error:
-                        missing_tests.append(
-                            f"Error reading {file_path}: {error}")
+                if not full_path.is_file():
+                    result["reference_errors"].append(
+                        f"Missing test file: {file_path}")
+                    continue
 
-            validation_results[spec_id] = missing_tests
+                normalized_node = self._normalize_node_path(node_path)
+                if (full_path, normalized_node) not in collected_nodes:
+                    result["reference_errors"].append(
+                        f"Uncollected pytest node: {test_path}")
+                    continue
+
+                try:
+                    tree = ast.parse(full_path.read_text(encoding="utf-8"))
+                    node = self._find_node(tree.body, list(normalized_node))
+                except (OSError, SyntaxError) as error:
+                    result["reference_errors"].append(
+                        f"Error reading {file_path}: {error}")
+                    continue
+
+                docstring = ast.get_docstring(node, clean=False) if node else None
+                documented_requirements = set(re.findall(
+                    r"\bREQ-\d{3}\b", docstring or ""))
+                if requirement_id not in documented_requirements:
+                    result["reference_errors"].append(
+                        f"Pytest node {test_path} does not declare "
+                        f"{requirement_id} in its docstring")
+                    continue
+
+                result["validated_references"] += 1
+
+            validation_results[spec_id] = result
 
         return validation_results
+
+    @staticmethod
+    def validation_errors(result: dict) -> list[str]:
+        """Return human-readable errors without conflating accounting units."""
+        errors = [
+            f"Requirement has no test reference: {requirement}"
+            for requirement in result["unlinked_requirements"]
+        ]
+        if result["collection_error"]:
+            errors.append(result["collection_error"])
+        errors.extend(result["reference_errors"])
+        return errors
     
     def check_authority_conflicts(self, specifications: dict[str, dict]) -> list[str]:
         """Check for potential authority conflicts"""
@@ -208,34 +377,56 @@ class SpecificationValidator:
         return conflicts
     
     def generate_coverage_report(self, specifications: dict[str, dict],
-                               validation_results: dict[str, list[str]]) -> str:
-        """Generate specification coverage report"""
+                               validation_results: dict[str, dict]) -> str:
+        """Generate a report with distinct link and requirement accounting."""
         total_specs = len(specifications)
         total_tests = sum(len(spec["test_references"]) for spec in specifications.values())
-        missing_tests = sum(len(missing) for missing in validation_results.values())
-        coverage_percentage = ((total_tests - missing_tests) / max(total_tests, 1)) * 100
+        validated_tests = sum(
+            result["validated_references"]
+            for result in validation_results.values())
+        invalid_tests = max(total_tests - validated_tests, 0)
+        unlinked_requirements = sum(
+            len(result["unlinked_requirements"])
+            for result in validation_results.values())
+        collection_failures = len({
+            result["collection_error"]
+            for result in validation_results.values()
+            if result["collection_error"]
+        })
+        coverage_percentage = (
+            (validated_tests / total_tests) * 100 if total_tests else 0)
         
         report = [
             "Specification Coverage Report",
             "=" * 35,
             f"Total specifications: {total_specs}",
             f"Total test references: {total_tests}",
-            f"Missing tests: {missing_tests}",
+            f"Validated test references: {validated_tests}",
+            f"Invalid test references: {invalid_tests}",
+            f"Unlinked requirements: {unlinked_requirements}",
+            f"Collection failures: {collection_failures}",
             f"Coverage: {coverage_percentage:.1f}%",
             "",
         ]
         
         for spec_id, spec_data in specifications.items():
             test_count = len(spec_data["test_references"])
-            missing_count = len(validation_results.get(spec_id, []))
-            spec_coverage = ((test_count - missing_count) / max(test_count, 1)) * 100 if test_count > 0 else 0
+            result = validation_results[spec_id]
+            linked_count = result["validated_references"]
+            spec_coverage = (
+                (linked_count / test_count) * 100 if test_count > 0 else 0
+            )
+            errors = self.validation_errors(result)
+            status = (
+                "✅" if not errors and linked_count == test_count and test_count
+                else "⚠️" if test_count else "❌")
+            report.append(
+                f"{status} {spec_id}: {spec_coverage:.0f}% "
+                f"({linked_count}/{test_count} references validated; "
+                f"{len(result['unlinked_requirements'])} unlinked requirements)")
             
-            status = "✅" if missing_count == 0 and test_count > 0 else "⚠️" if test_count > 0 else "❌"
-            report.append(f"{status} {spec_id}: {spec_coverage:.0f}% ({test_count - missing_count}/{test_count} tests linked)")
-            
-            # Show missing tests
-            for missing in validation_results.get(spec_id, []):
-                report.append(f"    ❌ {missing}")
+            for error in errors:
+                report.append(f"    ❌ {error}")
         
         return "\n".join(report)
     
@@ -274,6 +465,8 @@ class SpecificationValidator:
         for auth in filter(None, heading_authorities):
             if auth not in self.authority_levels:
                 errors.append(f"Invalid authority level: {auth}")
+
+        errors.extend(self._identifier_uniqueness_errors(content))
         
         return errors
     
@@ -307,8 +500,13 @@ class SpecificationValidator:
             print(report)
             
             # Set exit code based on coverage
-            missing_tests = sum(len(missing) for missing in validation_results.values())
-            if missing_tests > 0:
+            has_errors = any(
+                self.validation_errors(result)
+                or result["validated_references"]
+                != len(specifications[spec_id]["test_references"])
+                for spec_id, result in validation_results.items()
+            )
+            if has_errors:
                 exit_code = 1
         
         if check_conflicts:

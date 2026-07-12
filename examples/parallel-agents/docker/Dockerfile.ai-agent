@@ -7,8 +7,8 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js for JavaScript/TypeScript support
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+# Install the supported Node.js LTS line for JavaScript/TypeScript examples
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get install -y nodejs
 
 # Create working directory
@@ -16,7 +16,7 @@ WORKDIR /workspace
 
 # Install Python dependencies
 COPY docker/requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
+RUN pip install --no-cache-dir --requirement /tmp/requirements.txt
 
 # Copy scripts
 COPY scripts/ /scripts/

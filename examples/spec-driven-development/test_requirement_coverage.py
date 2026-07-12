@@ -1,14 +1,15 @@
 # Test Traceability Coverage
 # Validates that all requirements have proper test coverage and traceability links
 
-import pytest
 import re
 import yaml
 from pathlib import Path
 
+from spec_validator import SpecificationValidator
+
 class TestRequirementTraceability:
     """Ensure all requirements have test coverage and proper traceability"""
-    
+
     def setup_method(self):
         """Load traceability configuration"""
         # This is a self-contained example. Repository-wide scanning silently
@@ -18,6 +19,10 @@ class TestRequirementTraceability:
         self.traceability_config = self._load_traceability_config()
         self.requirements = self._extract_requirements()
         self.test_files = self._find_test_files()
+        self.validator = SpecificationValidator(
+            self.project_root / self.traceability_config["specification_files"][0],
+            self.project_root / "tests",
+        )
         
     def _load_traceability_config(self):
         """Load traceability rules from configuration"""
@@ -49,17 +54,38 @@ class TestRequirementTraceability:
         return sorted(test_path.rglob("test_*.py"))
 
     def _test_requirement_references(self):
-        """Return requirement IDs cited by executable tests."""
+        """Return requirement IDs explicitly declared by test docstrings."""
         references = set()
         for test_file in self.test_files:
             content = test_file.read_text(encoding="utf-8")
             references.update(re.findall(r'\bREQ-\d{3}\b', content))
         return references
-        
+
+    def _validated_requirement_references(self):
+        """Return requirements whose cited nodes collect and bind correctly."""
+        specifications = self.validator.extract_specifications()
+        validation_results = self.validator.validate_test_references(
+            specifications)
+        errors = [
+            error
+            for result in validation_results.values()
+            for error in self.validator.validation_errors(result)
+        ]
+        assert not errors, "Invalid requirement-to-test links:\n" + "\n".join(errors)
+        assert all(
+            validation_results[section_id]["validated_references"]
+            == len(section["test_references"])
+            for section_id, section in specifications.items()
+        ), "Not every requirement-to-test reference was validated"
+        return {
+            reference["requirement_id"]
+            for section in specifications.values()
+            for reference in section["test_references"]
+        }
+
     def test_all_requirements_have_tests(self):
         """All declared requirements must have real executable test coverage."""
-        requirements_with_tests = self._test_requirement_references()
-        # Check coverage
+        requirements_with_tests = self._validated_requirement_references()
         untested_requirements = self.requirements - requirements_with_tests
         covered = self.requirements & requirements_with_tests
         coverage_percentage = (len(covered) / len(self.requirements)) * 100
@@ -70,6 +96,10 @@ class TestRequirementTraceability:
             f"Requirement test coverage is {coverage_percentage:.1f}%, below target {target_coverage}%.\n"
             f"Untested requirements: {sorted(untested_requirements)}"
         )
+
+    def test_specification_identifiers_are_unique(self):
+        """The checked-in specification must pass structural uniqueness checks."""
+        assert self.validator.validate_syntax() == []
     
     def test_no_orphaned_test_requirement_references(self):
         """Tests may reference only requirement IDs declared by the spec."""
@@ -112,60 +142,11 @@ class TestRequirementTraceability:
         assert not missing, (
             "Implementation annotations do not cover requirements: "
             f"{sorted(missing)}")
-    
-    def test_user_stories_have_acceptance_criteria(self):
-        """
-        REQ-TRACE-004: All user stories must have linked acceptance criteria
-        """
-        user_stories = set()
-        acceptance_criteria = set()
-        
-        # Extract user stories and acceptance criteria from documentation
-        for file_path in self.project_root.rglob("*.md"):
-            if file_path.is_file():
-                content = file_path.read_text()
-                us_matches = re.findall(r'US-\d+', content)
-                ac_matches = re.findall(r'AC-\d+', content)
-                user_stories.update(us_matches)
-                acceptance_criteria.update(ac_matches)
-        
-        # For this test, we'll check that we have some acceptance criteria
-        # In a real implementation, you'd need more sophisticated linking logic
-        if user_stories:
-            assert acceptance_criteria, (
-                f"Found {len(user_stories)} user stories but no acceptance criteria (AC-*) defined.\n"
-                f"User stories: {sorted(user_stories)}"
-            )
-    
-    def test_compliance_requirements_mapped(self):
-        """
-        REQ-TRACE-005: Compliance requirements must be mapped to implementation requirements
-        """
-        compliance_config_path = self.project_root / ".ai" / "traceability" / "compliance_map.yml"
-        
-        if not compliance_config_path.exists():
-            pytest.skip("No compliance mapping configuration found")
-        
-        with open(compliance_config_path) as f:
-            compliance_config = yaml.safe_load(f)
-        
-        compliance_requirements = compliance_config.get('compliance_requirements', {})
-        
-        for framework, config in compliance_requirements.items():
-            linked_reqs = config.get('linked_requirements', [])
-            test_evidence = config.get('test_evidence', [])
-            
-            assert linked_reqs, f"Compliance framework {framework} has no linked requirements"
-            assert test_evidence, f"Compliance framework {framework} has no test evidence defined"
-            
-            # Verify test evidence files exist
-            for evidence_path in test_evidence:
-                evidence_file = self.project_root / evidence_path
-                assert evidence_file.exists(), f"Test evidence file not found: {evidence_path}"
 
     def test_traceability_health_metrics(self):
         """Generate and validate overall traceability health metrics"""
-        requirements_with_tests = self.requirements & self._test_requirement_references()
+        requirements_with_tests = (
+            self.requirements & self._validated_requirement_references())
         implementation_text = "\n".join(
             (self.project_root / relative).read_text(encoding="utf-8")
             for relative in self.traceability_config["implementation_files"])

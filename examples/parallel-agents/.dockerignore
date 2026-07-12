@@ -3,4 +3,5 @@
 !docker/Dockerfile.ai-agent
 !docker/requirements.txt
 !scripts/
-!scripts/*.py
+!scripts/agent_runner.py
+!scripts/coordinator.py

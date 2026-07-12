@@ -1,619 +1,206 @@
-# Parallel Agents - Example Implementation
+# Parallel Agents - Deterministic Local Simulator
 
-This directory contains a complete, practical implementation of the Parallel Agents pattern. The example demonstrates how to run multiple AI agents concurrently to build a Task Management SaaS application.
+This directory is a runnable, provider-free simulation of the
+**[Parallel Agents](../../README.md#parallel-agents)** pattern. Four isolated workers create
+stable example artifacts while a coordinator summarizes their progress.
 
-## 🎯 Overview
+The simulator makes **zero model calls and zero provider API calls**. It does not need an OpenAI,
+Anthropic, GitHub Models, or other API key, so running it cannot incur model-token charges. It is a
+local orchestration example, not an AI research or pattern-adoption evaluation.
 
-This example shows how to:
-- Run 4 AI agents in parallel working on different parts of a codebase
-- Use container isolation to prevent conflicts
-- Implement shared memory for agent collaboration
-- Automatically merge parallel work streams
-- Handle conflicts intelligently
+## What it demonstrates
 
-## 📁 Directory Structure
+- Four task-specific workers following an explicit dependency graph
+- Separate writable workspaces for each worker
+- A shared, lock-protected JSON coordination file
+- A provider-free coordinator with a stable machine-readable report
+- Completion-gated handoffs between dependent fixture generators
+- An internal Docker network with no external egress
+- Reviewable integration of remote `agent/*` branches
 
-```
+The generated artifacts are deterministic fixtures. Replace the worker implementation only in a
+separate integration that has its own credential, budget, review, and network controls.
+
+## Maintained files
+
+```text
 parallel-agents/
-├── config/
-│   └── tasks.yaml           # Task definitions for agents
+├── config/tasks.yaml
 ├── docker/
-│   └── Dockerfile.ai-agent  # AI agent container image
+│   ├── Dockerfile.ai-agent
+│   └── requirements.txt
 ├── scripts/
-│   ├── agent_runner.py      # Main agent execution script
-│   ├── coordinator.py       # Coordinator service
-│   ├── merge-parallel-work.sh # Automated merge script
-│   └── shared_memory.py     # Shared memory implementation
-├── shared-memory/           # Shared knowledge between agents
-├── workspace/               # Agent working directories
-│   ├── frontend/           # Frontend agent workspace
-│   ├── backend/            # Backend agent workspace
-│   ├── database/           # Database agent workspace
-│   └── tests/              # Testing agent workspace
-├── reports/                # Progress and merge reports
+│   ├── agent_runner.py
+│   ├── coordinator.py
+│   └── merge-parallel-work.sh
+├── .dockerignore
+├── .env.example
 └── docker-compose.parallel-agents.yml
 ```
 
-## 🚀 Quick Start
+The Python entrypoints are committed source files. You do not need to copy code out of this README
+or generate scripts before building the image.
 
-### Prerequisites
+## Container quick start
 
-- Docker and Docker Compose
-- Git (for worktree examples)
-- Python 3.8+
-- API keys for your AI provider (Claude, OpenAI, etc.)
+Prerequisites:
 
-### 1. Initial Setup
+- Docker Engine
+- Docker Compose v2
 
-```bash
-# Clone the repository
-git clone <your-repo>
-cd examples/parallel-agents
-
-# Create necessary directories
-mkdir -p workspace/{frontend,backend,database,tests}
-mkdir -p shared-memory reports
-
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your AI API keys
-```
-
-### 2. Define the AI Agent Container
-
-First, create the Dockerfile for the AI agents:
+From this directory:
 
 ```bash
-# Create the Dockerfile
-cat > docker/Dockerfile.ai-agent <<'EOF'
-FROM python:3.14-slim
+mkdir -p workspace/{frontend,backend,database,tests} shared-memory reports
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Node.js for JavaScript/TypeScript support
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs
-
-# Create working directory
-WORKDIR /workspace
-
-# Install Python dependencies
-COPY docker/requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
-
-# Copy scripts
-COPY scripts/ /scripts/
-RUN chmod +x /scripts/*.py
-
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
-ENV NODE_ENV=development
-
-# Default command
-CMD ["python", "/scripts/agent_runner.py"]
-EOF
-
-# Create requirements.txt
-cat > docker/requirements.txt <<'EOF'
-anthropic>=0.18.0
-openai>=1.0.0
-pyyaml>=6.0
-python-dotenv>=1.0.0
-rich>=13.0.0
-click>=8.0.0
-watchdog>=3.0.0
-aiofiles>=23.0.0
-EOF
-```
-
-### 3. Create Agent Runner Script
-
-```bash
-cat > scripts/agent_runner.py <<'EOF'
-#!/usr/bin/env python3
-"""
-AI Agent Runner - Executes tasks from task configuration
-"""
-import os
-import sys
-import yaml
-import json
-import asyncio
-from pathlib import Path
-from datetime import datetime
-from typing import Any
-import click
-from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn
-
-# Import your AI library (anthropic, openai, etc.)
-# This is a mock implementation - replace with actual AI calls
-
-console = Console()
-
-class AIAgent:
-    def __init__(self, agent_id: str, task_id: str):
-        self.agent_id = agent_id
-        self.task_id = task_id
-        self.workspace = Path("/workspace")
-        self.shared_memory_path = Path(os.environ.get("SHARED_MEMORY_PATH", "/shared/agent_memory.json"))
-        
-    async def load_task(self, task_file: str) -> dict:
-        """Load task configuration"""
-        with open(task_file, 'r') as f:
-            config = yaml.safe_load(f)
-        
-        # Find our specific task
-        for task in config['tasks']:
-            if task['id'] == self.task_id:
-                return task
-        
-        raise ValueError(f"Task {self.task_id} not found")
-    
-    async def execute_task(self, task: dict):
-        """Execute the assigned task"""
-        console.print(f"[bold blue]Agent {self.agent_id} starting task: {task['id']}[/bold blue]")
-        
-        # Record start in shared memory
-        await self.update_shared_memory("status", "started")
-        
-        # This is where you would integrate with your AI provider
-        # For demo purposes, we'll create some mock files
-        
-        instructions = task['instructions']
-        console.print(f"[yellow]Instructions:[/yellow]\n{instructions[:200]}...")
-        
-        # Simulate work based on task type
-        if self.task_id == "frontend-components":
-            await self.create_frontend_components()
-        elif self.task_id == "backend-api":
-            await self.create_backend_api()
-        elif self.task_id == "database-schema":
-            await self.create_database_schema()
-        elif self.task_id == "test-suite":
-            await self.create_test_suite()
-        
-        # Record completion
-        await self.update_shared_memory("status", "completed")
-        console.print(f"[bold green]Agent {self.agent_id} completed task: {task['id']}[/bold green]")
-    
-    async def create_frontend_components(self):
-        """Mock implementation for frontend components"""
-        components = [
-            ("TaskList.tsx", "React component for task list with Kanban board"),
-            ("TaskDetail.tsx", "React component for task details"),
-            ("TeamView.tsx", "React component for team management")
-        ]
-        
-        for filename, description in components:
-            filepath = self.workspace / "components" / filename
-            filepath.parent.mkdir(parents=True, exist_ok=True)
-            
-            # In real implementation, this would be AI-generated code
-            content = f"""// {description}
-// Generated by Agent: {self.agent_id}
-
-import React from 'react';
-
-export const {filename.replace('.tsx', '')} = () => {{
-    return <div>AI-generated component</div>;
-}};
-"""
-            filepath.write_text(content)
-            
-            # Record discovery
-            await self.update_shared_memory(
-                f"component_{filename}", 
-                {"path": str(filepath), "description": description}
-            )
-    
-    async def create_backend_api(self):
-        """Mock implementation for backend API"""
-        # Similar implementation for backend
-        pass
-    
-    async def create_database_schema(self):
-        """Mock implementation for database schema"""
-        schema_file = self.workspace / "schema.prisma"
-        schema_file.parent.mkdir(parents=True, exist_ok=True)
-        
-        schema_content = """// Generated by Agent: database
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  tasks     Task[]
-  createdAt DateTime @default(now())
-}
-
-model Task {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  status      Status   @default(TODO)
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
-}
-
-enum Status {
-  TODO
-  IN_PROGRESS
-  DONE
-}
-"""
-        schema_file.write_text(schema_content)
-        
-        # Share schema info with other agents
-        await self.update_shared_memory("database_schema", {
-            "path": str(schema_file),
-            "tables": ["User", "Task"],
-            "ready": True
-        })
-    
-    async def create_test_suite(self):
-        """Mock implementation for test suite"""
-        # Wait for other agents to share their work
-        await asyncio.sleep(2)
-        
-        # Read shared memory to understand what to test
-        shared_data = await self.read_shared_memory()
-        console.print(f"[cyan]Test agent found {len(shared_data.get('discoveries', {}))} items to test[/cyan]")
-    
-    async def update_shared_memory(self, key: str, value: Any):
-        """Update shared memory with discoveries"""
-        # This would use the shared_memory.py module in production
-        console.print(f"[dim]Agent {self.agent_id} sharing: {key}[/dim]")
-    
-    async def read_shared_memory(self) -> dict:
-        """Read current shared memory state"""
-        if self.shared_memory_path.exists():
-            with open(self.shared_memory_path, 'r') as f:
-                return json.load(f)
-        return {}
-
-@click.command()
-@click.option('--task-file', required=True, help='Path to tasks.yaml')
-@click.option('--task-id', required=True, help='Task ID to execute')
-def main(task_file: str, task_id: str):
-    """Run an AI agent for a specific task"""
-    agent_id = os.environ.get('AGENT_ID', 'unknown')
-    agent = AIAgent(agent_id, task_id)
-    
-    # Run the task
-    async def run():
-        task = await agent.load_task(task_file)
-        await agent.execute_task(task)
-    asyncio.run(run())
-
-if __name__ == "__main__":
-    main()
-EOF
-
-chmod +x scripts/agent_runner.py
-```
-
-### 4. Create Coordinator Script
-
-```bash
-cat > scripts/coordinator.py <<'EOF'
-#!/usr/bin/env python3
-"""
-Coordinator service to monitor agent progress
-"""
-import os
-import json
-import time
-from pathlib import Path
-from datetime import datetime, timezone
-from rich.console import Console
-from rich.table import Table
-from rich.live import Live
-import click
-
-console = Console()
-
-class Coordinator:
-    def __init__(self, watch_dir: str, report_dir: str):
-        self.watch_dir = Path(watch_dir)
-        self.report_dir = Path(report_dir)
-        self.report_dir.mkdir(parents=True, exist_ok=True)
-        
-    def get_agent_status(self) -> dict:
-        """Check status of all agent workspaces"""
-        status = {}
-        
-        for workspace in self.watch_dir.iterdir():
-            if workspace.is_dir():
-                agent_name = workspace.name
-                file_count = sum(1 for _ in workspace.rglob("*") if _.is_file())
-                last_modified = max(
-                    (f.stat().st_mtime for f in workspace.rglob("*") if f.is_file()),
-                    default=0
-                )
-                
-                status[agent_name] = {
-                    "files": file_count,
-                    "last_activity": datetime.fromtimestamp(last_modified).strftime("%H:%M:%S") if last_modified else "No activity",
-                    "status": "Active" if time.time() - last_modified < 60 else "Idle"
-                }
-        
-        return status
-    
-    def create_status_table(self, status: dict) -> Table:
-        """Create a rich table showing agent status"""
-        table = Table(title="Parallel Agent Status")
-        table.add_column("Agent", style="cyan", no_wrap=True)
-        table.add_column("Files", style="magenta")
-        table.add_column("Last Activity", style="yellow")
-        table.add_column("Status", style="green")
-        
-        for agent, info in status.items():
-            table.add_row(
-                agent,
-                str(info["files"]),
-                info["last_activity"],
-                info["status"]
-            )
-        
-        return table
-    
-    def generate_report(self, status: dict):
-        """Generate a status report"""
-        report = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "agents": status,
-            "summary": {
-                "total_agents": len(status),
-                "active_agents": sum(1 for s in status.values() if s["status"] == "Active"),
-                "total_files": sum(s["files"] for s in status.values())
-            }
-        }
-        
-        report_file = self.report_dir / f"status_{int(time.time())}.json"
-        with open(report_file, 'w') as f:
-            json.dump(report, f, indent=2)
-    
-    def monitor(self):
-        """Monitor agent activity"""
-        console.print("[bold blue]Starting Coordinator Service[/bold blue]")
-        
-        with Live(console=console, refresh_per_second=1) as live:
-            while True:
-                status = self.get_agent_status()
-                table = self.create_status_table(status)
-                
-                # Add summary
-                total_files = sum(s["files"] for s in status.values())
-                table.caption = f"Total files generated: {total_files}"
-                
-                live.update(table)
-                
-                # Generate report every 30 seconds
-                if int(time.time()) % 30 == 0:
-                    self.generate_report(status)
-                
-                time.sleep(1)
-
-@click.command()
-@click.option('--watch-dir', required=True, help='Directory to watch')
-@click.option('--report-dir', required=True, help='Directory for reports')
-def main(watch_dir: str, report_dir: str):
-    """Run the coordinator service"""
-    coordinator = Coordinator(watch_dir, report_dir)
-    try:
-        coordinator.monitor()
-    except KeyboardInterrupt:
-        console.print("\n[yellow]Coordinator shutting down...[/yellow]")
-
-if __name__ == "__main__":
-    main()
-EOF
-
-chmod +x scripts/coordinator.py
-```
-
-### 5. Build the AI Agent Container
-
-Build only after creating both scripts so the image contains the runner and coordinator. The
-example directory—not `docker/`—is the build context because the Dockerfile copies both
-`docker/requirements.txt` and `scripts/`. The committed `.dockerignore` admits only those build
-inputs, so `.env`, workspaces, shared memory, and reports never enter the Docker context:
-
-```bash
-docker build --pull --tag ai-agent:latest \
-  --file docker/Dockerfile.ai-agent .
-```
-
-### 6. Run the Parallel Agents
-
-#### Using Docker Compose (Recommended)
-
-```bash
-# Start all agents
+docker compose -f docker-compose.parallel-agents.yml build --pull
 docker compose -f docker-compose.parallel-agents.yml up -d
-
-# Watch the logs
 docker compose -f docker-compose.parallel-agents.yml logs -f
+```
 
-# Check agent status
-docker compose -f docker-compose.parallel-agents.yml ps
+All five services use the same image,
+`ai-development-patterns/parallel-agent:local`. Compose therefore builds and reuses one image
+instead of producing one image per service. The image contains Python 3.14 and Node.js 24 LTS;
+Node is available for experimenting with the generated JavaScript fixture but is not used to call
+a provider.
 
-# Stop all agents
+Compose starts the database and frontend fixture generators independently. The backend generator
+waits for the database service to exit successfully, and the test-plan generator waits for both
+the frontend and backend services to exit successfully. A failed prerequisite therefore prevents
+its dependents from publishing misleading fixtures; service start order alone is not treated as
+success.
+
+Each one-shot worker exits after reporting `status: fixture_generated` and
+`execution: simulated`. Inspect the results after the worker containers exit:
+
+```bash
+docker compose -f docker-compose.parallel-agents.yml ps -a
+find workspace -type f -print | sort
+cat shared-memory/agent_memory.json
+cat reports/parallel-agent-status.json
+```
+
+The coordinator remains active so it can observe later changes. Stop and remove all containers
+when finished:
+
+```bash
 docker compose -f docker-compose.parallel-agents.yml down
 ```
 
-#### Using Git Worktrees
+### Equivalent explicit image build
+
+The Compose image name and this manual tag are deliberately identical:
 
 ```bash
-# Create worktrees for each agent
-git worktree add -b agent/frontend ../agent-frontend
-git worktree add -b agent/backend ../agent-backend
-git worktree add -b agent/database ../agent-database
-git worktree add -b agent/tests ../agent-tests
-
-# Run agents in parallel (requires GNU parallel)
-parallel --jobs 4 << 'EOF'
-cd ../agent-frontend && ai-agent --task frontend-components
-cd ../agent-backend && ai-agent --task backend-api  
-cd ../agent-database && ai-agent --task database-schema
-cd ../agent-tests && ai-agent --task test-suite
-EOF
+docker build --pull \
+  --tag ai-development-patterns/parallel-agent:local \
+  --file docker/Dockerfile.ai-agent .
+docker compose -f docker-compose.parallel-agents.yml up --no-build -d
 ```
 
-### 7. Merge Parallel Work
+The example directory is the build context because the Dockerfile copies
+`docker/requirements.txt` and `scripts/`. The allowlist-based `.dockerignore` excludes `.env`,
+workspaces, shared memory, reports, merge helpers, and every other unneeded path from that
+context. Only the two runtime entrypoints are admitted from `scripts/`.
 
-After agents complete their tasks:
+## Run directly with local Python
+
+Python 3.11 or later is sufficient for the simulator itself:
 
 ```bash
-# Run the merge script
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install --requirement docker/requirements.txt
+mkdir -p workspace/{frontend,backend,database,tests} shared-memory reports
+
+AGENT_ID=frontend python scripts/agent_runner.py \
+  --task-file config/tasks.yaml \
+  --task-id frontend-components \
+  --workspace workspace/frontend \
+  --shared-memory shared-memory/agent_memory.json
+
+python scripts/coordinator.py \
+  --watch-dir workspace \
+  --report-dir reports \
+  --shared-memory shared-memory/agent_memory.json \
+  --once
+```
+
+Run the other task IDs in dependency order with their corresponding workspaces:
+
+| Task ID | Depends on | Workspace | Exact fixture |
+| --- | --- | --- | --- |
+| `frontend-components` | Nothing | `workspace/frontend` | `components/TaskList.tsx` |
+| `database-schema` | Nothing | `workspace/database` | `schema.prisma` |
+| `backend-api` | `database-schema` | `workspace/backend` | `server.js` |
+| `test-suite` | `frontend-components`, `backend-api` | `workspace/tests` | `test-plan.md` |
+
+Given the same task ID, agent ID, and starting shared-memory document, the worker writes the same
+artifact bytes and sorted JSON result on every run.
+
+### Machine-checked fixture contracts
+
+`config/tasks.yaml` is deliberately narrow: it declares this as simulated execution with zero
+model/provider calls, lists each dependency edge, and binds every task to an artifact path, media
+type, outcome, and SHA-256 digest. `agent_runner.py` validates the complete catalog before writing
+anything. It rejects missing or extra task IDs, duplicate or cyclic dependencies, unsafe paths,
+unexpected status/execution labels, path drift, and content-digest drift. The configuration cannot
+silently promise work that the hard-coded simulator does not perform.
+
+Shared memory is likewise a versioned two-key document (`version` and `agents`). The runner and
+coordinator reject legacy discovery schemas and any result not labeled `fixture_generated` and
+`simulated` instead of translating it into an apparently successful run.
+
+## Configuration and cost boundary
+
+`.env.example` contains optional local orchestration settings only. It intentionally contains no
+provider name, model name, token, or credential placeholder. Docker Compose reads
+`COMPOSE_PROJECT_NAME` automatically. To use its remaining values with the merge helper, export
+them explicitly:
+
+```bash
+cp .env.example .env
+set -a
+. ./.env
+set +a
 ./scripts/merge-parallel-work.sh
-
-# Check merge reports
-ls -la reports/
-
-# View the summary
-cat reports/merge_summary_*.txt
 ```
 
-## 🔧 Configuration
+Do not add provider credentials to this example. The internal Compose network prevents external
+egress, and neither Python entrypoint imports a provider SDK or contains an inference path.
 
-### Environment Variables
+## Merge helper safety
 
-Create a `.env` file:
+`scripts/merge-parallel-work.sh` discovers remote `origin/agent/*` branches and integrates them
+sequentially into a local `main` branch. Before doing any network or branch operation, it requires
+a clean tracked and untracked worktree. Updating local `main` is fast-forward-only.
 
-```env
-# AI Provider Configuration
-ANTHROPIC_API_KEY=your_key_here
-OPENAI_API_KEY=your_key_here
-AGENT_MODEL=claude-3-sonnet
+For JSON conflicts, the helper performs a conservative three-way object merge using Git's base,
+ours, and theirs blobs. It stages a file only after the merged result parses as JSON. Conflicting
+changes to the same value, non-JSON conflicts, and unsupported file types are left for human
+review. Temporary branches and in-progress merges are cleaned up when a branch cannot be
+integrated.
 
-# Agent Configuration
-AGENT_BRANCH_PREFIX=agent/
-MAIN_BRANCH=main
-WORKSPACE_DIR=./workspace
-REPORTS_DIR=./reports
-SHARED_MEMORY=./shared-memory/agent_memory.json
-
-# Container Configuration
-COMPOSE_PROJECT_NAME=parallel-agents
-```
-
-### Task Configuration
-
-Edit `config/tasks.yaml` to define your own tasks:
-
-```yaml
-tasks:
-  - id: your-task-id
-    agent_count: 1
-    isolation: container  # or 'worktree'
-    dependencies: []      # List task IDs that must complete first
-    priority: high        # high, medium, low
-    estimated_hours: 4
-    instructions: |
-      Detailed instructions for the AI agent...
-    success_criteria:
-      - Specific success criteria
-      - That can be validated
-```
-
-## 📊 Monitoring and Reports
-
-### Real-time Monitoring
-
-The coordinator service provides real-time status updates:
+The script's functions can be sourced without starting a merge:
 
 ```bash
-# View coordinator dashboard
-docker compose -f docker-compose.parallel-agents.yml logs -f coordinator
+source scripts/merge-parallel-work.sh
+declare -F resolve_conflicts require_clean_worktree
 ```
 
-### Generated Reports
+Review the local commits and reports before pushing anything. The helper never pushes.
 
-- `reports/merge_*.json` - Individual merge reports
-- `reports/merge_summary_*.txt` - Summary of all merges
-- `reports/status_*.json` - Agent status snapshots
-- `shared-memory/agent_memory.json` - Shared discoveries and conflicts
+## Security properties
 
-## 🎯 Real-World Example: TaskFlow SaaS
+- No API keys or model credentials are accepted or mounted.
+- The image build context is an explicit allowlist.
+- The Compose network is `internal: true`.
+- Configuration is mounted read-only.
+- Test workers can read frontend/backend output but cannot modify it.
+- Dependent workers start only after prerequisite containers exit successfully.
+- Provider SDKs are not installed.
+- Generated work is never merged into a remote branch automatically.
 
-This example implements a complete task management SaaS with:
-
-1. **Frontend Agent**: Creates React components with TypeScript
-2. **Backend Agent**: Implements REST API with Node.js/Express
-3. **Database Agent**: Designs PostgreSQL schema with Prisma
-4. **Test Agent**: Generates comprehensive test suites
-
-The agents work in parallel, share discoveries through shared memory, and their work is automatically merged.
-
-## 🚨 Troubleshooting
-
-### Common Issues
-
-1. **Merge Conflicts**
-   ```bash
-   # Check conflict details
-   cat reports/merge_*.json | jq '.status == "conflict"'
-   
-   # Manually resolve
-   git checkout agent/frontend
-   git rebase main
-   # Fix conflicts
-   git push --force-with-lease
-   ```
-
-2. **Agent Failures**
-   ```bash
-   # Check agent logs
-   docker compose -f docker-compose.parallel-agents.yml logs agent-frontend
-   
-   # Restart specific agent
-   docker compose -f docker-compose.parallel-agents.yml restart agent-frontend
-   ```
-
-3. **Shared Memory Issues**
-   ```bash
-   # Check shared memory
-   cat shared-memory/agent_memory.json | jq .
-   
-   # Reset if corrupted
-   rm shared-memory/agent_memory.json
-   docker compose -f docker-compose.parallel-agents.yml restart
-   ```
-
-## 🔐 Security Considerations
-
-1. **API Key Management**: Never commit API keys. Use environment variables or secrets management.
-2. **Container Isolation**: Set `internal: true` in docker-compose for complete network isolation.
-3. **Code Review**: Always review AI-generated code before merging to production.
-
-## 📚 Additional Resources
-
-- [Pattern Documentation](../../README.md#parallel-agents)
-- [Shared Memory Module](scripts/shared_memory.py)
-- [Docker Compose Reference](https://docs.docker.com/compose/)
-- [Git Worktree Documentation](https://git-scm.com/docs/git-worktree)
-
-## 🤝 Contributing
-
-To improve this example:
-
-1. Add support for more AI providers
-2. Implement better conflict resolution strategies
-3. Add metrics and performance monitoring
-4. Create language-specific agent templates
-
----
-
-**Note**: This is a demonstration of the pattern. In production, you would integrate with actual AI APIs and implement proper error handling, retries, and monitoring.
+This example demonstrates mechanics, not autonomous production development. Production systems
+also need least-privilege identities, resource limits, artifact review, observability, and an
+explicit approval boundary before publishing generated changes.

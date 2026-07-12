@@ -1,0 +1,5 @@
+**
+!Dockerfile.ai-sandbox
+!requirements-sandbox.txt
+!healthcheck.py
+!init-workspace.sh

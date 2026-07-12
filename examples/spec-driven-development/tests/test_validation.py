@@ -6,6 +6,8 @@ Tests corresponding to input_validation section in iam_policy_spec.md
 Validates input parameter checking and ARN format validation.
 """
 
+import json
+
 import pytest
 from iam_policy_generator import IAMPolicyGenerator
 
@@ -133,62 +135,92 @@ class TestInputValidation:
         assert not valid
         assert "Unsupported AWS service" in error
     
-    def test_input_sanitization(self):
-        """REQ-005: Remove unsafe characters and bound input length."""
-        malicious_inputs = [
-            "s3-read'; DROP TABLE users; --",
-            "<script>alert('xss')</script>",
-            'policy-type">&lt;script&gt;',
-            "input with \"quotes\" and 'apostrophes'",
-            "very_long_" + "a" * 1000 + "_input"  # Very long input
-        ]
-        
-        for malicious_input in malicious_inputs:
-            sanitized = self.generator.sanitize_input(malicious_input)
-            
-            # Should not contain dangerous characters
-            assert "<" not in sanitized
-            assert ">" not in sanitized
-            assert '"' not in sanitized
-            assert "'" not in sanitized
-            assert ";" not in sanitized
-            
-            # Should be length-limited
-            assert len(sanitized) <= 500
-    
-    def test_arn_escaping(self):
-        """REQ-005: Escape ARN quotes and backslashes for JSON."""
-        test_arns = [
+    def test_unsafe_input_rejected_without_rewriting(self):
+        """REQ-005: Reject unsafe or overlong input instead of rewriting it."""
+        unsafe_resources = [
             'arn:aws:s3:::bucket-with-"quotes"/*',
-            'arn:aws:s3:::bucket\\with\\backslashes/*',
-            'arn:aws:s3:::normal-bucket/*'
+            "arn:aws:s3:::bucket;<script>",
+            "arn:aws:s3:::bucket\\with\\backslashes/*",
+            "arn:aws:s3:::" + "a" * 501,
         ]
-        
-        for arn in test_arns:
-            escaped = self.generator.escape_arn_for_json(arn)
-            
-            # Should escape backslashes and quotes
-            if '\\' in arn:
-                assert '\\\\' in escaped
-            if '"' in arn:
-                assert '\\"' in escaped
-            
-            # Should be valid when used in JSON
-            import json
-            test_json = json.dumps({"resource": escaped})
-            parsed = json.loads(test_json)
-            assert "resource" in parsed
+
+        for resource in unsafe_resources:
+            with pytest.raises(ValueError, match="Input validation failed"):
+                self.generator.generate_policy("s3-read", resource)
+
+    def test_json_serialization_preserves_accepted_resource(self):
+        """REQ-005: Preserve accepted resource identity through JSON output."""
+        resource = (
+            "arn:aws:lambda:us-east-1:123456789012:"
+            "function:example-function"
+        )
+        policy = self.generator.generate_policy("lambda-execute", resource)
+        output = json.loads(self.generator.format_output(
+            policy, include_validation=False))
+
+        assert output["Statement"][0]["Resource"] == resource
 
     def test_generated_policy_matches_template(self):
-        """REQ-006: Copy reviewed template fields into an IAM statement."""
+        """REQ-006: Copy a non-S3 template into an IAM statement."""
         policy = self.generator.generate_policy(
-            "s3-read", "arn:aws:s3:::example-bucket/*")
+            "ec2-admin",
+            "arn:aws:ec2:us-east-1:123456789012:instance/*",
+        )
 
         assert policy["Version"] == "2012-10-17"
         assert policy["Statement"] == [{
             "Effect": "Allow",
-            "Action": ["s3:GetObject", "s3:ListBucket"],
-            "Resource": "arn:aws:s3:::example-bucket/*",
+            "Action": ["ec2:*"],
+            "Resource": "arn:aws:ec2:us-east-1:123456789012:instance/*",
+        }]
+
+    def test_s3_actions_use_matching_resource_types(self):
+        """REQ-006: Pair S3 bucket and object actions with matching ARNs."""
+        policy = self.generator.generate_policy(
+            "s3-read", "arn:aws:s3:::example-bucket/*")
+
+        assert policy["Statement"] == [
+            {
+                "Effect": "Allow",
+                "Action": ["s3:ListBucket"],
+                "Resource": "arn:aws:s3:::example-bucket",
+            },
+            {
+                "Effect": "Allow",
+                "Action": ["s3:GetObject"],
+                "Resource": "arn:aws:s3:::example-bucket/*",
+            },
+        ]
+
+    def test_s3_prefix_scope_constrains_bucket_listing(self):
+        """REQ-006: Constrain ListBucket to a requested object prefix."""
+        policy = self.generator.generate_policy(
+            "s3-read", "arn:aws:s3:::example-bucket/reports/2026/*")
+
+        assert policy["Statement"] == [
+            {
+                "Effect": "Allow",
+                "Action": ["s3:ListBucket"],
+                "Resource": "arn:aws:s3:::example-bucket",
+                "Condition": {
+                    "StringLike": {"s3:prefix": "reports/2026/*"}},
+            },
+            {
+                "Effect": "Allow",
+                "Action": ["s3:GetObject"],
+                "Resource": "arn:aws:s3:::example-bucket/reports/2026/*",
+            },
+        ]
+
+    def test_s3_exact_object_scope_omits_bucket_listing(self):
+        """REQ-006: Omit ListBucket when only one exact object is requested."""
+        policy = self.generator.generate_policy(
+            "s3-read", "arn:aws:s3:::example-bucket/reports/summary.json")
+
+        assert policy["Statement"] == [{
+            "Effect": "Allow",
+            "Action": ["s3:GetObject"],
+            "Resource": "arn:aws:s3:::example-bucket/reports/summary.json",
         }]
 
 

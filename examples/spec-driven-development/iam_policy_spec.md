@@ -10,8 +10,8 @@ without implementation or tests do not appear as requirements.
 ## Definitions {#definitions}
 
 - **Policy type**: A supported IAM action template such as `s3-read` or `ec2-admin`.
-- **Resource ARN**: An AWS resource identifier with at least six colon-separated components.
-- **Policy document**: JSON containing the IAM version and one generated statement.
+- **Resource ARN**: An identifier in the standard `aws` partition with at least six colon-separated components.
+- **Policy document**: JSON containing the IAM version and one or more generated statements.
 
 ## CLI Contract {#cli_contract authority=system}
 
@@ -20,13 +20,13 @@ without implementation or tests do not appear as requirements.
 ## Input Validation {#input_validation authority=platform}
 
 - **REQ-002**: The generator MUST accept only a policy type present in its reviewed template registry. [^test_policy_type_validation]
-- **REQ-003**: The generator MUST reject empty, structurally incomplete, syntactically invalid, or unsupported-service ARNs with an actionable error. [^test_empty_input] [^test_arn_validation] [^test_arn_components] [^test_invalid_service]
+- **REQ-003**: The generator MUST reject empty, structurally incomplete, syntactically invalid, unsupported-service, or invalid general-purpose S3 bucket ARNs with an actionable error. [^test_empty_input] [^test_arn_validation] [^test_arn_components] [^test_invalid_service] [^test_s3_bucket_naming]
 - **REQ-004**: The generator MUST reject a resource whose AWS service is incompatible with the selected policy type. [^test_compatibility]
-- **REQ-005**: The generator MUST remove the documented unsafe input characters, bound input length, and escape quotes and backslashes before JSON serialization. [^test_input_sanitization] [^test_arn_escaping]
+- **REQ-005**: The generator MUST reject unsafe characters and values longer than 500 characters without rewriting resource identity, and JSON serialization MUST preserve every accepted resource value exactly. [^test_unsafe_input] [^test_json_round_trip]
 
 ## Policy Generation {#policy_generation authority=system}
 
-- **REQ-006**: A generated policy MUST use IAM version `2012-10-17` and copy the selected template's effect and actions plus the validated resource into its statement. [^test_policy_shape]
+- **REQ-006**: A generated policy MUST use IAM version `2012-10-17`; non-S3 templates MUST copy their effect and actions to the validated resource, while S3 templates MUST place bucket actions on the bucket ARN and object actions on the object ARN, constrain `ListBucket` to wildcard prefixes, and omit `ListBucket` for exact-object scope. [^test_policy_shape] [^test_s3_resource_pairing] [^test_s3_prefix_scope] [^test_s3_exact_scope]
 
 ## Output Format {#output_format authority=feature}
 
@@ -48,10 +48,14 @@ that the cited test nodes resolve.
 [^test_arn_validation]: tests/test_validation.py::TestInputValidation::test_arn_format_validation
 [^test_arn_components]: tests/test_validation.py::TestInputValidation::test_arn_component_validation
 [^test_invalid_service]: tests/test_validation.py::TestInputValidation::test_invalid_service_names
+[^test_s3_bucket_naming]: tests/test_generator_runtime.py::test_s3_generation_rejects_invalid_or_reserved_bucket_names
 [^test_compatibility]: tests/test_validation.py::TestInputValidation::test_resource_policy_compatibility
-[^test_input_sanitization]: tests/test_validation.py::TestInputValidation::test_input_sanitization
-[^test_arn_escaping]: tests/test_validation.py::TestInputValidation::test_arn_escaping
+[^test_unsafe_input]: tests/test_validation.py::TestInputValidation::test_unsafe_input_rejected_without_rewriting
+[^test_json_round_trip]: tests/test_validation.py::TestInputValidation::test_json_serialization_preserves_accepted_resource
 [^test_policy_shape]: tests/test_validation.py::TestInputValidation::test_generated_policy_matches_template
+[^test_s3_resource_pairing]: tests/test_validation.py::TestInputValidation::test_s3_actions_use_matching_resource_types
+[^test_s3_prefix_scope]: tests/test_validation.py::TestInputValidation::test_s3_prefix_scope_constrains_bucket_listing
+[^test_s3_exact_scope]: tests/test_validation.py::TestInputValidation::test_s3_exact_object_scope_omits_bucket_listing
 [^test_compact_output]: tests/test_cli.py::TestCLIRequirements::test_compact_flag
 [^test_validation_status]: tests/test_cli.py::TestCLIRequirements::test_policy_validation_in_output
 [^test_no_validation_info]: tests/test_cli.py::TestCLIRequirements::test_no_validation_info_flag

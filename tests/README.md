@@ -18,9 +18,10 @@ Node.js 24 and npm 11 are also required to reproduce the locked TypeScript examp
 
 ## Commands
 
-Run the same non-network suite used by the required `Validation gate`:
+Run the same two non-network suites used by the required `Validation gate`:
 
 ```bash
+(cd examples/spec-driven-development && python3 -m pytest -q)
 python3 -m pytest -m "not slow" -q
 ```
 
@@ -84,10 +85,13 @@ done
 
 ### CI, dependencies, and governance
 
-- `test_verification_workflows.py` and `test_workflow_policy.py` — deterministic-only workflows,
-  immutable trusted checkouts, least privilege, and provider-call rejection.
+- `test_verification_workflows.py` and `test_workflow_policy.py` — model-free workflows,
+  deterministic required gates, advisory network checks, immutable trusted checkouts, least
+  privilege, and provider-call rejection.
 - `test_repository_rules.py` — repository rules, Actions policy, and security-setting configuration.
 - `test_dependency_security.py` — lockfile, Dependabot, audit, and dependency-review coverage.
+- `test_docker_examples.py` — provider-free simulator behavior, sandbox fail-closed probes, and
+  parallel-branch merge integration.
 - `test_pytest_configuration.py` — marker registration and test-discovery policy.
 
 ## Utilities
@@ -104,22 +108,29 @@ and discovery exclusions live in the root `pytest.ini`.
 
 ## GitHub Actions
 
-- `.github/workflows/pattern-validation.yml` builds locked examples, runs the complete non-slow
-  suite once, uploads JUnit/HTML/JSON/coverage reports, and exposes the required `Validation gate`.
+- `.github/workflows/pattern-validation.yml` builds locked TypeScript examples, runs the embedded
+  Spec-Driven Development gate plus the complete repository non-slow suite, uploads their reports,
+  and exposes the required `Validation gate`.
+- `.github/workflows/docker-example-compatibility.yml` builds and smoke-tests the two maintained
+  Docker examples on relevant changes, on demand, and weekly. It deliberately pulls mutable live
+  images/packages, so its `Docker example compatibility` result is advisory rather than a required
+  deterministic check. It receives no provider credentials and makes no model calls.
 - `.github/workflows/evidence-validation.yml` recomputes adoption verdicts and runs the focused
   evidence/governance subset on demand, on relevant changes, and weekly.
 - `.github/workflows/trusted-evidence-validation.yml` treats pull-request files as inert data and
   executes only validator code from the immutable base revision.
 - `.github/workflows/dependency-security.yml` rejects newly introduced vulnerable dependencies.
 
-The weekly link jobs are advisory because network availability is outside repository control.
-Deterministic failures block the stable aggregate checks.
+The weekly link and Docker compatibility jobs are advisory because network availability and live
+upstreams are outside repository control. Deterministic failures block the stable aggregate checks.
 
 ## Reports
 
 The pattern-validation workflow writes reports under `tests/test-results/` in one execution:
 
 - `junit.xml`
+- `spec-driven-junit.xml`
+- `spec-driven-report.json`
 - `report.html`
 - `report.json`
 - `coverage/`

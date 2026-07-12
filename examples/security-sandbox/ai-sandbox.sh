@@ -10,6 +10,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 SANDBOX_NAME="ai-dev-sandbox"
+SANDBOX_IMAGE="ai-development-patterns/security-sandbox:local"
 COMPOSE_FILE="$SCRIPT_DIR/docker-compose.ai-sandbox.yml"
 
 # Colors for output
@@ -45,7 +46,7 @@ USAGE:
     $0 [COMMAND] [OPTIONS]
 
 COMMANDS:
-    setup           Complete setup including Docker Compose installation
+    setup           Validate prerequisites and create local configuration
     build           Build the AI sandbox container
     start           Start the AI sandbox environment (includes setup if needed)
     stop            Stop the AI sandbox environment
@@ -61,11 +62,11 @@ EXAMPLES:
     # Complete automated setup and start
     $0 start
 
-    # Manual setup (installs Docker Compose if needed)
+    # Validate prerequisites and create local configuration
     $0 setup
 
-    # Run Claude Code in the sandbox
-    $0 exec "claude --help"
+    # Inspect an installed deterministic tool in the sandbox
+    $0 exec "pytest --version"
 
     # Test network isolation
     $0 demo
@@ -74,8 +75,8 @@ EXAMPLES:
     $0 clean
 
 AUTOMATION FEATURES:
-    ✓ Automatically starts Docker if not running
-    ✓ Installs Docker Compose if missing
+    ✓ Verifies Docker without starting services or changing system groups
+    ✓ Validates an already installed Docker Compose command
     ✓ Creates all required configuration files
     ✓ Builds secure container with validation
 
@@ -83,6 +84,7 @@ SECURITY FEATURES:
     ✓ Complete network isolation (network_mode: none)
     ✓ Non-root user execution (UID 1000)
     ✓ Read-only source code mounts
+    ✓ Docker-managed writable output and log volumes
     ✓ Resource limits (2 CPU, 4GB RAM)
     ✓ No privileged capabilities
     ✓ Credential isolation (no AWS/SSH/env mounts)
@@ -93,69 +95,20 @@ https://github.com/PaulDuvall/ai-development-patterns/tree/main/examples/securit
 EOF
 }
 
-# Auto-install Docker Compose if needed
-install_docker_compose() {
-    log_info "Installing Docker Compose automatically..."
-    
-    local os_type="$(uname -s)"
-    local arch="$(uname -m)"
-    local compose_version="v2.24.5"
-    
-    # Map architecture names for Docker Compose releases
-    case "$arch" in
-        x86_64) arch="x86_64" ;;
-        arm64|aarch64) arch="aarch64" ;;
-        *) 
-            log_error "Unsupported architecture: $arch"
-            return 1
-            ;;
-    esac
-    
-    # Create local bin directory if it doesn't exist
-    mkdir -p "$HOME/.local/bin"
-    
-    # Convert OS type to lowercase for URL
-    local os_lower=$(echo "$os_type" | tr '[:upper:]' '[:lower:]')
-    
-    # Download Docker Compose - use correct URL format
-    local download_url="https://github.com/docker/compose/releases/download/${compose_version}/docker-compose-${os_lower}-${arch}"
-    local install_path="$HOME/.local/bin/docker-compose"
-    
-    log_info "Downloading Docker Compose ${compose_version} for ${os_lower}-${arch}..."
-    log_info "URL: $download_url"
-    
-    if curl -L "$download_url" -o "$install_path" --progress-bar --fail; then
-        chmod +x "$install_path"
-        
-        # Add to PATH if not already there
-        if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-            export PATH="$HOME/.local/bin:$PATH"
-            
-            # Add to shell profile for persistence
-            local shell_profile=""
-            if [[ -f "$HOME/.zshrc" ]]; then
-                shell_profile="$HOME/.zshrc"
-            elif [[ -f "$HOME/.bashrc" ]]; then
-                shell_profile="$HOME/.bashrc"
-            elif [[ -f "$HOME/.bash_profile" ]]; then
-                shell_profile="$HOME/.bash_profile"
-            fi
-            
-            if [[ -n "$shell_profile" ]] && ! grep -q "HOME/.local/bin" "$shell_profile"; then
-                echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$shell_profile"
-                log_info "Added $HOME/.local/bin to PATH in $shell_profile"
-            fi
-        fi
-        
-        log_success "Docker Compose installed successfully to $install_path"
+# Require a package-managed Docker Compose installation. This script never
+# downloads executables or mutates shell startup files.
+require_docker_compose() {
+    if command -v docker-compose &> /dev/null || \
+        docker compose version &> /dev/null 2>&1; then
         return 0
-    else
-        log_error "Failed to download Docker Compose"
-        return 1
     fi
+    log_error "Docker Compose is required but was not found."
+    echo "Install the Docker Compose plugin or docker-compose package first:"
+    echo "  https://docs.docker.com/compose/install/"
+    return 1
 }
 
-# Check if Docker is available and install Docker Compose if needed
+# Check whether Docker and Docker Compose are available.
 check_docker() {
     if ! command -v docker &> /dev/null; then
         log_error "Docker is not installed. Please install Docker first:"
@@ -182,117 +135,31 @@ check_docker() {
         exit 1
     fi
 
-    # Check if Docker is running, start it automatically if not
+    # Do not start privileged services, launch desktop applications, or change
+    # group membership on the user's behalf. A sandbox helper should fail with
+    # actionable instructions instead of mutating host security state.
     if ! docker info &> /dev/null; then
-        log_warning "Docker is not running, starting it automatically..."
-        
+        log_error "The Docker daemon is not available."
+
         case "$(uname -s)" in
             Darwin*)
-                log_info "Starting Docker on macOS..."
-                
-                # Check for Colima first (preferred alternative to Docker Desktop)
-                if command -v colima &> /dev/null; then
-                    log_info "Found Colima, starting Docker with Colima..."
-                    if colima start --cpu 2 --memory 4 2>/dev/null; then
-                        log_success "Colima started successfully"
-                    else
-                        log_warning "Colima failed to start, checking if already running..."
-                        if colima status | grep -q "Running"; then
-                            log_success "Colima is already running"
-                        else
-                            log_error "Failed to start Colima"
-                            exit 1
-                        fi
-                    fi
-                    
-                # Check for Docker Desktop as fallback
-                elif [[ -d "/Applications/Docker.app" ]]; then
-                    log_info "Starting Docker Desktop..."
-                    open /Applications/Docker.app
-                    log_info "Waiting for Docker to start..."
-                    
-                    # Wait up to 60 seconds for Docker to start
-                    local timeout=60
-                    local elapsed=0
-                    while ! docker info &> /dev/null && [[ $elapsed -lt $timeout ]]; do
-                        sleep 2
-                        elapsed=$((elapsed + 2))
-                        echo -n "."
-                    done
-                    echo ""
-                    
-                    if docker info &> /dev/null; then
-                        log_success "Docker started successfully"
-                    else
-                        log_error "Docker failed to start within ${timeout} seconds"
-                        exit 1
-                    fi
-                    
-                # No Docker runtime found
-                else
-                    log_error "No Docker runtime found on macOS"
-                    log_info "Install Docker Engine alternatives:"
-                    echo "  Option 1 (Recommended): brew install colima && colima start"
-                    echo "  Option 2: brew install docker && start Docker daemon manually"
-                    exit 1
-                fi
+                log_info "Start Docker Desktop, or start Colima yourself with:"
+                echo "  colima start"
                 ;;
             Linux*)
-                log_info "Starting Docker daemon on Linux..."
-                # Try to start Docker daemon
-                if command -v systemctl &> /dev/null; then
-                    if sudo systemctl start docker 2>/dev/null; then
-                        log_success "Docker daemon started successfully"
-                        
-                        # Add user to docker group if not already
-                        if ! groups | grep -q docker; then
-                            log_info "Adding user to docker group..."
-                            sudo usermod -aG docker "$USER"
-                            log_warning "You may need to log out and back in for group changes to take effect"
-                            log_info "For now, trying with sudo..."
-                        fi
-                    else
-                        log_error "Failed to start Docker daemon. Please run:"
-                        echo "  sudo systemctl start docker"
-                        exit 1
-                    fi
-                elif command -v service &> /dev/null; then
-                    if sudo service docker start 2>/dev/null; then
-                        log_success "Docker service started successfully"
-                    else
-                        log_error "Failed to start Docker service. Please run:"
-                        echo "  sudo service docker start"
-                        exit 1
-                    fi
-                else
-                    log_error "Cannot start Docker automatically on this Linux distribution"
-                    log_info "Please start Docker manually and try again"
-                    exit 1
-                fi
+                log_info "Start Docker with your system's service manager. For example:"
+                echo "  sudo systemctl start docker"
                 ;;
             *)
-                log_error "Cannot start Docker automatically on this platform"
-                log_info "Please start Docker manually and try again"
-                exit 1
+                log_info "Start the Docker daemon for this platform."
                 ;;
         esac
+        log_info "After Docker is running, run this script again."
+        exit 1
     fi
 
-    # Check for either docker-compose or docker compose, install if needed
-    if ! command -v docker-compose &> /dev/null; then
-        if ! docker compose version &> /dev/null 2>&1; then
-            log_warning "Docker Compose not found, installing automatically..."
-            if install_docker_compose; then
-                # Verify installation
-                if ! command -v docker-compose &> /dev/null; then
-                    log_error "Docker Compose installation failed"
-                    exit 1
-                fi
-            else
-                log_error "Failed to install Docker Compose automatically"
-                exit 1
-            fi
-        fi
+    if ! require_docker_compose; then
+        exit 1
     fi
     
     log_success "Docker and Docker Compose are ready"
@@ -328,65 +195,248 @@ EOF
         log_info "Creating healthcheck.py..."
         cat > "$healthcheck_file" << 'EOF'
 #!/usr/bin/env python3
-"""
-AI Security Sandbox Health Check
-Validates that the sandbox environment is running correctly
-"""
-import sys
+"""Fail-closed health checks for the AI security sandbox."""
+
+import argparse
+import errno
+import ipaddress
 import os
-import subprocess
+import socket
+import stat
+import sys
+import tempfile
+
+
+DEFAULT_EGRESS_PROBE_HOST = "1.1.1.1"
+DEFAULT_EGRESS_PROBE_PORT = 443
+DEFAULT_EGRESS_PROBE_TIMEOUT = 2.0
+BLOCKED_EGRESS_ERRNOS = frozenset(
+    code
+    for code in (
+        getattr(errno, "EACCES", None),
+        getattr(errno, "ENETDOWN", None),
+        getattr(errno, "ENETUNREACH", None),
+        getattr(errno, "EPERM", None),
+    )
+    if code is not None
+)
+
 
 def check_python():
-    """Check Python is working"""
-    return sys.version_info >= (3, 8)
+    """Return whether the supported Python runtime is available."""
+    return sys.version_info >= (3, 11)
+
+
+def workspace_access_status():
+    """Verify the read-only workspace and dedicated writable volumes."""
+    workspace_dir = os.environ.get("WORKSPACE_DIR", "/workspace")
+    if not os.path.isdir(workspace_dir) or not os.access(
+            workspace_dir, os.R_OK):
+        return False, f"workspace is not readable: {workspace_dir}"
+
+    for name in ("generated", "logs"):
+        path = os.path.join(workspace_dir, name)
+        if os.path.islink(path) or not os.path.isdir(path):
+            return False, f"writable workspace directory is unsafe: {path}"
+        try:
+            with tempfile.NamedTemporaryFile(
+                    dir=path, prefix=".sandbox-health-") as probe:
+                probe.write(b"healthcheck")
+                probe.flush()
+        except OSError as exc:
+            return False, f"writable workspace probe failed for {path}: {exc}"
+    return True, (
+        f"{workspace_dir} is readable; generated/ and logs/ are writable")
+
 
 def check_workspace():
-    """Check workspace directory exists and is accessible"""
-    workspace_dir = os.environ.get('WORKSPACE_DIR', '/workspace')
-    return os.path.exists(workspace_dir) and os.access(workspace_dir, os.R_OK | os.W_OK)
+    """Return whether the workspace mount contract is satisfied."""
+    accessible, _ = workspace_access_status()
+    return accessible
+
+
+def immutable_runtime_status():
+    """Verify trusted scripts are root-owned and source is non-writable."""
+    workspace_dir = os.environ.get("WORKSPACE_DIR", "/workspace")
+    for path in (
+            os.path.join(workspace_dir, "healthcheck.py"),
+            os.path.join(workspace_dir, "init-workspace.sh")):
+        try:
+            metadata = os.lstat(path)
+        except OSError as exc:
+            return False, f"cannot inspect trusted runtime file {path}: {exc}"
+        if (not stat.S_ISREG(metadata.st_mode)
+                or stat.S_ISLNK(metadata.st_mode)):
+            return False, f"trusted runtime path is not a regular file: {path}"
+        if metadata.st_uid != 0:
+            return False, f"trusted runtime file is not root-owned: {path}"
+        writable_bits = stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH
+        if metadata.st_mode & writable_bits:
+            return False, (
+                f"trusted runtime file has writable mode bits: {path}")
+        if os.access(path, os.W_OK):
+            return False, f"trusted runtime file is writable: {path}"
+
+    source = os.path.join(workspace_dir, "src")
+    if os.path.islink(source) or not os.path.isdir(source):
+        return False, f"source path is unsafe: {source}"
+    if os.access(source, os.W_OK):
+        return False, f"source path is writable: {source}"
+    return True, (
+        "trusted scripts are root-owned; source and scripts are read-only")
+
+
+def _probe_configuration():
+    """Return one validated numeric endpoint without performing DNS."""
+    host = os.environ.get(
+        "SANDBOX_NETWORK_PROBE_HOST", DEFAULT_EGRESS_PROBE_HOST)
+    try:
+        address = ipaddress.ip_address(host)
+    except ValueError as exc:
+        raise ValueError(
+            "SANDBOX_NETWORK_PROBE_HOST must be a numeric IP address; "
+            "DNS names cannot prove network isolation"
+        ) from exc
+
+    try:
+        port = int(os.environ.get(
+            "SANDBOX_NETWORK_PROBE_PORT", DEFAULT_EGRESS_PROBE_PORT))
+    except ValueError as exc:
+        raise ValueError(
+            "SANDBOX_NETWORK_PROBE_PORT must be an integer") from exc
+    if not 1 <= port <= 65535:
+        raise ValueError(
+            "SANDBOX_NETWORK_PROBE_PORT must be between 1 and 65535")
+
+    try:
+        timeout = float(os.environ.get(
+            "SANDBOX_NETWORK_PROBE_TIMEOUT",
+            DEFAULT_EGRESS_PROBE_TIMEOUT,
+        ))
+    except ValueError as exc:
+        raise ValueError(
+            "SANDBOX_NETWORK_PROBE_TIMEOUT must be a number") from exc
+    if not 0.1 <= timeout <= 10.0:
+        raise ValueError(
+            "SANDBOX_NETWORK_PROBE_TIMEOUT must be between 0.1 and 10 seconds")
+
+    return address, port, timeout
+
+
+def _non_loopback_interfaces():
+    """Return visible non-loopback interface names, failing on ambiguity."""
+    interfaces = socket.if_nameindex()
+    return sorted({name for _, name in interfaces if name != "lo"})
+
+
+def probe_network_isolation():
+    """Return ``(isolated, detail)`` from a Python-native TCP egress probe.
+
+    A successful connection proves egress is available. Only an explicit
+    local kernel or policy denial proves isolation. Timeouts, refused
+    connections, malformed configuration, and other ambiguous failures remain
+    failures so missing tools, DNS, or an unavailable remote service can never
+    be mistaken for a secure sandbox.
+    """
+    try:
+        address, port, timeout = _probe_configuration()
+    except ValueError as exc:
+        return False, f"configuration error: {exc}"
+
+    family = socket.AF_INET6 if address.version == 6 else socket.AF_INET
+    endpoint = (str(address), port, 0, 0) if address.version == 6 else (
+        str(address), port)
+    try:
+        with socket.socket(family, socket.SOCK_STREAM) as connection:
+            connection.settimeout(timeout)
+            connection.connect(endpoint)
+    except OSError as exc:
+        error_name = errno.errorcode.get(exc.errno, "UNKNOWN")
+        if exc.errno in BLOCKED_EGRESS_ERRNOS:
+            try:
+                interfaces = _non_loopback_interfaces()
+            except OSError as interface_error:
+                return False, (
+                    "isolation not proven: cannot inspect network interfaces "
+                    f"after {error_name}: {interface_error}"
+                )
+            if interfaces:
+                return False, (
+                    f"isolation not proven: {error_name} occurred but "
+                    "non-loopback interface(s) are present: "
+                    f"{', '.join(interfaces)}"
+                )
+            return True, (
+                f"kernel blocked TCP egress to {address}:{port} "
+                f"({error_name}); only loopback is present"
+            )
+        return False, (
+            f"isolation not proven: TCP probe to {address}:{port} failed "
+            f"ambiguously ({error_name}: {exc})"
+        )
+    return False, f"TCP egress reached {address}:{port}"
+
 
 def check_network_isolation():
-    """Verify network isolation is working"""
-    try:
-        # This should fail in a properly isolated container
-        result = subprocess.run(['ping', '-c', '1', '-W', '1', '8.8.8.8'], 
-                              capture_output=True, timeout=5)
-        # If ping succeeds, network isolation is NOT working
-        return result.returncode != 0
-    except (subprocess.TimeoutExpired, FileNotFoundError):
-        # Timeout or no ping command means isolation is working
-        return True
+    """Return whether the Python-native probe proves network isolation."""
+    isolated, _ = probe_network_isolation()
+    return isolated
 
-def main():
-    """Run all health checks"""
-    checks = [
-        ("Python version", check_python),
-        ("Workspace access", check_workspace),
-        ("Network isolation", check_network_isolation)
-    ]
-    
+
+def _run_checks(network_only=False):
+    """Run checks and return whether all checks passed."""
+    runtime_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+    checks = []
+    if not network_only:
+        checks.extend((
+            (
+                "Python version",
+                lambda: (
+                    check_python(),
+                    f"running {runtime_version}",
+                ),
+            ),
+            ("Workspace access", workspace_access_status),
+            ("Runtime guards", immutable_runtime_status),
+        ))
+    checks.append(("Network isolation", probe_network_isolation))
+
     all_passed = True
-    
     for name, check_func in checks:
         try:
-            result = check_func()
-            status = "✅ PASS" if result else "❌ FAIL"
-            print(f"{name}: {status}")
-            if not result:
-                all_passed = False
-        except Exception as e:
-            print(f"{name}: ❌ ERROR - {e}")
-            all_passed = False
-    
+            passed, detail = check_func()
+        # Fail closed on unexpected probe or runtime errors.
+        except Exception as exc:
+            passed = False
+            detail = f"unexpected error: {exc}"
+        status = "PASS" if passed else "FAIL"
+        print(f"{name}: {status} - {detail}")
+        all_passed = all_passed and passed
+    return all_passed
+
+
+def main(argv=None):
+    """Run all health checks, or only the isolation probe."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--network-only",
+        action="store_true",
+        help="run only the fail-closed Python TCP egress probe",
+    )
+    args = parser.parse_args(argv)
+
+    all_passed = _run_checks(network_only=args.network_only)
     if all_passed:
-        print("\n🔒 AI Security Sandbox is healthy and properly isolated")
-        sys.exit(0)
-    else:
-        print("\n⚠️ AI Security Sandbox has issues")
-        sys.exit(1)
+        if not args.network_only:
+            print("\nAI Security Sandbox is healthy and properly isolated")
+        return 0
+    if not args.network_only:
+        print("\nAI Security Sandbox has issues")
+    return 1
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
 EOF
         chmod +x "$healthcheck_file"
         log_success "Created healthcheck.py"
@@ -398,29 +448,34 @@ EOF
         log_info "Creating init-workspace.sh..."
         cat > "$init_file" << 'EOF'
 #!/bin/bash
-# AI Security Sandbox Workspace Initialization
+# Security Sandbox Workspace Initialization
 
-echo "🔒 Initializing AI Security Sandbox..."
+set -euo pipefail
+
+echo "🔒 Initializing Security Sandbox..."
 echo "Workspace: $(pwd)"
 echo "User: $(whoami) ($(id))"
 echo "Python: $(python --version)"
 
-# Create workspace subdirectories
+# Ensure writable-volume mount points exist
 mkdir -p logs generated
 
 # Set up environment
 export AI_SANDBOX=true
-export PYTHONPATH="/workspace/src:$PYTHONPATH"
+export PYTHONPATH="/workspace/src:${PYTHONPATH:-}"
 
 # Display security status
 echo ""
 echo "🛡️ Security Status:"
-echo "✅ Network isolation: $(if ping -c 1 -W 1 8.8.8.8 &>/dev/null; then echo 'DISABLED ⚠️'; else echo 'ENABLED'; fi)"
+if ! python3 /workspace/healthcheck.py --network-only; then
+    echo "❌ Network isolation is not proven; refusing to initialize." >&2
+    exit 1
+fi
 echo "✅ Non-root user: $(if [[ $(id -u) -eq 0 ]]; then echo 'DISABLED ⚠️'; else echo 'ENABLED'; fi)"
-echo "✅ Read-only source: $(if [[ -w /workspace/src 2>/dev/null ]]; then echo 'DISABLED ⚠️'; else echo 'ENABLED'; fi)"
+echo "✅ Read-only source: $(if [[ -w /workspace/src ]] 2>/dev/null; then echo 'DISABLED ⚠️'; else echo 'ENABLED'; fi)"
 
 echo ""
-echo "🚀 AI Security Sandbox ready for secure development!"
+echo "🚀 Security Sandbox ready for secure development!"
 echo "   Use 'python /workspace/healthcheck.py' to run full health check"
 echo ""
 EOF
@@ -453,7 +508,7 @@ start_sandbox() {
     log_info "Starting AI Security Sandbox..."
     
     # Build if not exists
-    if ! docker image inspect ai-development-patterns-ai-development &> /dev/null; then
+    if ! docker image inspect "$SANDBOX_IMAGE" &> /dev/null; then
         build_sandbox
     fi
     
@@ -468,12 +523,14 @@ start_sandbox() {
     log_info "Waiting for sandbox to be ready..."
     sleep 3
     
-    if docker exec "$SANDBOX_NAME" python -c "print('Sandbox ready')" &> /dev/null; then
+    if docker exec "$SANDBOX_NAME" \
+        python3 /workspace/healthcheck.py; then
         log_success "AI Security Sandbox is running and ready"
         log_info "Use '$0 shell' to enter the sandbox"
         log_info "Use '$0 validate' to check security configuration"
     else
-        log_error "Sandbox failed to start properly"
+        log_error "Sandbox failed its fail-closed health check"
+        docker logs --tail 50 "$SANDBOX_NAME" || true
         exit 1
     fi
 }
@@ -534,9 +591,9 @@ show_status() {
     echo ""
     
     # Image info
-    if docker image inspect ai-development-patterns-ai-development &> /dev/null; then
+    if docker image inspect "$SANDBOX_IMAGE" &> /dev/null; then
         echo "🖼️  Image: BUILT"
-        docker image inspect ai-development-patterns-ai-development --format "Created: {{.Created}}"
+        docker image inspect "$SANDBOX_IMAGE" --format "Created: {{.Created}}"
     else
         echo "🖼️  Image: NOT BUILT"
     fi
@@ -576,8 +633,8 @@ clean_sandbox() {
         fi
         
         # Remove image
-        if docker image inspect ai-development-patterns-ai-development &> /dev/null; then
-            docker rmi ai-development-patterns-ai-development
+        if docker image inspect "$SANDBOX_IMAGE" &> /dev/null; then
+            docker rmi "$SANDBOX_IMAGE"
         fi
         
         log_success "Cleanup complete"
@@ -590,60 +647,107 @@ clean_sandbox() {
 validate_security() {
     log_info "Security Validation"
     echo ""
-    
-    if ! docker ps --format "table {{.Names}}" | grep -q "$SANDBOX_NAME"; then
+
+    if ! docker ps --format "{{.Names}}" | grep -Fxq "$SANDBOX_NAME"; then
         echo "❌ Container not running - cannot validate"
         return 1
     fi
-    
-    # Check network isolation
-    if docker inspect "$SANDBOX_NAME" --format "{{.HostConfig.NetworkMode}}" | grep -q "none"; then
+
+    local validation_failed=false
+    local network_mode=""
+    if network_mode=$(docker inspect "$SANDBOX_NAME" \
+        --format "{{.HostConfig.NetworkMode}}" 2>/dev/null) && \
+        [[ "$network_mode" == "none" ]]; then
         echo "✅ Network isolation: ENABLED (network_mode: none)"
     else
-        echo "❌ Network isolation: DISABLED"
+        echo "❌ Network isolation: DISABLED (${network_mode:-unknown})"
+        validation_failed=true
     fi
-    
-    # Check user
-    local user_info=$(docker exec "$SANDBOX_NAME" id 2>/dev/null || echo "")
-    if echo "$user_info" | grep -q "uid=1000"; then
+
+    local user_id=""
+    if user_id=$(docker exec "$SANDBOX_NAME" id -u 2>/dev/null) && \
+        [[ "$user_id" == "1000" ]]; then
         echo "✅ Non-root user: ENABLED (UID 1000)"
     else
-        echo "❌ Non-root user: DISABLED"
+        echo "❌ Non-root user: DISABLED (${user_id:-unknown})"
+        validation_failed=true
     fi
-    
-    # Check capabilities
-    local caps=$(docker inspect "$SANDBOX_NAME" --format "{{.HostConfig.CapDrop}}" 2>/dev/null || echo "")
-    if echo "$caps" | grep -q "ALL"; then
+
+    local caps=""
+    if caps=$(docker inspect "$SANDBOX_NAME" \
+        --format "{{.HostConfig.CapDrop}}" 2>/dev/null) && \
+        [[ "$caps" == *"ALL"* ]]; then
         echo "✅ Capabilities dropped: ALL"
     else
         echo "❌ Capabilities: NOT PROPERLY DROPPED"
+        validation_failed=true
     fi
-    
-    # Check for sensitive mounts
-    local mounts=$(docker inspect "$SANDBOX_NAME" --format "{{range .Mounts}}{{.Source}} {{end}}" 2>/dev/null || echo "")
+
+    local mounts=""
     local sensitive_found=false
-    
-    for sensitive in "/.aws" "/.ssh" "/.env" "/var/run/docker.sock"; do
-        if echo "$mounts" | grep -q "$sensitive"; then
-            echo "❌ Sensitive mount detected: $sensitive"
-            sensitive_found=true
-        fi
-    done
-    
-    if ! $sensitive_found; then
+    if mounts=$(docker inspect "$SANDBOX_NAME" --format \
+        '{{range .Mounts}}{{.Source}}|{{.Destination}}{{println}}{{end}}' \
+        2>/dev/null); then
+        local source=""
+        local destination=""
+        local path=""
+        while IFS='|' read -r source destination; do
+            [[ -n "$source$destination" ]] || continue
+            for path in "$source" "$destination"; do
+                case "$path" in
+                    */.aws|*/.aws/*|*/.ssh|*/.ssh/*|*/.env|*/.env/*|/var/run/docker.sock)
+                        echo "❌ Sensitive mount detected: $source -> $destination"
+                        sensitive_found=true
+                        validation_failed=true
+                        break
+                        ;;
+                esac
+            done
+        done <<< "$mounts"
+    else
+        echo "❌ Sensitive mounts: INSPECTION FAILED"
+        sensitive_found=true
+        validation_failed=true
+    fi
+    if [[ "$sensitive_found" == false ]]; then
         echo "✅ No sensitive mounts detected"
     fi
-    
-    # Check resource limits
-    local memory_limit=$(docker inspect "$SANDBOX_NAME" --format "{{.HostConfig.Memory}}" 2>/dev/null || echo "0")
-    if [[ "$memory_limit" != "0" ]]; then
-        echo "✅ Memory limit: $(($memory_limit / 1024 / 1024 / 1024))GB"
+
+    local memory_limit=""
+    if memory_limit=$(docker inspect "$SANDBOX_NAME" \
+        --format "{{.HostConfig.Memory}}" 2>/dev/null) && \
+        [[ "$memory_limit" =~ ^[1-9][0-9]*$ ]]; then
+        echo "✅ Memory limit: $((memory_limit / 1024 / 1024))MiB"
     else
         echo "❌ Memory limit: NOT SET"
+        validation_failed=true
     fi
-    
+
+    if docker exec "$SANDBOX_NAME" test ! -w /workspace/src; then
+        echo "✅ Source directory: READ-ONLY to the sandbox user"
+    else
+        echo "❌ Source directory: WRITABLE to the sandbox user"
+        validation_failed=true
+    fi
+
+    local health_output=""
+    if health_output=$(docker exec "$SANDBOX_NAME" \
+        python3 /workspace/healthcheck.py 2>&1); then
+        printf '%s\n' "$health_output"
+        echo "✅ Fail-closed container health check: PASSED"
+    else
+        printf '%s\n' "$health_output"
+        echo "❌ Fail-closed container health check: FAILED"
+        validation_failed=true
+    fi
+
     echo ""
+    if [[ "$validation_failed" == true ]]; then
+        log_error "Security validation failed"
+        return 1
+    fi
     log_success "Security validation complete"
+    return 0
 }
 
 # Run demonstration
@@ -659,29 +763,12 @@ run_demo() {
     log_info "Testing network isolation..."
     echo ""
     
-    echo "🧪 Testing external network access (should fail):"
-    docker exec "$SANDBOX_NAME" bash -c "
-        echo 'Attempting to ping Google DNS...'
-        if ping -c 1 8.8.8.8 2>/dev/null; then
-            echo '❌ SECURITY BREACH: Network access is available!'
-        else
-            echo '✅ Network isolation working: ping failed as expected'
-        fi
-        
-        echo 'Attempting HTTP request...'
-        if curl -s --connect-timeout 5 http://google.com 2>/dev/null; then
-            echo '❌ SECURITY BREACH: HTTP access is available!'
-        else
-            echo '✅ Network isolation working: HTTP request failed as expected'
-        fi
-        
-        echo 'Attempting DNS lookup...'
-        if nslookup google.com 2>/dev/null; then
-            echo '❌ SECURITY BREACH: DNS access is available!'
-        else
-            echo '✅ Network isolation working: DNS lookup failed as expected'
-        fi
-    " || true
+    echo "🧪 Running the fail-closed Python TCP egress probe:"
+    if ! docker exec "$SANDBOX_NAME" \
+        python3 /workspace/healthcheck.py --network-only; then
+        log_error "Network isolation is not proven; stopping the demonstration"
+        return 1
+    fi
     
     echo ""
     log_info "Testing file system access..."
@@ -739,17 +826,8 @@ main() {
                 exit 1
             fi
             
-            # Install Docker Compose if needed
-            if ! command -v docker-compose &> /dev/null; then
-                if ! docker compose version &> /dev/null 2>&1; then
-                    log_warning "Docker Compose not found, installing automatically..."
-                    if install_docker_compose; then
-                        log_success "Docker Compose installed successfully"
-                    else
-                        log_error "Failed to install Docker Compose automatically"
-                        exit 1
-                    fi
-                fi
+            if ! require_docker_compose; then
+                exit 1
             fi
             
             # Create all necessary files
@@ -759,7 +837,7 @@ main() {
             echo ""
             log_info "Next step:"
             echo "  Run the sandbox: $0 start"
-            echo "  (Docker will be started automatically if needed)"
+            echo "  (Start Docker yourself first if it is not already running.)"
             exit 0
             ;;
     esac
@@ -813,5 +891,7 @@ main() {
     esac
 }
 
-# Run main function
-main "$@"
+# Run main only when executed, allowing focused tests to source the functions.
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+    main "$@"
+fi

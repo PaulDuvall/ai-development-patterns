@@ -13,6 +13,8 @@ DEPENDABOT = ROOT / ".github" / "dependabot.yml"
 DEPENDENCY_WORKFLOW = ROOT / ".github" / "workflows" / "dependency-security.yml"
 PATTERN_VALIDATION_WORKFLOW = (
     ROOT / ".github" / "workflows" / "pattern-validation.yml")
+DOCKER_COMPATIBILITY_WORKFLOW = (
+    ROOT / ".github" / "workflows" / "docker-example-compatibility.yml")
 PROJECT = ROOT / "pyproject.toml"
 TEST_REQUIREMENTS = ROOT / "tests" / "requirements.txt"
 GATEWAY_ROOT = (
@@ -114,6 +116,8 @@ def test_docker_examples_use_current_supported_python_base_families():
     assert re.search(r"^FROM python:3\.14-slim$", parallel, re.MULTILINE)
     assert re.search(
         r"^FROM python:3\.13-slim-bookworm$", sandbox, re.MULTILINE)
+    assert "https://deb.nodesource.com/setup_24.x" in parallel
+    assert "setup_20.x" not in parallel
     assert "bullseye" not in parallel.casefold()
     assert "bullseye" not in sandbox.casefold()
 
@@ -128,6 +132,16 @@ def test_parallel_agent_build_context_contains_every_copied_path():
         for service in compose["services"].values()
     }
     assert builds == {(".", "docker/Dockerfile.ai-agent")}
+    assert {
+        service["image"] for service in compose["services"].values()
+    } == {"ai-development-patterns/parallel-agent:local"}
+    assert compose["services"]["agent-backend"]["depends_on"] == {
+        "agent-database": {"condition": "service_completed_successfully"},
+    }
+    assert compose["services"]["agent-tests"]["depends_on"] == {
+        "agent-frontend": {"condition": "service_completed_successfully"},
+        "agent-backend": {"condition": "service_completed_successfully"},
+    }
 
     dockerfile = (
         PARALLEL_AGENT_ROOT / "docker" / "Dockerfile.ai-agent"
@@ -135,7 +149,9 @@ def test_parallel_agent_build_context_contains_every_copied_path():
     assert "COPY docker/requirements.txt /tmp/requirements.txt" in dockerfile
     assert "COPY scripts/ /scripts/" in dockerfile
     assert (PARALLEL_AGENT_ROOT / "docker" / "requirements.txt").is_file()
-    assert (PARALLEL_AGENT_ROOT / "scripts").is_dir()
+    for entrypoint in ("agent_runner.py", "coordinator.py"):
+        assert (PARALLEL_AGENT_ROOT / "scripts" / entrypoint).is_file()
+        assert f"/scripts/{entrypoint}" in str(compose)
     assert (
         PARALLEL_AGENT_ROOT / ".dockerignore"
     ).read_text(encoding="utf-8").splitlines() == [
@@ -144,52 +160,117 @@ def test_parallel_agent_build_context_contains_every_copied_path():
         "!docker/Dockerfile.ai-agent",
         "!docker/requirements.txt",
         "!scripts/",
-        "!scripts/*.py",
+        "!scripts/agent_runner.py",
+        "!scripts/coordinator.py",
     ]
 
 
-def test_parallel_agent_documentation_matches_the_build_and_orders_it_safely():
-    """The tutorial must generate copied scripts before building the image."""
-    docs = (PARALLEL_AGENT_ROOT / "README.md").read_text(encoding="utf-8")
+def test_security_sandbox_build_context_and_compose_image_are_bounded():
+    """Every sandbox variant reuses one image built from an exact allowlist."""
+    compose_paths = [
+        SECURITY_SANDBOX_ROOT / "docker-compose.basic.yml",
+        SECURITY_SANDBOX_ROOT / "docker-compose.ai-sandbox.yml",
+        SECURITY_SANDBOX_ROOT / "docker-compose.parallel-agents.yml",
+    ]
+    services = [
+        service
+        for path in compose_paths
+        for service in yaml.safe_load(
+            path.read_text(encoding="utf-8"))["services"].values()
+    ]
 
-    assert docs.count("FROM python:3.14-slim") == 1
-    assert "FROM python:3.11" not in docs
-    assert docs.count("setup_20.x") == 1
-    assert "setup_18.x" not in docs
-    assert "COPY docker/requirements.txt /tmp/requirements.txt" in docs
-    assert "`.env`, workspaces, shared memory, and reports never enter" in docs
+    assert {
+        (service["build"]["context"], service["build"]["dockerfile"])
+        for service in services
+    } == {(".", "Dockerfile.ai-sandbox")}
+    assert {service["image"] for service in services} == {
+        "ai-development-patterns/security-sandbox:local"}
+    assert all(service["network_mode"] == "none" for service in services)
+    assert all(service["init"] is True for service in services)
+    assert all(
+        "/workspace/init-workspace.sh && exec tail -f /dev/null"
+        in " ".join(service["command"])
+        for service in services
+    )
+    assert (
+        SECURITY_SANDBOX_ROOT / ".dockerignore"
+    ).read_text(encoding="utf-8").splitlines() == [
+        "**",
+        "!Dockerfile.ai-sandbox",
+        "!requirements-sandbox.txt",
+        "!healthcheck.py",
+        "!init-workspace.sh",
+    ]
+
+    dockerfile = (
+        SECURITY_SANDBOX_ROOT / "Dockerfile.ai-sandbox"
+    ).read_text(encoding="utf-8")
+    for copied in (
+        "requirements-sandbox.txt",
+        "healthcheck.py",
+        "init-workspace.sh",
+    ):
+        assert re.search(
+            rf"^COPY(?:\s+--chown=\S+)?\s+{re.escape(copied)}\s+",
+            dockerfile,
+            re.MULTILINE,
+        )
+    assert "COPY --chown=" not in dockerfile
+    assert "chown -R aiuser:aiuser /workspace" not in dockerfile
+    assert "chown root:root" in dockerfile
+    assert "/workspace/healthcheck.py" in dockerfile
+    assert "/workspace/init-workspace.sh" in dockerfile
+    assert "chmod 555" in dockerfile
+
+
+def test_parallel_agent_documentation_matches_the_provider_free_image():
+    """The runnable tutorial must match its one zero-cost simulator image."""
+    docs = (PARALLEL_AGENT_ROOT / "README.md").read_text(encoding="utf-8")
+    requirements = (
+        PARALLEL_AGENT_ROOT / "docker" / "requirements.txt"
+    ).read_text(encoding="utf-8")
+
+    assert "Python 3.14 and Node.js 24 LTS" in docs
+    assert "zero model calls and zero provider API calls" in docs
+    assert "does not need an OpenAI" in docs
+    assert "agent_runner.py" in docs
+    assert "coordinator.py" in docs
+    assert "cat > scripts/" not in docs
+    assert requirements.splitlines() == ["PyYAML==6.0.3"]
     build = (
-        "docker build --pull --tag ai-agent:latest \\\n"
+        "docker build --pull \\\n"
+        "  --tag ai-development-patterns/parallel-agent:local \\\n"
         "  --file docker/Dockerfile.ai-agent ."
     )
     assert docs.count(build) == 1
-    assert docs.index(build) > docs.index("cat > scripts/agent_runner.py")
-    assert docs.index(build) > docs.index("cat > scripts/coordinator.py")
 
 
-def test_deterministic_validation_builds_both_docker_examples():
-    """CI must exercise the exact Dockerfiles and contexts Dependabot updates."""
+def test_network_compatibility_builds_both_docker_examples():
+    """Live pulls are weekly/manual compatibility checks, not deterministic CI."""
+    deterministic = PATTERN_VALIDATION_WORKFLOW.read_text(encoding="utf-8")
     workflow = yaml.load(
-        PATTERN_VALIDATION_WORKFLOW.read_text(encoding="utf-8"),
+        DOCKER_COMPATIBILITY_WORKFLOW.read_text(encoding="utf-8"),
         Loader=yaml.BaseLoader,
     )
-    steps = workflow["jobs"]["deterministic-validation"]["steps"]
+    steps = workflow["jobs"]["docker-compatibility"]["steps"]
     step = next(
         item for item in steps
-        if item.get("name") == "Build maintained Docker examples")
+        if item.get("name") == (
+            "Build maintained Docker examples from live upstreams"))
     run = step["run"]
 
+    assert "docker build --pull" not in deterministic
     assert step["env"] == {"DOCKER_BUILDKIT": "1"}
     assert run.count("docker build --pull") == 2
     assert (
         "docker build --pull \\\n"
-        "  --tag ai-development-patterns/parallel-agent:ci \\\n"
+        "  --tag ai-development-patterns/parallel-agent:compatibility \\\n"
         "  --file examples/parallel-agents/docker/Dockerfile.ai-agent \\\n"
         "  examples/parallel-agents"
     ) in run
     assert (
         "docker build --pull \\\n"
-        "  --tag ai-development-patterns/security-sandbox:ci \\\n"
+        "  --tag ai-development-patterns/security-sandbox:compatibility \\\n"
         "  --file examples/security-sandbox/Dockerfile.ai-sandbox \\\n"
         "  examples/security-sandbox"
     ) in run

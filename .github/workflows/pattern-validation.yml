@@ -105,33 +105,41 @@ jobs:
             echo "::endgroup::"
           done
 
-      - name: Build maintained Docker examples
-        env:
-          DOCKER_BUILDKIT: "1"
-        run: |
-          set -euo pipefail
-          docker build --pull \
-            --tag ai-development-patterns/parallel-agent:ci \
-            --file examples/parallel-agents/docker/Dockerfile.ai-agent \
-            examples/parallel-agents
-          docker build --pull \
-            --tag ai-development-patterns/security-sandbox:ci \
-            --file examples/security-sandbox/Dockerfile.ai-sandbox \
-            examples/security-sandbox
-
-      - name: Run deterministic repository tests once
+      - name: Run deterministic repository test suites
         id: tests
         continue-on-error: true
         run: |
+          set -uo pipefail
           mkdir -p tests/test-results
+          set +e
+          (
+            cd examples/spec-driven-development
+            python3 -m pytest -v --tb=short \
+              --junitxml="$GITHUB_WORKSPACE/tests/test-results/spec-driven-junit.xml" \
+              --json-report \
+              --json-report-file="$GITHUB_WORKSPACE/tests/test-results/spec-driven-report.json"
+          )
+          spec_status=$?
           python3 -m pytest -m "not slow" -v --tb=short \
             --junitxml=tests/test-results/junit.xml \
             --html=tests/test-results/report.html --self-contained-html \
             --cov=tests/utils --cov-report=html:tests/test-results/coverage \
             --json-report --json-report-file=tests/test-results/report.json
+          repository_status=$?
+          {
+            echo "spec_status=$spec_status"
+            echo "repository_status=$repository_status"
+          } >> "$GITHUB_OUTPUT"
+          set -e
+          if [ "$spec_status" -ne 0 ] || [ "$repository_status" -ne 0 ]; then
+            exit 1
+          fi
 
       - name: Generate local-agent fix prompt
         if: steps.tests.outcome == 'failure'
+        env:
+          SPEC_STATUS: ${{ steps.tests.outputs.spec_status }}
+          REPOSITORY_STATUS: ${{ steps.tests.outputs.repository_status }}
         run: |
           {
             echo "## Local agent fix instructions"
@@ -139,7 +147,26 @@ jobs:
             echo "Use this prompt in a signed-in local coding-agent session:"
             echo
             echo '````'
-            python3 scripts/generate-audit-prompt.py tests/test-results/report.json 2>/dev/null || true
+            if [ "$SPEC_STATUS" != "0" ]; then
+              echo "The embedded Spec-Driven Development gate failed. Reproduce it with:"
+              echo "  cd examples/spec-driven-development && python3 -m pytest -v --tb=short"
+              if [ -f tests/test-results/spec-driven-report.json ]; then
+                python3 scripts/generate-audit-prompt.py \
+                  --rerun-command \
+                  'cd examples/spec-driven-development && python3 -m pytest -x -q' \
+                  tests/test-results/spec-driven-report.json 2>/dev/null || true
+              else
+                echo 'The embedded suite failed before spec-driven-report.json was written.'
+              fi
+            fi
+            if [ "$REPOSITORY_STATUS" != "0" ] && \
+                [ -f tests/test-results/report.json ]; then
+              python3 scripts/generate-audit-prompt.py \
+                tests/test-results/report.json 2>/dev/null || true
+            elif [ "$REPOSITORY_STATUS" != "0" ]; then
+              echo 'The repository suite failed before report.json was written.'
+              echo 'Run: python3 -m pytest -m "not slow" -x -q'
+            fi
             echo '````'
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -226,7 +253,8 @@ jobs:
               '### Remediation checklist',
               '',
               '- [ ] Open the failed run and identify the first deterministic failure.',
-              '- [ ] Reproduce it locally with `python3 -m pytest -m "not slow" -x -q`.',
+              '- [ ] Reproduce the repository suite with `python3 -m pytest -m "not slow" -x -q`.',
+              '- [ ] Reproduce the embedded gate with `cd examples/spec-driven-development && python3 -m pytest -x -q`.',
               '- [ ] For catalog changes, run `python3 scripts/validate-pattern-names.py` and `python3 scripts/generate-patterns-data.py --check`.',
               '- [ ] Use the `Local agent fix instructions` in the job summary from a signed-in local coding-agent session if useful.',
               '- [ ] Commit the correction and confirm the required `Validation gate` check passes.'

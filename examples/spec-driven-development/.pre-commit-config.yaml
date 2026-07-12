@@ -1,69 +1,61 @@
-# Pre-commit configuration for Specification Driven Development
-# Ensures specification compliance before commits
+minimum_pre_commit_version: "4.6.0"
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+fail_fast: false
 
 repos:
-  # Specification validation
   - repo: local
     hooks:
       - id: spec-coverage
-        name: Specification Coverage Check
-        entry: python spec_validator.py --check-coverage
+        name: Validate collected requirement-to-test links
+        entry: >-
+          python examples/spec-driven-development/spec_validator.py
+          --check-coverage
+          --spec-file examples/spec-driven-development/iam_policy_spec.md
+          --test-dir examples/spec-driven-development/tests
         language: python
+        additional_dependencies: ["pytest==9.1.1"]
         pass_filenames: false
-        additional_dependencies: []
-        
+        always_run: true
+
       - id: spec-conflicts
-        name: Authority Conflict Check
-        entry: python spec_validator.py --authority-conflicts
+        name: Check specification authority conflicts
+        entry: >-
+          python examples/spec-driven-development/spec_validator.py
+          --authority-conflicts
+          --spec-file examples/spec-driven-development/iam_policy_spec.md
+          --test-dir examples/spec-driven-development/tests
         language: python
+        additional_dependencies: ["pytest==9.1.1"]
         pass_filenames: false
-        
+        always_run: true
+
       - id: spec-syntax
-        name: Specification Syntax Validation
-        entry: python spec_validator.py --validate-syntax iam_policy_spec.md
+        name: Validate specification syntax
+        entry: >-
+          python examples/spec-driven-development/spec_validator.py
+          --validate-syntax examples/spec-driven-development/iam_policy_spec.md
         language: python
+        additional_dependencies: ["pytest==9.1.1"]
         pass_filenames: false
+        always_run: true
 
-  # Code quality checks
-  - repo: https://github.com/psf/black
-    rev: 23.11.0
-    hooks:
-      - id: black
-        language_version: python3
-
-  - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
-    hooks:
-      - id: flake8
-        args: [--max-line-length=88, --extend-ignore=E203]
-
-  # Test validation
-  - repo: local
-    hooks:
-      - id: pytest-check
-        name: Run Tests
-        entry: pytest
+      - id: embedded-quality-gate
+        name: Run the embedded behavior, traceability, and coverage gates
+        entry: >-
+          bash -c 'cd examples/spec-driven-development && python -m pytest'
         language: python
+        additional_dependencies:
+          - "pytest==9.1.1"
+          - "pytest-cov==7.1.0"
+          - "PyYAML==6.0.3"
         pass_filenames: false
-        additional_dependencies: [pytest, pytest-cov]
+        always_run: true
 
-  # Commit message validation for specification traceability
-  - repo: local
-    hooks:
       - id: commit-msg-spec
-        name: Validate Commit Message for Spec References
-        entry: python -c "
-import sys, re
-msg = open(sys.argv[1]).read()
-if '[spec:' not in msg and 'feat:' in msg:
-    print('❌ Commit implementing features must reference specifications with [spec:anchor_id]')
-    print('Example: feat: implement rate limiting [spec:test_rate_limiting]')
-    sys.exit(1)
-"
+        name: Require specification anchors on feature commits
+        entry: >-
+          python examples/spec-driven-development/validate_commit_message.py
         language: python
         stages: [commit-msg]
-        pass_filenames: false
-
-# Global configuration
-default_stages: [commit]
-fail_fast: false
+        always_run: true
