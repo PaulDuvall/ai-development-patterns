@@ -138,7 +138,7 @@ def test_docker_examples_use_current_supported_python_base_families():
 
     assert re.search(r"^FROM python:3\.14-slim$", parallel, re.MULTILINE)
     assert re.search(
-        r"^FROM python:3\.13-slim-bookworm$", sandbox, re.MULTILINE)
+        r"^FROM python:3\.14-slim-bookworm$", sandbox, re.MULTILINE)
     assert "https://deb.nodesource.com/setup_24.x" in parallel
     assert "setup_20.x" not in parallel
     assert "bullseye" not in parallel.casefold()
