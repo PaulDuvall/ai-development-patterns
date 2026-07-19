@@ -5,6 +5,12 @@
 *.db-wal
 *.db-shm
 
+# Embedded Dolt backend local database state (bd >= 1.0)
+# Per-machine database working directory and local backups; never commit.
+# The shared representation is the tracked issues.jsonl.
+embeddeddolt/
+backup/
+
 # Daemon runtime files
 daemon.lock
 daemon.log
