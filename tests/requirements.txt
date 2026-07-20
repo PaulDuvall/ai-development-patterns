@@ -10,7 +10,7 @@ typing_extensions==4.16.0
 urllib3==2.7.0
 
 # Test runner and plugins (including their transitive dependencies)
-coverage==7.15.1
+coverage==7.15.2
 iniconfig==2.3.0
 Jinja2==3.1.6
 MarkupSafe==3.0.3
