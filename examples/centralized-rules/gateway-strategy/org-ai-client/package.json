@@ -9,7 +9,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.111.0"
+    "@anthropic-ai/sdk": "^0.112.3"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
