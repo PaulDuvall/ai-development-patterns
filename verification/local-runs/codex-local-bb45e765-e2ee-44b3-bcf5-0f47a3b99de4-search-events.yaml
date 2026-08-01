@@ -1,0 +1,88 @@
+schema_version: 1
+run_id: codex-local:bb45e765-e2ee-44b3-bcf5-0f47a3b99de4
+run_ref: verification/local-runs/codex-local-bb45e765-e2ee-44b3-bcf5-0f47a3b99de4.yaml
+run_manifest_sha256: d4e0549e485e6edc7e5d13f7ea770346fbd23b6bfb2afc96fc3e79d4feba13a6
+research_contract_sha256: 3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+events:
+- sequence: 1
+  unit: incident-automation
+  mode: name
+  tool: web.search_query
+  query: '"Incident Automation" AI runbooks historical incidents telemetry'
+  candidate_count: 2
+  previous_event_sha256: null
+  event_sha256: fea003961ecae42ab8ae3759fd5672c7d7983623a9305be604033f3e61dd270c
+- sequence: 2
+  unit: incident-automation
+  mode: name
+  tool: web.search_query
+  query: '"AI-generated runbook" incident response PagerDuty'
+  candidate_count: 2
+  previous_event_sha256: fea003961ecae42ab8ae3759fd5672c7d7983623a9305be604033f3e61dd270c
+  event_sha256: 4a3a2b391194894b180faa258364aa1374a95e21f41a533e6629962415a73b7c
+- sequence: 3
+  unit: incident-automation
+  mode: name
+  tool: web.search_query
+  query: '"AI SRE" incident response runbook automation'
+  candidate_count: 3
+  previous_event_sha256: 4a3a2b391194894b180faa258364aa1374a95e21f41a533e6629962415a73b7c
+  event_sha256: 20d2e678506169d17cce52e7eabe6d6f9f5e075544eee35a1c6cdaaff27257fd
+- sequence: 4
+  unit: incident-automation
+  mode: mechanism
+  tool: web.search_query
+  query: AI correlates logs metrics deployments past incidents execute remediation
+    workflows guardrails
+  candidate_count: 2
+  previous_event_sha256: 20d2e678506169d17cce52e7eabe6d6f9f5e075544eee35a1c6cdaaff27257fd
+  event_sha256: e46092a74011ba72f0113405ff9e0829d4ee2cd882ffd2f22d60abec6a9543e0
+- sequence: 5
+  unit: incident-automation
+  mode: mechanism
+  tool: web.search_query
+  query: autonomous incident response historical incidents current system state remediation
+    actions human approval
+  candidate_count: 3
+  previous_event_sha256: e46092a74011ba72f0113405ff9e0829d4ee2cd882ffd2f22d60abec6a9543e0
+  event_sha256: b9a02d42e9710503ba9bba4603253f7d50b7776dfa75c09c96f9b48fc05915dd
+- sequence: 6
+  unit: incident-automation
+  mode: mechanism
+  tool: web.search_query
+  query: AI on-call case study historical incidents proposed remediation reduced MTTR
+  candidate_count: 2
+  previous_event_sha256: b9a02d42e9710503ba9bba4603253f7d50b7776dfa75c09c96f9b48fc05915dd
+  event_sha256: 06819db708cfafb1cec9794c621c25ee55ecd8817a328f599b8a8d0880952e06
+- sequence: 7
+  unit: incident-automation
+  mode: artifact
+  tool: web.search_query
+  query: GitHub LLM incident response agent runbook automation repository
+  candidate_count: 4
+  previous_event_sha256: 06819db708cfafb1cec9794c621c25ee55ecd8817a328f599b8a8d0880952e06
+  event_sha256: f70f4094c6aa3c136ab37be748d7e8b12423ef6375461fe759535f1aa70011c9
+- sequence: 8
+  unit: incident-automation
+  mode: artifact
+  tool: web.search_query
+  query: open source AI SRE incident remediation agent GitHub telemetry runbooks
+  candidate_count: 4
+  previous_event_sha256: f70f4094c6aa3c136ab37be748d7e8b12423ef6375461fe759535f1aa70011c9
+  event_sha256: d13fb384247b07a4518ba2ded5bb82e3397726f78d7ace6e23e4436c71ceaa77
+- sequence: 9
+  unit: incident-automation
+  mode: artifact
+  tool: web.search_query
+  query: GitHub autonomous incident response historical incidents remediation agent
+  candidate_count: 3
+  previous_event_sha256: d13fb384247b07a4518ba2ded5bb82e3397726f78d7ace6e23e4436c71ceaa77
+  event_sha256: 57eee84de19e6a9c83e87aecc9f1c8cbac81e0d72376ffac4e4ad4619cef5bc9
+- sequence: 10
+  unit: incident-automation
+  mode: name
+  tool: web.search_query
+  query: '"Vibe OnCall" incident response historical incidents Shutterstock'
+  candidate_count: 1
+  previous_event_sha256: 57eee84de19e6a9c83e87aecc9f1c8cbac81e0d72376ffac4e4ad4619cef5bc9
+  event_sha256: a321808b991209776a9f19829f10a70c5852800a9685398c450fe5449230cd3e
