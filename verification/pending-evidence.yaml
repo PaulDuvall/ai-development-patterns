@@ -6,4 +6,4 @@
 # same PR: overlaps, duplicate slugs, and unknown catalog slugs are validation errors.
 #
 pending:
-  - dependency-migration
+- dependency-migration
