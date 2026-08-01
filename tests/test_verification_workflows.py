@@ -382,7 +382,7 @@ def test_general_validation_runs_once_and_has_a_stable_result_only_gate():
         "tests/requirements.txt")
     setup_node = named_step(validation, "Set up Node.js 24")
     assert setup_node["uses"] == (
-        "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e")
+        "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020")
     assert setup_node["with"]["node-version"] == "24"
     assert setup_node["with"]["cache"] == "npm"
     assert setup_node["with"]["cache-dependency-path"].splitlines() == [

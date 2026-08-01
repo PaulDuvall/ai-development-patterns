@@ -41,7 +41,7 @@ def test_spec_driven_example_enforces_its_embedded_coverage_gate():
     }
     assert requirements == {
         "PyYAML==6.0.3",
-        "pre-commit==4.6.0",
+        "pre-commit==4.6.1",
         "pytest==9.1.1",
         "pytest-cov==7.1.0",
     }
