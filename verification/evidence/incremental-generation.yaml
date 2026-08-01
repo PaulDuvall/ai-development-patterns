@@ -2,119 +2,163 @@ schema_version: 2
 provenance_status: complete
 pattern: Incremental Generation
 slug: incremental-generation
-last_checked: 2026-07-10
+last_checked: '2026-08-01'
 search:
-  run_id: "github-actions:29123202495"
-  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  run_id: codex-local:6f1554f6-a941-4530-a05d-e01931884de0
+  run_ref: verification/local-runs/codex-local-6f1554f6-a941-4530-a05d-e01931884de0.yaml
+  run_manifest_sha256: c0346a22dfcb6129847c42054a46254b749383e947d8623b6c2f4e540810dc91
   provider: openai
-  model: gpt-5.5
-  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-  checked_at: 2026-07-10
+  model: codex-managed
+  prompt_version: evidence-v2-codex-local-v1+sha256.3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+  checked_at: '2026-08-01'
   modes:
     name:
       queries:
-        - "incremental generation AI coding small deployable iterations"
-        - "\"Incremental Generation\" \"AI coding\""
-      candidate_count: 3
+      - '"Incremental Generation" AI coding small sequential validated increments'
+      - AI coding "bite-sized steps" "one at a time"
+      - '"small, iterative chunks" AI coding workflow Addy Osmani'
+      - '"incremental generation" "AI coding"'
+      candidate_count: 8
     mechanism:
       queries:
-        - "AI coding assistant break complex task into small tasks one at a time"
-        - "AI coding workflow small iterative chunks"
-        - "coding agent break goal into bite sized steps"
-      candidate_count: 8
+      - AI coding assistant break complex task into smaller tasks one by one validate
+        each step
+      - coding agent implement features incrementally test each step
+      - site:docs.github.com/copilot "smaller tasks" "one by one"
+      - site:aider.chat/docs/usage/tips "bite sized steps"
+      candidate_count: 6
     artifact:
       queries:
-        - "\"Single-tick build-loop conductor\" \"one pipeline stage\""
-        - "\"small, iterative chunks that build on each other\" \".claude/commands/plan.md\""
-      candidate_count: 4
-adoption_score: 15
+      - GitHub repository AI coding agent sequential tasks one at a time validate
+        implementation
+      - GitHub Claude Code workflow "one task at a time" tests
+      - GitHub Claude Code framework "one task at a time" verify tests
+      - GitHub AI coding "one verified task at a time"
+      candidate_count: 6
+adoption_score: 19
 tier_counts:
   T1: 1
-  T2: 2
+  T2: 3
   T4: 1
 adoption_dimensions:
   implementation_available: true
   independent_adoption: true
-  independence_groups: 4
-naming_alignment: aliased
+  independence_groups: 5
+naming_alignment: weak
 terminology_variants:
-  - term: break complex tasks into smaller tasks
-    used_by: GitHub Docs
-    url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
-  - term: bite sized steps
-    used_by: Aider
-    url: https://aider.chat/docs/usage/tips.html
-  - term: small, iterative chunks
-    used_by: Addy Osmani
-    url: https://addyosmani.com/blog/ai-coding-workflow/
+- term: Incremental Generation
+  used_by: Alchemaize CID
+  url: https://alchemaize.ai/cid/team-overview/
+- term: break complex tasks into simpler tasks
+  used_by: GitHub Docs
+  url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
+- term: bite sized steps
+  used_by: Aider
+  url: https://aider.chat/docs/usage/tips.html
+- term: small, iterative chunks
+  used_by: Addy Osmani
+  url: https://addyosmani.com/blog/ai-coding-workflow/
+- term: Verify Loop
+  used_by: Oli Woodman
+  url: https://github.com/oliwoodman/verify-loop-skill
 evidence:
-  - tier: T1
-    match: unnamed
-    mechanism_quote: "Single-tick build-loop conductor — advances one ready spec by one pipeline stage (plan → plan-review → work → make-pr, plus an optional `qa` stage when `pipeline.qa==on`) per tick"
-    source: gmickel/flow-next
-    source_kind: open_source_implementation
-    organization: gmickel
-    independence_group: independent:gmickel
-    url: https://github.com/gmickel/flow-next
-    resolved_url: https://github.com/gmickel/flow-next
-    content_sha256: 8dd5f792ad666591cfb3b2bfcfaea34b99676db304fa4dd8f685317b0617248a
-    verifier:
-      method: automated
-      model: gpt-5.5
-      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
-    claim: Open source Claude Code/Codex workflow plugin advances one ready specification by one pipeline stage per tick instead of generating the full change in one pass.
-  - tier: T2
-    match: aliased
-    mechanism_quote: "break the process down into smaller tasks, and ask Copilot to accomplish them one by one"
-    source: GitHub Docs, "Prompt engineering for GitHub Copilot Chat"
-    source_kind: official_documentation
-    organization: GitHub
-    independence_group: github
-    url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
-    resolved_url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
-    content_sha256: 503525f40bab90be8532834893eff9386d791469373f40ebd47f7d5b022f910a
-    verifier:
-      method: automated
-      model: gpt-5.5
-      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
-    claim: Official Copilot guidance tells users to handle complex coding work by decomposing it into smaller tasks and asking Copilot to complete them one by one.
-  - tier: T2
-    match: aliased
-    mechanism_quote: "Do them one at a time. Adjust the files added to the chat as you go"
-    source: Aider official documentation, "Tips"
-    source_kind: official_documentation
-    organization: Aider
-    independence_group: aider
-    url: https://aider.chat/docs/usage/tips.html
-    resolved_url: https://aider.chat/docs/usage/tips.html
-    content_sha256: edc45b0796288519b6d9911bd8e5611870aca5c5c500f476efc33db52ff5e95e
-    verifier:
-      method: automated
-      model: gpt-5.5
-      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
-    claim: Aider's official usage guidance directs users to break a goal into bite-sized steps, complete them one at a time, and adjust the chat context between steps.
-  - tier: T4
-    match: aliased
-    mechanism_quote: "Instead, we break the project into iterative steps or tickets and tackle them one by one."
-    source: Addy Osmani, "AI Coding Workflow"
-    source_kind: practitioner_report
-    organization: Addy Osmani
-    independence_group: independent:addy-osmani
-    url: https://addyosmani.com/blog/ai-coding-workflow/
-    resolved_url: https://addyosmani.com/blog/ai-coding-workflow/
-    content_sha256: 746d31e964680b8a6430f05cea15acfa29bb4d96c9f1c1479af30fcf070cedd8
-    verifier:
-      method: automated
-      model: gpt-5.5
-      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    date: 2026-01-04
-    retrieved: 2026-07-10
-    claim: Practitioner workflow report describes avoiding one-shot AI coding by planning iterative tickets and tackling them one by one.
+- tier: T1
+  match: aliased
+  mechanism_quote: it works one task at a time, checking each change for real before
+    moving to the next
+  source: oliwoodman/verify-loop-skill
+  source_kind: open_source_implementation
+  organization: Oli Woodman
+  independence_group: independent:oli-woodman
+  url: https://github.com/oliwoodman/verify-loop-skill
+  verifier:
+    method: automated
+    model: codex-managed
+    prompt_version: evidence-v2-codex-local-v1+sha256.3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+    run_ref: verification/local-runs/codex-local-6f1554f6-a941-4530-a05d-e01931884de0.yaml
+    run_manifest_sha256: c0346a22dfcb6129847c42054a46254b749383e947d8623b6c2f4e540810dc91
+  claim: An installable Claude skill selects one smallest task per lap, runs the application
+    or tests after the change, and advances only after observed success.
+  resolved_url: https://github.com/oliwoodman/verify-loop-skill
+  content_sha256: 6bcf499eaa55db4b1b5b61fdc2f50fa689ebc44a7003d87a1bbbc0cf62b6c0a4
+  retrieved: '2026-08-01'
+- tier: T2
+  match: named
+  mechanism_quote: One sub-task at a time. User approval between parent tasks.
+  source: Alchemaize CID, Team-level overview
+  source_kind: official_documentation
+  organization: Alchemaize
+  independence_group: alchemaize
+  url: https://alchemaize.ai/cid/team-overview/
+  verifier:
+    method: automated
+    model: codex-managed
+    prompt_version: evidence-v2-codex-local-v1+sha256.3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+    run_ref: verification/local-runs/codex-local-6f1554f6-a941-4530-a05d-e01931884de0.yaml
+    run_manifest_sha256: c0346a22dfcb6129847c42054a46254b749383e947d8623b6c2f4e540810dc91
+  claim: Official CID methodology names Incremental Generation and supplies agent-consumable
+    workflow rules for executing one sub-task at a time with approvals and checkpoints.
+  resolved_url: https://alchemaize.ai/cid/team-overview/
+  content_sha256: 64d44e46ebb27f7bff90d354bd06136a8be93d0235abe5f0c9377f5d4c268272
+  retrieved: '2026-08-01'
+- tier: T2
+  match: aliased
+  mechanism_quote: break the process down into smaller tasks, and ask Copilot to accomplish
+    them one by one
+  source: GitHub Docs, Prompt engineering for GitHub Copilot Chat
+  source_kind: official_documentation
+  organization: GitHub
+  independence_group: github
+  url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
+  verifier:
+    method: automated
+    model: codex-managed
+    prompt_version: evidence-v2-codex-local-v1+sha256.3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+    run_ref: verification/local-runs/codex-local-6f1554f6-a941-4530-a05d-e01931884de0.yaml
+    run_manifest_sha256: c0346a22dfcb6129847c42054a46254b749383e947d8623b6c2f4e540810dc91
+  claim: Official Copilot guidance directs users to decompose large coding requests
+    into small tasks completed sequentially.
+  resolved_url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
+  content_sha256: 4492dd2a5802635bb69d88993efc82627b2d79f109618b6f6e03db97cb7c1010
+  retrieved: '2026-08-01'
+- tier: T2
+  match: aliased
+  mechanism_quote: Do them one at a time. Adjust the files added to the chat as you
+    go
+  source: Aider official documentation, Tips
+  source_kind: official_documentation
+  organization: Aider
+  independence_group: aider
+  url: https://aider.chat/docs/usage/tips.html
+  verifier:
+    method: automated
+    model: codex-managed
+    prompt_version: evidence-v2-codex-local-v1+sha256.3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+    run_ref: verification/local-runs/codex-local-6f1554f6-a941-4530-a05d-e01931884de0.yaml
+    run_manifest_sha256: c0346a22dfcb6129847c42054a46254b749383e947d8623b6c2f4e540810dc91
+  claim: Aider guidance tells users to break goals into bite-sized steps, complete
+    them one at a time, and update context between steps.
+  resolved_url: https://aider.chat/docs/usage/tips.html
+  content_sha256: edc45b0796288519b6d9911bd8e5611870aca5c5c500f476efc33db52ff5e95e
+  retrieved: '2026-08-01'
+- tier: T4
+  match: aliased
+  mechanism_quote: We code that, test it, then move to Step 2, and so on.
+  source: Addy Osmani, My LLM coding workflow going into 2026
+  source_kind: practitioner_report
+  organization: Addy Osmani
+  independence_group: independent:addy-osmani
+  url: https://addyosmani.com/blog/ai-coding-workflow/
+  date: '2026-01-04'
+  verifier:
+    method: automated
+    model: codex-managed
+    prompt_version: evidence-v2-codex-local-v1+sha256.3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+    run_ref: verification/local-runs/codex-local-6f1554f6-a941-4530-a05d-e01931884de0.yaml
+    run_manifest_sha256: c0346a22dfcb6129847c42054a46254b749383e947d8623b6c2f4e540810dc91
+  claim: A dated practitioner workflow avoids monolithic AI output by implementing
+    and testing sequential tickets before advancing.
+  resolved_url: https://addyosmani.com/blog/ai-coding-workflow/
+  content_sha256: 746d31e964680b8a6430f05cea15acfa29bb4d96c9f1c1479af30fcf070cedd8
+  retrieved: '2026-08-01'
 verdict: verified

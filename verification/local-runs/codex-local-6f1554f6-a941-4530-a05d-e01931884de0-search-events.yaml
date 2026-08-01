@@ -1,0 +1,104 @@
+schema_version: 1
+run_id: codex-local:6f1554f6-a941-4530-a05d-e01931884de0
+run_ref: verification/local-runs/codex-local-6f1554f6-a941-4530-a05d-e01931884de0.yaml
+run_manifest_sha256: c0346a22dfcb6129847c42054a46254b749383e947d8623b6c2f4e540810dc91
+research_contract_sha256: 3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+events:
+- sequence: 1
+  unit: incremental-generation
+  mode: name
+  tool: web.search_query
+  query: '"Incremental Generation" AI coding small sequential validated increments'
+  candidate_count: 1
+  previous_event_sha256: null
+  event_sha256: 80d97710ca6e2ee01dadb73d20834dedd14ea901409f6ed5db05511eefce68f2
+- sequence: 2
+  unit: incremental-generation
+  mode: name
+  tool: web.search_query
+  query: AI coding "bite-sized steps" "one at a time"
+  candidate_count: 1
+  previous_event_sha256: 80d97710ca6e2ee01dadb73d20834dedd14ea901409f6ed5db05511eefce68f2
+  event_sha256: 9d8de97b5cb079a08307dc0da75fc855e91f58db8fd26a6afa5f5d049127f796
+- sequence: 3
+  unit: incremental-generation
+  mode: mechanism
+  tool: web.search_query
+  query: AI coding assistant break complex task into smaller tasks one by one validate
+    each step
+  candidate_count: 2
+  previous_event_sha256: 9d8de97b5cb079a08307dc0da75fc855e91f58db8fd26a6afa5f5d049127f796
+  event_sha256: 6aeb1c5fd5ddb472e1884b78882c5ed03f44c91147c32ae66cb2ee5b536fc88c
+- sequence: 4
+  unit: incremental-generation
+  mode: mechanism
+  tool: web.search_query
+  query: coding agent implement features incrementally test each step
+  candidate_count: 2
+  previous_event_sha256: 6aeb1c5fd5ddb472e1884b78882c5ed03f44c91147c32ae66cb2ee5b536fc88c
+  event_sha256: 78f2049a89329c6e94ddacf0acb112d3a3c941167f325afd5dd19e4a5dceaa81
+- sequence: 5
+  unit: incremental-generation
+  mode: artifact
+  tool: web.search_query
+  query: GitHub repository AI coding agent sequential tasks one at a time validate
+    implementation
+  candidate_count: 1
+  previous_event_sha256: 78f2049a89329c6e94ddacf0acb112d3a3c941167f325afd5dd19e4a5dceaa81
+  event_sha256: c4b214bcf0c60435923cbc55f169ea18f716cad05964625f69b8103667450990
+- sequence: 6
+  unit: incremental-generation
+  mode: artifact
+  tool: web.search_query
+  query: GitHub Claude Code workflow "one task at a time" tests
+  candidate_count: 1
+  previous_event_sha256: c4b214bcf0c60435923cbc55f169ea18f716cad05964625f69b8103667450990
+  event_sha256: c79b87d9851a4410697517ce79936a5de68d3b2c43f439fa6b649dff0199a84a
+- sequence: 7
+  unit: incremental-generation
+  mode: name
+  tool: web.search_query
+  query: '"small, iterative chunks" AI coding workflow Addy Osmani'
+  candidate_count: 1
+  previous_event_sha256: c79b87d9851a4410697517ce79936a5de68d3b2c43f439fa6b649dff0199a84a
+  event_sha256: de91488fb7f0d9a2816191456d4263575c41f9096a451d50597ffcbf72348a12
+- sequence: 8
+  unit: incremental-generation
+  mode: mechanism
+  tool: web.search_query
+  query: site:docs.github.com/copilot "smaller tasks" "one by one"
+  candidate_count: 1
+  previous_event_sha256: de91488fb7f0d9a2816191456d4263575c41f9096a451d50597ffcbf72348a12
+  event_sha256: 5ce49436e80b57e6539e7c4a2e15d30786d105df8f3d60997643d2b36c9fec4b
+- sequence: 9
+  unit: incremental-generation
+  mode: mechanism
+  tool: web.search_query
+  query: site:aider.chat/docs/usage/tips "bite sized steps"
+  candidate_count: 1
+  previous_event_sha256: 5ce49436e80b57e6539e7c4a2e15d30786d105df8f3d60997643d2b36c9fec4b
+  event_sha256: 9c4f545e9374cbfc436fb40c117ee7d634582250af7219bbaad8352faaec5920
+- sequence: 10
+  unit: incremental-generation
+  mode: artifact
+  tool: web.search_query
+  query: GitHub Claude Code framework "one task at a time" verify tests
+  candidate_count: 3
+  previous_event_sha256: 9c4f545e9374cbfc436fb40c117ee7d634582250af7219bbaad8352faaec5920
+  event_sha256: 8477a94515b20e0516aa540b06b542bf17e698f6c2a05ff6d3f347b5165abb70
+- sequence: 11
+  unit: incremental-generation
+  mode: artifact
+  tool: web.search_query
+  query: GitHub AI coding "one verified task at a time"
+  candidate_count: 1
+  previous_event_sha256: 8477a94515b20e0516aa540b06b542bf17e698f6c2a05ff6d3f347b5165abb70
+  event_sha256: 9535a8d3760f5919a56a557f9b8d00ac53f3403738ce1019428a922e8bedf6b6
+- sequence: 12
+  unit: incremental-generation
+  mode: name
+  tool: web.search_query
+  query: '"incremental generation" "AI coding"'
+  candidate_count: 5
+  previous_event_sha256: 9535a8d3760f5919a56a557f9b8d00ac53f3403738ce1019428a922e8bedf6b6
+  event_sha256: 2ba464740b0ec29c41f6bb90cf237bf64f5a2d44c52a24c323cda02b56cdfd48
