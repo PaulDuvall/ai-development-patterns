@@ -2,117 +2,122 @@ schema_version: 2
 provenance_status: complete
 pattern: Autonomous Remediation
 slug: autonomous-remediation
-last_checked: 2026-07-10
+last_checked: '2026-08-01'
 search:
-  run_id: "github-actions:29123202495"
-  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  run_id: codex-local:e3a0401a-8dcb-4b9f-9247-2aae4e39df1e
+  run_ref: verification/local-runs/codex-local-e3a0401a-8dcb-4b9f-9247-2aae4e39df1e.yaml
+  run_manifest_sha256: f4c3509d94d274a905bb62ee3184490aecdc83aa480362996d9a57aab8711fe9
   provider: openai
-  model: gpt-5.5
-  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-  checked_at: 2026-07-10
+  model: codex-managed
+  prompt_version: evidence-v2-codex-local-v1+sha256.3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+  checked_at: '2026-08-01'
   modes:
     name:
       queries:
-        - "\"Autonomous Remediation\" coding agent"
-        - "\"AI autofix\" code scanning LLM remediation"
-        - "\"automated program repair\" LLM agent"
-      candidate_count: 9
+      - '"Autonomous Remediation" LLM code repair recheck'
+      - '"Copilot Autofix" code scanning validate fix analysis'
+      - '"automated program repair" LLM iterative tests repair agent'
+      - '"Agentic Program Repair from Test Failures at Scale" Meta'
+      candidate_count: 4
     mechanism:
       queries:
-        - "run lint tests after AI edits automatically fix problems"
-        - "code scanning analysis large language model generate fixes"
-        - "coding agent hook blocks edit with violation report"
-      candidate_count: 10
+      - static analysis LLM generate fix rerun analyzer iterate until clean code
+      - lint failures AI edits automatically repair rerun lint test loop coding agent
+      - test failure LLM patch execute tests feedback loop bounded iterations program
+        repair
+      candidate_count: 3
     artifact:
       queries:
-        - "\"--test-cmd\" \"aider\" \"fix\""
-        - "\"PostToolUse\" \"lint\" \"Claude Code\" hook"
-        - "\"RepairAgent\" \"test it\" \"iterate\""
-      candidate_count: 7
-adoption_score: 16
-tier_counts: {T1: 1, T2: 2, T3: 1}
+      - RepairAgent GitHub validate_patch execute_tests max cycles
+      - GitHub agentic autofix re-running CodeQL repository source
+      - aider auto_lint lint errors fix code GitHub repository
+      - site:github.com/Aider-AI/aider "max_reflections" lint test fix
+      candidate_count: 3
+adoption_score: 12
+tier_counts:
+  T1: 2
+  T4: 1
 adoption_dimensions:
   implementation_available: true
   independent_adoption: true
-  independence_groups: 4
+  independence_groups: 3
 naming_alignment: aliased
 terminology_variants:
-  - term: Copilot Autofix
-    used_by: GitHub
-    url: https://docs.github.com/en/code-security/concepts/code-scanning/copilot-autofix-for-code-scanning
-  - term: Autofix
-    used_by: Harness
-    url: https://developer.harness.io/3k-docs/platform/getting-started/agents/code-quality/
-  - term: automated program repair
-    used_by: ICSE 2025 research track
-    url: https://conf.researchr.org/details/icse-2025/icse-2025-research-track/160/RepairAgent-An-Autonomous-LLM-Based-Agent-for-Program-Repair
+- term: Agentic autofix
+  used_by: GitHub
+  url: https://docs.github.com/en/code-security/concepts/code-scanning/autofix-for-code-scanning
+- term: RepairAgent
+  used_by: Software Lab, University of Stuttgart
+  url: https://github.com/sola-st/RepairAgent
+- term: agentic program repair
+  used_by: Meta
+  url: https://arxiv.org/abs/2507.18755
 evidence:
-  - tier: T1
-    match: unnamed
-    mechanism_quote: "Aider can automatically lint and test your code every time it makes changes. This helps identify and repair any problems introduced by the AI edits."
-    source: Aider lint and test documentation
-    source_kind: open_source_implementation
-    organization: Aider
-    independence_group: aider
-    url: https://aider.chat/docs/usage/lint-test.html
-    resolved_url: https://aider.chat/docs/usage/lint-test.html
-    content_sha256: 158a220553a109338789ce500f5dcf9cf6fe45c0bff9458f689d8bb190b434fc
-    verifier:
-      method: automated
-      model: gpt-5.5
-      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
-    claim: Runnable open-source coding agent can run lint and test checks after AI edits and use the results to repair introduced problems.
-  - tier: T2
-    match: aliased
-    mechanism_quote: "The potential fixes are generated automatically by large language models (LLMs) using data from the codebase and from code scanning analysis."
-    source: GitHub Docs Copilot Autofix for code scanning
-    source_kind: official_documentation
-    organization: GitHub
-    independence_group: github
-    url: https://docs.github.com/en/code-security/concepts/code-scanning/copilot-autofix-for-code-scanning
-    resolved_url: https://docs.github.com/en/code-security/concepts/code-scanning/copilot-autofix-for-code-scanning
-    content_sha256: 00a601a9b97a5bfe1e8e3ac5c67a287cdb6a8f7f94121d51b6657019152f30d6
-    verifier:
-      method: automated
-      model: gpt-5.5
-      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
-    claim: Official documentation describes an LLM-generated fix workflow driven by code scanning analysis.
-  - tier: T2
-    match: aliased
-    mechanism_quote: "Harness provides three AI-powered agents focused on code quality: Code Review for intelligent PR feedback, Code Coverage for automated test generation, and Autofix for automatic CI failure remediation."
-    source: Harness Code Quality Agents documentation
-    source_kind: official_documentation
-    organization: Harness
-    independence_group: harness
-    url: https://developer.harness.io/3k-docs/platform/getting-started/agents/code-quality
-    resolved_url: https://developer.harness.io/3k-docs/platform/getting-started/agents/code-quality/
-    content_sha256: 3bca554a22bcf8abf3b379d4705b4ce721d74327e3ff7cac1822d1dfbdec5bca
-    verifier:
-      method: automated
-      model: gpt-5.5
-      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
-    claim: Official documentation describes an AI Autofix agent for automatic CI failure remediation.
-  - tier: T3
-    match: aliased
-    mechanism_quote: "This paper introduces RepairAgent, the first work to address the program repair challenge through an autonomous agent based on a large language model (LLM)."
-    source: ICSE 2025 RepairAgent research-track entry
-    source_kind: peer_reviewed_research
-    organization: Software Lab, University of Stuttgart
-    independence_group: software-lab-stuttgart
-    url: https://conf.researchr.org/details/icse-2025/icse-2025-research-track/160/RepairAgent-An-Autonomous-LLM-Based-Agent-for-Program-Repair
-    resolved_url: https://conf.researchr.org/details/icse-2025/icse-2025-research-track/160/RepairAgent-An-Autonomous-LLM-Based-Agent-for-Program-Repair
-    content_sha256: 62be9da9533091f293894a5e79fa9fcd78561a682e0fdd6a9e6809c300506963
-    verifier:
-      method: automated
-      model: gpt-5.5
-      prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-      run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
-    claim: Peer-reviewed ICSE research records an autonomous LLM-based agent for program repair.
+- tier: T1
+  match: aliased
+  mechanism_quote: generates a fix, validates it (for example, by re-running CodeQL),
+    and iterates until it opens a pull request with the changes.
+  source: About autofix for code scanning
+  source_kind: shipped_product
+  organization: GitHub
+  independence_group: github
+  url: https://docs.github.com/en/code-security/concepts/code-scanning/autofix-for-code-scanning
+  verifier:
+    method: automated
+    model: codex-managed
+    prompt_version: evidence-v2-codex-local-v1+sha256.3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+    run_ref: verification/local-runs/codex-local-e3a0401a-8dcb-4b9f-9247-2aae4e39df1e.yaml
+    run_manifest_sha256: f4c3509d94d274a905bb62ee3184490aecdc83aa480362996d9a57aab8711fe9
+  claim: GitHub Agentic Autofix starts from a deterministic CodeQL alert, generates
+    a repair, reruns CodeQL, and iterates before opening a pull request.
+  resolved_url: https://docs.github.com/en/code-security/concepts/code-scanning/autofix-for-code-scanning
+  content_sha256: 1275df0b130cf8a7bbc01382cb027c89ddaf93edd65b5d6e58d4b3ec209f277a
+  retrieved: '2026-08-01'
+- tier: T1
+  match: aliased
+  mechanism_quote: 'RepairAgent is an autonomous agent that fixes bugs in Java projects
+    using LLMs. It operates in a loop: localize the bug -> analyze the code -> generate
+    a fix -> test it -> iterate — all without human guidance.'
+  source: GitHub - sola-st/RepairAgent
+  source_kind: open_source_implementation
+  organization: Software Lab, University of Stuttgart
+  independence_group: software-lab-stuttgart
+  url: https://github.com/sola-st/RepairAgent
+  verifier:
+    method: automated
+    model: codex-managed
+    prompt_version: evidence-v2-codex-local-v1+sha256.3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+    run_ref: verification/local-runs/codex-local-e3a0401a-8dcb-4b9f-9247-2aae4e39df1e.yaml
+    run_manifest_sha256: f4c3509d94d274a905bb62ee3184490aecdc83aa480362996d9a57aab8711fe9
+  claim: The runnable open-source RepairAgent loops through localization, analysis,
+    LLM-generated repair, test execution, and iteration.
+  resolved_url: https://github.com/sola-st/RepairAgent
+  content_sha256: 19258a8ddc588c9b970a5c2ee69282e38da4b7051d32c278e05fe0b13a38428f
+  retrieved: '2026-08-01'
+- tier: T4
+  match: aliased
+  mechanism_quote: We start with a test failure that was triaged by a rule-based test
+    failure bot. We then set up an agentic harness and allow the agent to reason and
+    run a set of 15 actions from reading a file to generating a patch. We provide
+    feedback to the agent through static analysis and test failures so it can refine
+    its solution.
+  source: 'Agentic Program Repair from Test Failures at Scale: A Neuro-symbolic approach
+    with static analysis and test execution feedback'
+  source_kind: case_study
+  organization: Meta
+  independence_group: meta
+  url: https://arxiv.org/abs/2507.18755
+  date: '2025-07-24'
+  verifier:
+    method: automated
+    model: codex-managed
+    prompt_version: evidence-v2-codex-local-v1+sha256.3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+    run_ref: verification/local-runs/codex-local-e3a0401a-8dcb-4b9f-9247-2aae4e39df1e.yaml
+    run_manifest_sha256: f4c3509d94d274a905bb62ee3184490aecdc83aa480362996d9a57aab8711fe9
+  claim: A Meta production case study reports a rule-triggered Engineering Agent that
+    iteratively repairs code using static-analysis and test feedback before validated
+    patches reach human review.
+  resolved_url: https://arxiv.org/abs/2507.18755
+  content_sha256: 697082639413a2f4de6afb7f78213e20ddcb73fc2e8c9e34f88ff794552d76e5
+  retrieved: '2026-08-01'
 verdict: verified

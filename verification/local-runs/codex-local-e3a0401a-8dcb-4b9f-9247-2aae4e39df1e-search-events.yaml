@@ -1,0 +1,95 @@
+schema_version: 1
+run_id: codex-local:e3a0401a-8dcb-4b9f-9247-2aae4e39df1e
+run_ref: verification/local-runs/codex-local-e3a0401a-8dcb-4b9f-9247-2aae4e39df1e.yaml
+run_manifest_sha256: f4c3509d94d274a905bb62ee3184490aecdc83aa480362996d9a57aab8711fe9
+research_contract_sha256: 3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+events:
+- sequence: 1
+  unit: autonomous-remediation
+  mode: name
+  tool: web.search_query
+  query: '"Autonomous Remediation" LLM code repair recheck'
+  candidate_count: 1
+  previous_event_sha256: null
+  event_sha256: 35304f9298447c8c7cbf3fbc49c6ebeb63b4221a40263a1ee8f32dbcf71ad334
+- sequence: 2
+  unit: autonomous-remediation
+  mode: name
+  tool: web.search_query
+  query: '"Copilot Autofix" code scanning validate fix analysis'
+  candidate_count: 1
+  previous_event_sha256: 35304f9298447c8c7cbf3fbc49c6ebeb63b4221a40263a1ee8f32dbcf71ad334
+  event_sha256: ec51103f425703a9d897c18206af85e5024d2b9116ece97abfa4f57886374e20
+- sequence: 3
+  unit: autonomous-remediation
+  mode: name
+  tool: web.search_query
+  query: '"automated program repair" LLM iterative tests repair agent'
+  candidate_count: 1
+  previous_event_sha256: ec51103f425703a9d897c18206af85e5024d2b9116ece97abfa4f57886374e20
+  event_sha256: 690f1faadf5f688b1c04de071e52e2f4de8c2c33f7630752fc28ff065a9acc3c
+- sequence: 4
+  unit: autonomous-remediation
+  mode: mechanism
+  tool: web.search_query
+  query: static analysis LLM generate fix rerun analyzer iterate until clean code
+  candidate_count: 1
+  previous_event_sha256: 690f1faadf5f688b1c04de071e52e2f4de8c2c33f7630752fc28ff065a9acc3c
+  event_sha256: 231eb456eb4e5fcb1e969569520b57571652c836d3010d2beed360c7c0873973
+- sequence: 5
+  unit: autonomous-remediation
+  mode: mechanism
+  tool: web.search_query
+  query: lint failures AI edits automatically repair rerun lint test loop coding agent
+  candidate_count: 1
+  previous_event_sha256: 231eb456eb4e5fcb1e969569520b57571652c836d3010d2beed360c7c0873973
+  event_sha256: 1b16afb5d9eb2e19b6515a07a7e6d5a55365749f0aceaf73bfbc2609678aa9bf
+- sequence: 6
+  unit: autonomous-remediation
+  mode: mechanism
+  tool: web.search_query
+  query: test failure LLM patch execute tests feedback loop bounded iterations program
+    repair
+  candidate_count: 1
+  previous_event_sha256: 1b16afb5d9eb2e19b6515a07a7e6d5a55365749f0aceaf73bfbc2609678aa9bf
+  event_sha256: 70b958c29e67341c9ee6ce652702df4c42ab84103d775b502348a3805174e6c1
+- sequence: 7
+  unit: autonomous-remediation
+  mode: artifact
+  tool: web.search_query
+  query: RepairAgent GitHub validate_patch execute_tests max cycles
+  candidate_count: 1
+  previous_event_sha256: 70b958c29e67341c9ee6ce652702df4c42ab84103d775b502348a3805174e6c1
+  event_sha256: 0e6f5c98c74beddf4ddb8861dbbe91d220383a7b836d959a1984f1332a0bd9fc
+- sequence: 8
+  unit: autonomous-remediation
+  mode: artifact
+  tool: web.search_query
+  query: GitHub agentic autofix re-running CodeQL repository source
+  candidate_count: 1
+  previous_event_sha256: 0e6f5c98c74beddf4ddb8861dbbe91d220383a7b836d959a1984f1332a0bd9fc
+  event_sha256: 7680102a2cd2fab14f95e92975e7b89deef1f8393e955e09283a01c10eeada9d
+- sequence: 9
+  unit: autonomous-remediation
+  mode: artifact
+  tool: web.search_query
+  query: aider auto_lint lint errors fix code GitHub repository
+  candidate_count: 1
+  previous_event_sha256: 7680102a2cd2fab14f95e92975e7b89deef1f8393e955e09283a01c10eeada9d
+  event_sha256: d63959ba48e19c2ad8930ba84fef51094834c325bf35e4856b8d06c56fc115e4
+- sequence: 10
+  unit: autonomous-remediation
+  mode: artifact
+  tool: web.search_query
+  query: site:github.com/Aider-AI/aider "max_reflections" lint test fix
+  candidate_count: 0
+  previous_event_sha256: d63959ba48e19c2ad8930ba84fef51094834c325bf35e4856b8d06c56fc115e4
+  event_sha256: 28455aee892302816d9a35f0597365bd63572ff64aa232822d6c81b27797dad4
+- sequence: 11
+  unit: autonomous-remediation
+  mode: name
+  tool: web.search_query
+  query: '"Agentic Program Repair from Test Failures at Scale" Meta'
+  candidate_count: 1
+  previous_event_sha256: 28455aee892302816d9a35f0597365bd63572ff64aa232822d6c81b27797dad4
+  event_sha256: fca91fb713384cf3f337b1e31a58d783d4228cb13e8b7ecdf0d5c56b201d35f4
