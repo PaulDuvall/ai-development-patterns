@@ -1,0 +1,78 @@
+schema_version: 1
+run_id: codex-local:b6256893-a059-4a31-aa0d-9f76f146db25
+run_ref: verification/local-runs/codex-local-b6256893-a059-4a31-aa0d-9f76f146db25.yaml
+run_manifest_sha256: 2bf5299b30fc87d951fe702a7123b81a0d0634e755a972cff6d9338d2e456fc5
+research_contract_sha256: 3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+events:
+- sequence: 1
+  unit: centralized-rules
+  mode: name
+  tool: web.search_query
+  query: '"Centralized Rules" AI coding assistants AGENTS.md sync'
+  candidate_count: 1
+  previous_event_sha256: null
+  event_sha256: 3a5c50400038f9d5691cc5e1587da372061916ed00f2f080c0df8d3da1ebe740
+- sequence: 2
+  unit: centralized-rules
+  mode: mechanism
+  tool: web.search_query
+  query: organization-wide AI instructions central source synchronize AGENTS.md CLAUDE.md
+  candidate_count: 3
+  previous_event_sha256: 3a5c50400038f9d5691cc5e1587da372061916ed00f2f080c0df8d3da1ebe740
+  event_sha256: 4d5ef96626349b9e1b7da5ce889d5f9b38a29cda4d69f63cda0bc0ae2bda7767
+- sequence: 3
+  unit: centralized-rules
+  mode: artifact
+  tool: web.search_query
+  query: GitHub tool generate sync AGENTS.md CLAUDE.md cursorrules single source
+  candidate_count: 3
+  previous_event_sha256: 4d5ef96626349b9e1b7da5ce889d5f9b38a29cda4d69f63cda0bc0ae2bda7767
+  event_sha256: 6e7b08b4cf2c6c866e3b164b1159cf730028f78e8d38f2e077987a8993e70f9f
+- sequence: 4
+  unit: centralized-rules
+  mode: name
+  tool: web.search_query
+  query: '"AI rules" "AGENTS.md" source of truth sync'
+  candidate_count: 3
+  previous_event_sha256: 6e7b08b4cf2c6c866e3b164b1159cf730028f78e8d38f2e077987a8993e70f9f
+  event_sha256: 2123341d51c2cc0b16f307f8621f0d5e5f54472d1384535926c983928e560eca
+- sequence: 5
+  unit: centralized-rules
+  mode: mechanism
+  tool: web.search_query
+  query: '"one repo as the source of truth" "AGENTS.md" AI setup'
+  candidate_count: 1
+  previous_event_sha256: 2123341d51c2cc0b16f307f8621f0d5e5f54472d1384535926c983928e560eca
+  event_sha256: 6f3c2d6e7ea5b9db6bacf9fa7d47a5cb2cbf964fd35a672a63da1b7cb0945ba4
+- sequence: 6
+  unit: centralized-rules
+  mode: artifact
+  tool: web.search_query
+  query: site:github.com/block/ai-rules CLAUDE.md AGENTS.md generate
+  candidate_count: 1
+  previous_event_sha256: 6f3c2d6e7ea5b9db6bacf9fa7d47a5cb2cbf964fd35a672a63da1b7cb0945ba4
+  event_sha256: ef3ca098ffb969e88eb7b5060855c17d468a4502af86bb73bb3bc7bf1802d3a1
+- sequence: 7
+  unit: centralized-rules
+  mode: artifact
+  tool: web.search_query
+  query: '"AlignTrue CLI" GitHub AI rules sync'
+  candidate_count: 3
+  previous_event_sha256: ef3ca098ffb969e88eb7b5060855c17d468a4502af86bb73bb3bc7bf1802d3a1
+  event_sha256: 9aaeeffb3c1c357c1df7f08f9a1a219b0f34bb58d96814c92cdc5be9c1111796
+- sequence: 8
+  unit: centralized-rules
+  mode: mechanism
+  tool: web.search_query
+  query: '"team" "single source of truth" AGENTS.md CLAUDE.md sync rules'
+  candidate_count: 1
+  previous_event_sha256: 9aaeeffb3c1c357c1df7f08f9a1a219b0f34bb58d96814c92cdc5be9c1111796
+  event_sha256: 7ee303ce2e62e477329119f128e5c88648c39deb7c3e57e998467bfb44b6608a
+- sequence: 9
+  unit: centralized-rules
+  mode: mechanism
+  tool: web.search_query
+  query: '"we use" AI rules GitHub organization AGENTS.md sync'
+  candidate_count: 1
+  previous_event_sha256: 7ee303ce2e62e477329119f128e5c88648c39deb7c3e57e998467bfb44b6608a
+  event_sha256: 063cb4dfa851513173bb9516377a17a6b56a48fc32d246977c74715b777d392d
