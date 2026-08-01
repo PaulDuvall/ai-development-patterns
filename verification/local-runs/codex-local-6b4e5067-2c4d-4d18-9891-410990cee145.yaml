@@ -1,0 +1,19 @@
+schema_version: 1
+run_id: codex-local:6b4e5067-2c4d-4d18-9891-410990cee145
+plan_id: 85ff942cb46791f61842b49f63d30fdaa2a27ac0087885982ee393394e902f2c
+base_sha: 683acf674427bb9fda6b091931b8f2d3f49ff715
+checked_date: '2026-08-01'
+scope: single
+selected_slugs:
+- autonomous-soc
+include_discovery: false
+execution:
+  provider: openai
+  surface: codex-app
+  auth_mode: chatgpt-operator-attested
+  model: codex-managed
+  prompt_version: evidence-v2-codex-local-v1+sha256.3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+approval:
+  status: approved
+  approved_at: '2026-08-01T19:24:30Z'
+  plan_id: 85ff942cb46791f61842b49f63d30fdaa2a27ac0087885982ee393394e902f2c
