@@ -392,7 +392,7 @@ def test_gateway_example_is_locked_local_and_cost_guarded():
     package = json.loads(
         (GATEWAY_ROOT / "ai-gateway" / "package.json").read_text(
             encoding="utf-8"))
-    assert package["dependencies"]["express-rate-limit"] == "^8.5.2"
+    assert package["dependencies"]["express-rate-limit"] == "^8.6.1"
     assert package["scripts"]["test"] == "node --test dist/server.test.js"
 
     validation = DEPENDENCY_WORKFLOW.parent.joinpath(
