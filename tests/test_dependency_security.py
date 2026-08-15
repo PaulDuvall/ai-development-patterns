@@ -25,6 +25,12 @@ GATEWAY_ROOT = (
 PARALLEL_AGENT_ROOT = ROOT / "examples" / "parallel-agents"
 SECURITY_SANDBOX_ROOT = ROOT / "examples" / "security-sandbox"
 
+# Lowest express-rate-limit release whose behavior the gateway example relies on.
+# Routine patch/minor bumps are expected; a downgrade below this floor or a major
+# bump would change the rate-limiting contract the example documents.
+GATEWAY_RATE_LIMIT_FLOOR = (8, 6, 1)
+CARET_RANGE = re.compile(r"^\^(\d+)\.(\d+)\.(\d+)$")
+
 PYTHON_DIRECTORIES = {
     "/",
     "/.github",
@@ -54,6 +60,26 @@ def dependabot_update(ecosystem):
     ]
     assert len(matches) == 1
     return matches[0]
+
+
+def assert_caret_pinned_at_least(spec, floor):
+    """Assert an npm spec is a caret range no older than ``floor``.
+
+    Args:
+        spec: The version spec declared in package.json, e.g. ``"^8.6.2"``.
+        floor: Lowest acceptable ``(major, minor, patch)`` tuple.
+
+    Raises:
+        AssertionError: If the spec is not a caret range, drops below the
+            floor, or crosses a major boundary. Routine patch and minor
+            bumps pass so dependency updates do not require a test edit.
+    """
+    match = CARET_RANGE.match(spec)
+    assert match, f"expected a caret range like ^8.6.1, got {spec!r}"
+    version = tuple(int(part) for part in match.groups())
+    assert version[0] == floor[0], (
+        f"major bump from {floor} to {version} changes the pinned contract")
+    assert version >= floor, f"{version} is older than the pinned floor {floor}"
 
 
 def repository_directory(path):
@@ -363,13 +389,15 @@ def test_dependency_review_fails_on_moderate_new_vulnerabilities():
     assert review["with"]["comment-summary-in-pr"] == "never"
 
 
-def test_gateway_example_is_locked_local_and_cost_guarded():
-    """The provider-backed example must be safe-by-default and reproducible."""
-    server = (GATEWAY_ROOT / "ai-gateway" / "src" / "server.ts").read_text(
+def gateway_server_source():
+    """Return the gateway example's server.ts source."""
+    return (GATEWAY_ROOT / "ai-gateway" / "src" / "server.ts").read_text(
         encoding="utf-8")
-    cli = (GATEWAY_ROOT / "ai-dev-cli" / "src" / "cli.ts").read_text(
-        encoding="utf-8")
-    docs = (GATEWAY_ROOT / "README-GATEWAY.md").read_text(encoding="utf-8")
+
+
+def test_gateway_example_authenticates_and_caps_cost():
+    """The gateway must authenticate, throttle, and bound request cost."""
+    server = gateway_server_source()
 
     assert "AI_GATEWAY_TOKEN" in server and "timingSafeEqual" in server
     assert 'express.json({ limit: "32kb" })' in server
@@ -379,8 +407,23 @@ def test_gateway_example_is_locked_local_and_cost_guarded():
     assert 'requireGatewayAuth(expectedGatewayToken())' in server
     assert "taskRateLimit" in server
     assert "createRequestBudget" in server
+
+
+def test_gateway_example_throttles_before_authenticating():
+    """Throttling must precede auth so unauthenticated floods stay cheap."""
+    server = gateway_server_source()
+
     route = server[server.index("  app.post("):server.index("    async (req, res)")]
     assert route.index("taskRateLimit") < route.index("requireGatewayAuth")
+
+
+def test_gateway_example_binds_locally_by_default():
+    """The example must not reach an untrusted network without an opt-in."""
+    server = gateway_server_source()
+    cli = (GATEWAY_ROOT / "ai-dev-cli" / "src" / "cli.ts").read_text(
+        encoding="utf-8")
+    docs = (GATEWAY_ROOT / "README-GATEWAY.md").read_text(encoding="utf-8")
+
     assert 'process.env.AI_GATEWAY_HOST || "127.0.0.1"' in server
     assert "ALLOW_REMOTE_AI_GATEWAY" in server
     assert "app.listen(port, host" in server
@@ -389,10 +432,15 @@ def test_gateway_example_is_locked_local_and_cost_guarded():
     assert docs.count("npm ci && npm run build") == 3
     assert "Never expose the example directly to an untrusted network" in docs
 
+
+def test_gateway_example_is_locked_and_reproducible():
+    """The example's dependencies and build steps must stay reproducible."""
     package = json.loads(
         (GATEWAY_ROOT / "ai-gateway" / "package.json").read_text(
             encoding="utf-8"))
-    assert package["dependencies"]["express-rate-limit"] == "^8.6.1"
+    assert_caret_pinned_at_least(
+        package["dependencies"]["express-rate-limit"],
+        GATEWAY_RATE_LIMIT_FLOOR)
     assert package["scripts"]["test"] == "node --test dist/server.test.js"
 
     validation = DEPENDENCY_WORKFLOW.parent.joinpath(
