@@ -2,119 +2,118 @@ schema_version: 2
 provenance_status: complete
 pattern: Incident Automation
 slug: incident-automation
-last_checked: '2026-07-10'
+last_checked: '2026-08-01'
 search:
-  run_id: 'github-actions:29123202495'
-  run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
+  run_id: codex-local:bb45e765-e2ee-44b3-bcf5-0f47a3b99de4
+  run_ref: verification/local-runs/codex-local-bb45e765-e2ee-44b3-bcf5-0f47a3b99de4.yaml
+  run_manifest_sha256: d4e0549e485e6edc7e5d13f7ea770346fbd23b6bfb2afc96fc3e79d4feba13a6
   provider: openai
-  model: gpt-5.5
-  prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-  checked_at: '2026-07-10'
+  model: codex-managed
+  prompt_version: evidence-v2-codex-local-v1+sha256.3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+  checked_at: '2026-08-01'
   modes:
     name:
       queries:
-      - '"Incident Automation" AI generate runbooks historical incidents'
-      - AI incident management generate runbooks from past incidents
-      candidate_count: 5
+      - '"Incident Automation" AI runbooks historical incidents telemetry'
+      - '"AI-generated runbook" incident response PagerDuty'
+      - '"AI SRE" incident response runbook automation'
+      - '"Vibe OnCall" incident response historical incidents Shutterstock'
+      candidate_count: 8
     mechanism:
       queries:
-      - AI learns from past incident resolutions suggest runbooks
-      - automated incident resolution AI runbooks previous incidents
-      - AI SRE correlate logs metrics deployments past incidents
-      - AI incident response similar incidents remediation actions
-      candidate_count: 9
+      - AI correlates logs metrics deployments past incidents execute remediation
+        workflows guardrails
+      - autonomous incident response historical incidents current system state remediation
+        actions human approval
+      - AI on-call case study historical incidents proposed remediation reduced MTTR
+      candidate_count: 7
     artifact:
       queries:
-      - GitHub code search incident runbook generator LLM
-      - GitHub code search PagerDuty incident AI runbook automation
-      candidate_count: 2
-adoption_score: 16
+      - GitHub LLM incident response agent runbook automation repository
+      - open source AI SRE incident remediation agent GitHub telemetry runbooks
+      - GitHub autonomous incident response historical incidents remediation agent
+      candidate_count: 11
+adoption_score: 11
 tier_counts:
-  T1: 2
+  T1: 1
   T2: 1
   T4: 1
 adoption_dimensions:
   implementation_available: true
   independent_adoption: true
-  independence_groups: 4
+  independence_groups: 3
 naming_alignment: aliased
 terminology_variants:
-- term: AI-generated runbook
-  used_by: PagerDuty Runbook Automation
-  url: https://www.pagerduty.com/platform/automation/runbook/
-- term: AI SRE
-  used_by: Harness and Microsoft
-  url: https://developer.harness.io/docs/ai-sre/runbooks/
+- term: AIOps agent
+  used_by: Akmatori
+  url: https://github.com/akmatori/akmatori
+- term: Azure SRE Agent
+  used_by: Microsoft
+  url: https://learn.microsoft.com/en-us/azure/sre-agent/incident-response
 - term: Vibe OnCall
   used_by: Vibranium Labs and Shutterstock
   url: https://vibraniumlabs.ai/customers/shutterstock
 evidence:
 - tier: T1
   match: aliased
-  mechanism_quote: Runbook Automation users have access to AI-generated Runbook feature to quickly start new jobs.
-  source: PagerDuty Runbook Automation
-  source_kind: shipped_product
-  organization: PagerDuty
-  independence_group: pagerduty
-  url: https://www.pagerduty.com/platform/automation/runbook/
-  resolved_url: https://www.pagerduty.com/platform/automation/runbook/
-  content_sha256: 07764b1d105021c3b13356ec3a106e227ceae9b94be9fd616eaac2a05fbe1e43
+  mechanism_quote: Analyze incidents and execute remediation skills using your preferred
+    LLM
+  source: Akmatori open-source repository
+  source_kind: open_source_implementation
+  organization: Akmatori
+  independence_group: akmatori
+  url: https://github.com/akmatori/akmatori
   verifier:
     method: automated
-    model: gpt-5.5
-    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
-  claim: PagerDuty ships a runbook automation product with an AI-generated runbook feature for creating incident response jobs.
-- tier: T1
-  match: aliased
-  mechanism_quote: Harness AI SRE allows teams to automate incident resolution by leveraging Runbook automation.
-  source: Harness AI SRE Runbooks documentation
-  source_kind: shipped_product
-  organization: Harness
-  independence_group: harness
-  url: https://developer.harness.io/docs/ai-sre/runbooks/
-  resolved_url: https://developer.harness.io/docs/ai-sre/runbooks/
-  content_sha256: f943c82821fd307b7ac34bc5c67725d0d9469a53a7994485b571ba5aabc91746
-  verifier:
-    method: automated
-    model: gpt-5.5
-    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
-  claim: Harness ships AI SRE runbook automation that executes predefined incident-resolution workflows from incident triggers.
+    model: codex-managed
+    prompt_version: evidence-v2-codex-local-v1+sha256.3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+    run_ref: verification/local-runs/codex-local-bb45e765-e2ee-44b3-bcf5-0f47a3b99de4.yaml
+    run_manifest_sha256: d4e0549e485e6edc7e5d13f7ea770346fbd23b6bfb2afc96fc3e79d4feba13a6
+  claim: Akmatori is a runnable, self-hosted incident-response agent that uses an
+    LLM to analyze incidents and execute remediation skills.
+  resolved_url: https://github.com/akmatori/akmatori
+  content_sha256: 6ccdb2478084bf2c0435644822e6b022e2cb8892bf4f5fb12933d1f215cd42d2
+  retrieved: '2026-08-01'
 - tier: T2
   match: aliased
-  mechanism_quote: It automatically correlates logs, metrics, deployments, and past incidents.
-  source: Microsoft Azure SRE Agent incident response documentation
+  mechanism_quote: It automatically correlates logs, metrics, deployments, and past
+    incidents. It proposes fixes or resolves autonomously based on your run mode.
+  source: Automate Incident Response in Azure SRE Agent
   source_kind: official_documentation
   organization: Microsoft
   independence_group: microsoft
   url: https://learn.microsoft.com/en-us/azure/sre-agent/incident-response
-  resolved_url: https://learn.microsoft.com/en-us/azure/sre-agent/incident-response
-  content_sha256: 112979e9139d9f5cf17dfb8a9e4c58deb99242d3e9e32b2f9957f21c45128e69
+  date: '2026-03-27'
   verifier:
     method: automated
-    model: gpt-5.5
-    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
-  claim: Microsoft official documentation describes an AI SRE agent that uses past incidents alongside operational telemetry during incident response.
+    model: codex-managed
+    prompt_version: evidence-v2-codex-local-v1+sha256.3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+    run_ref: verification/local-runs/codex-local-bb45e765-e2ee-44b3-bcf5-0f47a3b99de4.yaml
+    run_manifest_sha256: d4e0549e485e6edc7e5d13f7ea770346fbd23b6bfb2afc96fc3e79d4feba13a6
+  claim: Microsoft documents an Azure SRE Agent that correlates current telemetry,
+    deployment history, and prior incidents, then proposes or autonomously performs
+    fixes according to a configured autonomy mode.
+  resolved_url: https://learn.microsoft.com/en-us/azure/sre-agent/incident-response
+  content_sha256: 8cead1b802f2acb929c2ba0a0b138ab4494dcf8dd65a316451e37f3dc3a40531
+  retrieved: '2026-08-01'
 - tier: T4
   match: aliased
-  mechanism_quote: By accurately capturing detail, reviewing historical incidents, identifying patterns, and proposing targeted remediation actions, Vibe OnCall has played a significant role in reducing our Mean Time to Resolution (MTTR).
+  mechanism_quote: Through its integration with our CMDB, it produces high-quality
+    documentation and proposes remediation actions with clear ownership.
   source: Vibranium Labs customer story with Shutterstock
   source_kind: case_study
   organization: Vibranium Labs
   independence_group: vibranium-labs
   url: https://vibraniumlabs.ai/customers/shutterstock
-  resolved_url: https://vibraniumlabs.ai/customers/shutterstock
-  content_sha256: 1996875b598e7d7771b2831ffe86bdca7446a0f2e330203e5f35c611c0eef7bf
   verifier:
     method: automated
-    model: gpt-5.5
-    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
-  claim: The customer story reports production use of Vibe OnCall to review historical incidents, identify patterns, and propose remediation actions that reduce MTTR.
+    model: codex-managed
+    prompt_version: evidence-v2-codex-local-v1+sha256.3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+    run_ref: verification/local-runs/codex-local-bb45e765-e2ee-44b3-bcf5-0f47a3b99de4.yaml
+    run_manifest_sha256: d4e0549e485e6edc7e5d13f7ea770346fbd23b6bfb2afc96fc3e79d4feba13a6
+  claim: Shutterstock reports Vibe OnCall using CMDB context to produce incident documentation
+    and propose remediation actions with clear ownership.
+  resolved_url: https://vibraniumlabs.ai/customers/shutterstock
+  content_sha256: 01b2e1a24507438f0fa70dec7de0778979b06eb85e3185bc67f086400f3aff6c
+  retrieved: '2026-08-01'
 verdict: verified
