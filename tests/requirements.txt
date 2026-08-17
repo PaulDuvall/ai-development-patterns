@@ -14,7 +14,7 @@ coverage==7.15.4
 iniconfig==2.3.0
 Jinja2==3.1.6
 MarkupSafe==3.0.3
-packaging==26.2
+packaging==26.3
 pluggy==1.6.0
 Pygments==2.20.0
 pytest==9.1.1
