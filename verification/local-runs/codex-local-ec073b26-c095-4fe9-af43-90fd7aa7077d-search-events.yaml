@@ -1,0 +1,104 @@
+schema_version: 1
+run_id: codex-local:ec073b26-c095-4fe9-af43-90fd7aa7077d
+run_ref: verification/local-runs/codex-local-ec073b26-c095-4fe9-af43-90fd7aa7077d.yaml
+run_manifest_sha256: edf9575f3975d07c86ae3638c5a5b8ff581d03808b26975fe32142dfa75b2dfc
+research_contract_sha256: 3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+events:
+- sequence: 1
+  unit: pipeline-synthesis
+  mode: name
+  tool: web.search_query
+  query: '"Pipeline Synthesis" AI CI/CD generation'
+  candidate_count: 2
+  previous_event_sha256: null
+  event_sha256: 8faac4470f446de29f5dda9c070defed4d6f3184cffe4ee92a749c62a400a440
+- sequence: 2
+  unit: pipeline-synthesis
+  mode: name
+  tool: web.search_query
+  query: '"AutoPipelineAI" CI/CD pipeline natural language'
+  candidate_count: 2
+  previous_event_sha256: 8faac4470f446de29f5dda9c070defed4d6f3184cffe4ee92a749c62a400a440
+  event_sha256: 050708b83e96db0e0e086748cf57bfc3ba137e3ed75b717150413dc34076f033
+- sequence: 3
+  unit: pipeline-synthesis
+  mode: name
+  tool: web.search_query
+  query: '"Agentic Workflows" generate CI/CD pipeline'
+  candidate_count: 3
+  previous_event_sha256: 050708b83e96db0e0e086748cf57bfc3ba137e3ed75b717150413dc34076f033
+  event_sha256: 4fd2f4ac34b5e8dcbb09b2b6e2fab40a4789dc43b4079b31b38cf7e026a73259
+- sequence: 4
+  unit: pipeline-synthesis
+  mode: mechanism
+  tool: web.search_query
+  query: '"natural language" generate validated CI/CD pipeline YAML deployment rollback'
+  candidate_count: 1
+  previous_event_sha256: 4fd2f4ac34b5e8dcbb09b2b6e2fab40a4789dc43b4079b31b38cf7e026a73259
+  event_sha256: b71ba7dce1aba08a6611a2ce1c43e718ffe50f72119f40d764d8533267ec1140
+- sequence: 5
+  unit: pipeline-synthesis
+  mode: mechanism
+  tool: web.search_query
+  query: AI generate CI/CD pipeline configuration plain English deployment strategy
+    validation
+  candidate_count: 2
+  previous_event_sha256: b71ba7dce1aba08a6611a2ce1c43e718ffe50f72119f40d764d8533267ec1140
+  event_sha256: d1bb21c5a203803482858c531d62d06440ce848d45ac1cb6de4114d8b29b970e
+- sequence: 6
+  unit: pipeline-synthesis
+  mode: mechanism
+  tool: web.search_query
+  query: LLM CI/CD pipeline generation practitioner case study build deploy release
+  candidate_count: 2
+  previous_event_sha256: d1bb21c5a203803482858c531d62d06440ce848d45ac1cb6de4114d8b29b970e
+  event_sha256: 5be6396fe9d7143a6f3e2226399dcfc5038915e3b8c8dec3252aca113c39f3d4
+- sequence: 7
+  unit: pipeline-synthesis
+  mode: artifact
+  tool: web.search_query
+  query: site:github.com natural language CI/CD pipeline generator LLM GitHub Actions
+    GitLab
+  candidate_count: 0
+  previous_event_sha256: 5be6396fe9d7143a6f3e2226399dcfc5038915e3b8c8dec3252aca113c39f3d4
+  event_sha256: 838ec37e5ffa8444a3449ea52ac244be1c146695d816bea42e4c491495247c9d
+- sequence: 8
+  unit: pipeline-synthesis
+  mode: artifact
+  tool: web.search_query
+  query: open source AI CI/CD pipeline generator natural language YAML validation
+  candidate_count: 4
+  previous_event_sha256: 838ec37e5ffa8444a3449ea52ac244be1c146695d816bea42e4c491495247c9d
+  event_sha256: 35c492d89727112a9bcae378d13dc8b26c4676359d626cf31aff07933f07eca0
+- sequence: 9
+  unit: pipeline-synthesis
+  mode: artifact
+  tool: web.search_query
+  query: GitHub "AutoPipelineAI" repository code
+  candidate_count: 2
+  previous_event_sha256: 35c492d89727112a9bcae378d13dc8b26c4676359d626cf31aff07933f07eca0
+  event_sha256: 55adbd1e357cc06d4ef4bfbe5bf1fb745826f9e50fc147966fe52a26136f20a5
+- sequence: 10
+  unit: pipeline-synthesis
+  mode: artifact
+  tool: web.search_query
+  query: site:developer.harness.io AI generate CI pipeline natural language
+  candidate_count: 6
+  previous_event_sha256: 55adbd1e357cc06d4ef4bfbe5bf1fb745826f9e50fc147966fe52a26136f20a5
+  event_sha256: 07cae52a3f995065135cf7543d1b886b90f20ee21fdb0f1787d42c6d289b6b0d
+- sequence: 11
+  unit: pipeline-synthesis
+  mode: artifact
+  tool: web.search_query
+  query: site:docs.gitlab.com Duo generate CI/CD pipeline configuration natural language
+  candidate_count: 2
+  previous_event_sha256: 07cae52a3f995065135cf7543d1b886b90f20ee21fdb0f1787d42c6d289b6b0d
+  event_sha256: 509259fee3b37d053fa02679c30862265a90a1a77868a5d65cd5ce14d978b7a9
+- sequence: 12
+  unit: pipeline-synthesis
+  mode: artifact
+  tool: web.search_query
+  query: site:circleci.com AI generate pipeline config natural language
+  candidate_count: 2
+  previous_event_sha256: 509259fee3b37d053fa02679c30862265a90a1a77868a5d65cd5ce14d978b7a9
+  event_sha256: a76603238ee2f846f335e449f98cc4792188b915d8ebe017e67b59b32f8a5650
