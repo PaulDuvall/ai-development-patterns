@@ -269,3 +269,6 @@ coverage/
 verification/pattern-inventory.yaml
 verification/run-plan/
 .verify-worklist
+
+# Local beads Dolt database, retained for recovery after the 2026-08-17 migration
+.beads/
