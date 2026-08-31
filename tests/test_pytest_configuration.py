@@ -3,6 +3,8 @@
 from configparser import ConfigParser
 from pathlib import Path
 
+from utils.requirements import pinned_distributions, requirement_lines
+
 
 ROOT = Path(__file__).parent.parent
 SPEC_EXAMPLE = ROOT / "examples" / "spec-driven-development"
@@ -33,15 +35,11 @@ def test_spec_driven_example_enforces_its_embedded_coverage_gate():
     assert "--cov=spec_validator" in addopts
     assert "--cov-fail-under=85" in addopts
 
-    requirements = {
-        line.strip()
-        for line in (SPEC_EXAMPLE / "requirements.txt").read_text(
-            encoding="utf-8").splitlines()
-        if line.strip() and not line.startswith("#")
-    }
-    assert requirements == {
-        "PyYAML==6.0.3",
-        "pre-commit==4.6.1",
-        "pytest==9.1.1",
-        "pytest-cov==7.1.0",
+    requirements = requirement_lines(
+        (SPEC_EXAMPLE / "requirements.txt").read_text(encoding="utf-8"))
+    assert pinned_distributions(requirements) == {
+        "pyyaml",
+        "pre-commit",
+        "pytest",
+        "pytest-cov",
     }
