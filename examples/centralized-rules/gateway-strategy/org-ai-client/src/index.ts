@@ -20,7 +20,7 @@ export async function planFeature(params: {
   userPrompt: string;
 }) {
   return client.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-opus-5",
     max_tokens: 2000,
     system: orgSystemPrompt({ appName: params.appName }),
     messages: [
@@ -37,7 +37,7 @@ export async function refactorCode(params: {
   userPrompt: string;
 }) {
   return client.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-opus-5",
     max_tokens: 2000,
     system: orgSystemPrompt({ appName: params.appName }),
     messages: [
@@ -54,7 +54,7 @@ export async function writeSpec(params: {
   userPrompt: string;
 }) {
   return client.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-opus-5",
     max_tokens: 2000,
     system: orgSystemPrompt({ appName: params.appName }),
     messages: [
@@ -72,7 +72,7 @@ export async function orgClaudeTask(params: {
   userPrompt: string;
 }) {
   return client.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-opus-5",
     max_tokens: 1500,
     system: orgSystemPrompt({ appName: params.appName }),
     messages: [{ role: "user", content: params.userPrompt }]
