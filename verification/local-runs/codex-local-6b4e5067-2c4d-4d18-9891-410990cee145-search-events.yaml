@@ -1,0 +1,99 @@
+schema_version: 1
+run_id: codex-local:6b4e5067-2c4d-4d18-9891-410990cee145
+run_ref: verification/local-runs/codex-local-6b4e5067-2c4d-4d18-9891-410990cee145.yaml
+run_manifest_sha256: 383870847da32e9054a52006e0191d88b9a56235b10d90faf574b2ad19922120
+research_contract_sha256: 3a6f01229b1353bd01463910dcbdad30d9d2a4e5ce368ec4d5c8b2d06d478116
+events:
+- sequence: 1
+  unit: autonomous-soc
+  mode: name
+  tool: web.search_query
+  query: '"Autonomous SOC" policy bounded agents alert investigation response human
+    oversight'
+  candidate_count: 1
+  previous_event_sha256: null
+  event_sha256: 163ba5e28af61fbaf8fcf928778c9dd0d1b658eb2fb84868be05f33d7fe410a2
+- sequence: 2
+  unit: autonomous-soc
+  mode: name
+  tool: web.search_query
+  query: '"Security Copilot agents" autonomous alert triage Microsoft Defender'
+  candidate_count: 2
+  previous_event_sha256: 163ba5e28af61fbaf8fcf928778c9dd0d1b658eb2fb84868be05f33d7fe410a2
+  event_sha256: 0e5c0ead60e80d40149a2c25f002d5827542ee1017b09be2c0b9a2f8356d79be
+- sequence: 3
+  unit: autonomous-soc
+  mode: name
+  tool: web.search_query
+  query: '"AI SOC analyst" autonomous investigate alerts human escalation Dropzone'
+  candidate_count: 2
+  previous_event_sha256: 0e5c0ead60e80d40149a2c25f002d5827542ee1017b09be2c0b9a2f8356d79be
+  event_sha256: f8fa707717bbc984bef609789fa3b5da01d2f99dbe9224977e92d6d97cd6ae0a
+- sequence: 4
+  unit: autonomous-soc
+  mode: mechanism
+  tool: web.search_query
+  query: security operations AI agent autonomously investigates alerts enriches evidence
+    escalates confirmed threats human analyst
+  candidate_count: 2
+  previous_event_sha256: f8fa707717bbc984bef609789fa3b5da01d2f99dbe9224977e92d6d97cd6ae0a
+  event_sha256: 09525e3bb2faf0a8a45fe2ffa4307c93498e5681e08c889e31568ba43f659ff7
+- sequence: 5
+  unit: autonomous-soc
+  mode: mechanism
+  tool: web.search_query
+  query: SOC autonomous agent alert triage investigation response approval sensitive
+    actions case study
+  candidate_count: 1
+  previous_event_sha256: 09525e3bb2faf0a8a45fe2ffa4307c93498e5681e08c889e31568ba43f659ff7
+  event_sha256: 064a7481e8e298bdbc4239c0e4e4777dffa4dc564dfb51cbb6a0bb5333921ff4
+- sequence: 6
+  unit: autonomous-soc
+  mode: mechanism
+  tool: web.search_query
+  query: security operations agent automatically triages alerts provides verdict human
+    review production deployment
+  candidate_count: 1
+  previous_event_sha256: 064a7481e8e298bdbc4239c0e4e4777dffa4dc564dfb51cbb6a0bb5333921ff4
+  event_sha256: ec1af8c7989195a7c26be8a5215855d8383337d9e4aeb39ab37e55b26b6e45e3
+- sequence: 7
+  unit: autonomous-soc
+  mode: artifact
+  tool: web.search_query
+  query: site:github.com autonomous SOC agent alert triage investigation response
+  candidate_count: 1
+  previous_event_sha256: ec1af8c7989195a7c26be8a5215855d8383337d9e4aeb39ab37e55b26b6e45e3
+  event_sha256: ef95fe766802bd2c4895a172ba57262a741aa3e642bdaf0e812f47279b6dad62
+- sequence: 8
+  unit: autonomous-soc
+  mode: artifact
+  tool: web.search_query
+  query: site:github.com AI SOC analyst agent alert investigation human approval
+  candidate_count: 2
+  previous_event_sha256: ef95fe766802bd2c4895a172ba57262a741aa3e642bdaf0e812f47279b6dad62
+  event_sha256: e4f295e0d720a19d9758afa889e4eb6b22f344fcbb350ae18d0907545b44c060
+- sequence: 9
+  unit: autonomous-soc
+  mode: artifact
+  tool: web.search_query
+  query: site:github.com agentic SOC security alert triage multi-agent implementation
+  candidate_count: 2
+  previous_event_sha256: e4f295e0d720a19d9758afa889e4eb6b22f344fcbb350ae18d0907545b44c060
+  event_sha256: d4c4957432612550ecaf16180ab6102620cbddd8c8edeff126a70e3d8ec5fbd0
+- sequence: 10
+  unit: autonomous-soc
+  mode: mechanism
+  tool: web.search_query
+  query: autonomous AI SOC analyst customer case study alert investigations human
+    review
+  candidate_count: 2
+  previous_event_sha256: d4c4957432612550ecaf16180ab6102620cbddd8c8edeff126a70e3d8ec5fbd0
+  event_sha256: 66edccae75d8054e9061e3d49ec9962bbc1e1f0c3489b1d6e07bce0c261667a5
+- sequence: 11
+  unit: autonomous-soc
+  mode: mechanism
+  tool: web.search_query
+  query: agentic SOC customer deployed autonomous alert triage case study
+  candidate_count: 1
+  previous_event_sha256: 66edccae75d8054e9061e3d49ec9962bbc1e1f0c3489b1d6e07bce0c261667a5
+  event_sha256: 7febefebf7a0deb42fed2de3b3c46ff7c0d688f637148a7e936f0f1af3a0719c
