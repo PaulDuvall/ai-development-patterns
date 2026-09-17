@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Testing Orchestration
 slug: testing-orchestration
-last_checked: 2026-07-10
+last_checked: 2026-09-17
 search:
   run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -57,15 +57,15 @@ evidence:
     source_kind: open_source_implementation
     organization: Qodo
     independence_group: qodo
-    url: https://raw.githubusercontent.com/qodo-ai/qodo-cover/main/README.md
-    resolved_url: https://raw.githubusercontent.com/qodo-ai/qodo-cover/main/README.md
+    url: https://raw.githubusercontent.com/qodo-ai/qodo-cover/adcf55baba40e8fbf8a84e68b70d08bef1e2b9c9/README.md
+    resolved_url: https://raw.githubusercontent.com/qodo-ai/qodo-cover/adcf55baba40e8fbf8a84e68b70d08bef1e2b9c9/README.md
     content_sha256: 7135ad070989e8426ef28d91955d0fad5caf05ca415cec2f93046f406c5b8fe7
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Runnable open-source tool chains test execution, coverage parsing, prompt construction, and LLM-generated tests to extend a suite while checking that coverage increases.
   - tier: T2
     match: aliased
@@ -76,13 +76,13 @@ evidence:
     independence_group: github
     url: https://docs.github.com/en/copilot/tutorials/write-tests
     resolved_url: https://docs.github.com/en/copilot/tutorials/write-tests
-    content_sha256: 0142fdd2c847c33796e6492c56db68fe75526d6600070627c5aefa7ba0921881
+    content_sha256: 23839432c46d0c3d29698b86d9d2807b92a95576de91a36589a8439470111f31
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Official Copilot documentation describes prompting the assistant to generate tests, execute them, and verify results, including unit and integration testing workflows.
   - tier: T3
     match: aliased
@@ -93,12 +93,12 @@ evidence:
     independence_group: meta
     url: https://discovery.ucl.ac.uk/id/eprint/10199775/
     resolved_url: https://discovery.ucl.ac.uk/id/eprint/10199775/
-    content_sha256: 955bff5fe5d7b149bd3d27b502ebc1c67469600ee5720ea456329f450f85f457
+    content_sha256: b7cfaa1e098155d13bb18d7eb8d21eadc62288e7b284c9ca0837aea035916386
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: FSE 2024 proceedings record documents Meta's TestGen-LLM deployment, where LLM-generated tests were filtered for measurable suite improvement before production acceptance during Instagram and Facebook test-a-thons.
 verdict: verified

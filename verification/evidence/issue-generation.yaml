@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Issue Generation
 slug: issue-generation
-last_checked: 2026-07-10
+last_checked: 2026-09-17
 search:
   run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -63,15 +63,15 @@ evidence:
     source_kind: open_source_implementation
     organization: Eyal Toledano
     independence_group: eyal-toledano
-    url: https://raw.githubusercontent.com/eyaltoledano/claude-task-master/main/README.md
-    resolved_url: https://raw.githubusercontent.com/eyaltoledano/claude-task-master/main/README.md
+    url: https://raw.githubusercontent.com/eyaltoledano/claude-task-master/c0c98d367c55296bfe69e65680625b6db437af02/README.md
+    resolved_url: https://raw.githubusercontent.com/eyaltoledano/claude-task-master/c0c98d367c55296bfe69e65680625b6db437af02/README.md
     content_sha256: bc6c47eeb5dc8e15750a832ca2321d1f232e9ffd8c6bcd6a3472c8b98b1c187e
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Runnable open source task-management tooling exposes a parse-prd workflow that turns a
       product requirements document into generated tasks for AI-assisted development.
   - tier: T2
@@ -83,13 +83,13 @@ evidence:
     independence_group: github
     url: https://docs.github.com/en/copilot/how-tos/copilot-on-github/copilot-for-github-tasks/use-copilot-to-create-or-update-issues
     resolved_url: https://docs.github.com/en/copilot/how-tos/copilot-on-github/copilot-for-github-tasks/use-copilot-to-create-or-update-issues
-    content_sha256: 77e74d12ec23b8794ec561e30f3a8a210ae24d5d3aa15a1a434bfc9a77b963e0
+    content_sha256: d0cbbf3779ac956bebe9c5bf58644df6667e4fa59cbc74059d6f01ef8e9e8758
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Official GitHub documentation describes Copilot creating structured issue drafts,
       including parent issues and sub-issues, from natural-language prompts and images.
   - tier: T2
@@ -101,14 +101,14 @@ evidence:
     independence_group: atlassian
     url: https://support.atlassian.com/jira-software-cloud/docs/create-a-work-item-and-a-subtask/
     resolved_url: https://support.atlassian.com/jira-software-cloud/docs/create-a-work-item-and-a-subtask/
-    content_sha256: ab46cc158d18b4be523903cd929fc0274cd124cd8b691c0077ed96c97d43a7bf
+    content_sha256: f1156cc8008b4d2af810a38391561457e1688b0db889a676073cf715f70b3e0b
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
     date: 2026-05-29
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Official Atlassian Jira documentation describes AI-generated child work-item suggestions
       from a parent item, with accepted suggestions created and linked under the parent.
   - tier: T4
@@ -120,14 +120,14 @@ evidence:
     independence_group: mindstudio
     url: https://www.mindstudio.ai/blog/agentic-coding-workflow-claude-code-jira-walkthrough
     resolved_url: https://www.mindstudio.ai/blog/agentic-coding-workflow-claude-code-jira-walkthrough
-    content_sha256: 5f857b8276f59ecc6ec6eb54c924fb874b41582a573f1892c7399543efafa0fe
+    content_sha256: c70717d33f534880588ae8979740fced02f9a763315ce17cb5ec271ba19c98d6
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
     date: 2026-05-02
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Practitioner walkthrough shows Claude Code converting a PRD into Jira epics, stories,
       and subtasks through the Jira REST API as part of an agentic development workflow.
 verdict: verified

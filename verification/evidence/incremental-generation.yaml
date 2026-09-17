@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Incremental Generation
 slug: incremental-generation
-last_checked: '2026-08-01'
+last_checked: '2026-09-17'
 search:
   run_id: codex-local:6f1554f6-a941-4530-a05d-e01931884de0
   run_ref: verification/local-runs/codex-local-6f1554f6-a941-4530-a05d-e01931884de0.yaml
@@ -70,7 +70,7 @@ evidence:
   source_kind: open_source_implementation
   organization: Oli Woodman
   independence_group: independent:oli-woodman
-  url: https://github.com/oliwoodman/verify-loop-skill
+  url: https://raw.githubusercontent.com/oliwoodman/verify-loop-skill/1838fdeb269236f240b5c019614c4fddb2644a3d/README.md
   verifier:
     method: automated
     model: codex-managed
@@ -79,9 +79,9 @@ evidence:
     run_manifest_sha256: c0346a22dfcb6129847c42054a46254b749383e947d8623b6c2f4e540810dc91
   claim: An installable Claude skill selects one smallest task per lap, runs the application
     or tests after the change, and advances only after observed success.
-  resolved_url: https://github.com/oliwoodman/verify-loop-skill
-  content_sha256: 6bcf499eaa55db4b1b5b61fdc2f50fa689ebc44a7003d87a1bbbc0cf62b6c0a4
-  retrieved: '2026-08-01'
+  resolved_url: https://raw.githubusercontent.com/oliwoodman/verify-loop-skill/1838fdeb269236f240b5c019614c4fddb2644a3d/README.md
+  content_sha256: 81f27447d399d5726240cb02b817ce347367f164fb0fdfc3f40cd529f5a32553
+  retrieved: '2026-09-17'
 - tier: T2
   match: named
   mechanism_quote: One sub-task at a time. User approval between parent tasks.
@@ -100,7 +100,7 @@ evidence:
     workflow rules for executing one sub-task at a time with approvals and checkpoints.
   resolved_url: https://alchemaize.ai/cid/team-overview/
   content_sha256: 64d44e46ebb27f7bff90d354bd06136a8be93d0235abe5f0c9377f5d4c268272
-  retrieved: '2026-08-01'
+  retrieved: '2026-09-17'
 - tier: T2
   match: aliased
   mechanism_quote: break the process down into smaller tasks, and ask Copilot to accomplish
@@ -119,8 +119,8 @@ evidence:
   claim: Official Copilot guidance directs users to decompose large coding requests
     into small tasks completed sequentially.
   resolved_url: https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering
-  content_sha256: 4492dd2a5802635bb69d88993efc82627b2d79f109618b6f6e03db97cb7c1010
-  retrieved: '2026-08-01'
+  content_sha256: 99a1c940c4f8703b85d6871cb21ba7e9525ee29d46ff786961f13e06e194332f
+  retrieved: '2026-09-17'
 - tier: T2
   match: aliased
   mechanism_quote: Do them one at a time. Adjust the files added to the chat as you
@@ -140,7 +140,7 @@ evidence:
     them one at a time, and update context between steps.
   resolved_url: https://aider.chat/docs/usage/tips.html
   content_sha256: edc45b0796288519b6d9911bd8e5611870aca5c5c500f476efc33db52ff5e95e
-  retrieved: '2026-08-01'
+  retrieved: '2026-09-17'
 - tier: T4
   match: aliased
   mechanism_quote: We code that, test it, then move to Step 2, and so on.
@@ -159,6 +159,6 @@ evidence:
   claim: A dated practitioner workflow avoids monolithic AI output by implementing
     and testing sequential tickets before advancing.
   resolved_url: https://addyosmani.com/blog/ai-coding-workflow/
-  content_sha256: 746d31e964680b8a6430f05cea15acfa29bb4d96c9f1c1479af30fcf070cedd8
-  retrieved: '2026-08-01'
+  content_sha256: f6b07af7f23a84ee1d99c546e72c9232a3cd19dbef122dc5d61f9b9d7b8e81bb
+  retrieved: '2026-09-17'
 verdict: verified

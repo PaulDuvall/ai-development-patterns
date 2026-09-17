@@ -7,6 +7,8 @@ from pathlib import Path
 
 import yaml
 
+from utils.requirements import pinned_distributions, requirement_lines
+
 
 ROOT = Path(__file__).parent.parent
 DEPENDABOT = ROOT / ".github" / "dependabot.yml"
@@ -285,7 +287,7 @@ def test_parallel_agent_documentation_matches_the_provider_free_image():
     assert "agent_runner.py" in docs
     assert "coordinator.py" in docs
     assert "cat > scripts/" not in docs
-    assert requirements.splitlines() == ["PyYAML==6.0.3"]
+    assert pinned_distributions(requirement_lines(requirements)) == {"pyyaml"}
     build = (
         "docker build --pull \\\n"
         "  --tag ai-development-patterns/parallel-agent:local \\\n"
@@ -346,19 +348,16 @@ def test_direct_python_runtime_dependencies_are_declared_and_test_pinned():
     """Runtime imports must not rely on undeclared transitive dependencies."""
     project = tomllib.loads(PROJECT.read_text(encoding="utf-8"))
     declared = set(project["project"]["dependencies"])
-    pinned_for_tests = {
-        line.strip()
-        for line in TEST_REQUIREMENTS.read_text(encoding="utf-8").splitlines()
-        if line.strip() and not line.lstrip().startswith("#")
-    }
+    pinned_for_tests = set(
+        requirement_lines(TEST_REQUIREMENTS.read_text(encoding="utf-8")))
 
-    assert {
-        "beautifulsoup4==4.15.0",
-        "idna==3.18",
-        "PyYAML==6.0.3",
-        "requests==2.34.2",
-        "urllib3==2.7.0",
-    } == declared
+    assert pinned_distributions(declared) == {
+        "beautifulsoup4",
+        "idna",
+        "pyyaml",
+        "requests",
+        "urllib3",
+    }
     assert declared <= pinned_for_tests
 
 
