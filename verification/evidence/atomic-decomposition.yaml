@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Atomic Decomposition
 slug: atomic-decomposition
-last_checked: 2026-07-10
+last_checked: 2026-09-17
 search:
   run_id: "github-actions:29123202495"
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -56,15 +56,15 @@ evidence:
     source_kind: open_source_implementation
     organization: b0qi
     independence_group: b0qi
-    url: https://github.com/b0qi/skill-multi-agent
-    resolved_url: https://github.com/b0qi/skill-multi-agent
-    content_sha256: 1fc54a4bc78f2da4ee376957892c3a60dc6c99664a83a7e816525f375507cdd3
+    url: https://raw.githubusercontent.com/b0qi/skill-multi-agent/2fa0fb4a60b6744b3aee7cde422d7cbc999776d5/README.md
+    resolved_url: https://raw.githubusercontent.com/b0qi/skill-multi-agent/2fa0fb4a60b6744b3aee7cde422d7cbc999776d5/README.md
+    content_sha256: 31db968226f18e0cffd87488a37d7dc6e277092518cdff0264025e1c7ee62a2f
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Runnable open-source orchestration skill decomposes work into owned subtasks before dispatching multiple coding agents.
   - tier: T2
     match: aliased
@@ -75,14 +75,14 @@ evidence:
     independence_group: anthropic
     url: https://www.anthropic.com/engineering/building-effective-agents
     resolved_url: https://www.anthropic.com/engineering/building-effective-agents
-    content_sha256: abce80b40c5124e43e2ae985904ea9f6a653ab6c4299376fc6a66ef019917dfc
+    content_sha256: bc9f4bcdc81eb9b591e215484157ec22ade6a6d1455223f9ddd6041ba9047e04
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
     date: 2024-12-19
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Official agent-building guidance names sectioning as the workflow of breaking a task into independent parallel subtasks.
   - tier: T4
     match: aliased
@@ -93,13 +93,13 @@ evidence:
     independence_group: parallelcode
     url: https://parallelcode.app/blog/splitting-work-for-parallel-ai-agents/
     resolved_url: https://parallelcode.app/blog/splitting-work-for-parallel-ai-agents/
-    content_sha256: 5e66ca1b9bfa800951283b73c4814c6abd3d4e62711e4afa3363dd75e9347024
+    content_sha256: af85bacb991658cd22636bc6c9c3be0487c4bb6d61b0faa3cb110882ae7d953f
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
     date: 2026-05-22
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Practitioner guidance reports using contract-first task splits so parallel coding agents can work independently and merge without conflicts.
 verdict: verified

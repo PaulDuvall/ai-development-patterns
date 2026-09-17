@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Tool Integration
 slug: tool-integration
-last_checked: 2026-07-10
+last_checked: 2026-09-17
 search:
   run_id: "github-actions:29123202495"
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -58,15 +58,15 @@ evidence:
     source_kind: open_source_implementation
     organization: Model Context Protocol project
     independence_group: model-context-protocol
-    url: https://github.com/modelcontextprotocol/servers
-    resolved_url: https://github.com/modelcontextprotocol/servers
-    content_sha256: f109a9ff43a0ed162639b6054eecbc2bf7728574a0ac966bee2d48a2d9348a25
+    url: https://raw.githubusercontent.com/modelcontextprotocol/servers/d73f99efbfd40c3aa1b61e88728b3d49fb52608f/README.md
+    resolved_url: https://raw.githubusercontent.com/modelcontextprotocol/servers/d73f99efbfd40c3aa1b61e88728b3d49fb52608f/README.md
+    content_sha256: 52d46c9f010da7aedb20ca0eed902db0b7368dae74113cb5c6ad6593056e0138
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Runnable MCP server implementations give large language models controlled access to external tools and data sources.
   - tier: T2
     match: aliased
@@ -77,13 +77,13 @@ evidence:
     independence_group: openai
     url: https://developers.openai.com/api/docs/guides/function-calling
     resolved_url: https://developers.openai.com/api/docs/guides/function-calling
-    content_sha256: 00b21ec8063d9793a7655aa39cc7faf921fd0e9c6b3b971755e71458ea219afa
+    content_sha256: b1c8091594ada5df677a09d2061adf2c3445a94df185d131d7fd9b6325d36556
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: OpenAI documents function calling/tool calling as the canonical way for models to interface with external systems and outside data.
   - tier: T2
     match: aliased
@@ -94,14 +94,14 @@ evidence:
     independence_group: anthropic
     url: https://www.anthropic.com/news/model-context-protocol
     resolved_url: https://www.anthropic.com/news/model-context-protocol
-    content_sha256: cce89ac4026b89f8ac074cf5260206aed315372cef56c4e852f8a58fec791364
+    content_sha256: 27c8e0c62ae1f323ad14406a9434bf6d5e5f0b57b719216ec282b2659e669e1d
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
     date: 2024-11-25
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Anthropic presents MCP as official guidance for standardized two-way connections between AI-powered tools and external data sources.
   - tier: T3
     match: aliased
@@ -112,13 +112,13 @@ evidence:
     independence_group: meta
     url: https://papers.nips.cc/paper_files/paper/2023/hash/d842425e4bf79ba039352da0f658a906-Abstract-Conference.html
     resolved_url: https://papers.nips.cc/paper_files/paper/2023/hash/d842425e4bf79ba039352da0f658a906-Abstract-Conference.html
-    content_sha256: f0a83b6d9372aedf8454b0daeec373bee706ebb140dfa8746cbefb987364bd28
+    content_sha256: 9bb53abb3b2e20fd9f0142f1c80427afc5202ad4cea8057a59fe466072ba87a1
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Peer-reviewed research demonstrates language models using external tools through APIs to improve capability beyond prompt-only generation.
   - tier: T4
     match: aliased
@@ -129,13 +129,13 @@ evidence:
     independence_group: apideck
     url: https://www.apideck.com/blog/llm-tool-use-and-function-calling
     resolved_url: https://www.apideck.com/blog/llm-tool-use-and-function-calling
-    content_sha256: 7959b95bed0cae9644c6c64833c99ef19a71153d0c60d9ae83ca5b0b564dad12
+    content_sha256: 6149c6d40ed611736e074bacebc4c44e8c8d79bd0f2e0e49b6ccda42e0649566
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
     date: 2025-01-28
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Practitioner implementation guidance shows function/tool calling used to connect LLMs with external tools, APIs, and functions.
 verdict: verified

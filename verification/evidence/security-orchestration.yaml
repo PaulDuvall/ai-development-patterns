@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Security Orchestration
 slug: security-orchestration
-last_checked: 2026-07-10
+last_checked: 2026-09-17
 search:
   run_id: "github-actions:29123202495"
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -48,15 +48,15 @@ evidence:
     source_kind: open_source_implementation
     organization: AWS Samples
     independence_group: aws-samples
-    url: https://github.com/aws-samples/generative-ai-summarize-securityhub
-    resolved_url: https://github.com/aws-samples/generative-ai-summarize-securityhub
-    content_sha256: 059abff5a0ed17c5e30f02de751af747449766a10950d8a260a5121292eef3fd
+    url: https://raw.githubusercontent.com/aws-samples/generative-ai-summarize-securityhub/4c891743670606ab921d56aa781bc0b6063fbcc5/README.md
+    resolved_url: https://raw.githubusercontent.com/aws-samples/generative-ai-summarize-securityhub/4c891743670606ab921d56aa781bc0b6063fbcc5/README.md
+    content_sha256: 559ef726eab1300987edbde9cc014d792d9c9e80419978c4694e885dcb9b7e64
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Runnable sample routes Security Hub findings through Lambda and Amazon Bedrock, then writes AI-generated summaries back for security review.
   - tier: T4
     match: unnamed
@@ -67,13 +67,13 @@ evidence:
     independence_group: microsoft
     url: https://arxiv.org/abs/2407.09017
     resolved_url: https://arxiv.org/abs/2407.09017
-    content_sha256: b3fbd7ccccda6e1a3edca605a6a0b58f1d383a936e356e641b9139f8565bbcc5
+    content_sha256: f461f4adeac0fcf3a5b2fa33ff6e10e3583d6d790cab74602c0e2758b31c6b76
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
     date: 2024-07-12
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Practitioner report describes a production Microsoft Defender XDR capability that generates contextual guided response recommendations at worldwide customer scale.
 verdict: weak

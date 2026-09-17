@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Image Spec
 slug: image-spec
-last_checked: '2026-07-10'
+last_checked: '2026-09-17'
 search:
   run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -56,13 +56,13 @@ evidence:
   independence_group: vercel
   url: https://v0.app/docs/screenshots
   resolved_url: https://v0.app/docs/screenshots
-  content_sha256: 46918cc8d100277b53724b55e41bd806750e1080287ccf30a4ed90a73fccddc6
+  content_sha256: d7f014930f735addda683cb8115352fbb79029add077bc5a3f78e290b8248e77
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: v0 ships a product workflow where users attach screenshots, mockups, or wireframes in chat
     and the tool generates code that replicates the visible interface.
 - tier: T1
@@ -73,15 +73,15 @@ evidence:
   source_kind: open_source_implementation
   organization: Abi Raja
   independence_group: independent:abi-raja
-  url: https://github.com/abi/screenshot-to-code
-  resolved_url: https://github.com/abi/screenshot-to-code
-  content_sha256: b3953f5b1a9dd0ce4322ac4d2a30dadfdcff6686dfaf84c0f5c8dd17112f806b
+  url: https://raw.githubusercontent.com/abi/screenshot-to-code/d026163f586dfa8c5c10d28c36edd59a9d3b0e88/README.md
+  resolved_url: https://raw.githubusercontent.com/abi/screenshot-to-code/d026163f586dfa8c5c10d28c36edd59a9d3b0e88/README.md
+  content_sha256: 00a52475c2a0a277f8ff774e289a0abcd915ec52dc22ce9aa912f32b4c9f62ed
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: The open-source screenshot-to-code app provides a runnable image-to-code implementation for
     turning screenshots, mockups, Figma designs, and screen recordings into UI code.
 - tier: T2
@@ -94,14 +94,14 @@ evidence:
   independence_group: cursor
   url: https://cursor.com/blog/agent-best-practices
   resolved_url: https://cursor.com/blog/agent-best-practices
-  content_sha256: 60ab23c8e18aacc5fcaecaf72fd9531622fe4de460632b995c43203762634372
+  content_sha256: e5bf913885982511f9ed33211d6b14392efef31321be168f16e3976721776705
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   date: '2026-01-09'
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Cursor's official agent guidance recommends including images in prompts, specifically pasting
     design mockups so the coding agent can implement layouts, colors, and spacing from visual context.
 - tier: T4
@@ -114,14 +114,14 @@ evidence:
   independence_group: orkes
   url: https://www.orkes.io/blog/how-to-build-a-screenshot-to-react-ai-agent
   resolved_url: https://www.orkes.io/blog/how-to-build-a-screenshot-to-react-ai-agent
-  content_sha256: 5f55ce09a4f13092285d27a9c24ce0cd993ca7971118672ab14bb774576cbce5
+  content_sha256: d57a87d2d0c1a6e0ced4390b58eeb7f85be021a5dba4612f9e2498ed2bfc040e
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   date: '2026-07-09'
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Orkes publishes a practitioner implementation report for a screenshot-to-React agent that accepts
     an image upload, passes it to a visual LLM, and returns a generated React and TypeScript component.
 verdict: verified

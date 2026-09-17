@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Error Resolution
 slug: error-resolution
-last_checked: 2026-07-10
+last_checked: 2026-09-17
 search:
   run_id: "github-actions:29123202495"
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -54,15 +54,15 @@ evidence:
     source_kind: open_source_implementation
     organization: rp
     independence_group: penberg-rp
-    url: https://github.com/penberg/rp
-    resolved_url: https://github.com/penberg/rp
-    content_sha256: 61275c2e6f2ed8141031fa89b975d0193b9681506701420c67d8c8cb050f9c62
+    url: https://raw.githubusercontent.com/penberg/rp/309f37caded81edcb506e2508a6eea8410fc4626/README.md
+    resolved_url: https://raw.githubusercontent.com/penberg/rp/309f37caded81edcb506e2508a6eea8410fc4626/README.md
+    content_sha256: dd522ade36a7fafc6d73d5415603a9d292305818c4975f321f1b886fbdc65a06
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Runnable open-source tool turns an issue or test failure into a reproducer, checks it, asks an AI coding agent to patch the repository, and validates the fix.
   - tier: T2
     match: aliased
@@ -73,13 +73,13 @@ evidence:
     independence_group: github
     url: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/use-cloud-agent-on-github
     resolved_url: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/use-cloud-agent-on-github
-    content_sha256: 85692a72666a7899ddfc1dabe4e5530368ef0fb5a7c1c8678e9ec77dde58ee13
+    content_sha256: f0c3b0d3632369581c0a65990ba4346cbaf7383f8de734bc37fe44e1ea780acc
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Official documentation describes a workflow where Copilot investigates a failed GitHub Actions run and pushes a branch fix.
   - tier: T4
     match: aliased
@@ -96,6 +96,6 @@ evidence:
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Practitioner guidance describes CI failure context capture across logs, screenshots, network traces, metrics, and code changes so AI can diagnose test failure root causes.
 verdict: verified

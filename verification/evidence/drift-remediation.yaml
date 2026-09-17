@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Drift Remediation
 slug: drift-remediation
-last_checked: 2026-07-10
+last_checked: 2026-09-17
 search:
   run_id: "github-actions:29123202495"
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -54,15 +54,15 @@ evidence:
     source_kind: open_source_implementation
     organization: Cloud Posse
     independence_group: cloudposse
-    url: https://github.com/cloudposse/github-action-atmos-terraform-drift-remediation
-    resolved_url: https://github.com/cloudposse/github-action-atmos-terraform-drift-remediation
-    content_sha256: 501dafc74a31e458afd0716a42b05ec5c5a57bd33d434dc9b2210f02b3b367b0
+    url: https://raw.githubusercontent.com/cloudposse/github-action-atmos-terraform-drift-remediation/cc44214b06f663acf5240544262ff0c2a7655d30/README.md
+    resolved_url: https://raw.githubusercontent.com/cloudposse/github-action-atmos-terraform-drift-remediation/cc44214b06f663acf5240544262ff0c2a7655d30/README.md
+    content_sha256: b4e6bac561ccd2cb92210b1e436c77962815d0de4fe2ff69cdd21414949810ca
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Runnable GitHub Action workflow detects Terraform drift and remediates it through an explicit apply-labeled issue workflow.
   - tier: T2
     match: named
@@ -73,13 +73,13 @@ evidence:
     independence_group: env0
     url: https://docs.envzero.com/guides/admin-guide/environments/drift-detection/automatic-drift-remediation
     resolved_url: https://docs.envzero.com/guides/admin-guide/environments/drift-detection/automatic-drift-remediation
-    content_sha256: b6931c035ef9aaa923f44304960961ceb490cf713ab88957087b050533a4e7f6
+    content_sha256: cbaf6521934fabe4be87b6aafea6fc54dbfbd8e7c30b91b4ae98ca488b582dec
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Official documentation describes detecting drift and automatically running a deployment from version-controlled configuration to remediate it.
   - tier: T2
     match: named
@@ -90,13 +90,13 @@ evidence:
     independence_group: firefly
     url: https://docs.firefly.ai/detailed-guides/cloud-asset-inventory/remediating-drifts
     resolved_url: https://docs.firefly.ai/detailed-guides/cloud-asset-inventory/remediating-drifts
-    content_sha256: 7035729c09ad2edf3854137d462f2eeaacd7159531a925e73f1e9341dc4c920c
+    content_sha256: c91759594d90665077d91a1183494485a90ca87e9183f24f1677e70e1d6f8d13
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Official documentation describes generating an IaC repository code change to bring code and detected asset configuration back into alignment.
   - tier: T3
     match: aliased
@@ -107,12 +107,12 @@ evidence:
     independence_group: conf42
     url: https://www.conf42.com/DevOps_2026_Imran_Abdul_sdwan_networking_automation
     resolved_url: https://www.conf42.com/DevOps_2026_Imran_Abdul_sdwan_networking_automation
-    content_sha256: 1247707bbf30a3a3eaf92345d1acdf5c536aae1caab668be8fcb7e9735fbf6c1
+    content_sha256: 1bba5c3d82b36d0c19b68541ef50ee12497f531e5ad923a0d0ee92ea8886dd2a
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Conference talk record describes detecting configuration drift and automatically reapplying the correct configuration as remediation.
 verdict: verified
