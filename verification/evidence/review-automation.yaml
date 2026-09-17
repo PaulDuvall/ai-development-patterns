@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Review Automation
 slug: review-automation
-last_checked: '2026-07-10'
+last_checked: '2026-09-17'
 search:
   run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -55,15 +55,15 @@ evidence:
   source_kind: open_source_implementation
   organization: PR-Agent
   independence_group: pr-agent
-  url: https://github.com/The-PR-Agent/pr-agent
-  resolved_url: https://github.com/The-PR-Agent/pr-agent
-  content_sha256: 87d281037ecd460ccbea6eda3dc0e7f98b754aa4a80c5f743b00ebef4b798b75
+  url: https://raw.githubusercontent.com/The-PR-Agent/pr-agent/f7da79cfa061ebb61fb4c109794f94be90ef4b77/README.md
+  resolved_url: https://raw.githubusercontent.com/The-PR-Agent/pr-agent/f7da79cfa061ebb61fb4c109794f94be90ef4b77/README.md
+  content_sha256: 2fef3a48d2474b08dc0903f3f8a369b3672a1d1b8705872a5dac07b2e385d32d
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Runnable open-source GitHub Action and CLI implementation automates pull-request review on opened
     and synchronized pull requests.
 - tier: T2
@@ -74,14 +74,14 @@ evidence:
   organization: GitHub
   independence_group: github
   url: https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-automatic-review
-  resolved_url: https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-automatic-review
-  content_sha256: 4c76117a62f3ab2ed09639b0086a344190fc40f98eef0314be2020ae5ad47ebd
+  resolved_url: https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-code-review
+  content_sha256: c00fda4f6d93e87529122dbcaf0e1a98afb69ee1e7b99d3bcd1ce642f72305b0
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Official product documentation describes configuring Copilot to automatically review pull requests,
     including repository and organization ruleset options.
 - tier: T4
@@ -95,14 +95,14 @@ evidence:
   independence_group: cloudflare
   url: https://blog.cloudflare.com/ai-code-review/
   resolved_url: https://blog.cloudflare.com/ai-code-review/
-  content_sha256: af598ae77f738a5897a9bdce1f0714fc2bd79f22bfa9af728734b4753eccb1df
+  content_sha256: ed5cea7a9d751f7d4f986425e9ed69caf92cc93706fedf1c95a1d6c864d7f5fa
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   date: '2026-04-20'
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Cloudflare reports an internally deployed CI-native AI review orchestration system with specialized
     reviewers, coordinator deduplication and severity judgment, structured review comments, approvals, and
     merge blocking for serious findings.

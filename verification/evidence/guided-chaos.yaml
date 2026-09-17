@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Guided Chaos
 slug: guided-chaos
-last_checked: '2026-07-10'
+last_checked: '2026-09-17'
 search:
   run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -58,15 +58,15 @@ evidence:
   source_kind: open_source_implementation
   organization: NTT
   independence_group: ntt
-  url: https://github.com/ntt-dkiku/chaos-eater
-  resolved_url: https://github.com/ntt-dkiku/chaos-eater
-  content_sha256: 3f7edd0c8537a009c46c826ce8555289fdf0f432010f2b6da9ad3fb25e193d5c
+  url: https://raw.githubusercontent.com/ntt-dkiku/chaos-eater/47c4e44bc897014d22fa1cb3079a0e7d28011fbc/README.md
+  resolved_url: https://raw.githubusercontent.com/ntt-dkiku/chaos-eater/47c4e44bc897014d22fa1cb3079a0e7d28011fbc/README.md
+  content_sha256: 29c83f4c1e0adc3d0a26a52beb3c0f275ff29335bdb5fd29e9524574cdcc5b09
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Runnable open-source system uses LLM agents to automate the Kubernetes chaos-engineering
     cycle, including hypothesis, experiment, analysis, and improvement phases.
 - tier: T2
@@ -80,14 +80,14 @@ evidence:
   independence_group: amazon
   url: https://aws.amazon.com/blogs/architecture/architecting-ai-powered-resilience-framework-on-aws/
   resolved_url: https://aws.amazon.com/blogs/architecture/architecting-ai-powered-resilience-framework-on-aws/
-  content_sha256: 0d5f8a9025f3a0d48722fb25eae405a3d98dcd9c4114734daefb51aec55e64ca
+  content_sha256: 99e7992c6fc6f9ac76145ca0905598cf9cb30fee3fe7d8f69bdafe85b4538a3b
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   date: '2026-06-22'
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: AWS reference architecture describes agent-based dependency discovery, risk analysis,
     targeted experiment generation, FIS execution, and CI/CD resilience validation.
 - tier: T3
@@ -100,14 +100,14 @@ evidence:
   independence_group: conf42
   url: https://www.conf42.com/Chaos_Engineering_2024_Indika_Wimalasuriya_smart_chaos_generative_AI
   resolved_url: https://www.conf42.com/Chaos_Engineering_2024_Indika_Wimalasuriya_smart_chaos_generative_AI
-  content_sha256: 736d84db54b7fef5c479c07bacb7ae603cd6a81df44c470aa9d1763230507611
+  content_sha256: 6548ac6e957b3e8ff7a02c668b1e3531790c8585870225384cf9356a82e34019
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   date: '2024-02-15'
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Dated conference talk demonstrates using generative AI with an architecture diagram
     to derive failure hypotheses, experiments, and blast-radius analysis.
 verdict: verified

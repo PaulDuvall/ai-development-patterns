@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Policy Generation
 slug: policy-generation
-last_checked: 2026-07-10
+last_checked: 2026-09-17
 search:
   run_id: "github-actions:29123202495"
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -53,15 +53,15 @@ evidence:
     source_kind: open_source_implementation
     organization: AWS
     independence_group: aws
-    url: https://github.com/aws-samples/sample-amazon-bedrock-agentcore-onboarding/blob/main/08_policy/README.md
-    resolved_url: https://github.com/aws-samples/sample-amazon-bedrock-agentcore-onboarding/blob/main/08_policy/README.md
-    content_sha256: c3a9644e9bf89f99c28d9a1702c277dbfeb3c0777653a4fb2fcfdc9e76c8f8db
+    url: https://raw.githubusercontent.com/aws-samples/sample-amazon-bedrock-agentcore-onboarding/376ee7c687e84f4610cee390d2450f086d99612f/08_policy/README.md
+    resolved_url: https://raw.githubusercontent.com/aws-samples/sample-amazon-bedrock-agentcore-onboarding/376ee7c687e84f4610cee390d2450f086d99612f/08_policy/README.md
+    content_sha256: fdb9c90a69026f766cd6d17659b614af00abfaf2e241eb792acf78f406517783
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Runnable AWS sample converts natural-language policy intent into Cedar by invoking policy generation.
   - tier: T1
     match: named
@@ -71,14 +71,14 @@ evidence:
     organization: Harness
     independence_group: harness
     url: https://developer.harness.io/docs/platform/governance/policy-as-code/ai-for-policies/
-    resolved_url: https://developer.harness.io/docs/platform/governance/policy-as-code/ai-for-policies/
-    content_sha256: 39a950f0662843a3316dab00d56b555a4d30b8eae12c1ef9104d5bc656099279
+    resolved_url: https://developer.harness.io/harness-platform/use-harness-platform/governance/policy-as-code/ai-for-policies
+    content_sha256: b8e2da30fe67c070f3ecdd091a9811adc5e6c766d393c21fcb2828bca6c26589
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Harness ships an AI assistant that generates OPA/Rego policy code from user policy requests.
   - tier: T4
     match: aliased
@@ -96,6 +96,6 @@ evidence:
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
     date: 2026-03-20
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Red Hat reports an LLM-based workflow that inspects Kubernetes clusters and generates context-aware OPA Gatekeeper policies.
 verdict: verified

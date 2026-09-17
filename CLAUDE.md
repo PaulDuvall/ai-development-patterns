@@ -91,3 +91,21 @@ This is the AI Development Patterns repository - a comprehensive collection of p
 - **Scalability considerations**: Patterns support both small teams and enterprise deployments
 
 When modifying this repository, maintain the established pattern structure, ensure all hyperlinks work correctly, and follow the dependency relationships defined in the reference table.
+
+## Task Tracking
+
+Tasks live in `.tasks/backlog.jsonl` — an append-only JSONL file, one task per line, git-tracked. There is no daemon and no database: the file is the record and git is the history.
+
+Do NOT use TodoWrite, TaskCreate, markdown TODO lists, or `bd`/beads — this repo migrated off beads on 2026-08-17.
+
+**A task's state is its LAST line.** The file is append-only, so `grep '"status": *"open"'` also matches tasks that were later closed, over-reporting the open set. Always fold last-line-wins:
+
+```bash
+python3 -c "import json;last={};[last.__setitem__(t['id'],t) for t in map(json.loads,filter(str.strip,open('.tasks/backlog.jsonl')))];print('\n'.join(f\"{i}  {t['title'][:68]}\" for i,t in last.items() if t['status']=='open'))"
+```
+
+Close a task by APPENDING a new line with `status` set to `closed`; never edit or delete an existing line. Work discovered while doing another task gets its own line with `discovered_from` set to the parent id.
+
+**Schema:** `{id, title, status, blocks[], depends_on[], spec_ref, created, priority, description, discovered_from?}` — `status` is `open` or `closed`; `priority` is 1 (most urgent) to 4; a task is ready when every id in `depends_on` is closed. Issue ids keep their original beads form so existing commit messages still resolve.
+
+The full beads history is archived verbatim at `.tasks/beads-archive.jsonl`.

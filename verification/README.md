@@ -18,6 +18,23 @@ The capability deliberately separates three operations:
    verdict, naming signal, catalog mapping, pending entry, and generated status row.
 2. **Check links and content** — networked, read-only checks confirm cited pages remain reachable
    and recorded mechanism quotes remain present. This runs weekly and can be requested manually.
+   When a source keeps its quote but moves, `scripts/hydrate-evidence-content.py --recheck` records
+   the move without a model: it re-fetches every admitted source in the file, aborts unless every
+   mechanism quote is still present, then advances `last_checked` and each `retrieved` while leaving
+   `search.checked_at` pinned to the search run. `last_checked` therefore dates the most recent
+   verification and `search.checked_at` dates the search, and the two may differ in that one
+   direction. Rewording or withdrawal of a quote is out of scope here and requires operation 3.
+
+   A source hosted at a mutable branch tip drifts for reasons that have nothing to do with the
+   claim: editing a README restates a mechanism without withdrawing it, and this check cannot tell
+   the two apart. Such a source is cited at a commit-pinned permalink
+   (`raw.githubusercontent.com/<org>/<repo>/<sha>/<path>`) whenever its mechanism quote is verified
+   present at that revision. That narrows what the weekly check proves for the entry, and the trade
+   is deliberate: **a pinned citation shows the mechanism existed at that revision, not that it
+   still ships.** Currency is carried instead by the 90-day freshness requirement the weekly
+   schedule enforces, which forces re-evaluation rather than re-fetching. A source whose quote is
+   already gone from the tip is never pinned to an earlier revision, because freezing a claim its
+   owner has withdrawn asserts something the project does not know to be true.
 3. **Evaluate locally** — bounded, model-backed web research runs only in an interactive local
    Codex client. A deterministic plan and exact human approval precede every agent call. Read-only
    research agents return proposals to one root writer; a separate agent reviews each batch before
@@ -421,7 +438,8 @@ trusted code derives its count from distinct credential-free public candidate UR
 the URLs. The ledger binds the run ID, approved-manifest digest, and SHA-256 research-contract
 fingerprint covering the skill, methodology, and two agent definitions. Its events are hash-chained,
 scope-checked, and capped at 12 per unit. The combined candidate count cannot be smaller than the
-admitted evidence set. Complete runs set `search.checked_at` equal to `last_checked` and bind every
+admitted evidence set. Complete runs set `search.checked_at` to the run's own check date, which a
+later model-free recheck leaves pinned while advancing `last_checked`, and bind every
 verifier to the same model, prompt version, run manifest, and manifest digest. `evidence: none found`
 is valid only when all three modes exactly reconcile with the ledger. This is a deterministic audit
 record, not cryptographic proof that an operator or tool performed a search.
