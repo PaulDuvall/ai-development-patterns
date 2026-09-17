@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Pipeline Synthesis
 slug: pipeline-synthesis
-last_checked: '2026-08-01'
+last_checked: '2026-09-17'
 search:
   run_id: codex-local:ec073b26-c095-4fe9-af43-90fd7aa7077d
   run_ref: verification/local-runs/codex-local-ec073b26-c095-4fe9-af43-90fd7aa7077d.yaml
@@ -61,7 +61,7 @@ evidence:
   source_kind: open_source_implementation
   organization: Harness
   independence_group: harness
-  url: https://raw.githubusercontent.com/harness/harness-skills/main/skills/create-pipeline/SKILL.md
+  url: https://raw.githubusercontent.com/harness/harness-skills/320f7d0e5f8f0cec4967276e44a6fa94eaab8c7a/skills/create-pipeline/SKILL.md
   verifier:
     method: automated
     model: codex-managed
@@ -71,7 +71,7 @@ evidence:
   claim: Harness provides a runnable open-source agent skill that generates Harness
     CI/CD YAML with build, test, deployment, approval, and rollback behavior and can
     create the resulting pipeline through MCP.
-  resolved_url: https://raw.githubusercontent.com/harness/harness-skills/main/skills/create-pipeline/SKILL.md
+  resolved_url: https://raw.githubusercontent.com/harness/harness-skills/320f7d0e5f8f0cec4967276e44a6fa94eaab8c7a/skills/create-pipeline/SKILL.md
   content_sha256: 9a480f20a2ed515fcd3a3afd86d503063787eb7c3a5b9f7494e4bd929e84ba98
-  retrieved: '2026-08-01'
+  retrieved: '2026-09-17'
 verdict: weak

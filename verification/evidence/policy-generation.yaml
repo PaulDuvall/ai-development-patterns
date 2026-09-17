@@ -53,9 +53,9 @@ evidence:
     source_kind: open_source_implementation
     organization: AWS
     independence_group: aws
-    url: https://github.com/aws-samples/sample-amazon-bedrock-agentcore-onboarding/blob/main/08_policy/README.md
-    resolved_url: https://github.com/aws-samples/sample-amazon-bedrock-agentcore-onboarding/blob/main/08_policy/README.md
-    content_sha256: 37ba3f5c7d227f8ce4e8348f34e32a4250307bd77bddc531c6cea7b52931c74a
+    url: https://raw.githubusercontent.com/aws-samples/sample-amazon-bedrock-agentcore-onboarding/376ee7c687e84f4610cee390d2450f086d99612f/08_policy/README.md
+    resolved_url: https://raw.githubusercontent.com/aws-samples/sample-amazon-bedrock-agentcore-onboarding/376ee7c687e84f4610cee390d2450f086d99612f/08_policy/README.md
+    content_sha256: fdb9c90a69026f766cd6d17659b614af00abfaf2e241eb792acf78f406517783
     verifier:
       method: automated
       model: gpt-5.5

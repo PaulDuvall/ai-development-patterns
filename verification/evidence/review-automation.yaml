@@ -55,9 +55,9 @@ evidence:
   source_kind: open_source_implementation
   organization: PR-Agent
   independence_group: pr-agent
-  url: https://github.com/The-PR-Agent/pr-agent
-  resolved_url: https://github.com/The-PR-Agent/pr-agent
-  content_sha256: 095d8b4c9c44e0482c98b76fed6701565b5cb5996efa59b3405cde96442527c2
+  url: https://raw.githubusercontent.com/The-PR-Agent/pr-agent/f7da79cfa061ebb61fb4c109794f94be90ef4b77/README.md
+  resolved_url: https://raw.githubusercontent.com/The-PR-Agent/pr-agent/f7da79cfa061ebb61fb4c109794f94be90ef4b77/README.md
+  content_sha256: 2fef3a48d2474b08dc0903f3f8a369b3672a1d1b8705872a5dac07b2e385d32d
   verifier:
     method: automated
     model: gpt-5.5
