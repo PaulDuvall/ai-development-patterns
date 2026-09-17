@@ -1,16 +1,22 @@
 # Agent Instructions
 
-This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
+## Task Tracking
 
-## Quick Reference
+Tasks live in `.tasks/backlog.jsonl` — an append-only JSONL file, one task per line, git-tracked. There is no daemon and no database: the file is the record and git is the history.
+
+Do NOT use TodoWrite, TaskCreate, markdown TODO lists, or `bd`/beads — this repo migrated off beads on 2026-08-17.
+
+**A task's state is its LAST line.** The file is append-only, so `grep '"status": *"open"'` also matches tasks that were later closed, over-reporting the open set. Always fold last-line-wins:
 
 ```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --status in_progress  # Claim work
-bd close <id>         # Complete work
-bd sync               # Sync with git
+python3 -c "import json;last={};[last.__setitem__(t['id'],t) for t in map(json.loads,filter(str.strip,open('.tasks/backlog.jsonl')))];print('\n'.join(f\"{i}  {t['title'][:68]}\" for i,t in last.items() if t['status']=='open'))"
 ```
+
+Close a task by APPENDING a new line with `status` set to `closed`; never edit or delete an existing line. Work discovered while doing another task gets its own line with `discovered_from` set to the parent id.
+
+**Schema:** `{id, title, status, blocks[], depends_on[], spec_ref, created, priority, description, discovered_from?}` — `status` is `open` or `closed`; `priority` is 1 (most urgent) to 4; a task is ready when every id in `depends_on` is closed. Issue ids keep their original beads form so existing commit messages still resolve.
+
+The full beads history is archived verbatim at `.tasks/beads-archive.jsonl`.
 
 ## Pattern Adoption Evaluation
 
@@ -28,13 +34,12 @@ read-only link/content checks for this capability.
 
 **MANDATORY WORKFLOW:**
 
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
+1. **File tasks for remaining work** - Append tasks to `.tasks/backlog.jsonl` for anything that needs follow-up
 2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
+3. **Update task status** - Append `status=closed` lines for finished work
 4. **PUSH TO REMOTE** - This is MANDATORY:
    ```bash
    git pull --rebase
-   bd sync
    git push
    git status  # MUST show "up to date with origin"
    ```

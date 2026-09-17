@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Workflow Orchestration
 slug: workflow-orchestration
-last_checked: 2026-07-10
+last_checked: 2026-09-17
 search:
   run_id: "github-actions:29123202495"
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -55,15 +55,15 @@ evidence:
     source_kind: open_source_implementation
     organization: LangChain
     independence_group: langchain
-    url: https://raw.githubusercontent.com/langchain-ai/langgraph/main/README.md
-    resolved_url: https://raw.githubusercontent.com/langchain-ai/langgraph/main/README.md
+    url: https://raw.githubusercontent.com/langchain-ai/langgraph/230927fb3a9ac9b2893a30322b4dfea7cdea9a8f/README.md
+    resolved_url: https://raw.githubusercontent.com/langchain-ai/langgraph/230927fb3a9ac9b2893a30322b4dfea7cdea9a8f/README.md
     content_sha256: 2fd8f1132537f4f875d60c81b999d33e8e1f3d020cd28688c3945be82d47001f
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Open-source LangGraph provides runnable infrastructure for long-running stateful agent workflows with orchestration and human oversight support.
   - tier: T2
     match: named
@@ -80,7 +80,7 @@ evidence:
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: AWS official guidance names workflow orchestration agents and describes the same coordination mechanism for multistep agentic tasks across distributed systems.
   - tier: T4
     match: unnamed
@@ -91,13 +91,13 @@ evidence:
     independence_group: elastic
     url: https://www.elastic.co/search-labs/blog/human-in-the-loop-hitllanggraph-elasticsearch
     resolved_url: https://www.elastic.co/search-labs/blog/human-in-the-loop-hitllanggraph-elasticsearch
-    content_sha256: d61fad5532751dd1e7cee749e1fa9b75b34d0ae127e21249e948fb552e95ba3c
+    content_sha256: b401d26d2b66c8406332cc6613b4957d13d38bdfeb724672a3707d06c5742e21
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
     date: 2026-01-29
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Practitioner report implements a human-in-the-loop LangGraph workflow that combines Elasticsearch retrieval, user input, and refined agent output.
 verdict: verified

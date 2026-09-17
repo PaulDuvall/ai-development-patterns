@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Agent Readiness
 slug: agent-readiness
-last_checked: '2026-07-10'
+last_checked: '2026-09-17'
 search:
   run_id: 'github-actions:29117515902'
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29117515902
@@ -60,14 +60,14 @@ evidence:
   organization: Factory AI
   independence_group: factory-ai
   url: https://factory.ai/product/agent-readiness
-  resolved_url: https://factory.ai/product/agent-readiness
-  content_sha256: 29fa65504901ef6a3c3251b4d05111a88dc318edd0ced9b9891451b19bb77d10
+  resolved_url: https://factory.com/product/agent-readiness
+  content_sha256: 6f62a00ea2431c7bec6e04c27581e7bb5b149c9224f185ef5f18f932d325a603
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.9534676c6d39c14ea76297d9fe49af54dd212574a5c0c7c4ec639b2fad37a43c
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29117515902
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Factory ships an Agent Readiness product that evaluates a codebase across technical pillars
     and maturity levels before agent adoption.
 - tier: T1
@@ -77,15 +77,15 @@ evidence:
   source_kind: open_source_implementation
   organization: Kodus
   independence_group: kodus
-  url: https://github.com/kodustech/agent-readiness
-  resolved_url: https://github.com/kodustech/agent-readiness
-  content_sha256: cf742cd5bd68cd54b165342d4ad93f07b277303c06814b0e17c120920ff1cb57
+  url: https://raw.githubusercontent.com/kodustech/agent-readiness/80593b0f900070415d52c23a87579f9854c6bac6/README.md
+  resolved_url: https://raw.githubusercontent.com/kodustech/agent-readiness/80593b0f900070415d52c23a87579f9854c6bac6/README.md
+  content_sha256: 9c39f4acc80fa5d4e8e4f29b643571d24c75217e207becece25c07435ebb1119
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.9534676c6d39c14ea76297d9fe49af54dd212574a5c0c7c4ec639b2fad37a43c
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29117515902
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Kodus publishes a runnable open-source CLI that scores whether a codebase is ready for
     autonomous AI coding agents across multiple readiness pillars.
 - tier: T4
@@ -97,14 +97,14 @@ evidence:
   independence_group: upsun
   url: https://developer.upsun.com/posts/ai/making-coding-agents-reliable
   resolved_url: https://developer.upsun.com/posts/ai/making-coding-agents-reliable
-  content_sha256: 67b7225aea0987f0af35e9648dc938b321a11a999d044f865f7c6199534a7cb3
+  content_sha256: 72b14b46f830ce507df7a4f25dd6a5b71c71539d205b8f0574ba413dfedb4a4b
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.9534676c6d39c14ea76297d9fe49af54dd212574a5c0c7c4ec639b2fad37a43c
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29117515902
   date: '2026-02-17'
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Upsun describes an eight-area agent-ready codebase assessment covering testing,
     documentation, code quality, build systems, environments, observability, security, and standards.
 - tier: T4
@@ -116,14 +116,14 @@ evidence:
   independence_group: independent:dominika-zajac
   url: https://dev.to/domizajac/is-your-repo-ready-for-the-ai-agents-revolution-checklist-1a1b
   resolved_url: https://dev.to/domizajac/is-your-repo-ready-for-the-ai-agents-revolution-checklist-1a1b
-  content_sha256: a12d93535fba46fd1d6138789ccc6fb579b47654bb711a2ed136a95b00d68d85
+  content_sha256: 8f9c333e41662cd917620d65d6f8dbcd91f797d39c495c4527b258e5b4acc73a
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.9534676c6d39c14ea76297d9fe49af54dd212574a5c0c7c4ec639b2fad37a43c
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29117515902
   date: '2026-01-18'
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: The practitioner checklist evaluates repository hygiene, tests, grounding documents, and
     integrations before using AI agents on a repository.
 - tier: T4
@@ -135,14 +135,14 @@ evidence:
   independence_group: coder
   url: https://coder.com/blog/what-100-engineering-teams-revealed-about-ai-maturity-and-what-to-do-about-it
   resolved_url: https://coder.com/blog/what-100-engineering-teams-revealed-about-ai-maturity-and-what-to-do-about-it
-  content_sha256: aa891e0dfa655070c13977c31199cc79a2fbcd40e251bb73473b29b601b9f749
+  content_sha256: 3e4d5f3be18a42004a0581b2a0785a63731d43a206df42e867b4214b8585503a
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.9534676c6d39c14ea76297d9fe49af54dd212574a5c0c7c4ec639b2fad37a43c
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29117515902
   date: '2026-04-20'
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Coder reports an AI maturity self-assessment used by engineering teams to benchmark readiness
     and plan their next agentic AI adoption steps.
 verdict: verified

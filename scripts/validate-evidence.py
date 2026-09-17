@@ -308,11 +308,16 @@ def validate_search(data, errors):
         return
     if not isinstance(search.get("run_id"), str) or not search.get("run_id", "").strip():
         errors.append("search: 'run_id' must be a non-empty string")
+    # 'checked_at' dates the search run; 'last_checked' dates the most recent
+    # verification of the file. A model-free recheck re-fetches every admitted
+    # source and advances 'last_checked' without rerunning a search, so the two
+    # may diverge in that one direction. A search dated after the check it
+    # belongs to is incoherent and still fails.
     if not is_iso_date(search.get("checked_at")):
         errors.append("search: 'checked_at' must be ISO 8601 (YYYY-MM-DD)")
     elif is_iso_date(data.get("last_checked")) \
-            and date_string(search["checked_at"]) != date_string(data["last_checked"]):
-        errors.append("search: 'checked_at' must equal 'last_checked'")
+            and parsed_date(search["checked_at"]) > parsed_date(data["last_checked"]):
+        errors.append("search: 'checked_at' must not be after 'last_checked'")
     modes = search.get("modes")
     if not isinstance(modes, dict):
         errors.append("search: 'modes' must be a mapping")

@@ -121,6 +121,14 @@ Fetches admitted public evidence URLs through bounded SSRF-safe retrieval and re
 content/quote hashes and retrieval metadata. Primary caller: the local evaluation skill before
 independent verification.
 
+The mode is always explicit, because the retrieval date means something different in each.
+`--retrieved-date <run check date>` hydrates inside an approved local evaluation, whose caller owns
+`last_checked` and `search.checked_at`. `--recheck` re-verifies an already published file without a
+model: it advances `last_checked` together with the retrieval dates it writes and leaves
+`search.checked_at` pinned to the search run that actually happened, so the file never claims a
+search that did not occur. Both modes abort the whole file if any mechanism quote is absent, and
+both refuse a date earlier than one already recorded.
+
 ### `evidence_content.py`
 
 Shared source-admission, DNS/IP safety, content normalization, quote-matching, deadline, and hash
