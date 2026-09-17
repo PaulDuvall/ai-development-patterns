@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Planned Implementation
 slug: planned-implementation
-last_checked: '2026-07-10'
+last_checked: '2026-09-17'
 search:
   run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -62,13 +62,13 @@ evidence:
   independence_group: cursor
   url: https://cursor.com/blog/plan-mode
   resolved_url: https://cursor.com/blog/plan-mode
-  content_sha256: ff92bc9e1a5c48a27f4452cb399994624302653c50f9ef54b487f5f2d4c817c1
+  content_sha256: e118395845600df00166a4b7852f9cd05e1961832f129ae4d58c5732189d36ef
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Cursor ships Plan Mode as an agent workflow where the agent researches the codebase,
     asks clarifying questions, and produces a plan before implementation.
 - tier: T1
@@ -81,13 +81,13 @@ evidence:
   independence_group: anthropic
   url: https://docs.anthropic.com/en/docs/claude-code/common-workflows
   resolved_url: https://code.claude.com/docs/en/common-workflows
-  content_sha256: 19eeacdd00dfe3c62d2d863a94ae3829777f60c86381ae136baaa479d06191d4
+  content_sha256: 6342c4387c248d6884d2f4d027386126649f86b28789c17402398bbbb319013d
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Claude Code ships plan mode for review-before-edit workflows where the agent reads files
     and proposes a plan without modifying files until approval.
 - tier: T1
@@ -99,14 +99,14 @@ evidence:
   organization: Microsoft
   independence_group: microsoft
   url: https://code.visualstudio.com/docs/agents/planning
-  resolved_url: https://code.visualstudio.com/docs/agents/planning
-  content_sha256: 0861ddcf005b7dd8f44be68329fc0fec94881626b2b14fe1c2263f08af4a0a4f
+  resolved_url: https://code.visualstudio.com/docs/agents/run/planning
+  content_sha256: 7184e683ce82b9f95fc05e84087748c6d7d9601d2ee30345f5c55a11c1c6ce56
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Visual Studio Code ships a Plan agent that creates detailed implementation plans before
     starting implementation.
 - tier: T4
@@ -119,13 +119,13 @@ evidence:
   independence_group: equal-experts
   url: https://www.equalexperts.com/blog/our-thinking/ai-assisted-development-workflow/
   resolved_url: https://www.equalexperts.com/blog/our-thinking/ai-assisted-development-workflow/
-  content_sha256: 814ea022ef89e2c3335a3ba0def1a7dbf698e0cb89d4179bcca2f9cd7b811e39
+  content_sha256: 12f3e6445ac9a894f298b1fd2f79ded2eacf624baf1539e3b29970b30e96e1e3
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Practitioner workflow describes generating a concrete, reviewable implementation plan
     before letting the model generate code.
 verdict: verified

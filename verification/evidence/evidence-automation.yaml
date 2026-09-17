@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Evidence Automation
 slug: evidence-automation
-last_checked: '2026-07-10'
+last_checked: '2026-09-17'
 search:
   run_id: 'github-actions:29123202495'
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -57,13 +57,13 @@ evidence:
   independence_group: thoropass
   url: https://www.thoropass.com/platform/compliance-automation
   resolved_url: https://www.thoropass.com/platform/compliance-automation
-  content_sha256: 3db4e985e1df142cb05265ba0eb3a482c055de5b51e9fcf3d359fea7636b31c9
+  content_sha256: b3c677bc71a2c166417797adc46d529f32f96a47f8a1b9b2150a9f7a07447d6b
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Thoropass ships a compliance automation platform with evidence automation capabilities that
     generate auditor-approved evidence from connected monitors and platform features.
 - tier: T1
@@ -81,7 +81,7 @@ evidence:
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: DSG.AI ships an audit evidence automation product that handles evidence intake, support
     quality flags, control mapping, and source-linked workpaper drafts.
 - tier: T4
@@ -94,14 +94,14 @@ evidence:
   organization: Unosecur
   independence_group: unosecur
   url: https://www.unosecur.com/resources/blog/why-does-soc2-matter-and-how-does-unosecur-achieve-the-certification
-  resolved_url: https://www.unosecur.com/resources/blog/why-does-soc2-matter-and-how-does-unosecur-achieve-the-certification
-  content_sha256: 5d8ef6021a7e83c4848623523a90c1af8c8e58e4ced47d302d4e6479394c9c8c
+  resolved_url: https://www.unosecur.com/blog/why-does-soc2-matter-and-how-does-unosecur-achieve-the-certification
+  content_sha256: c8d5043829a76d8146fbe576012fa965f2927557a587c59bbccb6f601b2a0c71
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Unosecur reports using Vanta automation to gather most SOC 2 audit evidence, including access
     logs, security configurations, and audit trails.
 verdict: verified
