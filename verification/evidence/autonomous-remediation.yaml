@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Autonomous Remediation
 slug: autonomous-remediation
-last_checked: '2026-08-01'
+last_checked: '2026-09-17'
 search:
   run_id: codex-local:e3a0401a-8dcb-4b9f-9247-2aae4e39df1e
   run_ref: verification/local-runs/codex-local-e3a0401a-8dcb-4b9f-9247-2aae4e39df1e.yaml
@@ -71,8 +71,8 @@ evidence:
   claim: GitHub Agentic Autofix starts from a deterministic CodeQL alert, generates
     a repair, reruns CodeQL, and iterates before opening a pull request.
   resolved_url: https://docs.github.com/en/code-security/concepts/code-scanning/autofix-for-code-scanning
-  content_sha256: 1275df0b130cf8a7bbc01382cb027c89ddaf93edd65b5d6e58d4b3ec209f277a
-  retrieved: '2026-08-01'
+  content_sha256: ff6374bf8785197b897a4961cb6f85add82bb603b7e7dbcfd8cf6fb504dc6dd1
+  retrieved: '2026-09-17'
 - tier: T1
   match: aliased
   mechanism_quote: 'RepairAgent is an autonomous agent that fixes bugs in Java projects
@@ -82,7 +82,7 @@ evidence:
   source_kind: open_source_implementation
   organization: Software Lab, University of Stuttgart
   independence_group: software-lab-stuttgart
-  url: https://github.com/sola-st/RepairAgent
+  url: https://raw.githubusercontent.com/sola-st/RepairAgent/5d9dc8de427f47ccea20b373513be07c79f6e4a2/README.md
   verifier:
     method: automated
     model: codex-managed
@@ -91,9 +91,9 @@ evidence:
     run_manifest_sha256: f4c3509d94d274a905bb62ee3184490aecdc83aa480362996d9a57aab8711fe9
   claim: The runnable open-source RepairAgent loops through localization, analysis,
     LLM-generated repair, test execution, and iteration.
-  resolved_url: https://github.com/sola-st/RepairAgent
-  content_sha256: 19258a8ddc588c9b970a5c2ee69282e38da4b7051d32c278e05fe0b13a38428f
-  retrieved: '2026-08-01'
+  resolved_url: https://raw.githubusercontent.com/sola-st/RepairAgent/5d9dc8de427f47ccea20b373513be07c79f6e4a2/README.md
+  content_sha256: d08efc6ad5f410ae7b0ade14644ad1c35dd89af1e340b1241c40538f12a7d014
+  retrieved: '2026-09-17'
 - tier: T4
   match: aliased
   mechanism_quote: We start with a test failure that was triaged by a rule-based test
@@ -118,6 +118,6 @@ evidence:
     iteratively repairs code using static-analysis and test feedback before validated
     patches reach human review.
   resolved_url: https://arxiv.org/abs/2507.18755
-  content_sha256: 697082639413a2f4de6afb7f78213e20ddcb73fc2e8c9e34f88ff794552d76e5
-  retrieved: '2026-08-01'
+  content_sha256: b98a1af7ecc6e7807d40964ef1f768c4c1b35f85bb50c743f98c623d99829646
+  retrieved: '2026-09-17'
 verdict: verified

@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Agent Memory
 slug: agent-memory
-last_checked: '2026-07-10'
+last_checked: '2026-09-17'
 search:
   run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -65,13 +65,13 @@ evidence:
   independence_group: anthropic
   url: https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool
   resolved_url: https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool
-  content_sha256: b8da84a6ae741330c878b61b41e0567eee552ef7a6ae9e2fa55e46d58e14428b
+  content_sha256: c2dea3e00649b7884bac03950e82fff9d5ea6ed199add82953a57a59194b8e9d
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Anthropic ships a Claude API memory tool that stores files outside the context window and persists
     them across conversations for later retrieval and updates.
 - tier: T1
@@ -82,15 +82,15 @@ evidence:
   source_kind: open_source_implementation
   organization: rohitg00
   independence_group: rohitg00
-  url: https://github.com/rohitg00/agentmemory
-  resolved_url: https://github.com/rohitg00/agentmemory
-  content_sha256: 9299c2b549f825e09441770715b02ff1f6c3f5da4d888e481cde8c018dadd337
+  url: https://raw.githubusercontent.com/rohitg00/agentmemory/e04ba88819c365c9acf9d6661ea802143e728bd6/README.md
+  resolved_url: https://raw.githubusercontent.com/rohitg00/agentmemory/e04ba88819c365c9acf9d6661ea802143e728bd6/README.md
+  content_sha256: ef5b055196894e43553cc4e65223fce1f168851760f3f0ca663dd752fee384ce
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: The repository provides a runnable shared memory server for agents through hooks, MCP, or REST,
     supporting cross-agent persistent memory.
 - tier: T2
@@ -104,13 +104,13 @@ evidence:
   independence_group: cline
   url: https://docs.cline.bot/best-practices/memory-bank
   resolved_url: https://docs.cline.bot/best-practices/memory-bank
-  content_sha256: c1cc254ea76b7be32c02f2fac490b4b94821f2ef50159a14e64597a9a06fd0fd
+  content_sha256: a2340eab1c65b095a997c721bd79783fb3387561d850eae2c44011dbc09ea9fc
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Cline's official Memory Bank guidance prescribes structured markdown files that restore project
     context across otherwise stateless assistant sessions.
 - tier: T4
@@ -123,14 +123,14 @@ evidence:
   independence_group: cloudflare
   url: https://blog.cloudflare.com/introducing-agent-memory/
   resolved_url: https://blog.cloudflare.com/introducing-agent-memory/
-  content_sha256: cd1f37307475dfec34205a1d5a094e6ccf4b6a4a6c5c8861535ef07c603ed487
+  content_sha256: 7562d26126a5f5a467da5ef25e01e5e272e13790e85f3940e79ee4612d442bff
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   date: '2026-04-17'
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Cloudflare reports using an internal OpenCode plugin that wires Agent Memory into development
     workflows and preserves compaction memory within and across sessions.
 - tier: T4
@@ -141,15 +141,15 @@ evidence:
   source_kind: case_study
   organization: Gitpod
   independence_group: gitpod
-  url: https://github.com/gitpod-io/gitpod/blob/main/.clinerules/memory-bank.md
-  resolved_url: https://github.com/gitpod-io/gitpod/blob/main/.clinerules/memory-bank.md
-  content_sha256: efaf307ce9fccb6b3aa734673aa4969427daae2f55abbb67c8fc37efe6ebf4c4
+  url: https://raw.githubusercontent.com/gitpod-io/gitpod/ba4133851f9a54d440630364a9a8485fbaaf6ad6/.clinerules/memory-bank.md
+  resolved_url: https://raw.githubusercontent.com/gitpod-io/gitpod/ba4133851f9a54d440630364a9a8485fbaaf6ad6/.clinerules/memory-bank.md
+  content_sha256: d25661a4119323c526ad2ce6d4b1ac335cbe35578f93382b71acd61bbfdf1ab7
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Gitpod checks in Memory Bank operating instructions requiring the agent to reload structured memory
     files at every task start to continue work after context resets.
 verdict: verified

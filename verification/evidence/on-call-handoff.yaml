@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: On-Call Handoff
 slug: on-call-handoff
-last_checked: '2026-07-10'
+last_checked: '2026-09-17'
 search:
   run_id: 'github-actions:29123202495'
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -58,13 +58,13 @@ evidence:
   independence_group: firehydrant
   url: https://docs.firehydrant.com/docs/signals-shift-notifications
   resolved_url: https://docs.firehydrant.com/docs/signals-shift-notifications
-  content_sha256: 5dbb6721b85a0e2e01487978648143face89dd7c91f23abac7debf86b703abaf
+  content_sha256: c78212ed77ab79617d6db1340e2bca9b5e7626071c2e7fb16bf370c461fab4a4
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: FireHydrant ships configurable shift notifications that summarize active incidents and alerts for the next on-call responder.
 - tier: T1
   match: aliased
@@ -73,15 +73,15 @@ evidence:
   source_kind: open_source_implementation
   organization: Rootly
   independence_group: rootly
-  url: https://github.com/rootlyhq/rootly-mcp-server
-  resolved_url: https://github.com/rootlyhq/rootly-mcp-server
-  content_sha256: 2ff1a56c4292e1b8e6e7276347732f0f0d9743295645ccb6262e774038a36648
+  url: https://raw.githubusercontent.com/rootlyhq/rootly-mcp-server/83e2323cd37e1f7242b3def99388dcba628c88dc/README.md
+  resolved_url: https://raw.githubusercontent.com/rootlyhq/rootly-mcp-server/83e2323cd37e1f7242b3def99388dcba628c88dc/README.md
+  content_sha256: 1f1616253a772f8ef8fd819f1f828265fd494c2d80bf51d4b4b1188c73226b61
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Rootly provides a runnable MCP server tool that produces on-call handoff context from responders and incident history.
 - tier: T3
   match: unnamed
@@ -92,12 +92,12 @@ evidence:
   independence_group: microsoft-ucl
   url: https://discovery.ucl.ac.uk/id/eprint/10186655/
   resolved_url: https://discovery.ucl.ac.uk/id/eprint/10186655/
-  content_sha256: 15fb42357212df0cf89f51dbfb2eed6e529cc93792c74b5c752bae7d7a0df20f
+  content_sha256: 47d6f12b6d9c9d505bac5e525fdecaf5b4f5da6c86dd09c1fed26a89735ff1b0
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: The peer-reviewed Oasis system demonstrates automated operational handoff-style summaries by aggregating outage incidents and generating human-readable summaries with LLMs.
 verdict: verified

@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Test Promotion
 slug: test-promotion
-last_checked: 2026-07-10
+last_checked: 2026-09-17
 search:
   run_id: "github-actions:29123202495"
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -51,15 +51,15 @@ evidence:
     source_kind: open_source_implementation
     organization: Betterment
     independence_group: betterment
-    url: https://github.com/Betterment/alchemist
-    resolved_url: https://github.com/Betterment/alchemist
-    content_sha256: 4fe0a343824bee9c336fbc4190ddeb22642a2bd657df5f286c672e1f4c8102c7
+    url: https://raw.githubusercontent.com/Betterment/alchemist/1dfc53c5082b2c1e4ea9f5a191d20f81bd0ee81a/README.md
+    resolved_url: https://raw.githubusercontent.com/Betterment/alchemist/1dfc53c5082b2c1e4ea9f5a191d20f81bd0ee81a/README.md
+    content_sha256: 395ac4ee9bf8e9b721bbe43412ea710e4b6fde1f59045afffe9144378e1dc1f8
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Open-source Flutter tooling generates golden-file test baselines that are treated as accepted golden tests.
   - tier: T4
     match: unnamed
@@ -70,12 +70,12 @@ evidence:
     independence_group: ranorex
     url: https://www.ranorex.com/blog/generative-ai-in-software-testing/
     resolved_url: https://www.ranorex.com/blog/generative-ai-in-software-testing/
-    content_sha256: 8be1dcaeccc970e367062005de4c126e981e176b69901a900add7ee7719f577b
+    content_sha256: c10def3651d1b7b15262ecaaba2b22a4fa3d6792e7be0cbba8cc6e0f831b904e
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-17
     claim: Practitioner guidance says AI-generated tests should remain review candidates until human QA accepts them into the suite.
 verdict: weak
