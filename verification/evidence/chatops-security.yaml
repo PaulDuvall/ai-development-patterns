@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: ChatOps Security
 slug: chatops-security
-last_checked: '2026-07-10'
+last_checked: '2026-09-17'
 search:
   run_id: 'github-actions:29123202495'
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -56,15 +56,15 @@ evidence:
   source_kind: open_source_implementation
   organization: Amazon Web Services
   independence_group: amazon
-  url: https://github.com/aws-samples/chatops-slack
-  resolved_url: https://github.com/aws-samples/chatops-slack
-  content_sha256: dc61bf435154aaa9ccbb1eece5af2c681f856cf03247e81038877893c3a9651f
+  url: https://raw.githubusercontent.com/aws-samples/chatops-slack/9e896bfd54633aa5fe1bba238f922451b1394ac6/README.md
+  resolved_url: https://raw.githubusercontent.com/aws-samples/chatops-slack/9e896bfd54633aa5fe1bba238f922451b1394ac6/README.md
+  content_sha256: 86b3d0ec149a0228add5ec4e9205b681ffe334af9348e3d2aa76fbc1ce3ac19d
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Runnable AWS sample repository implements a Slack ChatOps workflow for managing SAST scan results.
 - tier: T4
   match: aliased
@@ -82,7 +82,7 @@ evidence:
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Practitioner security-operations write-up describes Slack slash commands that run immediate
     VirusTotal checks for hashes or URLs.
 - tier: T4
@@ -96,14 +96,14 @@ evidence:
   independence_group: rapid7
   url: https://www.rapid7.com/blog/post/2017/05/07/chatops-for-security-operations/
   resolved_url: https://www.rapid7.com/blog/post/2017/05/07/chatops-for-security-operations/
-  content_sha256: 3c24757fcadb62fafbea21a69b454718fb72c445acd5cf3f71bb48b18e4754f1
+  content_sha256: 072561bf7a52ec7c6ca19df9aa75479efdc083ff378a08d925a749029243e688
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   date: '2017-05-07'
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Practitioner article describes security operations ChatOps custom commands wired to scripts
     for immediate execution from chat.
 verdict: verified
