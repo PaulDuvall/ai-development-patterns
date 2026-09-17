@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Guided Architecture
 slug: guided-architecture
-last_checked: '2026-07-10'
+last_checked: '2026-09-17'
 search:
   run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -59,15 +59,15 @@ evidence:
   source_kind: open_source_implementation
   organization: ForceInjection
   independence_group: forceinjection
-  url: https://github.com/ForceInjection/domain-driven-design-skills/blob/main/README.en.md
-  resolved_url: https://github.com/ForceInjection/domain-driven-design-skills/blob/main/README.en.md
-  content_sha256: a3c51e746d30dc10097ecfb485c2b18ff8fc3831adbe0268ffe3ee34d2e65682
+  url: https://raw.githubusercontent.com/ForceInjection/domain-driven-design-skills/8923ce99f228da64ef1ae2fe7f94b578e3046acb/README.en.md
+  resolved_url: https://raw.githubusercontent.com/ForceInjection/domain-driven-design-skills/8923ce99f228da64ef1ae2fe7f94b578e3046acb/README.en.md
+  content_sha256: 5dda4adaf9e724536f3ebcb8b1c5e1c8580b6ce01d8f460f66a5425b8f5ef59f
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Runnable GitHub repository provides DDD skills for AI agents, organizing domain modeling
     guidance across discovery, strategic, tactical, validation, and specification-bridging steps.
 - tier: T3
@@ -81,14 +81,14 @@ evidence:
   independence_group: iiit-hyderabad
   url: https://arxiv.org/html/2403.01709
   resolved_url: https://arxiv.org/html/2403.01709
-  content_sha256: c5bcd4232bf110b0e93bece3769234eb6acb64d6094267d824837d1913c55352
+  content_sha256: 4ff5c2d1829e479ca22074eaa5fcb7b848a3d49b66f9492a9c06d70190dc35db
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   date: '2024-03-04'
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: Peer-reviewed ICSA 2024 research evaluates LLMs generating architectural design decisions
     from context, matching the ADR portion of AI-guided architecture work.
 - tier: T4
@@ -101,14 +101,14 @@ evidence:
   independence_group: amazon
   url: https://aws.amazon.com/blogs/machine-learning/accelerate-aws-well-architected-reviews-with-generative-ai/
   resolved_url: https://aws.amazon.com/blogs/machine-learning/accelerate-aws-well-architected-reviews-with-generative-ai/
-  content_sha256: 265bd16ec355d0f7b7141b085ef22598d2d8aa82b0b493a60fb04e8c6a560091
+  content_sha256: 302347456649c952a64bf956bf488a5c5fcc1334e8eb16b6b96c9fe17c0b33ef
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   date: '2025-03-04'
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-17'
   claim: AWS practitioner report describes a generative AI workflow that applies the AWS Well-Architected
     Framework to architecture documents and produces assessments and recommendations.
 verdict: verified

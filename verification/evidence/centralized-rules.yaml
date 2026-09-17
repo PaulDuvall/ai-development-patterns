@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Centralized Rules
 slug: centralized-rules
-last_checked: '2026-08-01'
+last_checked: '2026-09-17'
 search:
   run_id: codex-local:b6256893-a059-4a31-aa0d-9f76f146db25
   run_ref: verification/local-runs/codex-local-b6256893-a059-4a31-aa0d-9f76f146db25.yaml
@@ -59,7 +59,7 @@ evidence:
   source_kind: open_source_implementation
   organization: AlignTrue
   independence_group: aligntrue
-  url: https://github.com/AlignTrue/aligntrue-sync
+  url: https://raw.githubusercontent.com/AlignTrue/aligntrue-sync/6b441d09980b767fb3be4c98bc30dc464df8e56b/README.md
   verifier:
     method: automated
     model: codex-managed
@@ -69,9 +69,9 @@ evidence:
   claim: Runnable MIT-licensed CLI imports centralized Git rule sources, supports
     team mode, and exports rules into assistant-native files including AGENTS.md,
     CLAUDE.md, and Cursor formats.
-  resolved_url: https://github.com/AlignTrue/aligntrue-sync
-  content_sha256: 0849ffe53bb0bb11fc7825e2ddc753e1390ec063a6d88c491cdc106cb88e7ed6
-  retrieved: '2026-08-01'
+  resolved_url: https://raw.githubusercontent.com/AlignTrue/aligntrue-sync/6b441d09980b767fb3be4c98bc30dc464df8e56b/README.md
+  content_sha256: 8fcd1dd9b7d80b2dd61282032060e2c76abd80f4476624122b0a618580621d48
+  retrieved: '2026-09-17'
 - tier: T1
   match: aliased
   mechanism_quote: Multi-Agent Support - Generate rules for 11 AI coding agents from
@@ -80,7 +80,7 @@ evidence:
   source_kind: open_source_implementation
   organization: Block
   independence_group: block
-  url: https://github.com/block/ai-rules
+  url: https://raw.githubusercontent.com/block/ai-rules/b2c1cd16d05f47053eb3f059f87524f7b6ee1a1f/README.md
   verifier:
     method: automated
     model: codex-managed
@@ -89,9 +89,9 @@ evidence:
     run_manifest_sha256: 2bf5299b30fc87d951fe702a7123b81a0d0634e755a972cff6d9338d2e456fc5
   claim: Runnable open-source CLI distributes one rule source into AGENTS.md, CLAUDE.md,
     and other agent-specific files and checks generated-file consistency.
-  resolved_url: https://github.com/block/ai-rules
-  content_sha256: fddf670f56a9b87a54a709011565861b5f5ce725617ff8d7923d41903dc34f34
-  retrieved: '2026-08-01'
+  resolved_url: https://raw.githubusercontent.com/block/ai-rules/b2c1cd16d05f47053eb3f059f87524f7b6ee1a1f/README.md
+  content_sha256: 013767920d706dfd95f55272f61728892b3190e1a1c23c474a832fc165468e2f
+  retrieved: '2026-09-17'
 - tier: T2
   match: aliased
   mechanism_quote: The agent then regenerates and syncs AGENTS.md for all affected
@@ -111,8 +111,8 @@ evidence:
     in a centralized control plane and regenerates affected repositories' AGENTS.md
     files when rules change.
   resolved_url: https://docs.port.io/guides/all/centralize-ai-coding-rules-with-port/
-  content_sha256: 589b9cd716e1f8ac5d497fa4d606702653ec9e57a614431bb57dfbb765a2e6e5
-  retrieved: '2026-08-01'
+  content_sha256: 41153df86b52a97d9e4f208812e5caf43a48b600d918f5189d40c24976ecdea0
+  retrieved: '2026-09-17'
 - tier: T4
   match: aliased
   mechanism_quote: Keep `AGENTS.md` and `CLAUDE.md` identical. The repository-root
@@ -132,6 +132,6 @@ evidence:
     owned source material is distilled into generated instructions and synchronized
     entry points affect every contributor's agent sessions.
   resolved_url: https://docs.gitlab.com/development/ai_instruction_files_review/
-  content_sha256: 7d35d0bd0ef181a4056fde54a626becfe905b4a88bce4b0d6d8795b6ee2605cd
-  retrieved: '2026-08-01'
+  content_sha256: eaf5f68738378624d44c3b7b605745fde8906cccc3dd89a90f3ad6d42df914e8
+  retrieved: '2026-09-17'
 verdict: verified
