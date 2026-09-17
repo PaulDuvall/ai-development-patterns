@@ -906,6 +906,29 @@ def test_complete_run_retrieval_date_must_match_check_date(tmp_path):
     assert_fails(tmp_path, "requires 'retrieved' == 'last_checked'")
 
 
+def test_search_date_may_precede_a_later_recheck(tmp_path):
+    """A model-free recheck advances the check date without rerunning a search."""
+    document = evidence_document()
+    document["last_checked"] = "2026-07-08"
+    for entry in document["evidence"]:
+        entry["retrieved"] = "2026-07-08"
+    write_document(tmp_path, document)
+
+    result = run_validator(tmp_path)
+
+    assert result.returncode == 0, result.stdout
+    assert document["search"]["checked_at"] == "2026-07-01"
+
+
+def test_search_date_must_not_follow_the_check_it_belongs_to(tmp_path):
+    """A search dated after its own file check is incoherent provenance."""
+    document = evidence_document()
+    document["search"]["checked_at"] = "2026-07-02"
+    write_document(tmp_path, document)
+
+    assert_fails(tmp_path, "'checked_at' must not be after 'last_checked'")
+
+
 def test_max_age_days_can_make_freshness_a_gate(tmp_path):
     write_document(tmp_path, evidence_document())
     assert_fails(tmp_path, "days old (max 1)", "--max-age-days", "1")

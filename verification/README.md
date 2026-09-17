@@ -18,6 +18,12 @@ The capability deliberately separates three operations:
    verdict, naming signal, catalog mapping, pending entry, and generated status row.
 2. **Check links and content** — networked, read-only checks confirm cited pages remain reachable
    and recorded mechanism quotes remain present. This runs weekly and can be requested manually.
+   When a source keeps its quote but moves, `scripts/hydrate-evidence-content.py --recheck` records
+   the move without a model: it re-fetches every admitted source in the file, aborts unless every
+   mechanism quote is still present, then advances `last_checked` and each `retrieved` while leaving
+   `search.checked_at` pinned to the search run. `last_checked` therefore dates the most recent
+   verification and `search.checked_at` dates the search, and the two may differ in that one
+   direction. Rewording or withdrawal of a quote is out of scope here and requires operation 3.
 3. **Evaluate locally** — bounded, model-backed web research runs only in an interactive local
    Codex client. A deterministic plan and exact human approval precede every agent call. Read-only
    research agents return proposals to one root writer; a separate agent reviews each batch before
