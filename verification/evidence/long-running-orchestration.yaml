@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Long-Running Orchestration
 slug: long-running-orchestration
-last_checked: '2026-07-10'
+last_checked: '2026-09-21'
 search:
   run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -52,23 +52,21 @@ terminology_variants:
 evidence:
 - tier: T1
   match: aliased
-  mechanism_quote: Run tasks in isolated cloud environments, work in parallel, and start work from the web,
-    GitHub, Linear, or Slack.
+  mechanism_quote: Run tasks in isolated cloud environments, work in parallel, and start work from the web, GitHub, GitLab, Linear, or Slack.
   source: OpenAI Codex Cloud
   source_kind: shipped_product
   organization: OpenAI
   independence_group: openai
   url: https://developers.openai.com/codex/cloud
   resolved_url: https://learn.chatgpt.com/docs/cloud
-  content_sha256: dfdb55ad17cc0dab1007cb79bace7b3db7cfbc92c4c0311316107620557044af
+  content_sha256: 65e9cfb6a8da75d28b03ad79c65c20f335cda0fb0b2a65edf664a136f0d72eb1
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
-  claim: OpenAI ships Codex cloud tasks for delegated coding work in isolated cloud environments,
-    parallel execution, integrations, follow-up review, and pull-request creation.
+  retrieved: '2026-09-21'
+  claim: OpenAI ships Codex cloud tasks for delegated coding work in isolated cloud environments, parallel execution, integrations, follow-up review, and pull-request creation.
 - tier: T1
   match: aliased
   mechanism_quote: As a rule of thumb, if you can do it in three hours, Devin can most likely do it.
@@ -78,34 +76,30 @@ evidence:
   independence_group: cognition
   url: https://docs.devin.ai/get-started/devin-intro
   resolved_url: https://docs.devin.ai/get-started/devin-intro
-  content_sha256: 697bccbcfa21c99bd0b413f845f67b58f8ef82161a8d7b87a019204acd1480cb
+  content_sha256: 2d2e4439e3a386d3f369accff4ad31b8fe17207a0db77785c8b9f4cecd5da413
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
-  claim: Cognition ships Devin as an autonomous coding agent with a multi-hour task horizon and
-    documented ability to write, run, and test code.
+  retrieved: '2026-09-21'
+  claim: Cognition ships Devin as an autonomous coding agent with a multi-hour task horizon and documented ability to write, run, and test code.
 - tier: T4
   match: aliased
-  mechanism_quote: Cursor can prepare the pull request for you in the background, and once it’s ready,
-    you can review and test everything in one go.
+  mechanism_quote: Cursor can prepare the pull request for you in the background, and once it’s ready, you can review and test everything in one go.
   source: madewithlove, Using Cursor background agents
   source_kind: practitioner_report
   organization: madewithlove
   independence_group: madewithlove
   url: https://madewithlove.com/blog/using-cursor-background-agents/
   resolved_url: https://madewithlove.com/blog/using-cursor-background-agents/
-  content_sha256: a15f1491a03f8b4cb1ac7c4cc78b018aa984bee0c78766235f2fa0addc0554fe
+  content_sha256: e197a86f4ec4058c6f04de1c018291bb2644e08c6a4bdfc2397aae1665733929
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   date: '2025-07-31'
-  retrieved: '2026-07-10'
-  claim: A practitioner report describes using Cursor background agents to run in cloud-backed
-    repository environments, prepare pull requests while the developer works elsewhere, and hand
-    results back for review and testing.
+  retrieved: '2026-09-21'
+  claim: A practitioner report describes using Cursor background agents to run in cloud-backed repository environments, prepare pull requests while the developer works elsewhere, and hand results back for review and testing.
 verdict: verified

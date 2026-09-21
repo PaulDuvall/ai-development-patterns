@@ -2,9 +2,9 @@ schema_version: 2
 provenance_status: complete
 pattern: Spec-Driven Development
 slug: spec-driven-development
-last_checked: '2026-07-10'
+last_checked: '2026-09-21'
 search:
-  run_id: 'github-actions:29123202495'
+  run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   provider: openai
   model: gpt-5.5
@@ -50,20 +50,20 @@ terminology_variants:
 evidence:
 - tier: T1
   match: named
-  mechanism_quote: 'Spec-Driven Development changes this: specifications become executable, directly generating working implementations rather than just guiding them.'
+  mechanism_quote: Spec Kit is an open source toolkit that gives AI coding agents structured
   source: GitHub Spec Kit README
   source_kind: open_source_implementation
   organization: GitHub
   independence_group: github
   url: https://raw.githubusercontent.com/github/spec-kit/main/README.md
   resolved_url: https://raw.githubusercontent.com/github/spec-kit/main/README.md
-  content_sha256: 7979278eb9353b0210e7311b88bdc76d067bd6e1717283817d7f805a1864fb25
+  content_sha256: 0d97f2116dfe5a1861a9beade162da529e9a2f57d8d96f9c1fd2e398c0578819
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-21'
   claim: GitHub Spec Kit provides a runnable open-source workflow where executable specifications drive implementation.
 - tier: T2
   match: named
@@ -74,13 +74,13 @@ evidence:
   independence_group: amazon
   url: https://kiro.dev/docs/specs/
   resolved_url: https://kiro.dev/docs/specs/
-  content_sha256: 2f87d7f81ced2978ada54f7cf819758a7642312f86f5ff7f36cfd4c1471e570c
+  content_sha256: 7940c1c526f6fdc383d7c91ec529c8a7e7312616d206990ce84f42f2823c910c
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-21'
   claim: Kiro's official docs define specs as requirements, design, and task artifacts that guide implementation planning.
 - tier: T4
   match: named
@@ -91,14 +91,14 @@ evidence:
   independence_group: thoughtworks
   url: https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html
   resolved_url: https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html
-  content_sha256: 91bdeaa47ccff935dd53d0a43fcea54471702954889d904364d49b4ccd12a112
+  content_sha256: be8d4af9a00ceb6e3f7546db8b150c3311cbb122d492663fbb562461017ca7ff
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   date: '2025-10-15'
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-21'
   claim: A Thoughtworks practitioner report compares SDD tools and describes specs as the shared source of truth for humans and AI.
 - tier: T4
   match: aliased
@@ -109,12 +109,12 @@ evidence:
   independence_group: augment-code
   url: https://www.augmentcode.com/guides/living-specs-for-ai-agent-development
   resolved_url: https://www.augmentcode.com/guides/living-specs-for-ai-agent-development
-  content_sha256: 05ac99f8eaa80bd49b946d0669770085019525ffaa00dbb4646af25435e326f9
+  content_sha256: 461ff4c85c34530f054dd1bf06c786cfad8c3ab87ac29d2ee70caea7b965c380
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-09-21'
   claim: Augment Code's living specs guide applies structured, testable acceptance criteria to AI-agent development workflows.
 verdict: verified
