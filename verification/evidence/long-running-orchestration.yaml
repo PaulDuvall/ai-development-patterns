@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Long-Running Orchestration
 slug: long-running-orchestration
-last_checked: '2026-09-21'
+last_checked: '2026-10-07'
 search:
   run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -52,21 +52,21 @@ terminology_variants:
 evidence:
 - tier: T1
   match: aliased
-  mechanism_quote: Run tasks in isolated cloud environments, work in parallel, and start work from the web, GitHub, GitLab, Linear, or Slack.
+  mechanism_quote: Each task has its own workspace and can keep working while your computer is asleep.
   source: OpenAI Codex Cloud
   source_kind: shipped_product
   organization: OpenAI
   independence_group: openai
   url: https://developers.openai.com/codex/cloud
   resolved_url: https://learn.chatgpt.com/docs/cloud
-  content_sha256: 65e9cfb6a8da75d28b03ad79c65c20f335cda0fb0b2a65edf664a136f0d72eb1
+  content_sha256: c62a4b514a347f1c1b249536623903de60392455c695496202965c372da95267
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-09-21'
-  claim: OpenAI ships Codex cloud tasks for delegated coding work in isolated cloud environments, parallel execution, integrations, follow-up review, and pull-request creation.
+  retrieved: '2026-10-07'
+  claim: OpenAI ships Codex Cloud for delegated coding tasks that each run in their own cloud workspace and keep working while the user's computer is asleep, with follow-up review and pull-request creation.
 - tier: T1
   match: aliased
   mechanism_quote: As a rule of thumb, if you can do it in three hours, Devin can most likely do it.
@@ -76,13 +76,13 @@ evidence:
   independence_group: cognition
   url: https://docs.devin.ai/get-started/devin-intro
   resolved_url: https://docs.devin.ai/get-started/devin-intro
-  content_sha256: 2d2e4439e3a386d3f369accff4ad31b8fe17207a0db77785c8b9f4cecd5da413
+  content_sha256: 1ff1c695091a91e02f1f84e4e01437693dfe4bbd812c753e94b03525406706a9
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-09-21'
+  retrieved: '2026-10-07'
   claim: Cognition ships Devin as an autonomous coding agent with a multi-hour task horizon and documented ability to write, run, and test code.
 - tier: T4
   match: aliased
@@ -93,13 +93,13 @@ evidence:
   independence_group: madewithlove
   url: https://madewithlove.com/blog/using-cursor-background-agents/
   resolved_url: https://madewithlove.com/blog/using-cursor-background-agents/
-  content_sha256: e197a86f4ec4058c6f04de1c018291bb2644e08c6a4bdfc2397aae1665733929
+  content_sha256: e91a8fde696c122d301922f5ccdeac3a9fe23554c0d4e5ffb4e602eba8bcace9
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   date: '2025-07-31'
-  retrieved: '2026-09-21'
+  retrieved: '2026-10-07'
   claim: A practitioner report describes using Cursor background agents to run in cloud-backed repository environments, prepare pull requests while the developer works elsewhere, and hand results back for review and testing.
 verdict: verified
