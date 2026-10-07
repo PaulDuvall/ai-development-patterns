@@ -71,7 +71,7 @@ evidence:
     CLAUDE.md, and Cursor formats.
   resolved_url: https://raw.githubusercontent.com/AlignTrue/aligntrue-sync/6b441d09980b767fb3be4c98bc30dc464df8e56b/README.md
   content_sha256: 8fcd1dd9b7d80b2dd61282032060e2c76abd80f4476624122b0a618580621d48
-  retrieved: '2026-09-17'
+  retrieved: '2026-10-07'
 - tier: T1
   match: aliased
   mechanism_quote: Multi-Agent Support - Generate rules for 11 AI coding agents from
@@ -91,7 +91,7 @@ evidence:
     and other agent-specific files and checks generated-file consistency.
   resolved_url: https://raw.githubusercontent.com/block/ai-rules/b2c1cd16d05f47053eb3f059f87524f7b6ee1a1f/README.md
   content_sha256: 013767920d706dfd95f55272f61728892b3190e1a1c23c474a832fc165468e2f
-  retrieved: '2026-09-17'
+  retrieved: '2026-10-07'
 - tier: T2
   match: aliased
   mechanism_quote: Git stays the source of truth for rule content. Port is the control
@@ -132,6 +132,6 @@ evidence:
     owned source material is distilled into generated instructions and synchronized
     entry points affect every contributor's agent sessions.
   resolved_url: https://docs.gitlab.com/development/ai_instruction_files_review/
-  content_sha256: eaf5f68738378624d44c3b7b605745fde8906cccc3dd89a90f3ad6d42df914e8
-  retrieved: '2026-09-17'
+  content_sha256: 1da5c7273690c401a1cd45c91d6e9d374df5e686c5822c4de1a604b48cbdf0f0
+  retrieved: '2026-10-07'
 verdict: verified

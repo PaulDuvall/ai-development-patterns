@@ -76,13 +76,13 @@ evidence:
   independence_group: cognition
   url: https://docs.devin.ai/get-started/devin-intro
   resolved_url: https://docs.devin.ai/get-started/devin-intro
-  content_sha256: 2d2e4439e3a386d3f369accff4ad31b8fe17207a0db77785c8b9f4cecd5da413
+  content_sha256: 1ff1c695091a91e02f1f84e4e01437693dfe4bbd812c753e94b03525406706a9
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-09-21'
+  retrieved: '2026-10-07'
   claim: Cognition ships Devin as an autonomous coding agent with a multi-hour task horizon and documented ability to write, run, and test code.
 - tier: T4
   match: aliased
@@ -93,13 +93,13 @@ evidence:
   independence_group: madewithlove
   url: https://madewithlove.com/blog/using-cursor-background-agents/
   resolved_url: https://madewithlove.com/blog/using-cursor-background-agents/
-  content_sha256: e197a86f4ec4058c6f04de1c018291bb2644e08c6a4bdfc2397aae1665733929
+  content_sha256: e91a8fde696c122d301922f5ccdeac3a9fe23554c0d4e5ffb4e602eba8bcace9
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   date: '2025-07-31'
-  retrieved: '2026-09-21'
+  retrieved: '2026-10-07'
   claim: A practitioner report describes using Cursor background agents to run in cloud-backed repository environments, prepare pull requests while the developer works elsewhere, and hand results back for review and testing.
 verdict: verified
