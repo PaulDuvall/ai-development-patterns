@@ -1,7 +1,7 @@
 # Runtime dependencies
 beautifulsoup4==4.15.0
 certifi==2026.10.19
-charset-normalizer==3.5.0
+charset-normalizer==3.5.2
 idna==3.20
 PyYAML==6.0.3
 requests==2.34.2
