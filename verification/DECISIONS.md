@@ -67,7 +67,7 @@ Alignment values come from each pattern's `evidence/<slug>.yaml`; rules are defi
 | Test Promotion | aliased | golden tests; protected test baselines | Keep experimental; require evidence for the complete candidate-to-approved-baseline workflow | Accepted 2026-07-11 — canonical name retained |
 
 This ledger retains earlier human naming decisions while evidence is refreshed independently.
-Current coverage, provenance, verdicts, and freshness are generated in `STATUS.md`. A pattern may
+Current coverage, provenance, and verdicts are generated in `STATUS.md`. A pattern may
 remain here after its alignment becomes `strong` when the row preserves accepted decision history.
 
 ### 2026-07-11 — two-word taxonomy consolidation

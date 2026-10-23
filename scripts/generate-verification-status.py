@@ -5,7 +5,14 @@ One row per catalog pattern: verdict, score, naming alignment, last checked,
 naming recommendation, and the human decision. Pure derived data, assembled
 from patterns.yaml, experiments/README.md, verification/evidence/, and
 verification/DECISIONS.md. Run with --check to fail (exit 1) when the
-committed file is stale — the same contract as generate-patterns-data.py.
+committed file is out of sync with those inputs — the same contract as
+generate-patterns-data.py.
+
+The rendered view is clock-independent by design. Every cell is a function of
+the committed inputs alone, so --check only ever fails on a real input change.
+Currency is a separate concern, owned by the weekly 90-day gate
+(validate-evidence.py --max-age-days 90), which reports age against
+last_checked and names refreshing evidence as the fix.
 """
 
 import argparse
@@ -20,7 +27,6 @@ REPO_ROOT = Path(__file__).parent.parent
 STATUS_PATH = REPO_ROOT / "verification" / "STATUS.md"
 EVIDENCE_DIR = REPO_ROOT / "verification" / "evidence"
 DECISIONS_PATH = REPO_ROOT / "verification" / "DECISIONS.md"
-STALE_AFTER_DAYS = 90
 
 EXPERIMENT_ROW_RE = re.compile(
     r"^\|\s*\*\*\[([^\]]+)\]\(#([a-z0-9-]+)\)\*\*\s*\|\s*(?:Beginner|Intermediate|Advanced)\s*\|")
@@ -48,10 +54,13 @@ LEGEND = """\
 **Verdict** — `verified`: complete v2 provenance, at least 8 points from T1-T4, a shipped implementation,
 and independent practitioner adoption · `weak`: assessed evidence exists but is below that
 bar or still has legacy provenance · `unverified`: no meaningful scored evidence (score <= 2) ·
-`pending`: no assessment exists. **Freshness** — `current`: checked within 90 days ·
-`stale`: last checked more than 90 days ago · `needs refresh`: migrated evidence lacks the
-complete search and content provenance required for verification. Stale and needs-refresh
-counts overlap the verdict counts.
+`pending`: no assessment exists. **Provenance** — `complete`: carries the full search and
+content provenance · `needs refresh`: migrated evidence lacks the complete search and content
+provenance required for verification. Needs-refresh counts overlap the verdict counts.
+**Currency is deliberately not a column here.** This view is clock-independent so CI can diff
+it deterministically; a column derived from today's date would desynchronize the committed file
+with no commit. Read **Last checked** against the 90-day requirement enforced by the weekly
+`validate-evidence.py --max-age-days 90` run, which fails with the evidence files to refresh.
 **Score** — 0-45, the sum of source-tier weights (T1 shipped tool = 5 ... T5 social
 mention = 1, at most 3 entries per tier). **Naming** — `strong`: most sources use our
 name · `weak`: some do · `aliased`: industry uses other stable names (rename signal) ·
@@ -118,28 +127,27 @@ def parse_iso_date(value):
         return None
 
 
-def evidence_freshness(evidence, today=None):
-    """Return current, stale, or needs refresh for an assessed evidence file."""
+def evidence_provenance(evidence):
+    """Return complete or needs refresh for an assessed evidence file.
+
+    Both outcomes are static properties of the committed file, so the rendered
+    view never moves with the clock.
+    """
     if evidence.get("provenance_status") != "complete":
         return "needs refresh"
-    checked = parse_iso_date(evidence.get("last_checked"))
-    if checked is None:
+    if parse_iso_date(evidence.get("last_checked")) is None:
         return "needs refresh"
-    today = today or datetime.date.today()
-    if (today - checked).days > STALE_AFTER_DAYS:
-        return "stale"
-    return "current"
+    return "complete"
 
 
-def summarize_patterns(patterns, today=None):
-    """Count coverage, verdicts, and overlapping freshness states."""
+def summarize_patterns(patterns):
+    """Count coverage, verdicts, and the overlapping provenance gap."""
     counts = {
         "assessed": 0,
         "verified": 0,
         "weak": 0,
         "unverified": 0,
         "pending": 0,
-        "stale": 0,
         "needs refresh": 0,
     }
     for _, slug in patterns:
@@ -151,50 +159,49 @@ def summarize_patterns(patterns, today=None):
         verdict = evidence.get("verdict")
         if verdict in ("verified", "weak", "unverified"):
             counts[verdict] += 1
-        freshness = evidence_freshness(evidence, today)
-        if freshness in ("stale", "needs refresh"):
-            counts[freshness] += 1
+        if evidence_provenance(evidence) == "needs refresh":
+            counts["needs refresh"] += 1
     return counts
 
 
-def format_row(name, slug, ledger, today=None):
+def format_row(name, slug, ledger):
     """Format one table row for a pattern."""
     evidence = load_evidence(slug)
     if evidence is None:
         return f"| {name} | pending | — | — | — | — | — | — |"
     checked = evidence.get("last_checked") or "—"
-    freshness = evidence_freshness(evidence, today)
+    provenance = evidence_provenance(evidence)
     recommendation, decision = ledger.get(name, ("—", "—"))
     return (f"| {name} | {evidence.get('verdict', '—')} "
             f"| {evidence.get('adoption_score', '—')} "
-            f"| {evidence.get('naming_alignment', '—')} | {checked} | {freshness} "
+            f"| {evidence.get('naming_alignment', '—')} | {checked} | {provenance} "
             f"| {recommendation} | {decision} |")
 
 
-def render_table(title, patterns, ledger, today=None):
+def render_table(title, patterns, ledger):
     """Render one markdown table section for a pattern list."""
-    counts = summarize_patterns(patterns, today)
+    counts = summarize_patterns(patterns)
     summary = (
         f"{counts['assessed']} of {len(patterns)} assessed: "
         f"{counts['verified']} verified · {counts['weak']} weak · "
         f"{counts['unverified']} unverified · {counts['pending']} pending · "
-        f"{counts['stale']} stale · {counts['needs refresh']} need refresh"
+        f"{counts['needs refresh']} need refresh"
     )
     lines = [f"## {title} ({summary})", "",
-             "| Pattern | Verdict | Score | Naming | Last checked | Freshness "
+             "| Pattern | Verdict | Score | Naming | Last checked | Provenance "
              "| Recommendation | Decision |",
-             "|---------|---------|-------|--------|--------------|-----------"
+             "|---------|---------|-------|--------|--------------|------------"
              "|----------------|----------|"]
-    lines += [format_row(name, slug, ledger, today) for name, slug in patterns]
+    lines += [format_row(name, slug, ledger) for name, slug in patterns]
     return "\n".join(lines) + "\n\n"
 
 
-def render_status(today=None):
+def render_status():
     """Render the full STATUS.md content."""
     ledger = load_ledger()
     body = HEADER
-    body += render_table("Main catalog", load_main_patterns(), ledger, today)
-    body += render_table("Experimental", load_experimental_patterns(), ledger, today)
+    body += render_table("Main catalog", load_main_patterns(), ledger)
+    body += render_table("Experimental", load_experimental_patterns(), ledger)
     body += LEGEND
     return body
 

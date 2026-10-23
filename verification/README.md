@@ -542,9 +542,17 @@ No missing search, quote, or hash was invented. A complete local refresh is the 
 ## Generated status and human decisions
 
 `scripts/generate-verification-status.py` builds [STATUS.md](STATUS.md). Its headings report
-assessed, verified, weak, unverified, and pending counts separately. `stale` (more than 90 days
-since a complete check) and `needs refresh` are overlapping freshness/provenance signals, not
-verdicts.
+assessed, verified, weak, unverified, and pending counts separately. `needs refresh` is an
+overlapping provenance signal, not a verdict.
+
+Every cell is a function of the committed inputs alone, so `--check` fails only on a real input
+change. The table therefore reports no age-derived currency column: it shows `Last checked` as a
+date and leaves the 90-day judgment to the weekly
+`validate-evidence.py --max-age-days 90` gate, which names the evidence files to refresh. An
+age-derived column here was both wrong and actively harmful. It desynchronized the committed file
+on a calendar boundary with no commit, and its remediation message told CI to regenerate the
+table, which turns the build green by writing the word `stale` into a cell while refreshing no
+evidence at all.
 
 [DECISIONS.md](DECISIONS.md) is the human-owned naming and rubric ledger. Local finalization
 synchronizes evidence-derived Alignment and may add a neutral review placeholder, but never edits
@@ -561,6 +569,6 @@ python3 scripts/generate-verification-status.py
 - `local-runs/codex-local-<uuid>.yaml` — immutable approved plan and local execution attestation.
 - `local-runs/codex-local-<uuid>-search-events.yaml` — sanitized, run-bound search receipts.
 - `pending-evidence.yaml` — catalog slugs with no assessment; updated during local finalization.
-- `STATUS.md` — generated coverage, verdict, naming, and freshness view.
+- `STATUS.md` — generated coverage, verdict, naming, and provenance view.
 - `DECISIONS.md` — human-owned naming and rubric decisions.
 - `pattern-inventory.yaml`, `.verify-worklist`, and `run-plan/` — ephemeral planning artifacts.
