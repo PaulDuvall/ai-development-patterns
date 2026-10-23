@@ -72,6 +72,9 @@ jobs:
       - name: Install validation dependencies
         run: python3 -m pip install --requirement tests/requirements.txt
 
+      - name: Enforce workflow policy
+        run: python3 scripts/validate-workflow-policy.py .github/workflows
+
       - name: Validate canonical two-word pattern names
         run: python3 scripts/validate-pattern-names.py
 

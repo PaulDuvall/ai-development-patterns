@@ -97,37 +97,26 @@ python3 -m pytest tests/test_evidence_files.py -m "not slow"
 
 The `Adoption Evidence` workflow (`.github/workflows/evidence-validation.yml`) exposes the same
 checks through `workflow_dispatch` and `workflow_call`, runs for every pull request, and
-runs weekly. A separate `pull_request_target` workflow executes the default branch's trusted
-validator against pull-request data without executing pull-request code. After installing pinned
-dependencies from the trusted base, policy code semantically parses every candidate `.yml` and
-`.yaml` workflow as bounded inert data; aliases, duplicate keys, and unsupported structures fail
-closed. It rejects local and Docker actions and permits only commit-pinned external action
-repositories already allowlisted by the trusted base. A new action family requires an earlier
-allowlist-only PR. The same scan rejects hosted model/provider entry points, requires candidate
-copies of essential trust-root files to remain present, and cannot be weakened by candidate tests.
-Before any full test dependency is installed, the gate recursively inventories and byte-compares
-the candidate's complete `scripts/`, `tests/`, workflow, local-skill, and Codex-agent execution
-closure against the trusted base. Added startup/import hooks and any unapproved difference fail
-closed. It posts the required commit-status context `Trusted evidence checks` on the immutable
-candidate revision.
-Closed or otherwise ineligible pull requests are successful no-ops rather than false failures.
+runs weekly. `scripts/validate-workflow-policy.py` runs on every push as a lint over
+`.github/workflows`. It semantically parses each `.yml` and `.yaml` workflow as bounded inert
+data; aliases, duplicate keys, and unsupported structures fail closed. It rejects local and
+Docker actions, permits only commit-pinned external action repositories from an explicit
+allowlist, and rejects hosted model/provider entry points, provider SDK and CLI invocations,
+provider API endpoints, blanket workflow permissions, and retired credential markers.
 
-A legitimate trust-root upgrade requires a repository `OWNER` to add a top-level comment in the pull
-request's **Conversation** tab with the candidate's current 40-character head SHA in this exact form:
+The property that matters is unchanged: **GitHub Actions never runs an evaluator model and never
+receives an evaluator credential.** That is enforced mechanically, by this lint plus
+`test_model_backed_pattern_evaluation_is_local_only`, not by anyone approving anything.
 
-```text
-APPROVE TRUST ROOT <head-sha>
-```
-
-This is not a general PR approval and does not invoke a model, expose a provider credential, or incur
-model/provider API usage or charges. For that one commit, it waives only the byte-for-byte equality
-requirement for the protected trust-root inventory. Required-file presence, direct candidate-workflow
-policy checks, credential scanning of selected published and verification artifacts, evidence
-recomputation, status recomputation, and the separate deterministic validation gate must still pass.
-
-The approval is commit-bound: a new push requires a new exact comment. Creating, editing, or
-deleting an owner comment starts a no-checkout job that finds the completed
-`pull_request_target` run for that exact pull request and current head SHA, then requests its rerun.
+A previous design added a `pull_request_target` validator that byte-compared a "trust root" of
+`scripts/`, `tests/` and `.github/workflows/` against the default branch, and required an owner
+comment naming the head SHA to permit any difference. It was retired in October 2026. The threat
+it addressed is a multi-party one, and this repository has a single maintainer, so in practice it
+asked that maintainer to approve their own work. The costs were concrete: seven approval comments
+for one change because each push invalidated the last, five dependency pull requests that could
+never land, and a clock-dependence defect that sat on `main` for 14 days waiting to clear the
+gate. Reinstate it if a second maintainer joins or the repository starts accepting fork pull
+requests, at which point the trust boundary is real.
 Before requesting the rerun, that job asks GitHub to mark `Trusted evidence checks` failed on the
 current head; only a complete trusted validation can restore success. Resolver and validation failures
 also attempt to publish failure. As with any GitHub-hosted control, an outage of the Statuses or Actions

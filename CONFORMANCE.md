@@ -30,16 +30,17 @@ that a solo maintainer can satisfy honestly.
 
 What does gate change:
 
-- The ruleset requires pull requests to `main`, blocks non-fast-forward pushes, and blocks branch
-  deletion.
-- Three status checks are required to pass before merge: `Validation gate`,
-  `Trusted evidence checks`, and `Dependency Review`.
-- `required_review_thread_resolution` is enabled, so an unresolved review thread blocks merge.
-- Changes to the trust root — `tests/`, `scripts/`, `.github/workflows/` — require an explicit
-  owner approval comment naming the head SHA, re-issued after any branch update.
+- The ruleset blocks non-fast-forward pushes and branch deletion. It gates nothing else.
+- Work lands directly on `main`. There is no pull-request requirement and no required status
+  check, so no change can be held behind a gate that a single maintainer would only be clearing
+  for themselves.
+- Validation runs on push and on a weekly schedule. A red build is fixed forward.
 
-ACD-1 is therefore reported as an open self-promotion path and left open by choice. Revisit if a
-second maintainer joins.
+ACD-1 is reported as an open self-promotion path and left open deliberately. The repository has
+one maintainer, so a pre-merge approval is that maintainer approving their own work, which buys
+no independent review and costs real delay: a clock-dependence defect sat on `main` for 14 days
+in October 2026 because its fix had to clear an approval gate. Revisit if a second maintainer
+joins, at which point review by another person becomes available and worth requiring.
 
 ### MCD-TBD-1 — Longest-lived unmerged branch
 

@@ -13,11 +13,6 @@ import sys
 
 
 RULESET_NAME = "Protect main with adoption evidence validation"
-REQUIRED_CHECKS = (
-    "Trusted evidence checks",
-    "Validation gate",
-    "Dependency Review",
-)
 GITHUB_ACTIONS_INTEGRATION_ID = 15368
 APPROVED_EXTERNAL_ACTION_REPOSITORIES = (
     "actions/checkout",
@@ -130,35 +125,12 @@ def ruleset_payload():
         "conditions": {
             "ref_name": {"include": ["~DEFAULT_BRANCH"], "exclude": []},
         },
+        # Trunk-based: commits go straight to main, so no pull_request rule and
+        # no required status checks. CI runs on push and the build is fixed
+        # forward. What stays is the pair that protects history rather than
+        # gating work, because nothing about trunk-based development needs a
+        # force-push or a branch deletion to succeed.
         "rules": [
-            {
-                "type": "pull_request",
-                "parameters": {
-                    "allowed_merge_methods": ["merge", "squash", "rebase"],
-                    "dismiss_stale_reviews_on_push": False,
-                    "require_code_owner_review": False,
-                    "require_last_push_approval": False,
-                    "required_approving_review_count": 0,
-                    "required_review_thread_resolution": True,
-                },
-            },
-            {
-                "type": "required_status_checks",
-                "parameters": {
-                    "do_not_enforce_on_create": True,
-                    "strict_required_status_checks_policy": True,
-                    "required_status_checks": [
-                        {
-                            "context": context,
-                            "integration_id": GITHUB_ACTIONS_INTEGRATION_ID,
-                        }
-                        for context in REQUIRED_CHECKS
-                    ],
-                },
-            },
-            # Default CodeQL setup excludes fork pull requests. A native
-            # code_scanning merge rule would deadlock public fork
-            # contributions that cannot produce analysis for their revision.
             {"type": "deletion"},
             {"type": "non_fast_forward"},
         ],

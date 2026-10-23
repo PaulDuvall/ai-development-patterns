@@ -1,25 +1,5 @@
 version: 2
-
-# Trust-root manifests are deliberately excluded from version updates.
-#
-# CONFORMANCE.md requires an owner "APPROVE TRUST ROOT <head_sha>" comment for any
-# change to tests/, scripts/, .github/workflows/, pyproject.toml, pytest.ini, and
-# the two pinned requirements files. Dependabot cannot obtain that comment, and its
-# next force-push would invalidate one that already exists, so a routine version
-# bump to a protected manifest can never land unattended. Those ecosystems and
-# directories carry open-pull-requests-limit: 0, which turns off version updates
-# without touching security updates; those keep their own internal limit of ten.
-# See ai-development-patterns-d8t.
-#
-# A security update to a protected manifest still opens a pull request and still
-# needs the owner's approval comment. That is the intended trade: a vulnerability
-# fix is worth one manual approval, a weekly patch bump is not.
-#
-# To re-enable version updates for an entry, restore its limit and its
-# minor/patch group.
-
 updates:
-  # Every bump here edits .github/workflows/*, a protected trust-root directory.
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -27,39 +7,25 @@ updates:
       day: monday
       time: "09:00"
       timezone: Etc/UTC
-    open-pull-requests-limit: 0
+    open-pull-requests-limit: 5
     commit-message:
       prefix: "ci"
-
-  # Protected: pyproject.toml, .github/requirements.txt, tests/requirements.txt.
-  # Kept as its own entry so grouping cannot span a protected and a free manifest
-  # in one pull request, which is how #140 came to touch two protected files.
+    groups:
+      actions-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
   - package-ecosystem: pip
     directories:
       - /
       - /.github
-      - /tests
-    schedule:
-      interval: weekly
-      day: monday
-      time: "09:15"
-      timezone: Etc/UTC
-    open-pull-requests-limit: 0
-    commit-message:
-      prefix: "deps"
-    groups:
-      python-security:
-        applies-to: security-updates
-        patterns:
-          - "*"
-
-  # Free: example and experiment manifests, outside the trust root.
-  - package-ecosystem: pip
-    directories:
       - /examples/parallel-agents/docker
       - /examples/security-sandbox
       - /examples/spec-driven-development
       - /experiments/examples/test-promotion
+      - /tests
     schedule:
       interval: weekly
       day: monday
@@ -80,7 +46,6 @@ updates:
         applies-to: security-updates
         patterns:
           - "*"
-
   - package-ecosystem: npm
     directories:
       - /examples/centralized-rules/gateway-strategy/ai-dev-cli
@@ -106,7 +71,6 @@ updates:
         applies-to: security-updates
         patterns:
           - "*"
-
   - package-ecosystem: docker
     directories:
       - /examples/parallel-agents/docker

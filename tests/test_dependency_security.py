@@ -1,6 +1,5 @@
 """Regression tests for dependency maintenance and review coverage."""
 
-import importlib.util
 import json
 import re
 import tomllib
@@ -17,7 +16,6 @@ DEPENDENCY_WORKFLOW = ROOT / ".github" / "workflows" / "dependency-security.yml"
 TRUSTED_EVIDENCE_WORKFLOW = (
     ROOT / ".github" / "workflows" / "trusted-evidence-validation.yml")
 LIFECYCLE_VALIDATOR = ROOT / "scripts" / "validate-package-lifecycle.py"
-WORKFLOW_POLICY = ROOT / "scripts" / "validate-workflow-policy.py"
 PATTERN_VALIDATION_WORKFLOW = (
     ROOT / ".github" / "workflows" / "pattern-validation.yml")
 DOCKER_COMPATIBILITY_WORKFLOW = (
@@ -184,26 +182,6 @@ def test_dependabot_covers_all_dependency_manifest_directories():
     assert discovered_npm == NPM_DIRECTORIES
 
 
-def test_trusted_validation_rejects_package_lifecycle_hook_changes():
-    """Fork content must be inspected by trusted code before acceptance."""
-    workflow = TRUSTED_EVIDENCE_WORKFLOW.read_text(encoding="utf-8")
-    validator = LIFECYCLE_VALIDATOR.read_text(encoding="utf-8")
-
-    assert "trusted/scripts/validate-package-lifecycle.py" in workflow
-    assert "--trusted-root trusted" in workflow
-    assert "--candidate-root candidate" in workflow
-    assert "steps.package-lifecycle.outcome != 'success'" in workflow
-    for hook in (
-        "preinstall",
-        "install",
-        "postinstall",
-        "prepare",
-        "prepublish",
-        "prepublishOnly",
-    ):
-        assert f'"{hook}"' in validator
-
-
 def test_dependabot_groups_compatible_updates_without_grouping_majors():
     """Minor/patch and security updates are grouped; majors stay reviewable."""
     for ecosystem, version_group, security_group in (
@@ -233,42 +211,6 @@ def test_dependabot_groups_compatible_updates_without_grouping_majors():
             assert version_group not in update.get("groups", {})
             assert update["groups"][security_group]["applies-to"] == (
                 "security-updates")
-
-
-def test_dependabot_excludes_trust_root_manifests_from_version_updates():
-    """A bump Dependabot can never land must not be proposed every week.
-
-    CONFORMANCE.md requires an owner approval comment naming the head SHA for
-    any trust-root change. Dependabot cannot obtain one, and its next
-    force-push would invalidate it, so version updates are off for every
-    directory holding a protected manifest. Derived from the policy module
-    rather than a hand-kept list, so adding a protected path that Dependabot
-    targets fails here instead of producing an unmergeable pull request.
-    """
-    policy = trust_root_policy()
-    classified = 0
-
-    for ecosystem in ("github-actions", "pip", "npm", "docker"):
-        for update in dependabot_updates(ecosystem):
-            for directory in updater_directories(update):
-                manifests = manifests_in(ecosystem, directory)
-                assert manifests, (
-                    f"{ecosystem} {directory} matches no manifest")
-                protected = {
-                    manifest for manifest in manifests
-                    if protects(policy, manifest)
-                }
-                classified += 1
-                if protected:
-                    assert not does_version_updates(update), (
-                        f"{ecosystem} {directory} holds protected "
-                        f"{sorted(protected)} but still opens version updates")
-                else:
-                    assert does_version_updates(update), (
-                        f"{ecosystem} {directory} holds no protected manifest, "
-                        "so it should keep version updates")
-
-    assert classified == 13, f"expected 13 ecosystem/directory pairs, saw {classified}"
 
 
 def test_docker_examples_use_current_supported_python_base_families():

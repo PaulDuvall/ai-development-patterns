@@ -21,58 +21,6 @@ import yaml
 
 MAX_WORKFLOW_BYTES = 512 * 1024
 MAX_WORKFLOW_FILES = 128
-MAX_TRUST_ROOT_BYTES = 1024 * 1024
-MAX_TRUST_ROOT_FILES = 512
-MAX_TRUST_ROOT_ENTRIES = 1024
-MAX_TRUST_ROOT_TOTAL_BYTES = 25 * 1024 * 1024
-WORKFLOW_SUFFIXES = frozenset({".yml", ".yaml"})
-REQUIRED_TRUST_ROOT_FILES = (
-    ".agents/skills/evaluate-pattern-adoption/SKILL.md",
-    ".agents/skills/evaluate-pattern-adoption/references/evidence-methodology.md",
-    ".codex/agents/adoption-researcher.toml",
-    ".codex/agents/adoption-verifier.toml",
-    ".codex/config.toml",
-    ".github/requirements.txt",
-    ".github/workflows/trusted-evidence-validation.yml",
-    "AGENTS.md",
-    "pyproject.toml",
-    "pytest.ini",
-    "scripts/build-verification-inventory.py",
-    "scripts/configure-repository-rules.py",
-    "scripts/evidence_content.py",
-    "scripts/finalize-local-verification.py",
-    "scripts/generate-verification-status.py",
-    "scripts/hydrate-evidence-content.py",
-    "scripts/local_verification.py",
-    "scripts/plan-local-verification.py",
-    "scripts/record-local-search-event.py",
-    "scripts/scan-candidate-secrets.py",
-    "scripts/sync-verification-decisions.py",
-    "scripts/validate-evidence.py",
-    "scripts/validate-research-scope.py",
-    "scripts/validate-workflow-policy.py",
-    "tests/requirements.txt",
-    "tests/test_local_verification.py",
-    "tests/test_verification_workflows.py",
-    "tests/test_workflow_policy.py",
-)
-REQUIRED_TRUST_ROOT_DIRECTORIES = (
-    ".agents/skills/evaluate-pattern-adoption",
-    ".codex",
-    ".github/workflows",
-    "scripts",
-    "tests",
-)
-OPTIONAL_TRUST_ROOT_FILES = (
-    "conftest.py",
-    "sitecustomize.py",
-    "usercustomize.py",
-)
-RUNTIME_CACHE_DIRECTORIES = frozenset({
-    "__pycache__", ".mypy_cache", ".pytest_cache", ".ruff_cache",
-})
-RUNTIME_CACHE_SUFFIXES = frozenset({".pyc", ".pyo"})
-
 CONFIGURATION = runpy.run_path(
     str(Path(__file__).with_name("configure-repository-rules.py")))
 # This allowlist is shared with the trusted repository Actions settings. A new
@@ -191,6 +139,9 @@ PROVIDER_SDK = re.compile(
     r")",
     re.IGNORECASE,
 )
+
+
+WORKFLOW_SUFFIXES = frozenset({".yml", ".yaml"})
 
 
 class WorkflowPolicyError(ValueError):
@@ -497,259 +448,27 @@ def iter_action_references(value):
             yield from iter_action_references(child)
 
 
-def tracked_tree_paths(root):
-    """Return UTF-8 paths committed at HEAD without executing repository code."""
-    root = Path(root)
-    git_metadata = root / ".git"
-    if not git_metadata.exists():
-        return None
-    result = subprocess.run(
-        [
-            "git", "-c", "core.hooksPath=/dev/null", "-C", str(root),
-            "ls-tree", "-rz", "--name-only", "HEAD",
-        ],
-        capture_output=True,
-        check=False,
-    )
-    if result.returncode:
-        raise WorkflowPolicyError(
-            f"cannot enumerate committed trust-root paths: {root}")
-    try:
-        return {
-            item.decode("utf-8")
-            for item in result.stdout.split(b"\0")
-            if item
-        }
-    except UnicodeDecodeError as exc:
-        raise WorkflowPolicyError(
-            f"committed trust-root path is not UTF-8: {root}") from exc
-
-
-def has_tracked_descendant(relative_directory, tracked_paths):
-    """Return whether a committed file exists below a relative directory."""
-    if tracked_paths is None:
-        return True
-    prefix = relative_directory.rstrip("/") + "/"
-    return any(path.startswith(prefix) for path in tracked_paths)
-
-
-def trust_root_inventory(root_path):
-    """Return a bounded recursive trust inventory plus unsafe-entry findings."""
-    root = Path(root_path)
-    try:
-        root_stat = root.lstat()
-    except OSError as exc:
-        raise WorkflowPolicyError(
-            f"cannot inspect trust-root checkout: {root}") from exc
-    if stat.S_ISLNK(root_stat.st_mode) or not stat.S_ISDIR(root_stat.st_mode):
-        raise WorkflowPolicyError(
-            f"trust-root checkout must be a regular directory: {root}")
-
-    inventory = {}
-    findings = []
-    tracked_paths = tracked_tree_paths(root)
-    file_count = 0
-    entry_count = 0
-    total_bytes = 0
-
-    def add_file(path, relative, required):
-        """Validate and add one bounded regular file to the inventory."""
-        nonlocal file_count, entry_count, total_bytes
-        if relative in inventory:
-            return
-        try:
-            file_stat = path.lstat()
-        except OSError:
-            if required:
-                findings.append(
-                    f"{path}: required candidate trust-root entry is missing")
-            return
-        if stat.S_ISLNK(file_stat.st_mode) or not stat.S_ISREG(
-                file_stat.st_mode):
-            findings.append(
-                f"{path}: trust-root entry must be a regular file")
-            return
-        if file_stat.st_size > MAX_TRUST_ROOT_BYTES:
-            findings.append(
-                f"{path}: trust-root file exceeds {MAX_TRUST_ROOT_BYTES} bytes")
-            return
-        file_count += 1
-        entry_count += 1
-        total_bytes += file_stat.st_size
-        if file_count > MAX_TRUST_ROOT_FILES:
-            raise WorkflowPolicyError(
-                f"trust-root inventory exceeds {MAX_TRUST_ROOT_FILES} files")
-        if entry_count > MAX_TRUST_ROOT_ENTRIES:
-            raise WorkflowPolicyError(
-                f"trust-root inventory exceeds {MAX_TRUST_ROOT_ENTRIES} entries")
-        if total_bytes > MAX_TRUST_ROOT_TOTAL_BYTES:
-            raise WorkflowPolicyError(
-                "trust-root inventory exceeds its total byte bound")
-        inventory[relative] = (
-            "file",
-            stat.S_IMODE(file_stat.st_mode),
-            file_stat.st_size,
-            hashlib.sha256(path.read_bytes()).hexdigest(),
-        )
-
-    for relative in REQUIRED_TRUST_ROOT_FILES:
-        add_file(root / relative, relative, required=True)
-    for relative in OPTIONAL_TRUST_ROOT_FILES:
-        add_file(root / relative, relative, required=False)
-
-    for relative_directory in REQUIRED_TRUST_ROOT_DIRECTORIES:
-        directory = root / relative_directory
-        try:
-            directory_stat = directory.lstat()
-        except OSError:
-            findings.append(
-                f"{directory}: required candidate trust-root entry is missing")
-            continue
-        if stat.S_ISLNK(directory_stat.st_mode) or not stat.S_ISDIR(
-                directory_stat.st_mode):
-            findings.append(
-                f"{directory}: trust-root entry must be a regular directory")
-            continue
-        inventory[f"{relative_directory}/"] = ("directory", 0, "")
-        entry_count += 1
-
-        def walk_error(exc):
-            """Convert protected-directory traversal failures to policy errors."""
-            raise WorkflowPolicyError(
-                f"cannot enumerate protected trust-root directory: {directory}") from exc
-
-        for current, directories, filenames in os.walk(
-                directory, topdown=True, followlinks=False,
-                onerror=walk_error):
-            current_path = Path(current)
-            directories.sort()
-            filenames.sort()
-            retained_directories = []
-            for name in directories:
-                path = current_path / name
-                child_relative = path.relative_to(root).as_posix()
-                entry_stat = path.lstat()
-                if stat.S_ISDIR(entry_stat.st_mode) \
-                        and name in RUNTIME_CACHE_DIRECTORIES \
-                        and (tracked_paths is None
-                             or child_relative not in tracked_paths) \
-                        and not has_tracked_descendant(
-                            child_relative, tracked_paths):
-                    continue
-                if stat.S_ISLNK(entry_stat.st_mode) or not stat.S_ISDIR(
-                        entry_stat.st_mode):
-                    findings.append(
-                        f"{path}: trust-root entry must be a regular directory")
-                    continue
-                inventory[f"{child_relative}/"] = ("directory", 0, "")
-                entry_count += 1
-                if entry_count > MAX_TRUST_ROOT_ENTRIES:
-                    raise WorkflowPolicyError(
-                        f"trust-root inventory exceeds "
-                        f"{MAX_TRUST_ROOT_ENTRIES} entries")
-                retained_directories.append(name)
-            directories[:] = retained_directories
-            for name in filenames:
-                path = current_path / name
-                child_relative = path.relative_to(root).as_posix()
-                if tracked_paths is not None \
-                        and child_relative not in tracked_paths \
-                        and path.suffix.casefold() in RUNTIME_CACHE_SUFFIXES:
-                    continue
-                add_file(
-                    path, child_relative, required=True)
-    return inventory, findings
-
-
-def validate_trust_root_presence(candidate_root):
-    """Require a safe, bounded candidate copy of the complete trust closure."""
-    root = Path(candidate_root)
-    _, findings = trust_root_inventory(root)
-    return findings
-
-
-def validate_trust_root_integrity(
-        candidate_root, trusted_root, allow_trust_root_upgrade=False):
-    """Compare recursive candidate inventory and bytes with the trusted base."""
-    candidate = Path(candidate_root)
-    trusted = Path(trusted_root)
-    trusted_inventory, trusted_findings = trust_root_inventory(trusted)
-    if trusted_findings:
-        raise WorkflowPolicyError(
-            "trusted base contains an unsafe or incomplete trust-root inventory")
-    candidate_inventory, _ = trust_root_inventory(candidate)
-    if allow_trust_root_upgrade:
-        return []
-
-    findings = []
-    for relative in sorted({*trusted_inventory, *candidate_inventory}):
-        if candidate_inventory.get(relative) != trusted_inventory.get(relative):
-            safe_relative = relative.encode(
-                "unicode_escape", errors="backslashreplace").decode("ascii")
-            findings.append(
-                f"{candidate}/{safe_relative}: protected trust-root inventory "
-                "or bytes differ from the trusted base without exact OWNER approval")
-    return findings
-
-
-def validate_candidate_repository(
-        candidate_root, trusted_root, workflow_directory,
-        allow_trust_root_upgrade=False):
-    """Validate candidate workflows and the complete protected trust closure."""
-    root = Path(candidate_root).absolute()
-    trusted = Path(trusted_root).absolute()
-    workflows = Path(workflow_directory).absolute()
-    expected = root / ".github" / "workflows"
-    if workflows != expected:
-        raise WorkflowPolicyError(
-            "workflow directory must be candidate_root/.github/workflows")
-    return [
-        *validate_trust_root_presence(root),
-        *validate_trust_root_integrity(
-            root, trusted, allow_trust_root_upgrade),
-        *validate_directory(workflows),
-    ]
-
-
 def main(argv=None):
-    """Validate a candidate workflow directory from command-line arguments."""
+    """Validate a workflow directory from command-line arguments."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--candidate-root",
-        required=True,
-        help="Candidate checkout root whose trust-root files must remain present",
-    )
-    parser.add_argument(
-        "--trusted-root",
-        required=True,
-        help="Trusted base checkout used for byte-for-byte closure comparison",
-    )
-    parser.add_argument(
-        "--allow-trust-root-upgrade",
-        action="store_true",
-        help="Permit changed closure bytes after exact commit-bound OWNER approval",
-    )
-    parser.add_argument(
         "workflow_directory",
-        help="Candidate .github/workflows directory to parse as inert data",
+        nargs="?",
+        default=".github/workflows",
+        help="Workflow directory to parse as inert data",
     )
     args = parser.parse_args(argv)
     try:
-        findings = validate_candidate_repository(
-            args.candidate_root,
-            args.trusted_root,
-            args.workflow_directory,
-            allow_trust_root_upgrade=args.allow_trust_root_upgrade,
-        )
+        findings = validate_directory(Path(args.workflow_directory).absolute())
     except (OSError, WorkflowPolicyError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     if findings:
-        print("Candidate workflow policy validation failed:", file=sys.stderr)
+        print("Workflow policy validation failed:", file=sys.stderr)
         for finding in findings:
             print(f"  - {finding}", file=sys.stderr)
         return 1
-    print("Candidate workflow policy validation passed")
+    print("Workflow policy validation passed")
     return 0
 
 

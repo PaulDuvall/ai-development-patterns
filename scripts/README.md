@@ -173,16 +173,13 @@ Primary callers: trusted pull-request validation and the local finalizer.
 
 ### `validate-workflow-policy.py`
 
-Parses candidate workflows and the protected trust-root inventory as inert data. It rejects hosted
-model/provider surfaces, credentials, unsafe action references, overbroad permissions, executable
-candidate indirection, tracked caches, unsafe modes, and unapproved trust-root changes. Primary
-caller: `.github/workflows/trusted-evidence-validation.yml`.
+Parses every workflow in `.github/workflows` as inert data. It rejects hosted
+model/provider surfaces, credentials, unsafe action references and overbroad permissions, so
+GitHub Actions cannot acquire a path to an evaluator model. Runs on every push from
+`.github/workflows/pattern-validation.yml`.
 
 ```bash
-python3 scripts/validate-workflow-policy.py \
-  --trusted-root . \
-  --candidate-root . \
-  .github/workflows
+python3 scripts/validate-workflow-policy.py .github/workflows
 ```
 
 ### `configure-repository-rules.py`
@@ -192,9 +189,10 @@ retired secret/variable cleanup, secret scanning, push protection, and CodeQL de
 checked-in workflows and PR candidates, direct hosted-model surfaces in workflow YAML are rejected by
 workflow policy, named retired credentials are removed, and Actions is limited to the selected
 SHA-pinned action allowlist; the unavailable public-preview Models Settings route is not treated as an
-attested control. A changed protected script requires the commit-bound owner trust approval documented
-in `verification/README.md`. These are not account-wide controls and cannot inspect an unreviewed
-same-repository branch before it runs. Primary caller: a maintainer from a clean `main` checkout. See
+attested control. The ruleset blocks force pushes and branch deletion on `main` and gates nothing
+else: work lands directly on `main`. The former commit-bound owner trust approval was retired in
+October 2026; `verification/README.md` records why. These are not account-wide controls and cannot
+inspect an unreviewed same-repository branch before it runs. Primary caller: a maintainer from a clean `main` checkout. See
 `verification/README.md` for the enforcement boundary.
 
 ```bash
