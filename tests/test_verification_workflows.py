@@ -18,6 +18,37 @@ PATTERN_VALIDATION = WORKFLOWS / "pattern-validation.yml"
 DOCKER_COMPATIBILITY = WORKFLOWS / "docker-example-compatibility.yml"
 PAGES = WORKFLOWS / "deploy-pages.yml"
 
+# Every external action, pinned to the exact commit and the version its comment
+# claims. .github/workflows/ is trust root, so a pin cannot change without an
+# owner approval round; this table makes it impossible to change one without
+# also editing a test, and a new action fails here until it is listed. Each SHA
+# was resolved from the upstream tag with `git ls-remote --tags`, not copied
+# from a bot's pull request body. Verify a bump the same way before editing.
+EXPECTED_ACTION_PINS = {
+    "actions/checkout":
+        ("3d3c42e5aac5ba805825da76410c181273ba90b1", "v7.0.1"),
+    "actions/configure-pages":
+        ("45bfe0192ca1faeb007ade9deae92b16b8254a0d", "v6"),
+    "actions/dependency-review-action":
+        ("a1d282b36b6f3519aa1f3fc636f609c47dddb294", "v5.0.0"),
+    "actions/deploy-pages":
+        ("368f82528645a54fb793d4d04e342629a3f51346", "v5"),
+    "actions/github-script":
+        ("3a2844b7e9c422d3c10d287c895573f7108da1b3", "v9.0.0"),
+    "actions/setup-node":
+        ("949feb2413d6458794dcd2491c4babbbce0c15c1", "v7.1.0"),
+    "actions/setup-python":
+        ("5fda3b95a4ea91299a34e894583c3862153e4b97", "v7.0.0"),
+    "actions/upload-artifact":
+        ("cf430e030ddbb5b0abf93d22962f4752f3646cd9", "v7.0.2"),
+    "actions/upload-pages-artifact":
+        ("fc324d3547104276b827a68afc52ff2a11cc49c9", "v5"),
+}
+
+ACTION_USE = re.compile(
+    r"\buses:\s*(?P<repository>[^\s#@]+)@(?P<revision>[^\s#]+)"
+    r"(?:\s*#\s*(?P<comment>\S+))?")
+
 
 def workflow_paths():
     """Return every filename extension GitHub recognizes as a workflow."""
@@ -48,6 +79,51 @@ def test_every_external_action_is_pinned_to_a_commit_sha():
                 unpinned.append(
                     f"{path.name}:{line_number}: {match.group(1)}")
     assert not unpinned, "unpinned Actions:\n" + "\n".join(unpinned)
+
+
+def test_every_external_action_matches_its_expected_pin():
+    """No action pin moves, and no new action arrives, without a test edit.
+
+    The generic test above only proves a pin is *some* commit, which any SHA
+    satisfies including a hostile one. This fixes which commit, so changing a
+    pin or adding an action is a deliberate edit a reviewer sees, matching the
+    approval the trust root already requires for .github/workflows/.
+    """
+    seen = {}
+    mismatched = []
+    for path in workflow_paths():
+        for line_number, line in enumerate(
+                path.read_text(encoding="utf-8").splitlines(), 1):
+            match = ACTION_USE.search(line)
+            if not match or match.group("repository").startswith(
+                    ("./", "docker://")):
+                continue
+            repository = match.group("repository")
+            found = (match.group("revision"), match.group("comment"))
+            seen.setdefault(repository, set()).add(found)
+            expected = EXPECTED_ACTION_PINS.get(repository)
+            if expected is None:
+                continue
+            if found != expected:
+                mismatched.append(
+                    f"{path.name}:{line_number}: {repository} is "
+                    f"{found[0]} # {found[1]}, expected "
+                    f"{expected[0]} # {expected[1]}")
+
+    assert set(seen) == set(EXPECTED_ACTION_PINS), (
+        "unlisted actions in use: "
+        f"{sorted(set(seen) - set(EXPECTED_ACTION_PINS))}; "
+        "listed but unused: "
+        f"{sorted(set(EXPECTED_ACTION_PINS) - set(seen))}")
+    assert not mismatched, "action pins out of date:\n" + "\n".join(mismatched)
+
+    inconsistent = {
+        repository: sorted(pins) for repository, pins in seen.items()
+        if len(pins) > 1
+    }
+    assert not inconsistent, (
+        f"one action pinned several ways, so a bump can miss a call site: "
+        f"{inconsistent}")
 
 
 def test_model_backed_pattern_evaluation_is_local_only():
@@ -382,7 +458,7 @@ def test_general_validation_runs_once_and_has_a_stable_result_only_gate():
         "tests/requirements.txt")
     setup_node = named_step(validation, "Set up Node.js 24")
     assert setup_node["uses"] == (
-        "actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1")
+        f"actions/setup-node@{EXPECTED_ACTION_PINS['actions/setup-node'][0]}")
     assert setup_node["with"]["node-version"] == "24"
     assert setup_node["with"]["cache"] == "npm"
     assert setup_node["with"]["cache-dependency-path"].splitlines() == [
