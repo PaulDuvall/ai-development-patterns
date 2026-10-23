@@ -80,8 +80,11 @@ chmod +x .git/hooks/pre-commit
 
 ### `hooks/pre-push`
 
-Optional local pre-push hook that runs the deterministic suite, the generated-status check and
-the workflow-policy lint before a push reaches `main`. Work lands directly on `main`, so this is
+Optional local pre-push hook that runs the deterministic suite, the generated-status check, the
+workflow-policy lint and the ruleset drift check before a push reaches `main`. The drift check
+reports on GitHub's state rather than on the commits being pushed, so it warns and does not
+block; it is skipped when `gh` is missing or unauthenticated. This is the only place it runs,
+since reading a ruleset needs administration access CI deliberately lacks. Work lands directly on `main`, so this is
 the last check before a commit is public; it takes about 25 seconds. CI stays the authority, and
 `git push --no-verify` skips it when you intend to fix forward.
 
