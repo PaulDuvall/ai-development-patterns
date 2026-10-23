@@ -1,16 +1,4 @@
 #!/usr/bin/env bash
-# Run the deterministic suite before a push reaches main.
-#
-# Work lands directly on main, so this is the only check that runs before a
-# commit is public. It is the same suite CI runs, minus the slow network
-# tests, and takes about 25 seconds. CI remains the authority; this exists so
-# a red build is rare rather than impossible.
-#
-# Install:
-#   ln -sf ../../scripts/hooks/pre-push .git/hooks/pre-push
-#
-# Skip for a single push when you intend to fix forward:
-#   git push --no-verify
 
 set -euo pipefail
 
@@ -35,12 +23,6 @@ echo "pre-push: checking generated artifacts are in sync..."
 python3 scripts/generate-verification-status.py --check
 python3 scripts/validate-workflow-policy.py .github/workflows
 
-# Ruleset drift reports on GitHub's state, not on the commits being pushed, so
-# it warns rather than blocks. Refusing an unrelated push because someone
-# edited a ruleset in the UI would repeat the mistake this repository removed
-# in October 2026: holding work for something the committer did not cause and
-# may not be able to fix right now. Needs repository administration access,
-# which CI deliberately does not have, so here is the only place it runs.
 if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
   echo "pre-push: checking the GitHub ruleset still matches the committed payload..."
   if ! python3 scripts/configure-repository-rules.py --check; then

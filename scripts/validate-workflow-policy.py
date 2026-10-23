@@ -18,13 +18,10 @@ from pathlib import Path
 
 import yaml
 
-
 MAX_WORKFLOW_BYTES = 512 * 1024
 MAX_WORKFLOW_FILES = 128
 CONFIGURATION = runpy.run_path(
     str(Path(__file__).with_name("configure-repository-rules.py")))
-# This allowlist is shared with the trusted repository Actions settings. A new
-# action repository must be admitted in a separate, OWNER-approved upgrade.
 APPROVED_EXTERNAL_ACTION_REPOSITORIES = frozenset(
     CONFIGURATION["APPROVED_EXTERNAL_ACTION_REPOSITORIES"])
 RETIRED_ACTIONS_SECRETS = tuple(CONFIGURATION["RETIRED_ACTIONS_SECRETS"])
@@ -140,13 +137,10 @@ PROVIDER_SDK = re.compile(
     re.IGNORECASE,
 )
 
-
 WORKFLOW_SUFFIXES = frozenset({".yml", ".yaml"})
-
 
 class WorkflowPolicyError(ValueError):
     """Raised when candidate YAML cannot be handled safely and completely."""
-
 
 class WorkflowLoader(yaml.SafeLoader):
     """Safe YAML 1.2-like loader that rejects aliases and duplicate keys."""
@@ -181,9 +175,6 @@ class WorkflowLoader(yaml.SafeLoader):
             seen.add(key)
         return super().construct_mapping(node, deep=deep)
 
-
-# PyYAML follows YAML 1.1 and otherwise resolves ``on``/``off`` as booleans.
-# GitHub workflow keys use YAML 1.2 behavior, where only true/false are boolean.
 WorkflowLoader.yaml_implicit_resolvers = {
     first: [
         resolver for resolver in resolvers
@@ -196,7 +187,6 @@ WorkflowLoader.add_implicit_resolver(
     re.compile(r"^(?:true|false)$", re.IGNORECASE),
     list("tTfF"),
 )
-
 
 def iter_workflow_files(directory):
     """Return sorted regular, bounded ``.yml`` and ``.yaml`` files."""
@@ -254,7 +244,6 @@ def iter_workflow_files(directory):
             f"workflow directory contains no .yml or .yaml files: {root}")
     return sorted(paths)
 
-
 def load_workflow_document(path):
     """Parse one workflow with the trusted strict loader."""
     try:
@@ -276,13 +265,11 @@ def load_workflow_document(path):
             f"workflow root must be a mapping: {path}")
     return document
 
-
 def safe_child_location(location, key, index):
     """Build a useful location without echoing arbitrary candidate content."""
     if SAFE_LOCATION_KEY.fullmatch(key):
         return f"{location}.{key}"
     return f"{location}.key[{index}]"
-
 
 def scalar_findings(path, location, value, command=False):
     """Inspect one decoded scalar without retaining or printing its content."""
@@ -318,7 +305,6 @@ def scalar_findings(path, location, value, command=False):
             f"{path}:{location}: hosted evaluator invocation is forbidden")
     return findings
 
-
 def action_reference_findings(path, location, reference):
     """Validate one decoded ``uses`` reference against the base allowlist."""
     folded = reference.casefold()
@@ -350,7 +336,6 @@ def action_reference_findings(path, location, reference):
         findings.append(
             f"{path}:{location}: external action repository is not approved")
     return findings
-
 
 def inspect_value(path, value, location="$", command=False):
     """Recursively inspect every decoded mapping, sequence, and scalar."""
@@ -421,11 +406,9 @@ def inspect_value(path, value, location="$", command=False):
     raise WorkflowPolicyError(
         f"unsupported YAML value type: {path}:{location}")
 
-
 def scan_workflow(path):
     """Return semantic policy findings for one inert workflow file."""
     return inspect_value(path, load_workflow_document(path))
-
 
 def validate_directory(directory):
     """Return every policy finding under one candidate workflow directory."""
@@ -434,7 +417,6 @@ def validate_directory(directory):
         for path in iter_workflow_files(directory)
         for finding in scan_workflow(path)
     ]
-
 
 def iter_action_references(value):
     """Yield decoded action references from an already validated document."""
@@ -446,7 +428,6 @@ def iter_action_references(value):
     elif isinstance(value, list):
         for child in value:
             yield from iter_action_references(child)
-
 
 def main(argv=None):
     """Validate a workflow directory from command-line arguments."""
@@ -470,7 +451,6 @@ def main(argv=None):
         return 1
     print("Workflow policy validation passed")
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

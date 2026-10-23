@@ -11,7 +11,6 @@ import json
 import subprocess
 import sys
 
-
 RULESET_NAME = "Protect main with adoption evidence validation"
 GITHUB_ACTIONS_INTEGRATION_ID = 15368
 APPROVED_EXTERNAL_ACTION_REPOSITORIES = (
@@ -94,7 +93,6 @@ RETIRED_ACTIONS_VARIABLES = (
     "ENABLE_ANTHROPIC_REVIEW",
 )
 
-
 def gh_json(*args, input_data=None):
     """Run ``gh`` and decode its JSON response."""
     command = ["gh", *args]
@@ -109,12 +107,10 @@ def gh_json(*args, input_data=None):
         raise RuntimeError(result.stderr.strip() or "gh command failed")
     return json.loads(result.stdout) if result.stdout.strip() else None
 
-
 def repository_name():
     """Return the authenticated checkout's ``owner/name``."""
     data = gh_json("repo", "view", "--json", "nameWithOwner")
     return data["nameWithOwner"]
-
 
 def ruleset_payload():
     """Return the complete idempotent repository-rules definition."""
@@ -125,17 +121,11 @@ def ruleset_payload():
         "conditions": {
             "ref_name": {"include": ["~DEFAULT_BRANCH"], "exclude": []},
         },
-        # Trunk-based: commits go straight to main, so no pull_request rule and
-        # no required status checks. CI runs on push and the build is fixed
-        # forward. What stays is the pair that protects history rather than
-        # gating work, because nothing about trunk-based development needs a
-        # force-push or a branch deletion to succeed.
         "rules": [
             {"type": "deletion"},
             {"type": "non_fast_forward"},
         ],
     }
-
 
 def workflow_permissions_payload():
     """Keep the default token read-only and forbid Actions-authored PR approval."""
@@ -144,12 +134,10 @@ def workflow_permissions_payload():
         "can_approve_pull_request_reviews": False,
     }
 
-
 def find_existing(repo):
     """Return the matching ruleset, if one is already configured."""
     rulesets = gh_json("api", f"repos/{repo}/rulesets") or []
     return next((item for item in rulesets if item.get("name") == RULESET_NAME), None)
-
 
 def apply_ruleset(repo, payload):
     """Create or replace the named ruleset and return GitHub's response."""
@@ -162,15 +150,10 @@ def apply_ruleset(repo, payload):
         method = "POST"
     return gh_json("api", "--method", method, endpoint, "--input", "-", input_data=payload)
 
-
-# GitHub adds these to a stored ruleset; they are not ours to compare. The
-# bypass_actors key is returned only to callers with write access to the
-# ruleset, so its absence says nothing about the ruleset itself.
 SERVER_OWNED_RULESET_KEYS = frozenset({
     "id", "node_id", "source", "source_type", "created_at", "updated_at",
     "_links", "current_user_can_bypass", "bypass_actors", "bypass_mode",
 })
-
 
 def comparable_ruleset(ruleset):
     """Reduce a ruleset to the fields this repository actually declares."""
@@ -185,7 +168,6 @@ def comparable_ruleset(ruleset):
         "rules": rules,
     }
 
-
 def ruleset_drift(repo, payload):
     """Return human-readable differences between GitHub's state and payload.
 
@@ -196,7 +178,6 @@ def ruleset_drift(repo, payload):
     live = find_existing(repo)
     if live is None:
         return [f"ruleset {payload['name']!r} does not exist on {repo}"]
-    # Re-read by id: the list endpoint omits each ruleset's rules.
     live = gh_json("api", f"repos/{repo}/rulesets/{live['id']}")
     expected = comparable_ruleset(payload)
     actual = comparable_ruleset(live)
@@ -221,7 +202,6 @@ def ruleset_drift(repo, payload):
                 "payload")
     return drift
 
-
 def apply_workflow_permissions(repo, payload):
     """Apply and verify least-privilege default Actions token settings."""
     gh_json(
@@ -240,7 +220,6 @@ def apply_workflow_permissions(repo, payload):
             "GitHub did not retain required workflow token permissions")
     return retained
 
-
 def apply_actions_permissions(repo):
     """Enable Actions with selected-only, commit-SHA-pinned execution."""
     endpoint = f"repos/{repo}/actions/permissions"
@@ -258,7 +237,6 @@ def apply_actions_permissions(repo):
         raise RuntimeError(
             "GitHub did not retain selected-only SHA-pinned Actions permissions")
     return retained
-
 
 def apply_selected_actions(repo):
     """Apply and verify the exact base-owned external-action allowlist."""
@@ -281,7 +259,6 @@ def apply_selected_actions(repo):
             "GitHub did not retain the exact selected-actions allowlist")
     return retained
 
-
 def apply_fork_pr_approval_policy(repo):
     """Require maintainer approval for every external fork workflow run."""
     endpoint = (
@@ -295,7 +272,6 @@ def apply_fork_pr_approval_policy(repo):
         raise RuntimeError(
             "GitHub did not retain all-external-contributors fork approval")
     return retained
-
 
 def apply_secret_protection(repo):
     """Enable secret protection and verify the state GitHub actually retained."""
@@ -325,7 +301,6 @@ def apply_secret_protection(repo):
                 },
             )
         except RuntimeError:
-            # Availability varies by repository visibility and GitHub rollout.
             attempted[setting] = False
         else:
             attempted[setting] = True
@@ -344,7 +319,6 @@ def apply_secret_protection(repo):
         and (retained.get(setting) or {}).get("status") == "enabled"
         for setting in BEST_EFFORT_SECRET_PROTECTION
     }
-
 
 def apply_codeql_default_setup(repo):
     """Configure CodeQL default setup and verify GitHub retained core settings."""
@@ -371,7 +345,6 @@ def apply_codeql_default_setup(repo):
             or not requested_languages.issubset(retained_languages):
         raise RuntimeError("GitHub did not retain required CodeQL default setup")
     return result
-
 
 def delete_retired_actions_credentials(repo):
     """Remove generic credentials that historical workflow definitions can read."""
@@ -403,7 +376,6 @@ def delete_retired_actions_credentials(repo):
 
     return removed
 
-
 def delete_obsolete_actions_environments(repo):
     """Remove environments used only by the retired hosted evaluator."""
     environment_data = gh_json(
@@ -421,7 +393,6 @@ def delete_obsolete_actions_environments(repo):
         removed.append(name)
 
     return removed
-
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -516,7 +487,6 @@ def main():
             "unavailable; core scanning and push protection remain enabled."
         )
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())
