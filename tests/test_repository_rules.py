@@ -50,6 +50,84 @@ def test_ruleset_protects_main_without_deadlocking_public_fork_prs():
     assert "code_scanning" not in types
 
 
+def live_ruleset(**overrides):
+    """Return a ruleset shaped like GitHub's, matching the payload by default."""
+    payload = MODULE.ruleset_payload()
+    stored = {
+        **payload,
+        # Fields GitHub adds that this repository does not declare.
+        "id": 12345,
+        "node_id": "RRS_abc",
+        "source": "PaulDuvall/ai-development-patterns",
+        "source_type": "Repository",
+        "created_at": "2026-01-01T00:00:00Z",
+        "_links": {"self": {"href": "https://example.invalid"}},
+    }
+    stored.update(overrides)
+    return stored
+
+
+def check_against(monkeypatch, stored):
+    """Run the drift check against a given stored ruleset."""
+    monkeypatch.setattr(MODULE, "find_existing", lambda repo: stored)
+    monkeypatch.setattr(MODULE, "gh_json", lambda *a, **k: stored)
+    return MODULE.ruleset_drift("owner/repo", MODULE.ruleset_payload())
+
+
+def test_drift_check_ignores_fields_github_owns(monkeypatch):
+    """Server-added metadata must not read as drift."""
+    assert check_against(monkeypatch, live_ruleset()) == []
+
+
+def test_drift_check_catches_an_enforcement_change_made_in_the_ui(monkeypatch):
+    """The exact failure this check exists for.
+
+    On 2026-10-23 the committed payload said the ruleset was active with
+    three required status checks. The live ruleset had been edited by hand and
+    disagreed. Nothing noticed until a push was rejected naming a rule the
+    payload did not describe, which cost three failed pushes and a screenshot
+    to diagnose. Applying configuration is not the same as knowing it holds.
+    """
+    drift = check_against(monkeypatch, live_ruleset(enforcement="disabled"))
+
+    assert len(drift) == 1
+    assert "enforcement" in drift[0]
+    assert "disabled" in drift[0]
+
+
+def test_drift_check_catches_a_gating_rule_added_outside_this_file(monkeypatch):
+    """A rule that reappears in the UI is drift, not configuration."""
+    stored = live_ruleset()
+    stored["rules"] = [
+        *stored["rules"],
+        {"type": "pull_request", "parameters": {
+            "required_approving_review_count": 0}},
+    ]
+
+    drift = check_against(monkeypatch, stored)
+
+    assert any("pull_request" in item and "present on GitHub" in item
+               for item in drift)
+
+
+def test_drift_check_catches_a_declared_rule_missing_on_github(monkeypatch):
+    stored = live_ruleset()
+    stored["rules"] = [r for r in stored["rules"] if r["type"] != "deletion"]
+
+    drift = check_against(monkeypatch, stored)
+
+    assert any("deletion" in item and "missing on GitHub" in item
+               for item in drift)
+
+
+def test_drift_check_reports_an_absent_ruleset(monkeypatch):
+    monkeypatch.setattr(MODULE, "find_existing", lambda repo: None)
+
+    drift = MODULE.ruleset_drift("owner/repo", MODULE.ruleset_payload())
+
+    assert len(drift) == 1 and "does not exist" in drift[0]
+
+
 def test_workflow_token_defaults_to_read_and_cannot_publish_or_approve_prs():
     assert MODULE.workflow_permissions_payload() == {
         "default_workflow_permissions": "read",

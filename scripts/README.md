@@ -206,8 +206,15 @@ October 2026; `verification/README.md` records why. These are not account-wide c
 inspect an unreviewed same-repository branch before it runs. Primary caller: a maintainer from a clean `main` checkout. See
 `verification/README.md` for the enforcement boundary.
 
+`--check` compares GitHub's live ruleset against the payload in this file and exits non-zero on
+any difference. Applying configuration is not the same as knowing it holds: the ruleset can be
+edited in the GitHub UI, and until this existed nothing noticed until a push was rejected naming
+a rule the committed payload did not describe. Run it when a push is refused unexpectedly, and
+before trusting what this file claims.
+
 ```bash
 python3 scripts/configure-repository-rules.py
+python3 scripts/configure-repository-rules.py --check
 python3 scripts/configure-repository-rules.py --apply
 ```
 
