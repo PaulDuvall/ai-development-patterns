@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Run the deterministic suite before a push reaches main.
+#
+# Work lands directly on main, so this is the only check that runs before a
+# commit is public. It is the same suite CI runs, minus the slow network
+# tests, and takes about 25 seconds. CI remains the authority; this exists so
+# a red build is rare rather than impossible.
+#
+# Install:
+#   ln -sf ../../scripts/hooks/pre-push .git/hooks/pre-push
+#
+# Skip for a single push when you intend to fix forward:
+#   git push --no-verify
+
+set -euo pipefail
+
+repository_root=$(git rev-parse --show-toplevel)
+cd "$repository_root"
+
+if ! python3 -c "import pytest" 2>/dev/null; then
+  echo "pre-push: pytest is not installed; run" >&2
+  echo "  python3 -m pip install --requirement tests/requirements.txt" >&2
+  exit 1
+fi
+
+echo "pre-push: running deterministic suite..."
+if ! python3 -m pytest -m "not slow" -q; then
+  echo >&2
+  echo "pre-push: tests failed, push aborted." >&2
+  echo "Fix them, or push with --no-verify if you intend to fix forward." >&2
+  exit 1
+fi
+
+echo "pre-push: checking generated artifacts are in sync..."
+python3 scripts/generate-verification-status.py --check
+python3 scripts/validate-workflow-policy.py .github/workflows
+
+echo "pre-push: ok"

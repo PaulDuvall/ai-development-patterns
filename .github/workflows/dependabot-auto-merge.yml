@@ -1,0 +1,53 @@
+name: Dependabot auto-merge
+
+# Work lands directly on main, so Dependabot is the only pull-request lane
+# left. GitHub's native auto-merge waits on required status checks, and this
+# repository deliberately has none, so it would merge the moment a pull
+# request opened. This waits for the validation run to finish instead.
+
+on:
+  workflow_run:
+    workflows: ["AI Development Patterns Validation"]
+    types: [completed]
+
+permissions: {}
+
+concurrency:
+  group: dependabot-auto-merge-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  auto-merge:
+    name: Merge green Dependabot updates
+    # The actor check is what restricts this to Dependabot. A run triggered by
+    # anyone else never reaches the merge step.
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.actor.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Merge the pull request that this run validated
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          [[ "$HEAD_SHA" =~ ^[0-9a-f]{40}$ ]]
+          # Match on the exact revision the run validated. A push landing
+          # after the run started leaves the branch ahead of HEAD_SHA, and
+          # that unvalidated revision must not be merged.
+          number=$(gh pr list --repo "$REPOSITORY" --head "$HEAD_BRANCH" \
+            --state open --json number,headRefOid \
+            --jq "[.[] | select(.headRefOid == \"$HEAD_SHA\") | .number] | first // empty")
+          if [ -z "$number" ]; then
+            echo "::notice::No open pull request still at $HEAD_SHA; nothing to merge."
+            exit 0
+          fi
+          gh pr merge "$number" --repo "$REPOSITORY" --squash --delete-branch

@@ -78,6 +78,17 @@ cp scripts/pre-commit-patterns.sh .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 ```
 
+### `hooks/pre-push`
+
+Optional local pre-push hook that runs the deterministic suite, the generated-status check and
+the workflow-policy lint before a push reaches `main`. Work lands directly on `main`, so this is
+the last check before a commit is public; it takes about 25 seconds. CI stays the authority, and
+`git push --no-verify` skips it when you intend to fix forward.
+
+```bash
+ln -sf ../../scripts/hooks/pre-push .git/hooks/pre-push
+```
+
 ## Local pattern-adoption evaluation
 
 Model-backed research is allowed only in a signed-in interactive evaluator session through the
