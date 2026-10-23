@@ -83,7 +83,8 @@ Rules: [README.md](README.md) · recommendations and decisions: [DECISIONS.md](D
 - **This table only** (after evidence or DECISIONS.md changes):
   `python3 scripts/generate-verification-status.py`
 - **Refresh evidence** (new evidence, new verdicts): invoke
-  `$evaluate-pattern-adoption` in a signed-in local Codex session and approve its exact
-  deterministic plan. See "Local evidence evaluation" in [README.md](README.md).
+  `$evaluate-pattern-adoption` in a signed-in interactive evaluator session (the local Codex
+  app today) and approve its exact deterministic plan. See "Local evidence evaluation" in
+  [README.md](README.md).
 - **Weekly GitHub Actions** validates committed evidence, links, content, and freshness; it never
   runs an evaluator model or refreshes evidence.

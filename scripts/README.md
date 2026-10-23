@@ -80,8 +80,8 @@ chmod +x .git/hooks/pre-commit
 
 ## Local pattern-adoption evaluation
 
-Model-backed research is allowed only in a signed-in local Codex session through the
-`evaluate-pattern-adoption` skill. GitHub Actions and evaluator API-key environments are rejected.
+Model-backed research is allowed only in a signed-in interactive evaluator session through the
+`evaluate-pattern-adoption` skill; the local Codex app is the configured implementation. GitHub Actions and evaluator API-key environments are rejected.
 See `verification/README.md` for the end-to-end method and approval boundaries.
 
 ### `build-verification-inventory.py`

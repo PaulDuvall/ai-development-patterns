@@ -36,14 +36,14 @@ The capability deliberately separates three operations:
    already gone from the tip is never pinned to an earlier revision, because freezing a claim its
    owner has withdrawn asserts something the project does not know to be true.
 3. **Evaluate locally** — bounded, model-backed web research runs only in an interactive local
-   Codex client. A deterministic plan and exact human approval precede every agent call. Read-only
+   evaluator client (Codex today). A deterministic plan and exact human approval precede every agent call. Read-only
    research agents return proposals to one root writer; a separate agent reviews each batch before
    trusted local code hydrates, validates, and scans the result.
 
 The flow is:
 
 ```text
-signed-in local Codex request
+signed-in local evaluator request
   -> deterministic catalog inventory and immutable plan
   -> exact human approval: APPROVE LOCAL EVALUATION <plan-id>
   -> up to three read-only research agents at a time
@@ -213,7 +213,17 @@ EVIDENCE_HASH_STRICT=1 python3 -m pytest tests/test_evidence_content.py -m slow
 
 ### Local evidence evaluation
 
-Open this repository in the signed-in Codex app and invoke:
+What this step requires is a capability, not a vendor: an interactive session that can take an
+exact human plan approval, and that mints a run ID CI cannot produce. Which tool supplies it is
+repository configuration, carried by the agent definitions under `.codex/` and the
+`evaluate-pattern-adoption` skill. Codex is the configured implementation today, and the
+identifiers below are wire format rather than a preference: `codex-local:<uuid>` run IDs,
+`codex-local-<uuid>.yaml` manifests, the `codex-app`/`codex-cli`/`codex-ide` surfaces, and the
+`evidence-v2-codex-local-v1` prompt contract are validated by regex in
+`scripts/local_verification.py` and already recorded in committed evidence, so retargeting the
+evaluator is a schema migration, not a docs change.
+
+Open this repository in the signed-in evaluator client, the Codex app today, and invoke:
 
 ```text
 $evaluate-pattern-adoption
