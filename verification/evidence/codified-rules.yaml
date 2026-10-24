@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Codified Rules
 slug: codified-rules
-last_checked: '2026-07-10'
+last_checked: '2026-10-23'
 search:
   run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -63,13 +63,13 @@ evidence:
   independence_group: openai
   url: https://developers.openai.com/codex/guides/agents-md
   resolved_url: https://learn.chatgpt.com/docs/agent-configuration/agents-md
-  content_sha256: 70f2d035433e467cd4122b28ba2d2396896b2d9330ea12ec74e4ee5c4e869961
+  content_sha256: a9fff105485c6b04ba3ba0974201d259454452d6cd475bbd6f1aa17d45eaaa55
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-10-23'
   claim: OpenAI Codex reads layered AGENTS.md instruction files before tasks, giving a runnable shipped coding agent a repository-scoped rules mechanism.
 - tier: T2
   match: aliased
@@ -83,13 +83,13 @@ evidence:
   independence_group: agentic-ai-foundation
   url: https://agents.md/
   resolved_url: https://agents.md/
-  content_sha256: f3790b523dc6c0ea8f8cc43689c3dab55270070c279ccf2c9e68e077e1262023
+  content_sha256: 51265b66355b7acdbc67ba4709db1267fb5d2f5aefeda4bb044c4d31765eb66a
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-10-23'
   claim: The AGENTS.md format documents repository-committed instructions for build steps, tests, and conventions needed by coding agents.
 - tier: T2
   match: aliased
@@ -102,13 +102,13 @@ evidence:
   independence_group: anthropic
   url: https://code.claude.com/docs/en/memory
   resolved_url: https://code.claude.com/docs/en/memory
-  content_sha256: 3a1206f5256cd8073ac9c348b815089f1305f940f656f9503377ca6d9a641060
+  content_sha256: 30ac08bff90404a9ff50fc7a45d961e89ce61acbdba7ad866f61fca5b8e00921
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-10-23'
   claim: Claude Code documents project memory instructions that teams share through version control as project-level standards.
 - tier: T4
   match: aliased
@@ -122,12 +122,12 @@ evidence:
   independence_group: kane-mcgorty
   url: https://kane.mx/posts/2025/context-engineering-secrets-claude-code/
   resolved_url: https://kane.mx/posts/2025/context-engineering-secrets-claude-code/
-  content_sha256: 5d4a7dc6e1d7b1ff17d440bd946f0d4d1764fa5013278e8b2c3c89321d414001
+  content_sha256: 3374e3d19d86e872543f531e8dea37e21d4753185da8127c50978b499df7933f
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-07-10'
+  retrieved: '2026-10-23'
   claim: The practitioner report describes team AI workflow knowledge captured in CLAUDE.md and distributed through version control.
 verdict: verified

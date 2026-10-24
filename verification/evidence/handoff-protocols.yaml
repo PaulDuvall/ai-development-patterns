@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Handoff Protocols
 slug: handoff-protocols
-last_checked: 2026-07-10
+last_checked: 2026-10-23
 search:
   run_id: "github-actions:29123202495"
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -60,13 +60,13 @@ evidence:
     independence_group: github
     url: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/start-copilot-sessions
     resolved_url: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/start-copilot-sessions
-    content_sha256: 39d319d85904b0727c8d870716d2e24eee70d642dacd7f49013f8720b2fc7f5d
+    content_sha256: 7f82d80787a45f4fb48231a6d7849b4e0165c6c592d8906355677522fc2bb774
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-10-23
     claim: GitHub Copilot cloud agent lets users start background agent sessions that take tasks and open pull requests.
   - tier: T2
     match: aliased
@@ -79,13 +79,13 @@ evidence:
     independence_group: openai
     url: https://openai.github.io/openai-agents-js/guides/human-in-the-loop/
     resolved_url: https://openai.github.io/openai-agents-js/guides/human-in-the-loop/
-    content_sha256: 32a6a2bba16e36522714973c4d5534c2a3713a6199d9a11add2d30229d24ab4a
+    content_sha256: de6cbb1680b49404b3eaedf44774ba515ddeaa54ee03b022d1f070bdff282be0
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-10-23
     claim: Official SDK guidance documents approval gates that pause agent execution and resume after human intervention.
   - tier: T4
     match: aliased
@@ -102,13 +102,13 @@ evidence:
     independence_group: mabl
     url: https://www.mabl.com/blog/how-we-built-a-system-for-ai-agents-to-ship-real-code-across-75-repos
     resolved_url: https://www.mabl.com/blog/how-we-built-a-system-for-ai-agents-to-ship-real-code-across-75-repos
-    content_sha256: 499d2af446087a2df8906f3d7363c5e93f3396525a55c46da6f2e22740e13875
+    content_sha256: 3910d6467ae8c41b232050adc332e47cbe4a60f37afcc1ce4b780585cdf84899
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
     date: 2026-04-08
-    retrieved: 2026-07-10
+    retrieved: 2026-10-23
     claim: mabl reports an implemented agent-generated PR workflow that routes low-risk AI work through automated review while preserving human judgment for selected PRs.
 verdict: verified
