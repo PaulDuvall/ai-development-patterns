@@ -1,4 +1,4 @@
-# Async Agent Platform Comparison (2025+)
+# Async Agent Platform Comparison
 
 This document is a lightweight comparison framework you can fill in for your team.
 

@@ -19,7 +19,7 @@ code-research/
 │   ├── create-research-repo.sh       # Script to initialize research repository
 │   ├── claude-code-config.md         # Configure Claude Code for research
 │   ├── antigravity-config.md         # Configure Google Antigravity for research
-│   └── platform-comparison.md        # Compare async agent platforms (2025)
+│   └── platform-comparison.md        # Framework for comparing async agent platforms
 ├── prompt-templates/
 │   ├── performance-benchmark.md      # Template for benchmark research
 │   ├── feasibility-study.md          # Template for "is this possible?"
@@ -252,11 +252,14 @@ calls pyodide.
 
 **Result**: 88.4KB `.whl` file with working C extension in WebAssembly.
 
-## Platform Comparison (November 2025)
+## Platform Comparison
 
-| Platform | Free Tier | Network Access | Setup Time | Best For |
-|----------|-----------|----------------|------------|----------|
-| **Claude Code (web)** | $250 credits ($20/month users, until Nov 18) | Configurable | 5 min | Complex research, multi-file |
+Shape of the trade-off, not a price list. Tiers and limits move faster than this file, so check
+vendor pricing before choosing. Setup times were observed November 2025 and are indicative only.
+
+| Platform | Pricing | Network Access | Setup Time | Best For |
+|----------|---------|----------------|------------|----------|
+| **Claude Code (web)** | See [pricing](https://www.claude.ai/code) | Configurable | 5 min | Complex research, multi-file |
 | **Google Antigravity** | See [pricing](https://antigravity.google/) | See [docs](https://antigravity.google/docs/overview) | — | Parallel agents across workspaces |
 | **Codex Cloud** | Pay-as-you-go | Configurable | 10 min | Enterprise workflows |
 | **GitHub Copilot Agent** | Enterprise | Configurable | 15 min | GitHub integration |
