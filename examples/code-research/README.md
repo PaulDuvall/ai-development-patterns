@@ -18,7 +18,7 @@ code-research/
 ├── setup/
 │   ├── create-research-repo.sh       # Script to initialize research repository
 │   ├── claude-code-config.md         # Configure Claude Code for research
-│   ├── gemini-jules-config.md        # Configure Gemini Jules for research
+│   ├── antigravity-config.md         # Configure Google Antigravity for research
 │   └── platform-comparison.md        # Compare async agent platforms (2025)
 ├── prompt-templates/
 │   ├── performance-benchmark.md      # Template for benchmark research
@@ -71,7 +71,7 @@ git push -u origin main
 Choose your platform and follow the configuration guide:
 
 - **Claude Code (web)**: See [setup/claude-code-config.md](setup/claude-code-config.md)
-- **Gemini Jules**: See [setup/gemini-jules-config.md](setup/gemini-jules-config.md)
+- **Google Antigravity**: See [setup/antigravity-config.md](setup/antigravity-config.md)
 - **Codex Cloud**: Similar to Claude Code configuration
 - **GitHub Copilot**: Follow GitHub Enterprise setup
 
@@ -257,7 +257,7 @@ calls pyodide.
 | Platform | Free Tier | Network Access | Setup Time | Best For |
 |----------|-----------|----------------|------------|----------|
 | **Claude Code (web)** | $250 credits ($20/month users, until Nov 18) | Configurable | 5 min | Complex research, multi-file |
-| **Gemini Jules** | Free tier | Default unrestricted | 2 min | Quick POCs, exploration |
+| **Google Antigravity** | See [pricing](https://antigravity.google/) | See [docs](https://antigravity.google/docs/overview) | — | Parallel agents across workspaces |
 | **Codex Cloud** | Pay-as-you-go | Configurable | 10 min | Enterprise workflows |
 | **GitHub Copilot Agent** | Enterprise | Configurable | 15 min | GitHub integration |
 
