@@ -11,7 +11,9 @@ check date, so this mode writes entry fields only.
 ``--recheck`` is the standalone, model-free re-verification of an already
 published file: it advances ``last_checked`` together with the retrieval dates
 it writes, and leaves ``search.checked_at`` pinned to the search run that
-actually happened. No search reran, so the file never claims one did.
+actually happened. No search reran, so the file never claims one did. It
+refuses a file whose every source is commit-pinned, because those fetches
+cannot fail and so cannot carry a fresh check date.
 
 Running with neither mode is refused rather than defaulted. Both silent
 defaults produced a wrong file: today's date left ``last_checked`` behind and
@@ -204,6 +206,40 @@ def refresh_entry(index, entry, retrieved_date):
     return updates, note
 
 
+COMMIT_PINNED_URL = re.compile(
+    r"^https://(?:raw\.githubusercontent\.com/[^/]+/[^/]+"
+    r"|github\.com/[^/]+/[^/]+/(?:blob|raw|tree))"
+    r"/[0-9a-f]{40}(?:/|$)", re.IGNORECASE)
+
+
+def is_commit_pinned(entry):
+    """Return whether an entry cites an immutable commit-pinned permalink."""
+    for field in ("url", "resolved_url"):
+        value = entry.get(field)
+        if value and COMMIT_PINNED_URL.match(str(value)):
+            return True
+    return False
+
+
+def reject_fully_pinned_recheck(entries):
+    """Refuse to advance the freshness clock on a file that is entirely pinned.
+
+    A commit-pinned permalink returns the same bytes forever, so re-fetching
+    one always succeeds and says nothing about whether the practice it cites
+    still ships. Advancing 'last_checked' on that basis would reset the 90-day
+    gate indefinitely and quietly retire the only currency check the schedule
+    performs. A file with at least one live source may still advance: the live
+    fetch is what the new date rests on.
+    """
+    if not entries or not all(is_commit_pinned(entry) for entry in entries):
+        return
+    raise ValueError(
+        "every source in this file is commit-pinned, so --recheck would advance "
+        "'last_checked' on fetches that cannot fail and cannot show currency. "
+        "Re-evaluate the pattern instead, or admit a live source alongside the "
+        "pins")
+
+
 def advance_check_date(data, date):
     """Advance the document check date and leave the search run's date pinned."""
     previous = data.get("last_checked")
@@ -226,6 +262,8 @@ def hydrate(path, retrieved_date=None, recheck=False):
     if entries is None:
         return 0, ["'none found' admits no source to re-fetch; nothing written"]
     reject_backdating(entries, date)
+    if recheck:
+        reject_fully_pinned_recheck(entries)
     updates, notes = [], []
     for index, entry in enumerate(entries):
         entry_updates, note = refresh_entry(index, entry, date)

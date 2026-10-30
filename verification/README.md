@@ -32,7 +32,11 @@ The capability deliberately separates three operations:
    present at that revision. That narrows what the weekly check proves for the entry, and the trade
    is deliberate: **a pinned citation shows the mechanism existed at that revision, not that it
    still ships.** Currency is carried instead by the 90-day freshness requirement the weekly
-   schedule enforces, which forces re-evaluation rather than re-fetching. A source whose quote is
+   schedule enforces, which forces re-evaluation rather than re-fetching. `--recheck` enforces that
+   rather than trusting it: it refuses a file whose every source is commit-pinned, because advancing
+   `last_checked` on fetches that cannot fail would reset the 90-day clock indefinitely and retire
+   the only currency check the schedule performs. Such a file needs operation 3, or a live source
+   admitted alongside its pins. A source whose quote is
    already gone from the tip is never pinned to an earlier revision, because freezing a claim its
    owner has withdrawn asserts something the project does not know to be true.
 3. **Evaluate locally** — bounded, model-backed web research runs only in an interactive local
