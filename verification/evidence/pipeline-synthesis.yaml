@@ -46,7 +46,7 @@ naming_alignment: aliased
 terminology_variants:
 - term: /create-pipeline
   used_by: Harness
-  url: https://raw.githubusercontent.com/harness/harness-skills/main/skills/create-pipeline/SKILL.md
+  url: https://raw.githubusercontent.com/harness/harness-skills/main/skills/pipelines/create-pipeline/SKILL.md
 - term: AutoPipelineAI
   used_by: AutoPipelineAI authors
   url: https://arxiv.org/html/2606.06662v1
