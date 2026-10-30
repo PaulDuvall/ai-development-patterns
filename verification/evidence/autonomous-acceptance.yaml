@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Autonomous Acceptance
 slug: autonomous-acceptance
-last_checked: 2026-07-10
+last_checked: 2026-10-30
 search:
   run_id: "github-actions:29123202495"
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -54,7 +54,7 @@ evidence:
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-10-30
     claim: StrongDM reports a Software Factory workflow where specifications and scenarios drive coding agents through harnesses until they converge without human review.
   - tier: T4
     match: aliased
@@ -65,14 +65,14 @@ evidence:
     independence_group: simon-willison
     url: https://simonwillison.net/2026/Feb/7/software-factory/
     resolved_url: https://simonwillison.net/2026/Feb/7/software-factory/
-    content_sha256: 4222b87212bff422e2685f832fef2c3c9613c8845238f3745f3b5ae722f61135
+    content_sha256: edbfe3bd86489f846e318aae1c788634622c4424a0feb879d67e0abfa0dd6d94
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
     date: 2026-02-07
-    retrieved: 2026-07-10
+    retrieved: 2026-10-30
     claim: The independent report describes StrongDM's Software Factory as using hidden scenario holdout sets to evaluate agent-produced software instead of normal human code review.
   - tier: T2
     match: unnamed
@@ -83,12 +83,12 @@ evidence:
     independence_group: github
     url: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets
     resolved_url: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets
-    content_sha256: f8b3cb2ac2ecc742c1a9f28f6e0c2431490e360c3ecf735570ef25192b5241df
+    content_sha256: c62f36c99de4e36e52ef86b5cb462689c53d5be7d5a376e8669f61e43421389d
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-10-30
     claim: GitHub documents a canonical machine-enforced merge gate where required checks must pass before changes can merge.
 verdict: weak
