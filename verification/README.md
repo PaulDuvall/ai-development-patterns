@@ -18,6 +18,11 @@ The capability deliberately separates three operations:
    verdict, naming signal, catalog mapping, pending entry, and generated status row.
 2. **Check links and content** — networked, read-only checks confirm cited pages remain reachable
    and recorded mechanism quotes remain present. This runs weekly and can be requested manually.
+   The same job also confirms every `terminology_variants` URL still resolves. Those rows carry no
+   quote and no digest, so that check proves retrievability alone: it cannot tell that the term is
+   still used on the page, and a redirect onto a generic landing page reads as success. It exists
+   because schema validation checks these URLs for HTTPS syntax only, so before it a naming source
+   could 404 indefinitely with every check green.
    When a source keeps its quote but moves, `scripts/hydrate-evidence-content.py --recheck` records
    the move without a model: it re-fetches every admitted source in the file, aborts unless every
    mechanism quote is still present, then advances `last_checked` and each `retrieved` while leaving
@@ -190,7 +195,8 @@ gh workflow run evidence-validation.yml -f check_links=true
 ```
 
 Bot-protected responses are handled separately from dead links. Trusted retrieval makes at most
-three attempts with a 30-second per-attempt timeout and bounded exponential backoff for transient
+three attempts inside one 30-second total budget per URL, which every attempt and backoff shares,
+with bounded exponential backoff for transient
 connection failures, timeouts, truncated streams, 408/425/429 responses, and selected 5xx errors;
 certificate and other permanent failures fail closed.
 
@@ -198,7 +204,8 @@ Complete evidence records a normalized-content SHA-256 and an exact mechanism qu
 drift is observable even when a URL remains live. Trusted hydration fails unless the quote is
 present and overwrites the resolved URL, digest, and retrieval date. Weekly checks fail when the
 quote disappears and warn when normalized content changes. A strict second fetch is available as a
-diagnostic for sources expected to be byte-stable:
+diagnostic for sources expected to be byte-stable, and it also escalates a bot-guarded response to
+a failure, for both scored entries and terminology sources:
 
 ```bash
 EVIDENCE_HASH_STRICT=1 python3 -m pytest tests/test_evidence_content.py -m slow

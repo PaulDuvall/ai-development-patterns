@@ -65,24 +65,36 @@ def evidence_scope():
     return set(value)
 
 
-def check_complete_entry(filename, index, entry, strict_hashes):
-    """Fetch one submitted URL and return integrity failures for its record."""
-    url = entry.get("url")
+def fetch_or_failures(label, url, quote, strict):
+    """Fetch one source and classify retrieval failure the same way everywhere.
+
+    Returns ``(result, failures)`` with ``result`` set to None when nothing was
+    retrieved. A bot guard warns rather than fails outside strict mode, because
+    a challenge page says nothing about whether the source is still there.
+    """
     try:
-        result = CONTENT.fetch(url, quote=entry["mechanism_quote"])
+        return CONTENT.fetch(url, quote=quote), []
     except requests.HTTPError as exc:
         status = exc.response.status_code if exc.response is not None else None
-        message = f"{filename}[{index}]: {url} -> HTTP {status or 'error'}"
-        if status in BOT_GUARDED and not strict_hashes:
-            warnings.warn(f"{message}; source could not be machine-verified", stacklevel=1)
-            return []
-        return [message]
+        message = f"{label}: {url} -> HTTP {status or 'error'}"
+        if status in BOT_GUARDED and not strict:
+            warnings.warn(f"{message}; source could not be machine-verified", stacklevel=2)
+            return None, []
+        return None, [message]
     except (
             requests.RequestException, CONTENT.UnsafeURL, CONTENT.ResponseTooLarge,
             CONTENT.UnsupportedContent) as exc:
-        return [f"{filename}[{index}]: {url} -> {type(exc).__name__}: {exc}"]
+        return None, [f"{label}: {url} -> {type(exc).__name__}: {exc}"]
 
-    failures = []
+
+def check_complete_entry(filename, index, entry, strict_hashes):
+    """Fetch one submitted URL and return integrity failures for its record."""
+    url = entry.get("url")
+    result, failures = fetch_or_failures(
+        f"{filename}[{index}]", url, entry["mechanism_quote"], strict_hashes)
+    if result is None:
+        return failures
+
     if CONTENT.canonical_url(result["resolved_url"]) != CONTENT.canonical_url(
             entry.get("resolved_url", "")):
         failures.append(
@@ -111,6 +123,50 @@ def test_complete_evidence_quotes_still_present():
         failures.extend(check_complete_entry(filename, index, entry, strict_hashes))
 
     assert not failures, "evidence content drift detected:\n" + "\n".join(failures)
+
+
+def terminology_variants():
+    """Yield recorded naming sources from complete-provenance files."""
+    scope = evidence_scope()
+    for path in sorted(EVIDENCE_DIR.glob("*.yaml")):
+        if scope is not None and path.stem not in scope:
+            continue
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if data.get("provenance_status") != "complete":
+            continue
+        variants = data.get("terminology_variants")
+        for index, variant in enumerate(variants if isinstance(variants, list) else []):
+            if isinstance(variant, dict) and variant.get("url"):
+                yield path.name, index, variant
+
+
+def check_terminology_variant(filename, index, variant, strict):
+    """Confirm a naming source still resolves.
+
+    A terminology variant records no quote and no digest, so this proves
+    retrievability only: that the page backing the naming claim is still
+    served. It cannot tell that the term is still used there, and a redirect
+    onto a generic landing page reads as success.
+    """
+    _, failures = fetch_or_failures(
+        f"{filename} terminology_variants[{index}]", variant["url"], None, strict)
+    return failures
+
+
+@pytest.mark.slow
+def test_terminology_variant_urls_still_resolve():
+    """A naming claim whose source has vanished rests on nothing retrievable.
+
+    Schema validation only checks these URLs for HTTPS syntax, and the content
+    check above fetches scored entries, so without this a terminology source
+    could 404 indefinitely with every check green.
+    """
+    strict = os.environ.get("EVIDENCE_HASH_STRICT") == "1"
+    failures = []
+    for filename, index, variant in terminology_variants():
+        failures.extend(check_terminology_variant(filename, index, variant, strict))
+
+    assert not failures, "terminology source rot detected:\n" + "\n".join(failures)
 
 
 def test_quote_normalization_tolerates_markup_and_typography():
@@ -920,3 +976,70 @@ def test_candidate_scope_is_strict_json(monkeypatch):
     monkeypatch.setenv("EVIDENCE_SCOPE_SLUGS", "one,two")
     with pytest.raises(AssertionError, match="JSON list"):
         evidence_scope()
+
+
+def raise_status(monkeypatch, status, url="https://naming.example/docs"):
+    """Make every fetch fail with one HTTP status, as a guarded host would."""
+    response = requests.Response()
+    response.status_code = status
+    response.url = url
+    monkeypatch.setattr(
+        CONTENT, "fetch",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            requests.HTTPError(response=response)))
+    return url
+
+
+def test_a_vanished_terminology_source_fails_the_weekly_check(monkeypatch):
+    """This is the gap: a 404 naming source used to pass every check."""
+    url = raise_status(monkeypatch, 404)
+
+    failures = check_terminology_variant(
+        "example.yaml", 1, {"term": "Example", "url": url}, strict=False)
+
+    assert failures == [f"example.yaml terminology_variants[1]: {url} -> HTTP 404"]
+
+
+@pytest.mark.parametrize("status", sorted(BOT_GUARDED))
+def test_a_guarded_terminology_source_warns_rather_than_failing(monkeypatch, status):
+    """A challenge page does not show the source is gone, so it must not fail."""
+    url = raise_status(monkeypatch, status)
+
+    with pytest.warns(UserWarning, match="could not be machine-verified"):
+        assert check_terminology_variant(
+            "example.yaml", 0, {"term": "Example", "url": url}, strict=False) == []
+
+
+def test_a_guarded_terminology_source_fails_under_strict_diagnosis(monkeypatch):
+    """The strict diagnostic exists to surface what the weekly pass tolerates."""
+    url = raise_status(monkeypatch, 403)
+
+    assert check_terminology_variant(
+        "example.yaml", 0, {"term": "Example", "url": url}, strict=True) == [
+            f"example.yaml terminology_variants[0]: {url} -> HTTP 403"]
+
+
+def test_terminology_scope_skips_incomplete_files_and_urlless_variants(
+        tmp_path, monkeypatch):
+    """Legacy imports already read as 'needs refresh'; a termless row has no URL."""
+    complete = {
+        "provenance_status": "complete",
+        "terminology_variants": [
+            {"term": "Named", "url": "https://naming.example/a"},
+            {"term": "No source recorded"},
+            "not a mapping",
+        ],
+    }
+    legacy = {
+        "provenance_status": "legacy-import",
+        "terminology_variants": [{"term": "Old", "url": "https://naming.example/b"}],
+    }
+    for stem, document in (("complete-pattern", complete), ("legacy-pattern", legacy)):
+        (tmp_path / f"{stem}.yaml").write_text(
+            yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    monkeypatch.setitem(globals(), "EVIDENCE_DIR", tmp_path)
+
+    found = [(name, index, variant["url"])
+             for name, index, variant in terminology_variants()]
+
+    assert found == [("complete-pattern.yaml", 0, "https://naming.example/a")]
