@@ -174,6 +174,88 @@ def test_none_found_document_is_never_marked_freshly_checked(tmp_path, monkeypat
     assert read_back(path)["last_checked"] == SEARCH_DATE
 
 
+PINNED_URL = f"https://raw.githubusercontent.com/octo/repo/{'a' * 40}/docs/README.md"
+
+
+def pin(entry, url=PINNED_URL):
+    """Repoint an entry at an immutable commit permalink."""
+    entry["url"] = url
+    entry["resolved_url"] = url
+    return entry
+
+
+@pytest.mark.parametrize("url, pinned", [
+    (PINNED_URL, True),
+    (f"https://github.com/octo/repo/blob/{'B' * 40}/README.md", True),
+    (f"https://github.com/octo/repo/tree/{'c' * 40}", True),
+    ("https://raw.githubusercontent.com/octo/repo/main/README.md", False),
+    ("https://raw.githubusercontent.com/octo/repo/v1.2.3/README.md", False),
+    (f"https://vendor.example/docs/{'d' * 40}/page", False),
+], ids=["raw", "blob", "tree", "branch", "tag", "other-host"])
+def test_only_an_immutable_commit_reference_counts_as_a_pin(url, pinned):
+    """A branch or tag address can change under the same URL; a commit cannot."""
+    assert HYDRATE.is_commit_pinned({"url": url}) is pinned
+
+
+def test_a_fully_pinned_file_cannot_advance_its_own_freshness_clock(
+        tmp_path, monkeypatch):
+    """Refetching permalinks always succeeds, so it cannot evidence currency."""
+    install_fake_fetch(monkeypatch)
+    document = evidence_document()
+    for entry in document["evidence"]:
+        pin(entry)
+    path = write_document(tmp_path, document)
+
+    with pytest.raises(ValueError, match="commit-pinned"):
+        HYDRATE.hydrate(path, recheck=True)
+
+    assert read_back(path) == document, "a refused run must not write"
+
+
+def test_a_redirect_into_a_permalink_counts_as_pinned(tmp_path, monkeypatch):
+    """A live address that resolves to a permalink still fetches frozen bytes."""
+    install_fake_fetch(monkeypatch)
+    document = evidence_document(entry_count=1)
+    document["evidence"][0]["resolved_url"] = PINNED_URL
+    path = write_document(tmp_path, document)
+
+    with pytest.raises(ValueError, match="commit-pinned"):
+        HYDRATE.hydrate(path, recheck=True)
+
+
+def test_one_live_source_lets_a_mostly_pinned_file_advance(tmp_path, monkeypatch):
+    """The live fetch is what the new date rests on; the pins ride along."""
+    install_fake_fetch(monkeypatch)
+    document = evidence_document()
+    pin(document["evidence"][0])
+    path = write_document(tmp_path, document)
+
+    count, _ = HYDRATE.hydrate(path, recheck=True)
+
+    assert count == 2
+    assert read_back(path)["last_checked"] == HYDRATE.today_utc().isoformat()
+
+
+def test_a_pinned_file_still_hydrates_inside_an_approved_evaluation(
+        tmp_path, monkeypatch):
+    """Run mode leaves 'last_checked' alone, so there is no clock to reset."""
+    install_fake_fetch(monkeypatch)
+    document = evidence_document(entry_count=1)
+    pin(document["evidence"][0])
+    path = write_document(tmp_path, document)
+
+    HYDRATE.hydrate(path, retrieved_date="2026-09-17")
+    written = read_back(path)
+
+    assert written["evidence"][0]["retrieved"] == "2026-09-17"
+    assert written["last_checked"] == SEARCH_DATE
+
+
+def test_a_file_with_no_admitted_source_is_not_called_fully_pinned():
+    """No source is not 'every source'; that refusal would misname the problem."""
+    HYDRATE.reject_fully_pinned_recheck([])
+
+
 HEADER = (
     "schema_version: 2\n"
     "provenance_status: complete\n"

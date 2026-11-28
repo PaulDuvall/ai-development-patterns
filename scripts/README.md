@@ -78,10 +78,24 @@ cp scripts/pre-commit-patterns.sh .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 ```
 
+### `hooks/pre-push`
+
+Optional local pre-push hook that runs the deterministic suite, the generated-status check, the
+workflow-policy lint and the ruleset drift check before a push reaches `main`. The drift check
+reports on GitHub's state rather than on the commits being pushed, so it warns and does not
+block; it is skipped when `gh` is missing or unauthenticated. This is the only place it runs,
+since reading a ruleset needs administration access CI deliberately lacks. Work lands directly on `main`, so this is
+the last check before a commit is public; it takes about 25 seconds. CI stays the authority, and
+`git push --no-verify` skips it when you intend to fix forward.
+
+```bash
+ln -sf ../../scripts/hooks/pre-push .git/hooks/pre-push
+```
+
 ## Local pattern-adoption evaluation
 
-Model-backed research is allowed only in a signed-in local Codex session through the
-`evaluate-pattern-adoption` skill. GitHub Actions and evaluator API-key environments are rejected.
+Model-backed research is allowed only in a signed-in interactive evaluator session through the
+`evaluate-pattern-adoption` skill; the local Codex app is the configured implementation. GitHub Actions and evaluator API-key environments are rejected.
 See `verification/README.md` for the end-to-end method and approval boundaries.
 
 ### `build-verification-inventory.py`
@@ -127,7 +141,9 @@ The mode is always explicit, because the retrieval date means something differen
 model: it advances `last_checked` together with the retrieval dates it writes and leaves
 `search.checked_at` pinned to the search run that actually happened, so the file never claims a
 search that did not occur. Both modes abort the whole file if any mechanism quote is absent, and
-both refuse a date earlier than one already recorded.
+both refuse a date earlier than one already recorded. `--recheck` additionally refuses a file whose
+every source is commit-pinned: those fetches cannot fail and cannot show currency, so advancing
+`last_checked` on them would reset the 90-day freshness clock indefinitely.
 
 ### `evidence_content.py`
 
@@ -173,16 +189,13 @@ Primary callers: trusted pull-request validation and the local finalizer.
 
 ### `validate-workflow-policy.py`
 
-Parses candidate workflows and the protected trust-root inventory as inert data. It rejects hosted
-model/provider surfaces, credentials, unsafe action references, overbroad permissions, executable
-candidate indirection, tracked caches, unsafe modes, and unapproved trust-root changes. Primary
-caller: `.github/workflows/trusted-evidence-validation.yml`.
+Parses every workflow in `.github/workflows` as inert data. It rejects hosted
+model/provider surfaces, credentials, unsafe action references and overbroad permissions, so
+GitHub Actions cannot acquire a path to an evaluator model. Runs on every push from
+`.github/workflows/pattern-validation.yml`.
 
 ```bash
-python3 scripts/validate-workflow-policy.py \
-  --trusted-root . \
-  --candidate-root . \
-  .github/workflows
+python3 scripts/validate-workflow-policy.py .github/workflows
 ```
 
 ### `configure-repository-rules.py`
@@ -192,13 +205,21 @@ retired secret/variable cleanup, secret scanning, push protection, and CodeQL de
 checked-in workflows and PR candidates, direct hosted-model surfaces in workflow YAML are rejected by
 workflow policy, named retired credentials are removed, and Actions is limited to the selected
 SHA-pinned action allowlist; the unavailable public-preview Models Settings route is not treated as an
-attested control. A changed protected script requires the commit-bound owner trust approval documented
-in `verification/README.md`. These are not account-wide controls and cannot inspect an unreviewed
-same-repository branch before it runs. Primary caller: a maintainer from a clean `main` checkout. See
+attested control. The ruleset blocks force pushes and branch deletion on `main` and gates nothing
+else: work lands directly on `main`. The former commit-bound owner trust approval was retired in
+October 2026; `verification/README.md` records why. These are not account-wide controls and cannot
+inspect an unreviewed same-repository branch before it runs. Primary caller: a maintainer from a clean `main` checkout. See
 `verification/README.md` for the enforcement boundary.
+
+`--check` compares GitHub's live ruleset against the payload in this file and exits non-zero on
+any difference. Applying configuration is not the same as knowing it holds: the ruleset can be
+edited in the GitHub UI, and until this existed nothing noticed until a push was rejected naming
+a rule the committed payload did not describe. Run it when a push is refused unexpectedly, and
+before trusting what this file claims.
 
 ```bash
 python3 scripts/configure-repository-rules.py
+python3 scripts/configure-repository-rules.py --check
 python3 scripts/configure-repository-rules.py --apply
 ```
 

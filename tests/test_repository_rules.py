@@ -14,38 +14,33 @@ MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
 
-def test_ruleset_targets_default_branch_and_every_required_check():
+def test_ruleset_targets_default_branch_and_protects_history_only():
     payload = MODULE.ruleset_payload()
 
     assert payload["enforcement"] == "active"
     assert payload["conditions"]["ref_name"]["include"] == ["~DEFAULT_BRANCH"]
-    status_rule = next(
-        rule for rule in payload["rules"]
-        if rule["type"] == "required_status_checks")
-    assert status_rule["parameters"]["required_status_checks"] == [
-        {
-            "context": context,
-            "integration_id": MODULE.GITHUB_ACTIONS_INTEGRATION_ID,
-        }
-        for context in MODULE.REQUIRED_CHECKS
-    ]
-    assert MODULE.REQUIRED_CHECKS == (
-        "Trusted evidence checks", "Validation gate", "Dependency Review")
-    assert status_rule["parameters"][
-        "strict_required_status_checks_policy"] is True
+    assert {rule["type"] for rule in payload["rules"]} == {
+        "deletion", "non_fast_forward"}
 
 
-def test_ruleset_requires_pull_requests_and_blocks_force_pushes():
-    rules = MODULE.ruleset_payload()["rules"]
-    types = {rule["type"] for rule in rules}
+def test_ruleset_does_not_gate_work_behind_a_single_maintainers_own_approval():
+    """Trunk-based: nothing may hold a commit back from main.
 
-    assert "pull_request" in types
-    assert "non_fast_forward" in types
-    pull_request = next(
-        rule for rule in rules if rule["type"] == "pull_request")
-    assert pull_request["parameters"][
-        "required_review_thread_resolution"] is True
-    assert pull_request["parameters"]["required_approving_review_count"] == 0
+    This repository has one maintainer, so a pull-request requirement or a
+    required status check is that maintainer gating their own work. It buys no
+    independent review and it has cost real delay: a clock-dependence defect
+    sat on main for 14 days in October 2026 waiting to clear such a gate.
+    Re-adding either rule here, or reintroducing the trust-root approval it
+    enforced, fails this test rather than quietly re-arming the gate after
+    someone turns it off in the GitHub UI.
+    """
+    payload = MODULE.ruleset_payload()
+    types = {rule["type"] for rule in payload["rules"]}
+
+    assert "pull_request" not in types
+    assert "required_status_checks" not in types
+    assert not hasattr(MODULE, "REQUIRED_CHECKS")
+    assert "APPROVE TRUST ROOT" not in SCRIPT.read_text(encoding="utf-8")
 
 
 def test_ruleset_protects_main_without_deadlocking_public_fork_prs():
@@ -53,6 +48,84 @@ def test_ruleset_protects_main_without_deadlocking_public_fork_prs():
 
     assert "deletion" in types
     assert "code_scanning" not in types
+
+
+def live_ruleset(**overrides):
+    """Return a ruleset shaped like GitHub's, matching the payload by default."""
+    payload = MODULE.ruleset_payload()
+    stored = {
+        **payload,
+        # Fields GitHub adds that this repository does not declare.
+        "id": 12345,
+        "node_id": "RRS_abc",
+        "source": "PaulDuvall/ai-development-patterns",
+        "source_type": "Repository",
+        "created_at": "2026-01-01T00:00:00Z",
+        "_links": {"self": {"href": "https://example.invalid"}},
+    }
+    stored.update(overrides)
+    return stored
+
+
+def check_against(monkeypatch, stored):
+    """Run the drift check against a given stored ruleset."""
+    monkeypatch.setattr(MODULE, "find_existing", lambda repo: stored)
+    monkeypatch.setattr(MODULE, "gh_json", lambda *a, **k: stored)
+    return MODULE.ruleset_drift("owner/repo", MODULE.ruleset_payload())
+
+
+def test_drift_check_ignores_fields_github_owns(monkeypatch):
+    """Server-added metadata must not read as drift."""
+    assert check_against(monkeypatch, live_ruleset()) == []
+
+
+def test_drift_check_catches_an_enforcement_change_made_in_the_ui(monkeypatch):
+    """The exact failure this check exists for.
+
+    On 2026-10-23 the committed payload said the ruleset was active with
+    three required status checks. The live ruleset had been edited by hand and
+    disagreed. Nothing noticed until a push was rejected naming a rule the
+    payload did not describe, which cost three failed pushes and a screenshot
+    to diagnose. Applying configuration is not the same as knowing it holds.
+    """
+    drift = check_against(monkeypatch, live_ruleset(enforcement="disabled"))
+
+    assert len(drift) == 1
+    assert "enforcement" in drift[0]
+    assert "disabled" in drift[0]
+
+
+def test_drift_check_catches_a_gating_rule_added_outside_this_file(monkeypatch):
+    """A rule that reappears in the UI is drift, not configuration."""
+    stored = live_ruleset()
+    stored["rules"] = [
+        *stored["rules"],
+        {"type": "pull_request", "parameters": {
+            "required_approving_review_count": 0}},
+    ]
+
+    drift = check_against(monkeypatch, stored)
+
+    assert any("pull_request" in item and "present on GitHub" in item
+               for item in drift)
+
+
+def test_drift_check_catches_a_declared_rule_missing_on_github(monkeypatch):
+    stored = live_ruleset()
+    stored["rules"] = [r for r in stored["rules"] if r["type"] != "deletion"]
+
+    drift = check_against(monkeypatch, stored)
+
+    assert any("deletion" in item and "missing on GitHub" in item
+               for item in drift)
+
+
+def test_drift_check_reports_an_absent_ruleset(monkeypatch):
+    monkeypatch.setattr(MODULE, "find_existing", lambda repo: None)
+
+    drift = MODULE.ruleset_drift("owner/repo", MODULE.ruleset_payload())
+
+    assert len(drift) == 1 and "does not exist" in drift[0]
 
 
 def test_workflow_token_defaults_to_read_and_cannot_publish_or_approve_prs():

@@ -2,9 +2,9 @@ schema_version: 2
 provenance_status: complete
 pattern: ChatOps Security
 slug: chatops-security
-last_checked: '2026-09-17'
+last_checked: '2026-09-21'
 search:
-  run_id: 'github-actions:29123202495'
+  run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
   provider: openai
   model: gpt-5.5
@@ -30,14 +30,14 @@ search:
       - site:github.com slack security bot slash command virustotal
       - site:github.com trivy slack slash command scan
       candidate_count: 6
-adoption_score: 9
+adoption_score: 7
 tier_counts:
   T1: 1
-  T4: 2
+  T4: 1
 adoption_dimensions:
   implementation_available: true
   independent_adoption: true
-  independence_groups: 3
+  independence_groups: 2
 naming_alignment: aliased
 terminology_variants:
 - term: ChatOps solution
@@ -49,9 +49,7 @@ terminology_variants:
 evidence:
 - tier: T1
   match: aliased
-  mechanism_quote: 'There is a pressing need for a solution that can streamline SAST result management,
-    enhance team collaboration, and automate infrastructure provisioning to address these challenges
-    effectively.'
+  mechanism_quote: There is a pressing need for a solution that can streamline SAST result management, enhance team collaboration, and automate infrastructure provisioning to address these challenges effectively.
   source: AWS Samples, chatops-slack GitHub repository
   source_kind: open_source_implementation
   organization: Amazon Web Services
@@ -64,12 +62,11 @@ evidence:
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-09-17'
+  retrieved: '2026-09-21'
   claim: Runnable AWS sample repository implements a Slack ChatOps workflow for managing SAST scan results.
 - tier: T4
   match: aliased
-  mechanism_quote: Similar to the integration above, this one adds a new slash command to Slack to
-    query VirusTotal for a hash or URL.
+  mechanism_quote: Similar to the integration above, this one adds a new slash command to Slack to query VirusTotal for a hash or URL.
   source: Recon InfoSec, Slacking at Security Operations
   source_kind: practitioner_report
   organization: Recon InfoSec
@@ -82,28 +79,6 @@ evidence:
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-09-17'
-  claim: Practitioner security-operations write-up describes Slack slash commands that run immediate
-    VirusTotal checks for hashes or URLs.
-- tier: T4
-  match: aliased
-  mechanism_quote: Configure ChatOps with custom commands and link it to the script to run. Script
-    would then take the command and convert it to the system command to be executed on the target
-    system
-  source: Rapid7, ChatOps for Security Operations
-  source_kind: practitioner_report
-  organization: Rapid7
-  independence_group: rapid7
-  url: https://www.rapid7.com/blog/post/2017/05/07/chatops-for-security-operations/
-  resolved_url: https://www.rapid7.com/blog/post/2017/05/07/chatops-for-security-operations/
-  content_sha256: 072561bf7a52ec7c6ca19df9aa75479efdc083ff378a08d925a749029243e688
-  verifier:
-    method: automated
-    model: gpt-5.5
-    prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
-    run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  date: '2017-05-07'
-  retrieved: '2026-09-17'
-  claim: Practitioner article describes security operations ChatOps custom commands wired to scripts
-    for immediate execution from chat.
-verdict: verified
+  retrieved: '2026-09-21'
+  claim: Practitioner security-operations write-up describes Slack slash commands that run immediate VirusTotal checks for hashes or URLs.
+verdict: weak

@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Security Sandbox
 slug: security-sandbox
-last_checked: 2026-07-10
+last_checked: 2026-10-23
 search:
   run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -62,13 +62,13 @@ evidence:
     independence_group: anthropic
     url: https://raw.githubusercontent.com/anthropic-experimental/sandbox-runtime/refs/heads/main/README.md
     resolved_url: https://raw.githubusercontent.com/anthropic-experimental/sandbox-runtime/refs/heads/main/README.md
-    content_sha256: 2f72275edbb568cc08b124eff78ba499540722b9ebb2f7472a9a6250b4aef95a
+    content_sha256: 06bfee561875e21ef21a44e4bec59da1d15d5821528ec91a70d1877f658b7675
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-10-23
     claim: Anthropic provides a runnable open-source sandbox runtime that enforces OS-level filesystem and
       network restrictions around arbitrary agent processes.
   - tier: T1
@@ -81,13 +81,13 @@ evidence:
     independence_group: kubernetes-sigs
     url: https://raw.githubusercontent.com/kubernetes-sigs/agent-sandbox/refs/heads/main/README.md
     resolved_url: https://raw.githubusercontent.com/kubernetes-sigs/agent-sandbox/refs/heads/main/README.md
-    content_sha256: a3e6673b574d2f671fb58b67665f0b738a8205f864a3fe251ded336aee52fc06
+    content_sha256: c4ce7f2a6dc972b79aea0796aa0934de67dccf00d242655ba023813e0d3d1373
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-10-23
     claim: Kubernetes SIGs provides a runnable open-source agent-sandbox implementation for isolated
       AI agent runtime workloads.
   - tier: T2
@@ -100,13 +100,13 @@ evidence:
     independence_group: openai
     url: https://developers.openai.com/codex/concepts/sandboxing
     resolved_url: https://learn.chatgpt.com/docs/sandboxing
-    content_sha256: 854421632e359cff2f3ade276bc8aba8c702beb698ff5b7c75a34608ffdf2dad
+    content_sha256: 2efdd4c44dda632733b5d9ed98399f77a8df947a9b56a5bedb90c43b26b43877
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-10-23
     claim: OpenAI's Codex documentation presents sandboxing as canonical guidance for allowing agent
       autonomy without unrestricted machine access.
   - tier: T4
@@ -119,14 +119,14 @@ evidence:
     independence_group: independent:mark-phelps
     url: https://markphelps.me/posts/running-ai-agents-in-devcontainers/
     resolved_url: https://markphelps.me/posts/running-ai-agents-in-devcontainers/
-    content_sha256: 295c7321934ed0c3dacfd888857b513a8a8a4020a9ee884522b357d4ae3f4f83
+    content_sha256: 0dec34203269f665ae320f8937fd08adf842a20b59f89959f56dceade865a34b
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
     date: 2026-02-19
-    retrieved: 2026-07-10
+    retrieved: 2026-10-23
     claim: A practitioner report provides a devcontainer-based implementation that isolates AI agents
       from the host home directory and SSH keys.
   - tier: T4
@@ -147,7 +147,7 @@ evidence:
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
     date: 2026-01-24
-    retrieved: 2026-07-10
+    retrieved: 2026-10-23
     claim: A practitioner report documents secured VS Code dev container configuration to contain coding
       agents away from host credentials and repository privileges.
 verdict: verified

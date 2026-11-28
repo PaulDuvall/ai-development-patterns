@@ -117,8 +117,6 @@ and discovery exclusions live in the root `pytest.ini`.
   deterministic check. It receives no provider credentials and makes no model calls.
 - `.github/workflows/evidence-validation.yml` recomputes adoption verdicts and runs the focused
   evidence/governance subset on demand, on relevant changes, and weekly.
-- `.github/workflows/trusted-evidence-validation.yml` treats pull-request files as inert data and
-  executes only validator code from the immutable base revision.
 - `.github/workflows/dependency-security.yml` rejects newly introduced vulnerable dependencies.
 
 The weekly link and Docker compatibility jobs are advisory because network availability and live

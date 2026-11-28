@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+repository_root=$(git rev-parse --show-toplevel)
+cd "$repository_root"
+
+if ! python3 -c "import pytest" 2>/dev/null; then
+  echo "pre-push: pytest is not installed; run" >&2
+  echo "  python3 -m pip install --requirement tests/requirements.txt" >&2
+  exit 1
+fi
+
+echo "pre-push: running deterministic suite..."
+if ! python3 -m pytest -m "not slow" -q; then
+  echo >&2
+  echo "pre-push: tests failed, push aborted." >&2
+  echo "Fix them, or push with --no-verify if you intend to fix forward." >&2
+  exit 1
+fi
+
+echo "pre-push: checking generated artifacts are in sync..."
+python3 scripts/generate-verification-status.py --check
+python3 scripts/validate-workflow-policy.py .github/workflows
+
+if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
+  echo "pre-push: checking the GitHub ruleset still matches the committed payload..."
+  if ! python3 scripts/configure-repository-rules.py --check; then
+    echo >&2
+    echo "pre-push: ruleset drift above. Not blocking this push, since the" >&2
+    echo "drift is on GitHub rather than in these commits. Reconcile when you" >&2
+    echo "can: edit the payload to match intent, then --apply." >&2
+  fi
+else
+  echo "pre-push: skipping ruleset check (gh missing or not authenticated)"
+fi
+
+echo "pre-push: ok"

@@ -15,7 +15,8 @@ row. Humans refine Industry terms and Recommendation and exclusively own Decisio
 **After editing this file** (recording a decision, adjusting a recommendation):
 run `python3 scripts/generate-verification-status.py` — [STATUS.md](STATUS.md) embeds the
 Recommendation and Decision columns and CI fails while it is stale. To gather fresh evidence
-behind a recommendation, invoke `$evaluate-pattern-adoption` in a signed-in local Codex session;
+behind a recommendation, invoke `$evaluate-pattern-adoption` in a signed-in interactive
+evaluator session (the local Codex app today);
 see "Local evidence evaluation" in [README.md](README.md). GitHub Actions validates evidence but
 never performs model-backed research.
 
@@ -67,7 +68,7 @@ Alignment values come from each pattern's `evidence/<slug>.yaml`; rules are defi
 | Test Promotion | aliased | golden tests; protected test baselines | Keep experimental; require evidence for the complete candidate-to-approved-baseline workflow | Accepted 2026-07-11 — canonical name retained |
 
 This ledger retains earlier human naming decisions while evidence is refreshed independently.
-Current coverage, provenance, verdicts, and freshness are generated in `STATUS.md`. A pattern may
+Current coverage, provenance, and verdicts are generated in `STATUS.md`. A pattern may
 remain here after its alignment becomes `strong` when the row preserves accepted decision history.
 
 ### 2026-07-11 — two-word taxonomy consolidation

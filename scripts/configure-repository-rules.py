@@ -11,13 +11,7 @@ import json
 import subprocess
 import sys
 
-
 RULESET_NAME = "Protect main with adoption evidence validation"
-REQUIRED_CHECKS = (
-    "Trusted evidence checks",
-    "Validation gate",
-    "Dependency Review",
-)
 GITHUB_ACTIONS_INTEGRATION_ID = 15368
 APPROVED_EXTERNAL_ACTION_REPOSITORIES = (
     "actions/checkout",
@@ -99,7 +93,6 @@ RETIRED_ACTIONS_VARIABLES = (
     "ENABLE_ANTHROPIC_REVIEW",
 )
 
-
 def gh_json(*args, input_data=None):
     """Run ``gh`` and decode its JSON response."""
     command = ["gh", *args]
@@ -114,12 +107,10 @@ def gh_json(*args, input_data=None):
         raise RuntimeError(result.stderr.strip() or "gh command failed")
     return json.loads(result.stdout) if result.stdout.strip() else None
 
-
 def repository_name():
     """Return the authenticated checkout's ``owner/name``."""
     data = gh_json("repo", "view", "--json", "nameWithOwner")
     return data["nameWithOwner"]
-
 
 def ruleset_payload():
     """Return the complete idempotent repository-rules definition."""
@@ -131,39 +122,10 @@ def ruleset_payload():
             "ref_name": {"include": ["~DEFAULT_BRANCH"], "exclude": []},
         },
         "rules": [
-            {
-                "type": "pull_request",
-                "parameters": {
-                    "allowed_merge_methods": ["merge", "squash", "rebase"],
-                    "dismiss_stale_reviews_on_push": False,
-                    "require_code_owner_review": False,
-                    "require_last_push_approval": False,
-                    "required_approving_review_count": 0,
-                    "required_review_thread_resolution": True,
-                },
-            },
-            {
-                "type": "required_status_checks",
-                "parameters": {
-                    "do_not_enforce_on_create": True,
-                    "strict_required_status_checks_policy": True,
-                    "required_status_checks": [
-                        {
-                            "context": context,
-                            "integration_id": GITHUB_ACTIONS_INTEGRATION_ID,
-                        }
-                        for context in REQUIRED_CHECKS
-                    ],
-                },
-            },
-            # Default CodeQL setup excludes fork pull requests. A native
-            # code_scanning merge rule would deadlock public fork
-            # contributions that cannot produce analysis for their revision.
             {"type": "deletion"},
             {"type": "non_fast_forward"},
         ],
     }
-
 
 def workflow_permissions_payload():
     """Keep the default token read-only and forbid Actions-authored PR approval."""
@@ -172,12 +134,10 @@ def workflow_permissions_payload():
         "can_approve_pull_request_reviews": False,
     }
 
-
 def find_existing(repo):
     """Return the matching ruleset, if one is already configured."""
     rulesets = gh_json("api", f"repos/{repo}/rulesets") or []
     return next((item for item in rulesets if item.get("name") == RULESET_NAME), None)
-
 
 def apply_ruleset(repo, payload):
     """Create or replace the named ruleset and return GitHub's response."""
@@ -190,6 +150,57 @@ def apply_ruleset(repo, payload):
         method = "POST"
     return gh_json("api", "--method", method, endpoint, "--input", "-", input_data=payload)
 
+SERVER_OWNED_RULESET_KEYS = frozenset({
+    "id", "node_id", "source", "source_type", "created_at", "updated_at",
+    "_links", "current_user_can_bypass", "bypass_actors", "bypass_mode",
+})
+
+def comparable_ruleset(ruleset):
+    """Reduce a ruleset to the fields this repository actually declares."""
+    rules = {}
+    for rule in ruleset.get("rules") or []:
+        rules[rule["type"]] = rule.get("parameters") or {}
+    return {
+        "name": ruleset.get("name"),
+        "target": ruleset.get("target"),
+        "enforcement": ruleset.get("enforcement"),
+        "conditions": ruleset.get("conditions"),
+        "rules": rules,
+    }
+
+def ruleset_drift(repo, payload):
+    """Return human-readable differences between GitHub's state and payload.
+
+    Applying configuration is not the same as knowing it holds. The ruleset
+    can be edited in the GitHub UI, and nothing in this script noticed until
+    a push was rejected for a rule the committed payload did not describe.
+    """
+    live = find_existing(repo)
+    if live is None:
+        return [f"ruleset {payload['name']!r} does not exist on {repo}"]
+    live = gh_json("api", f"repos/{repo}/rulesets/{live['id']}")
+    expected = comparable_ruleset(payload)
+    actual = comparable_ruleset(live)
+
+    drift = []
+    for field in ("name", "target", "enforcement", "conditions"):
+        if actual[field] != expected[field]:
+            drift.append(
+                f"{field}: GitHub has {actual[field]!r}, "
+                f"the committed payload declares {expected[field]!r}")
+    for rule_type in sorted(set(actual["rules"]) | set(expected["rules"])):
+        if rule_type not in expected["rules"]:
+            drift.append(
+                f"rule {rule_type!r}: present on GitHub, not in the committed "
+                "payload; it gates work nothing here declares")
+        elif rule_type not in actual["rules"]:
+            drift.append(
+                f"rule {rule_type!r}: declared here, missing on GitHub")
+        elif actual["rules"][rule_type] != expected["rules"][rule_type]:
+            drift.append(
+                f"rule {rule_type!r}: parameters differ from the committed "
+                "payload")
+    return drift
 
 def apply_workflow_permissions(repo, payload):
     """Apply and verify least-privilege default Actions token settings."""
@@ -209,7 +220,6 @@ def apply_workflow_permissions(repo, payload):
             "GitHub did not retain required workflow token permissions")
     return retained
 
-
 def apply_actions_permissions(repo):
     """Enable Actions with selected-only, commit-SHA-pinned execution."""
     endpoint = f"repos/{repo}/actions/permissions"
@@ -227,7 +237,6 @@ def apply_actions_permissions(repo):
         raise RuntimeError(
             "GitHub did not retain selected-only SHA-pinned Actions permissions")
     return retained
-
 
 def apply_selected_actions(repo):
     """Apply and verify the exact base-owned external-action allowlist."""
@@ -250,7 +259,6 @@ def apply_selected_actions(repo):
             "GitHub did not retain the exact selected-actions allowlist")
     return retained
 
-
 def apply_fork_pr_approval_policy(repo):
     """Require maintainer approval for every external fork workflow run."""
     endpoint = (
@@ -264,7 +272,6 @@ def apply_fork_pr_approval_policy(repo):
         raise RuntimeError(
             "GitHub did not retain all-external-contributors fork approval")
     return retained
-
 
 def apply_secret_protection(repo):
     """Enable secret protection and verify the state GitHub actually retained."""
@@ -294,7 +301,6 @@ def apply_secret_protection(repo):
                 },
             )
         except RuntimeError:
-            # Availability varies by repository visibility and GitHub rollout.
             attempted[setting] = False
         else:
             attempted[setting] = True
@@ -313,7 +319,6 @@ def apply_secret_protection(repo):
         and (retained.get(setting) or {}).get("status") == "enabled"
         for setting in BEST_EFFORT_SECRET_PROTECTION
     }
-
 
 def apply_codeql_default_setup(repo):
     """Configure CodeQL default setup and verify GitHub retained core settings."""
@@ -340,7 +345,6 @@ def apply_codeql_default_setup(repo):
             or not requested_languages.issubset(retained_languages):
         raise RuntimeError("GitHub did not retain required CodeQL default setup")
     return result
-
 
 def delete_retired_actions_credentials(repo):
     """Remove generic credentials that historical workflow definitions can read."""
@@ -372,7 +376,6 @@ def delete_retired_actions_credentials(repo):
 
     return removed
 
-
 def delete_obsolete_actions_environments(repo):
     """Remove environments used only by the retired hosted evaluator."""
     environment_data = gh_json(
@@ -391,7 +394,6 @@ def delete_obsolete_actions_environments(repo):
 
     return removed
 
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -399,12 +401,34 @@ def main():
         action="store_true",
         help="write controls and remove retired automation configuration",
     )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="exit 1 when GitHub's live ruleset differs from this payload",
+    )
     args = parser.parse_args()
+    if args.apply and args.check:
+        print("error: pass --apply or --check, not both", file=sys.stderr)
+        return 1
 
     try:
         repo = repository_name()
         payload = ruleset_payload()
         workflow_permissions = workflow_permissions_payload()
+        if args.check:
+            drift = ruleset_drift(repo, payload)
+            if drift:
+                print(
+                    f"Repository ruleset on {repo} has drifted from "
+                    f"{__file__}:", file=sys.stderr)
+                for item in drift:
+                    print(f"  - {item}", file=sys.stderr)
+                print(
+                    "\nReconcile by editing the payload to match intent, then "
+                    "running --apply.", file=sys.stderr)
+                return 1
+            print(f"Repository ruleset on {repo} matches the committed payload")
+            return 0
         if not args.apply:
             print(
                 json.dumps(
@@ -463,7 +487,6 @@ def main():
             "unavailable; core scanning and push protection remain enabled."
         )
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

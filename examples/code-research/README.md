@@ -18,8 +18,8 @@ code-research/
 ├── setup/
 │   ├── create-research-repo.sh       # Script to initialize research repository
 │   ├── claude-code-config.md         # Configure Claude Code for research
-│   ├── gemini-jules-config.md        # Configure Gemini Jules for research
-│   └── platform-comparison.md        # Compare async agent platforms (2025)
+│   ├── antigravity-config.md         # Configure Google Antigravity for research
+│   └── platform-comparison.md        # Framework for comparing async agent platforms
 ├── prompt-templates/
 │   ├── performance-benchmark.md      # Template for benchmark research
 │   ├── feasibility-study.md          # Template for "is this possible?"
@@ -71,7 +71,7 @@ git push -u origin main
 Choose your platform and follow the configuration guide:
 
 - **Claude Code (web)**: See [setup/claude-code-config.md](setup/claude-code-config.md)
-- **Gemini Jules**: See [setup/gemini-jules-config.md](setup/gemini-jules-config.md)
+- **Google Antigravity**: See [setup/antigravity-config.md](setup/antigravity-config.md)
 - **Codex Cloud**: Similar to Claude Code configuration
 - **GitHub Copilot**: Follow GitHub Enterprise setup
 
@@ -252,16 +252,40 @@ calls pyodide.
 
 **Result**: 88.4KB `.whl` file with working C extension in WebAssembly.
 
-## Platform Comparison (November 2025)
+## Platform Comparison
 
-| Platform | Free Tier | Network Access | Setup Time | Best For |
-|----------|-----------|----------------|------------|----------|
-| **Claude Code (web)** | $250 credits ($20/month users, until Nov 18) | Configurable | 5 min | Complex research, multi-file |
-| **Gemini Jules** | Free tier | Default unrestricted | 2 min | Quick POCs, exploration |
-| **Codex Cloud** | Pay-as-you-go | Configurable | 10 min | Enterprise workflows |
-| **GitHub Copilot Agent** | Enterprise | Configurable | 15 min | GitHub integration |
+Prices below were read from vendor pricing pages on **2026-10-29**. They move, so re-check before
+committing budget. Listed price is the cheapest tier whose own pricing page says it includes the
+cloud agent, not the cheapest tier overall.
 
-See [setup/platform-comparison.md](setup/platform-comparison.md) for detailed comparison.
+| Platform | Cheapest tier with the cloud agent | Price | Best for |
+|----------|------------------------------------|-------|----------|
+| **Claude Code (web)** | Pro, but see note 1 | $17/month billed annually, $20 monthly | Complex research, multi-file |
+| **Google Antigravity** | Individuals | $0/month, "Basic weekly rate limits" | Parallel agents across workspaces |
+| **Codex Cloud** | ChatGPT Free | $0/month; Go $8, Plus $20 | Shares one allowance with ChatGPT |
+| **Copilot in the cloud** | Copilot Pro | $10 USD/month | GitHub integration |
+
+1. [claude.com/pricing](https://claude.com/pricing) says "Claude Code is included in all paid
+   plans", but [the product page](https://claude.com/product/claude-code) lists "Claude Code on web
+   and mobile" under the heading "Available on Team and Enterprise". Neither page says whether Pro
+   or Max includes the *web* agent specifically, and `claude.ai/code` refuses automated requests.
+   If the web surface is required, the confirmed tier is Team at $20/seat/month billed annually.
+2. Antigravity's Google AI Pro and Ultra tiers carry no price on any
+   [antigravity.google](https://antigravity.google/pricing) page; those buttons redirect to Google
+   One. Organizations start at "$30 USD per seat per month" via Gemini Enterprise.
+3. Codex figures come from [learn.chatgpt.com](https://learn.chatgpt.com/codex/pricing) because
+   `openai.com/codex` and `openai.com/chatgpt/pricing` both refuse automated requests. No separate
+   Codex Cloud price exists: "ChatGPT Work and Codex share usage."
+4. GitHub's docs never use the phrase "coding agent". The feature is "Copilot in the cloud",
+   described on [the plans page](https://github.com/features/copilot/plans) as "Assign work to
+   Copilot to research, plan, and write code — with or without a pull request". Copilot Free is
+   "Not included". Business is $19 and Enterprise $39 USD per seat per month.
+
+Network access and setup time were dropped rather than carried forward. The previous values were
+observed in November 2025 and were not re-verified, and a stale capability claim is worse than no
+claim. Check each vendor's docs for current sandbox network defaults.
+
+See [setup/platform-comparison.md](setup/platform-comparison.md) for a framework to fill in.
 
 ## Success Metrics
 

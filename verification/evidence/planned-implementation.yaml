@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Planned Implementation
 slug: planned-implementation
-last_checked: '2026-09-17'
+last_checked: '2026-09-29'
 search:
   run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -47,7 +47,7 @@ terminology_variants:
   url: https://cursor.com/blog/plan-mode
 - term: Plan agent
   used_by: Microsoft Visual Studio Code
-  url: https://code.visualstudio.com/docs/agents/planning
+  url: https://code.visualstudio.com/docs/agents/run/planning
 - term: AI-assisted development workflow
   used_by: Equal Experts
   url: https://www.equalexperts.com/blog/our-thinking/ai-assisted-development-workflow/
@@ -62,13 +62,13 @@ evidence:
   independence_group: cursor
   url: https://cursor.com/blog/plan-mode
   resolved_url: https://cursor.com/blog/plan-mode
-  content_sha256: e118395845600df00166a4b7852f9cd05e1961832f129ae4d58c5732189d36ef
+  content_sha256: d1dea9a05e021f9e52430a557163eedc2702691d1682caef63be56946dcc4935
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-09-17'
+  retrieved: '2026-09-29'
   claim: Cursor ships Plan Mode as an agent workflow where the agent researches the codebase,
     asks clarifying questions, and produces a plan before implementation.
 - tier: T1
@@ -81,34 +81,33 @@ evidence:
   independence_group: anthropic
   url: https://docs.anthropic.com/en/docs/claude-code/common-workflows
   resolved_url: https://code.claude.com/docs/en/common-workflows
-  content_sha256: 6342c4387c248d6884d2f4d027386126649f86b28789c17402398bbbb319013d
+  content_sha256: 83bb85ad0504fccc00dfe66990e79696f6666e34b2eaa82932a15750a04c2264
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-09-17'
+  retrieved: '2026-09-29'
   claim: Claude Code ships plan mode for review-before-edit workflows where the agent reads files
     and proposes a plan without modifying files until approval.
 - tier: T1
   match: aliased
-  mechanism_quote: The plan agent enables you to create detailed implementation plans before starting
-    the implementation to ensure all requirements are met.
+  mechanism_quote: Use Copilot to create and review an implementation plan before changing code.
   source: Visual Studio Code plan agent documentation
   source_kind: shipped_product
   organization: Microsoft
   independence_group: microsoft
-  url: https://code.visualstudio.com/docs/agents/planning
+  url: https://code.visualstudio.com/docs/agents/run/planning
   resolved_url: https://code.visualstudio.com/docs/agents/run/planning
-  content_sha256: 7184e683ce82b9f95fc05e84087748c6d7d9601d2ee30345f5c55a11c1c6ce56
+  content_sha256: 4138ac0004c9b460009f1a0fe02ff7ccfd52ae33b946d780bcd1997062c2406f
   verifier:
     method: automated
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-09-17'
-  claim: Visual Studio Code ships a Plan agent that creates detailed implementation plans before
-    starting implementation.
+  retrieved: '2026-09-29'
+  claim: Visual Studio Code documents planning with agents so developers can create and review an
+    implementation plan before changing code.
 - tier: T4
   match: aliased
   mechanism_quote: We don't jump straight to "generate code". First, we generate a plan. That plan
@@ -125,7 +124,7 @@ evidence:
     model: gpt-5.5
     prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
     run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-  retrieved: '2026-09-17'
+  retrieved: '2026-09-29'
   claim: Practitioner workflow describes generating a concrete, reviewable implementation plan
     before letting the model generate code.
 verdict: verified

@@ -18,6 +18,11 @@ The capability deliberately separates three operations:
    verdict, naming signal, catalog mapping, pending entry, and generated status row.
 2. **Check links and content** — networked, read-only checks confirm cited pages remain reachable
    and recorded mechanism quotes remain present. This runs weekly and can be requested manually.
+   The same job also confirms every `terminology_variants` URL still resolves. Those rows carry no
+   quote and no digest, so that check proves retrievability alone: it cannot tell that the term is
+   still used on the page, and a redirect onto a generic landing page reads as success. It exists
+   because schema validation checks these URLs for HTTPS syntax only, so before it a naming source
+   could 404 indefinitely with every check green.
    When a source keeps its quote but moves, `scripts/hydrate-evidence-content.py --recheck` records
    the move without a model: it re-fetches every admitted source in the file, aborts unless every
    mechanism quote is still present, then advances `last_checked` and each `retrieved` while leaving
@@ -32,18 +37,22 @@ The capability deliberately separates three operations:
    present at that revision. That narrows what the weekly check proves for the entry, and the trade
    is deliberate: **a pinned citation shows the mechanism existed at that revision, not that it
    still ships.** Currency is carried instead by the 90-day freshness requirement the weekly
-   schedule enforces, which forces re-evaluation rather than re-fetching. A source whose quote is
+   schedule enforces, which forces re-evaluation rather than re-fetching. `--recheck` enforces that
+   rather than trusting it: it refuses a file whose every source is commit-pinned, because advancing
+   `last_checked` on fetches that cannot fail would reset the 90-day clock indefinitely and retire
+   the only currency check the schedule performs. Such a file needs operation 3, or a live source
+   admitted alongside its pins. A source whose quote is
    already gone from the tip is never pinned to an earlier revision, because freezing a claim its
    owner has withdrawn asserts something the project does not know to be true.
 3. **Evaluate locally** — bounded, model-backed web research runs only in an interactive local
-   Codex client. A deterministic plan and exact human approval precede every agent call. Read-only
+   evaluator client (Codex today). A deterministic plan and exact human approval precede every agent call. Read-only
    research agents return proposals to one root writer; a separate agent reviews each batch before
    trusted local code hydrates, validates, and scans the result.
 
 The flow is:
 
 ```text
-signed-in local Codex request
+signed-in local evaluator request
   -> deterministic catalog inventory and immutable plan
   -> exact human approval: APPROVE LOCAL EVALUATION <plan-id>
   -> up to three read-only research agents at a time
@@ -97,37 +106,26 @@ python3 -m pytest tests/test_evidence_files.py -m "not slow"
 
 The `Adoption Evidence` workflow (`.github/workflows/evidence-validation.yml`) exposes the same
 checks through `workflow_dispatch` and `workflow_call`, runs for every pull request, and
-runs weekly. A separate `pull_request_target` workflow executes the default branch's trusted
-validator against pull-request data without executing pull-request code. After installing pinned
-dependencies from the trusted base, policy code semantically parses every candidate `.yml` and
-`.yaml` workflow as bounded inert data; aliases, duplicate keys, and unsupported structures fail
-closed. It rejects local and Docker actions and permits only commit-pinned external action
-repositories already allowlisted by the trusted base. A new action family requires an earlier
-allowlist-only PR. The same scan rejects hosted model/provider entry points, requires candidate
-copies of essential trust-root files to remain present, and cannot be weakened by candidate tests.
-Before any full test dependency is installed, the gate recursively inventories and byte-compares
-the candidate's complete `scripts/`, `tests/`, workflow, local-skill, and Codex-agent execution
-closure against the trusted base. Added startup/import hooks and any unapproved difference fail
-closed. It posts the required commit-status context `Trusted evidence checks` on the immutable
-candidate revision.
-Closed or otherwise ineligible pull requests are successful no-ops rather than false failures.
+runs weekly. `scripts/validate-workflow-policy.py` runs on every push as a lint over
+`.github/workflows`. It semantically parses each `.yml` and `.yaml` workflow as bounded inert
+data; aliases, duplicate keys, and unsupported structures fail closed. It rejects local and
+Docker actions, permits only commit-pinned external action repositories from an explicit
+allowlist, and rejects hosted model/provider entry points, provider SDK and CLI invocations,
+provider API endpoints, blanket workflow permissions, and retired credential markers.
 
-A legitimate trust-root upgrade requires a repository `OWNER` to add a top-level comment in the pull
-request's **Conversation** tab with the candidate's current 40-character head SHA in this exact form:
+The property that matters is unchanged: **GitHub Actions never runs an evaluator model and never
+receives an evaluator credential.** That is enforced mechanically, by this lint plus
+`test_model_backed_pattern_evaluation_is_local_only`, not by anyone approving anything.
 
-```text
-APPROVE TRUST ROOT <head-sha>
-```
-
-This is not a general PR approval and does not invoke a model, expose a provider credential, or incur
-model/provider API usage or charges. For that one commit, it waives only the byte-for-byte equality
-requirement for the protected trust-root inventory. Required-file presence, direct candidate-workflow
-policy checks, credential scanning of selected published and verification artifacts, evidence
-recomputation, status recomputation, and the separate deterministic validation gate must still pass.
-
-The approval is commit-bound: a new push requires a new exact comment. Creating, editing, or
-deleting an owner comment starts a no-checkout job that finds the completed
-`pull_request_target` run for that exact pull request and current head SHA, then requests its rerun.
+A previous design added a `pull_request_target` validator that byte-compared a "trust root" of
+`scripts/`, `tests/` and `.github/workflows/` against the default branch, and required an owner
+comment naming the head SHA to permit any difference. It was retired in October 2026. The threat
+it addressed is a multi-party one, and this repository has a single maintainer, so in practice it
+asked that maintainer to approve their own work. The costs were concrete: seven approval comments
+for one change because each push invalidated the last, five dependency pull requests that could
+never land, and a clock-dependence defect that sat on `main` for 14 days waiting to clear the
+gate. Reinstate it if a second maintainer joins or the repository starts accepting fork pull
+requests, at which point the trust boundary is real.
 Before requesting the rerun, that job asks GitHub to mark `Trusted evidence checks` failed on the
 current head; only a complete trusted validation can restore success. Resolver and validation failures
 also attempt to publish failure. As with any GitHub-hosted control, an outage of the Statuses or Actions
@@ -197,7 +195,8 @@ gh workflow run evidence-validation.yml -f check_links=true
 ```
 
 Bot-protected responses are handled separately from dead links. Trusted retrieval makes at most
-three attempts with a 30-second per-attempt timeout and bounded exponential backoff for transient
+three attempts inside one 30-second total budget per URL, which every attempt and backoff shares,
+with bounded exponential backoff for transient
 connection failures, timeouts, truncated streams, 408/425/429 responses, and selected 5xx errors;
 certificate and other permanent failures fail closed.
 
@@ -205,7 +204,8 @@ Complete evidence records a normalized-content SHA-256 and an exact mechanism qu
 drift is observable even when a URL remains live. Trusted hydration fails unless the quote is
 present and overwrites the resolved URL, digest, and retrieval date. Weekly checks fail when the
 quote disappears and warn when normalized content changes. A strict second fetch is available as a
-diagnostic for sources expected to be byte-stable:
+diagnostic for sources expected to be byte-stable, and it also escalates a bot-guarded response to
+a failure, for both scored entries and terminology sources:
 
 ```bash
 EVIDENCE_HASH_STRICT=1 python3 -m pytest tests/test_evidence_content.py -m slow
@@ -213,7 +213,17 @@ EVIDENCE_HASH_STRICT=1 python3 -m pytest tests/test_evidence_content.py -m slow
 
 ### Local evidence evaluation
 
-Open this repository in the signed-in Codex app and invoke:
+What this step requires is a capability, not a vendor: an interactive session that can take an
+exact human plan approval, and that mints a run ID CI cannot produce. Which tool supplies it is
+repository configuration, carried by the agent definitions under `.codex/` and the
+`evaluate-pattern-adoption` skill. Codex is the configured implementation today, and the
+identifiers below are wire format rather than a preference: `codex-local:<uuid>` run IDs,
+`codex-local-<uuid>.yaml` manifests, the `codex-app`/`codex-cli`/`codex-ide` surfaces, and the
+`evidence-v2-codex-local-v1` prompt contract are validated by regex in
+`scripts/local_verification.py` and already recorded in committed evidence, so retargeting the
+evaluator is a schema migration, not a docs change.
+
+Open this repository in the signed-in evaluator client, the Codex app today, and invoke:
 
 ```text
 $evaluate-pattern-adoption
@@ -542,9 +552,17 @@ No missing search, quote, or hash was invented. A complete local refresh is the 
 ## Generated status and human decisions
 
 `scripts/generate-verification-status.py` builds [STATUS.md](STATUS.md). Its headings report
-assessed, verified, weak, unverified, and pending counts separately. `stale` (more than 90 days
-since a complete check) and `needs refresh` are overlapping freshness/provenance signals, not
-verdicts.
+assessed, verified, weak, unverified, and pending counts separately. `needs refresh` is an
+overlapping provenance signal, not a verdict.
+
+Every cell is a function of the committed inputs alone, so `--check` fails only on a real input
+change. The table therefore reports no age-derived currency column: it shows `Last checked` as a
+date and leaves the 90-day judgment to the weekly
+`validate-evidence.py --max-age-days 90` gate, which names the evidence files to refresh. An
+age-derived column here was both wrong and actively harmful. It desynchronized the committed file
+on a calendar boundary with no commit, and its remediation message told CI to regenerate the
+table, which turns the build green by writing the word `stale` into a cell while refreshing no
+evidence at all.
 
 [DECISIONS.md](DECISIONS.md) is the human-owned naming and rubric ledger. Local finalization
 synchronizes evidence-derived Alignment and may add a neutral review placeholder, but never edits
@@ -561,6 +579,6 @@ python3 scripts/generate-verification-status.py
 - `local-runs/codex-local-<uuid>.yaml` — immutable approved plan and local execution attestation.
 - `local-runs/codex-local-<uuid>-search-events.yaml` — sanitized, run-bound search receipts.
 - `pending-evidence.yaml` — catalog slugs with no assessment; updated during local finalization.
-- `STATUS.md` — generated coverage, verdict, naming, and freshness view.
+- `STATUS.md` — generated coverage, verdict, naming, and provenance view.
 - `DECISIONS.md` — human-owned naming and rubric decisions.
 - `pattern-inventory.yaml`, `.verify-worklist`, and `run-plan/` — ephemeral planning artifacts.

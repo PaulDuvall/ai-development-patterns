@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Debt Forecasting
 slug: debt-forecasting
-last_checked: 2026-07-10
+last_checked: 2026-10-23
 search:
   run_id: "github-actions:29123202495"
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -62,7 +62,7 @@ evidence:
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-10-23
     claim: Runnable product analyzes code hotspots and Code Health signals to identify and prioritize high-impact technical debt.
   - tier: T3
     match: named
@@ -79,7 +79,7 @@ evidence:
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-10-23
     claim: Peer-reviewed research support material describes machine-learning models that forecast technical debt evolution from software metrics for maintenance planning.
   - tier: T3
     match: named
@@ -96,6 +96,6 @@ evidence:
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-10-23
     claim: Peer-reviewed research record describes technical debt forecasting models that use temporal software-metric properties to predict technical debt across projects.
 verdict: verified

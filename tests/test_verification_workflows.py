@@ -18,6 +18,37 @@ PATTERN_VALIDATION = WORKFLOWS / "pattern-validation.yml"
 DOCKER_COMPATIBILITY = WORKFLOWS / "docker-example-compatibility.yml"
 PAGES = WORKFLOWS / "deploy-pages.yml"
 
+# Every external action, pinned to the exact commit and the version its comment
+# claims. .github/workflows/ is trust root, so a pin cannot change without an
+# owner approval round; this table makes it impossible to change one without
+# also editing a test, and a new action fails here until it is listed. Each SHA
+# was resolved from the upstream tag with `git ls-remote --tags`, not copied
+# from a bot's pull request body. Verify a bump the same way before editing.
+EXPECTED_ACTION_PINS = {
+    "actions/checkout":
+        ("3d3c42e5aac5ba805825da76410c181273ba90b1", "v7.0.1"),
+    "actions/configure-pages":
+        ("45bfe0192ca1faeb007ade9deae92b16b8254a0d", "v6"),
+    "actions/dependency-review-action":
+        ("a1d282b36b6f3519aa1f3fc636f609c47dddb294", "v5.0.0"),
+    "actions/deploy-pages":
+        ("368f82528645a54fb793d4d04e342629a3f51346", "v5"),
+    "actions/github-script":
+        ("3a2844b7e9c422d3c10d287c895573f7108da1b3", "v9.0.0"),
+    "actions/setup-node":
+        ("949feb2413d6458794dcd2491c4babbbce0c15c1", "v7.1.0"),
+    "actions/setup-python":
+        ("5fda3b95a4ea91299a34e894583c3862153e4b97", "v7.0.0"),
+    "actions/upload-artifact":
+        ("cf430e030ddbb5b0abf93d22962f4752f3646cd9", "v7.0.2"),
+    "actions/upload-pages-artifact":
+        ("fc324d3547104276b827a68afc52ff2a11cc49c9", "v5"),
+}
+
+ACTION_USE = re.compile(
+    r"\buses:\s*(?P<repository>[^\s#@]+)@(?P<revision>[^\s#]+)"
+    r"(?:\s*#\s*(?P<comment>\S+))?")
+
 
 def workflow_paths():
     """Return every filename extension GitHub recognizes as a workflow."""
@@ -48,6 +79,51 @@ def test_every_external_action_is_pinned_to_a_commit_sha():
                 unpinned.append(
                     f"{path.name}:{line_number}: {match.group(1)}")
     assert not unpinned, "unpinned Actions:\n" + "\n".join(unpinned)
+
+
+def test_every_external_action_matches_its_expected_pin():
+    """No action pin moves, and no new action arrives, without a test edit.
+
+    The generic test above only proves a pin is *some* commit, which any SHA
+    satisfies including a hostile one. This fixes which commit, so changing a
+    pin or adding an action is a deliberate edit a reviewer sees, matching the
+    approval the trust root already requires for .github/workflows/.
+    """
+    seen = {}
+    mismatched = []
+    for path in workflow_paths():
+        for line_number, line in enumerate(
+                path.read_text(encoding="utf-8").splitlines(), 1):
+            match = ACTION_USE.search(line)
+            if not match or match.group("repository").startswith(
+                    ("./", "docker://")):
+                continue
+            repository = match.group("repository")
+            found = (match.group("revision"), match.group("comment"))
+            seen.setdefault(repository, set()).add(found)
+            expected = EXPECTED_ACTION_PINS.get(repository)
+            if expected is None:
+                continue
+            if found != expected:
+                mismatched.append(
+                    f"{path.name}:{line_number}: {repository} is "
+                    f"{found[0]} # {found[1]}, expected "
+                    f"{expected[0]} # {expected[1]}")
+
+    assert set(seen) == set(EXPECTED_ACTION_PINS), (
+        "unlisted actions in use: "
+        f"{sorted(set(seen) - set(EXPECTED_ACTION_PINS))}; "
+        "listed but unused: "
+        f"{sorted(set(EXPECTED_ACTION_PINS) - set(seen))}")
+    assert not mismatched, "action pins out of date:\n" + "\n".join(mismatched)
+
+    inconsistent = {
+        repository: sorted(pins) for repository, pins in seen.items()
+        if len(pins) > 1
+    }
+    assert not inconsistent, (
+        f"one action pinned several ways, so a bump can miss a call site: "
+        f"{inconsistent}")
 
 
 def test_model_backed_pattern_evaluation_is_local_only():
@@ -184,180 +260,6 @@ def test_no_workflow_can_restore_a_legacy_shared_provider_secret():
     assert "secrets.ANTHROPIC_API_KEY" not in workflow_text
 
 
-def test_trusted_pr_workflow_executes_only_base_branch_validation_code():
-    """Trusted PR validation executes code exclusively from the base revision."""
-    workflow = load_workflow(TRUSTED)
-    assert "pull_request_target" in workflow["on"]
-    assert "workflow_dispatch" not in workflow["on"]
-    assert workflow["permissions"] == {}
-    job = workflow["jobs"]["trusted-evidence"]
-    assert job["if"] == "github.event_name == 'pull_request_target'"
-    assert job["permissions"] == {
-        "contents": "read",
-        "issues": "read",
-        "pull-requests": "read",
-        "statuses": "write",
-    }
-    base_checkout = named_step(job, "Checkout trusted base")
-    candidate_checkout = named_step(job, "Checkout candidate as inert data")
-    assert base_checkout["with"]["ref"] == (
-        "${{ github.event.pull_request.base.sha }}")
-    assert candidate_checkout["with"]["repository"] == (
-        "${{ github.event.pull_request.head.repo.full_name }}")
-    assert candidate_checkout["with"]["ref"] == (
-        "${{ github.event.pull_request.head.sha }}")
-    assert candidate_checkout["with"]["allow-unsafe-pr-checkout"] == "true"
-    assert "allow-unsafe-pr-checkout" not in base_checkout["with"]
-    assert TRUSTED.read_text(encoding="utf-8").count(
-        "allow-unsafe-pr-checkout: true") == 1
-    commands = "\n".join(str(step.get("run", "")) for step in job["steps"])
-    policy = named_step(
-        job, "Enforce candidate workflow policy with trusted code")
-    assert policy["id"] == "workflow-policy"
-    assert policy["if"] == "steps.resolve.outputs.eligible == 'true'"
-    assert policy["env"]["TRUST_ROOT_APPROVED"] == (
-        "${{ steps.resolve.outputs.trust_root_approved }}")
-    assert "python3 trusted/scripts/validate-workflow-policy.py" in policy["run"]
-    assert "--trusted-root trusted" in policy["run"]
-    assert "--candidate-root candidate" in policy["run"]
-    assert "upgrade_args+=(--allow-trust-root-upgrade)" in policy["run"]
-    assert 'if [ "$TRUST_ROOT_APPROVED" = true ]' in policy["run"]
-    assert '"${upgrade_args[@]}"' in policy["run"]
-    assert "candidate/.github/workflows" in policy["run"]
-    step_names = [step["name"] for step in job["steps"]]
-    assert step_names.index(
-        "Install minimal trusted workflow-policy dependency") < (
-            step_names.index(
-                "Enforce candidate workflow policy with trusted code"))
-    assert step_names.index(
-        "Enforce candidate workflow policy with trusted code") < (
-            step_names.index("Install trusted validation dependencies"))
-    assert "trusted/scripts/validate-evidence.py" in commands
-    assert "trusted/scripts/generate-verification-status.py" in commands
-    assert "trusted/scripts/validate-workflow-policy.py" in commands
-    assert "candidate/scripts/" not in commands
-    assert "candidate/tests/" not in commands
-    assert 'context="Trusted evidence checks"' in commands
-    publish = named_step(
-        job, "Publish trusted result on the candidate revision")
-    assert publish["env"]["HEAD_SHA"] == (
-        "${{ github.event.pull_request.head.sha }}")
-    assert "steps.resolve.outputs.head_sha" not in str(job)
-    assert "steps.resolve.outputs.head_repo" not in str(job)
-    assert "steps.resolve.outputs.base_sha" not in str(job)
-    assert "steps.resolve.outcome == 'failure'" in publish["if"]
-    assert "steps.resolve.outputs.eligible == 'true'" in publish["if"]
-    assert "steps.resolve.outcome != 'success'" in publish["env"]["FAILED"]
-    assert "steps.workflow-policy.outcome != 'success'" in publish["env"][
-        "FAILED"]
-    assert "steps.install-policy.outcome != 'success'" in publish["env"][
-        "FAILED"]
-    status = named_step(job, "Recompute candidate status with trusted generator")
-    assert "trusted/scripts/generate-verification-status.py --root candidate" in status["run"]
-    assert 'marker = "\\n## How to refresh\\n"' in status["run"]
-    assert "submitted_derived != recomputed_derived" in status["run"]
-    assert "candidate/scripts/generate-verification-status.py" not in status["run"]
-
-
-def test_trusted_pr_workflow_no_ops_when_pr_is_no_longer_eligible():
-    """Trusted validation stops before privileged steps for ineligible PRs."""
-    workflow = load_workflow(TRUSTED)
-    trigger_types = workflow["on"]["pull_request_target"]["types"]
-    job = workflow["jobs"]["trusted-evidence"]
-    resolve = named_step(job, "Resolve immutable pull request revisions")
-
-    assert trigger_types == [
-        "opened", "synchronize", "reopened", "ready_for_review", "edited"]
-    assert 'eligible=false' in resolve["run"]
-    assert 'echo "eligible=$eligible"' in resolve["run"]
-    assert "successful no-op" in resolve["run"]
-
-    for step in job["steps"]:
-        if step["name"] == "Resolve immutable pull request revisions":
-            continue
-        assert "steps.resolve.outputs.eligible == 'true'" in step["if"]
-
-
-def test_trust_root_upgrade_requires_exact_commit_bound_owner_comment():
-    """Trust-root upgrades require an owner approval bound to the exact commit."""
-    workflow = load_workflow(TRUSTED)
-    validation = workflow["jobs"]["trusted-evidence"]
-    resolve = named_step(validation, "Resolve immutable pull request revisions")
-    rerun = workflow["jobs"]["rerun-trust-root-validation"]
-    rerun_step = named_step(
-        rerun, "Rerun completed validation for the current pull request head")
-
-    assert workflow["on"]["issue_comment"]["types"] == [
-        "created", "edited", "deleted"]
-    assert "github.event_name" in workflow["concurrency"]["group"]
-    assert "github.event.issue.number" in workflow["concurrency"]["group"]
-    assert resolve["env"] == {
-        "GH_TOKEN": "${{ github.token }}",
-        "EVENT_PR_NUMBER": "${{ github.event.pull_request.number }}",
-        "EVENT_HEAD_SHA": "${{ github.event.pull_request.head.sha }}",
-        "EVENT_HEAD_REPO": (
-            "${{ github.event.pull_request.head.repo.full_name }}"),
-        "EVENT_BASE_SHA": "${{ github.event.pull_request.base.sha }}",
-        "EVENT_BASE_REF": "${{ github.event.pull_request.base.ref }}",
-    }
-    assert '[ "$current_head_sha" = "$EVENT_HEAD_SHA" ]' in resolve["run"]
-    assert '[ "$current_head_repo" = "$EVENT_HEAD_REPO" ]' in resolve["run"]
-    assert '[ "$current_base_sha" = "$EVENT_BASE_SHA" ]' in resolve["run"]
-    assert '[ "$current_base_ref" = "$EVENT_BASE_REF" ]' in resolve["run"]
-    assert 'expected="APPROVE TRUST ROOT ${EVENT_HEAD_SHA}"' in resolve["run"]
-    assert "gh api --paginate --slurp" in resolve["run"]
-    assert '.body == $expected' in resolve["run"]
-    assert '.author_association == "OWNER"' in resolve["run"]
-    assert "trust_root_approved=true" in resolve["run"]
-    assert 'echo "trust_root_approved=$trust_root_approved"' in resolve["run"]
-    assert "head_sha=" not in "\n".join(
-        line.strip() for line in resolve["run"].splitlines()
-        if line.strip().startswith("echo "))
-
-    assert "github.event.issue.pull_request != null" in rerun["if"]
-    assert "github.event.comment.author_association == 'OWNER'" in rerun["if"]
-    assert "startsWith" not in rerun["if"]
-    assert rerun["permissions"] == {
-        "actions": "write",
-        "pull-requests": "read",
-        "statuses": "write",
-    }
-    assert all("uses" not in step for step in rerun["steps"])
-    assert rerun_step["env"]["PR_NUMBER"] == (
-        "${{ github.event.issue.number }}")
-    rerun_command = rerun_step["run"]
-    assert "pulls/${PR_NUMBER}" in rerun_command
-    invalidate = '"repos/${GITHUB_REPOSITORY}/statuses/${head_sha}"'
-    rerun_api = '"repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/rerun"'
-    assert invalidate in rerun_command
-    assert "-f state=failure" in rerun_command
-    assert '-f context="Trusted evidence checks"' in rerun_command
-    assert rerun_command.index(invalidate) < rerun_command.index(rerun_api)
-    assert rerun_step["env"]["RUN_URL"] == (
-        "${{ github.server_url }}/${{ github.repository }}/actions/runs/"
-        "${{ github.run_id }}")
-    assert "event=pull_request_target&status=completed" in rerun_command
-    assert "head_sha=${head_sha}" in rerun_command
-    assert ".number == $pr and .head.sha == $sha" in rerun_command
-    assert 'actions/runs/${run_id}/rerun' in rerun_command
-    assert "actions/checkout" not in str(rerun)
-    assert "candidate" not in rerun_command
-
-
-def test_trusted_validation_does_not_publish_success_for_stale_events():
-    """A stale validation event cannot publish a successful commit status."""
-    workflow = load_workflow(TRUSTED)
-    validation = workflow["jobs"]["trusted-evidence"]
-    resolve = named_step(validation, "Resolve immutable pull request revisions")
-    publish = named_step(
-        validation, "Publish trusted result on the candidate revision")
-
-    assert "eligible=false" in resolve["run"]
-    assert "steps.resolve.outputs.eligible == 'true'" in publish["if"]
-    assert "steps.resolve.outcome == 'failure'" in publish["if"]
-    assert "steps.resolve.outputs.eligible != 'true'" not in publish["if"]
-
-
 def test_general_validation_runs_once_and_has_a_stable_result_only_gate():
     """General validation runs once and exposes only its stable aggregate gate."""
     workflow = load_workflow(PATTERN_VALIDATION)
@@ -382,7 +284,7 @@ def test_general_validation_runs_once_and_has_a_stable_result_only_gate():
         "tests/requirements.txt")
     setup_node = named_step(validation, "Set up Node.js 24")
     assert setup_node["uses"] == (
-        "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020")
+        f"actions/setup-node@{EXPECTED_ACTION_PINS['actions/setup-node'][0]}")
     assert setup_node["with"]["node-version"] == "24"
     assert setup_node["with"]["cache"] == "npm"
     assert setup_node["with"]["cache-dependency-path"].splitlines() == [

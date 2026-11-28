@@ -21,7 +21,8 @@ The full beads history is archived verbatim at `.tasks/beads-archive.jsonl`.
 ## Pattern Adoption Evaluation
 
 Run model-backed pattern-adoption research only through the repository-local
-`$evaluate-pattern-adoption` skill in an interactive, signed-in local Codex client.
+`$evaluate-pattern-adoption` skill in an interactive, signed-in local evaluator client
+(Codex today).
 Never run it in GitHub Actions, expose evaluator API keys to the repository, or bypass either the
 exact plan approval or the separate draft-PR publication approval. Use no more than three
 read-only research subagents at once, keep the root task as the sole writer, and use a fresh

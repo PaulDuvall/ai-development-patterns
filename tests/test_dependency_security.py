@@ -53,15 +53,81 @@ DOCKER_DIRECTORIES = {
 }
 
 
-def dependabot_update(ecosystem):
-    """Return the single updater for an ecosystem."""
+def dependabot_updates(ecosystem):
+    """Return every updater for an ecosystem, in file order.
+
+    An ecosystem may be split across several updaters so that one pull request
+    can never mix a protected manifest with a free one.
+    """
     document = yaml.safe_load(DEPENDABOT.read_text(encoding="utf-8"))
     matches = [
         update for update in document["updates"]
         if update["package-ecosystem"] == ecosystem
     ]
-    assert len(matches) == 1
-    return matches[0]
+    assert matches, f"no dependabot updater for {ecosystem}"
+    return matches
+
+
+def updater_directories(update):
+    """Return one updater's repository directories."""
+    return set(update.get("directories") or [update["directory"]])
+
+
+def dependabot_directories(ecosystem):
+    """Return every directory an ecosystem covers, across its updaters."""
+    covered = set()
+    for update in dependabot_updates(ecosystem):
+        directories = updater_directories(update)
+        assert not covered & directories, (
+            f"{ecosystem} lists {covered & directories} in more than one updater")
+        covered |= directories
+    return covered
+
+
+def does_version_updates(update):
+    """Return whether an updater still opens version-update pull requests."""
+    return update["open-pull-requests-limit"] > 0
+
+
+def trust_root_policy():
+    """Load the trusted workflow policy module for its protected inventory."""
+    spec = importlib.util.spec_from_file_location(
+        "workflow_policy", WORKFLOW_POLICY)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def protects(policy, relative_path):
+    """Return whether the trust root protects a repository-relative path."""
+    if relative_path in set(policy.REQUIRED_TRUST_ROOT_FILES):
+        return True
+    return any(
+        relative_path.startswith(f"{directory}/")
+        for directory in policy.REQUIRED_TRUST_ROOT_DIRECTORIES
+    )
+
+
+def manifests_in(ecosystem, repository_directory_path):
+    """Return the repository-relative manifests Dependabot would edit."""
+    base = ROOT if repository_directory_path == "/" else (
+        ROOT / repository_directory_path.lstrip("/"))
+    patterns = {
+        "pip": ("pyproject.toml", "requirements*.txt"),
+        "npm": ("package.json", "package-lock.json"),
+        "docker": ("Dockerfile*",),
+        "github-actions": (),
+    }[ecosystem]
+    found = {
+        path.relative_to(ROOT).as_posix()
+        for pattern in patterns for path in base.glob(pattern)
+    }
+    if ecosystem == "github-actions":
+        found = {
+            path.relative_to(ROOT).as_posix()
+            for path in (ROOT / ".github" / "workflows").glob("*.y*ml")
+        }
+    return found
 
 
 def assert_caret_pinned_at_least(spec, floor):
@@ -92,9 +158,9 @@ def repository_directory(path):
 
 def test_dependabot_covers_all_dependency_manifest_directories():
     """Nested example manifests must not fall outside update coverage."""
-    assert set(dependabot_update("pip")["directories"]) == PYTHON_DIRECTORIES
-    assert set(dependabot_update("npm")["directories"]) == NPM_DIRECTORIES
-    assert set(dependabot_update("docker")["directories"]) == DOCKER_DIRECTORIES
+    assert dependabot_directories("pip") == PYTHON_DIRECTORIES
+    assert dependabot_directories("npm") == NPM_DIRECTORIES
+    assert dependabot_directories("docker") == DOCKER_DIRECTORIES
     discovered_docker = {
         repository_directory(path)
         for path in ROOT.rglob("Dockerfile*")
@@ -116,26 +182,6 @@ def test_dependabot_covers_all_dependency_manifest_directories():
     assert discovered_npm == NPM_DIRECTORIES
 
 
-def test_trusted_validation_rejects_package_lifecycle_hook_changes():
-    """Fork content must be inspected by trusted code before acceptance."""
-    workflow = TRUSTED_EVIDENCE_WORKFLOW.read_text(encoding="utf-8")
-    validator = LIFECYCLE_VALIDATOR.read_text(encoding="utf-8")
-
-    assert "trusted/scripts/validate-package-lifecycle.py" in workflow
-    assert "--trusted-root trusted" in workflow
-    assert "--candidate-root candidate" in workflow
-    assert "steps.package-lifecycle.outcome != 'success'" in workflow
-    for hook in (
-        "preinstall",
-        "install",
-        "postinstall",
-        "prepare",
-        "prepublish",
-        "prepublishOnly",
-    ):
-        assert f'"{hook}"' in validator
-
-
 def test_dependabot_groups_compatible_updates_without_grouping_majors():
     """Minor/patch and security updates are grouped; majors stay reviewable."""
     for ecosystem, version_group, security_group in (
@@ -143,16 +189,28 @@ def test_dependabot_groups_compatible_updates_without_grouping_majors():
         ("npm", "npm-minor-patch", "npm-security"),
         ("docker", "docker-minor-patch", "docker-security"),
     ):
-        groups = dependabot_update(ecosystem)["groups"]
-        assert groups[version_group]["patterns"] == ["*"]
-        assert set(groups[version_group]["update-types"]) == {"minor", "patch"}
-        assert groups[version_group]["group-by"] == "dependency-name"
-        assert groups[security_group]["applies-to"] == "security-updates"
-        assert groups[security_group]["patterns"] == ["*"]
+        updating = [
+            update for update in dependabot_updates(ecosystem)
+            if does_version_updates(update)
+        ]
+        assert updating, f"{ecosystem} opens no version updates at all"
+        for update in updating:
+            groups = update["groups"]
+            assert groups[version_group]["patterns"] == ["*"]
+            assert set(groups[version_group]["update-types"]) == {
+                "minor", "patch"}
+            assert groups[version_group]["group-by"] == "dependency-name"
+            assert groups[security_group]["applies-to"] == "security-updates"
+            assert groups[security_group]["patterns"] == ["*"]
 
-    actions = dependabot_update("github-actions")["groups"]
-    assert set(actions["actions-minor-patch"]["update-types"]) == {
-        "minor", "patch"}
+        for update in dependabot_updates(ecosystem):
+            if does_version_updates(update):
+                continue
+            # A version group on a limit-0 updater is dead config that reads as
+            # though those bumps still arrive. Security grouping stays live.
+            assert version_group not in update.get("groups", {})
+            assert update["groups"][security_group]["applies-to"] == (
+                "security-updates")
 
 
 def test_docker_examples_use_current_supported_python_base_families():

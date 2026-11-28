@@ -2,7 +2,7 @@ schema_version: 2
 provenance_status: complete
 pattern: Guided Refactoring
 slug: guided-refactoring
-last_checked: 2026-07-10
+last_checked: 2026-09-29
 search:
   run_id: github-actions:29123202495
   run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
@@ -51,21 +51,21 @@ terminology_variants:
 evidence:
   - tier: T1
     match: aliased
-    mechanism_quote: Copilot can help you to split up complex blocks of code into smaller units that are more suitable for reuse.
+    mechanism_quote: Copilot Chat can suggest ways to make your code easier to understand and maintain.
     source: GitHub Copilot, refactoring tutorial
     source_kind: shipped_product
     organization: GitHub
     independence_group: github
-    url: https://docs.github.com/en/copilot/tutorials/refactor-code
-    resolved_url: https://docs.github.com/en/copilot/tutorials/refactor-code
-    content_sha256: cb63e93f3a0c3827a4c408274403a99af49e455b16ea388276a17e5950c74bef
+    url: https://docs.github.com/en/copilot/tutorials/copilot-cookbook/refactor-code
+    resolved_url: https://docs.github.com/en/copilot/tutorials/copilot-cookbook/refactor-code
+    content_sha256: 996b3640a920b90e377d66dac5ac7160123e192451cbcba4cdbf5cae287bb119
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
-    claim: GitHub Copilot is a shipped coding-assistant product whose official refactoring tutorial shows developers using Copilot to restructure complex code into smaller reusable units.
+    retrieved: 2026-09-29
+    claim: GitHub Copilot is a shipped coding-assistant product whose official refactoring cookbook shows developers using Copilot Chat to improve code readability and maintainability.
   - tier: T2
     match: aliased
     mechanism_quote: When an Instance Admin enables AI CodeFix for your project, you can get an AI-generated fix suggestion for eligible issues.
@@ -75,13 +75,13 @@ evidence:
     independence_group: sonarsource
     url: https://docs.sonarsource.com/sonarqube-server/project-administration/ai-features/enable-ai-codefix
     resolved_url: https://docs.sonarsource.com/sonarqube-server/project-administration/ai-features/enable-ai-codefix
-    content_sha256: 47c058077f33baf8b25994436433e9f856c2953bf6786b83d9778260e52a4022
+    content_sha256: 0eff1ce875ba66f88b45d9223ef5ba8bf36e0a16c51a0587ed9abf2771eda419
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
-    retrieved: 2026-07-10
+    retrieved: 2026-09-29
     claim: SonarSource's canonical SonarQube Server documentation describes AI CodeFix generating fixes for eligible static-analysis issues and applying them from SonarQube or connected IDEs.
   - tier: T4
     match: aliased
@@ -92,13 +92,13 @@ evidence:
     independence_group: codescene
     url: https://codescene.com/blog/making-legacy-code-ai-ready-benchmarks-on-agentic-refactoring
     resolved_url: https://codescene.com/blog/making-legacy-code-ai-ready-benchmarks-on-agentic-refactoring
-    content_sha256: 4aa9ccdc372c3470c02844ac17f1411c8a10c8e5a7c2b98f7176336bb3ec8c0c
+    content_sha256: 5ef7639c47e097fc34b0b64910079501f0113bd9c44b20bea4360fab233b7cb3
     verifier:
       method: automated
       model: gpt-5.5
       prompt_version: evidence-v2-openai-codex-v1+sha256.2d798050b92abd6e9fdd3a73c6d1d0cd809bf27d3864781ebcdd95c8912354a1
       run_url: https://github.com/PaulDuvall/ai-development-patterns/actions/runs/29123202495
     date: 2026-03-18
-    retrieved: 2026-07-10
+    retrieved: 2026-09-29
     claim: CodeScene reports a benchmarked MCP-guided refactoring workflow where Claude Code receives Code Health feedback, forms a structured refactoring plan, runs correctness tests, and remeasures Code Health after each iteration.
 verdict: verified
