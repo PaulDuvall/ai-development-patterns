@@ -141,7 +141,9 @@ The mode is always explicit, because the retrieval date means something differen
 model: it advances `last_checked` together with the retrieval dates it writes and leaves
 `search.checked_at` pinned to the search run that actually happened, so the file never claims a
 search that did not occur. Both modes abort the whole file if any mechanism quote is absent, and
-both refuse a date earlier than one already recorded.
+both refuse a date earlier than one already recorded. `--recheck` additionally refuses a file whose
+every source is commit-pinned: those fetches cannot fail and cannot show currency, so advancing
+`last_checked` on them would reset the 90-day freshness clock indefinitely.
 
 ### `evidence_content.py`
 
