@@ -222,9 +222,9 @@ def test_docker_examples_use_current_supported_python_base_families():
         SECURITY_SANDBOX_ROOT / "Dockerfile.ai-sandbox"
     ).read_text(encoding="utf-8")
 
-    assert re.search(r"^FROM python:3\.14-slim$", parallel, re.MULTILINE)
+    assert re.search(r"^FROM python:3\.15-slim$", parallel, re.MULTILINE)
     assert re.search(
-        r"^FROM python:3\.14-slim-bookworm$", sandbox, re.MULTILINE)
+        r"^FROM python:3\.15-slim-bookworm$", sandbox, re.MULTILINE)
     assert "https://deb.nodesource.com/setup_24.x" in parallel
     assert "setup_20.x" not in parallel
     assert "bullseye" not in parallel.casefold()
@@ -339,7 +339,7 @@ def test_parallel_agent_documentation_matches_the_provider_free_image():
         PARALLEL_AGENT_ROOT / "docker" / "requirements.txt"
     ).read_text(encoding="utf-8")
 
-    assert "Python 3.14 and Node.js 24 LTS" in docs
+    assert "Python 3.15 and Node.js 24 LTS" in docs
     assert "zero model calls and zero provider API calls" in docs
     assert "does not need an OpenAI" in docs
     assert "agent_runner.py" in docs

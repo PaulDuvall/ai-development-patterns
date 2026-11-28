@@ -60,7 +60,7 @@ docker compose -f docker-compose.parallel-agents.yml logs -f
 
 All five services use the same image,
 `ai-development-patterns/parallel-agent:local`. Compose therefore builds and reuses one image
-instead of producing one image per service. The image contains Python 3.14 and Node.js 24 LTS;
+instead of producing one image per service. The image contains Python 3.15 and Node.js 24 LTS;
 Node is available for experimenting with the generated JavaScript fixture but is not used to call
 a provider.
 
