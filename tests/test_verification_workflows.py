@@ -30,7 +30,7 @@ EXPECTED_ACTION_PINS = {
     "actions/configure-pages":
         ("45bfe0192ca1faeb007ade9deae92b16b8254a0d", "v6"),
     "actions/dependency-review-action":
-        ("a1d282b36b6f3519aa1f3fc636f609c47dddb294", "v5.0.0"),
+        ("bbc44d14a204704ccc493733616cd1e93a0321ec", "v5.0.1"),
     "actions/deploy-pages":
         ("368f82528645a54fb793d4d04e342629a3f51346", "v5"),
     "actions/github-script":
@@ -38,7 +38,7 @@ EXPECTED_ACTION_PINS = {
     "actions/setup-node":
         ("949feb2413d6458794dcd2491c4babbbce0c15c1", "v7.1.0"),
     "actions/setup-python":
-        ("5fda3b95a4ea91299a34e894583c3862153e4b97", "v7.0.0"),
+        ("6d4fd22b20465ccc0f7354476588e8df7c9ca0e0", "v7.1.0"),
     "actions/upload-artifact":
         ("cf430e030ddbb5b0abf93d22962f4752f3646cd9", "v7.0.2"),
     "actions/upload-pages-artifact":
